@@ -1,0 +1,268 @@
+import { Typography } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+
+import BaseScreen, { type TitleItem } from "../BaseScreen";
+import useProductsSchema from "./useProductsSchema";
+import { Divider, Select, DatePicker, Row, Col, Space, Button } from "antd";
+import { Controller, useForm } from "react-hook-form";
+import { CustomFormItem } from "./styles";
+import { Content } from "antd/es/layout/layout";
+import { yupResolver } from "@hookform/resolvers/yup";
+import type { INewProductForm } from "../../services/resources/products/IProduct";
+import dayjs from "dayjs";
+import ConvocacaoTable from "./components/ConvocacaoTable";
+import useListRequest from "../../hooks/useListRequest";
+import { useQuery } from "@tanstack/react-query";
+import { API } from "../../services";
+
+const mockData: INewProductForm[] = Array.from({ length: 50 }).map(
+  (_, index) => {
+    const concursos = [
+      "Concurso A",
+      "Concurso B",
+      "Concurso C",
+      "Concurso D",
+      "Concurso E",
+    ];
+    const cargos = [
+      "Analista",
+      "Técnico",
+      "Assistente",
+      "Coordenador",
+      "Gestor",
+    ];
+    const randomConcurso = concursos[index % concursos.length];
+    const randomCargo = cargos[index % cargos.length];
+
+    return {
+      concurso: `${randomConcurso} ${index + 1}`,
+      cargo: randomCargo,
+      data_inicial: `2025-06-${String((index % 28) + 1).padStart(2, "0")}`,
+      data_final: `2025-07-${String((index % 28) + 1).padStart(2, "0")}`,
+      is_active: index % 2 === 0,
+    };
+  }
+);
+
+const breadcrumbItems = [
+  {
+    title: <a href="/">Home</a>,
+  },
+  {
+    title: <a href="/processos">Processos</a>,
+  },
+  {
+    title: <a href="/administracao">Consulta de candidatos</a>,
+  },
+] as TitleItem[];
+
+const Administracao: React.FC = () => {
+  const { listRequest, onAntTableChange } = useListRequest<INewProductForm>({
+    pagination: { pageNumber: 1, pageSize: 10 },
+  });
+  console.log("listRequest", listRequest);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["permissions", "products", listRequest],
+    queryFn: ({ signal }) =>
+      API.Products.getProductsData(listRequest, { signal }).response,
+    staleTime: 1000 * 60 * 5, // 5 mins
+  });
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors: formErrors },
+  } = useForm<INewProductForm>({
+    defaultValues: {
+      concurso: undefined,
+      cargo: undefined,
+      data_convocacao: "",
+      data_inicial: "",
+      data_final: "",
+      is_active: true,
+    } as any,
+    resolver: yupResolver(useProductsSchema()),
+    reValidateMode: "onChange",
+    mode: "all",
+    shouldFocusError: false,
+  });
+
+  const handleSub = async (data: INewProductForm) => {
+    try {
+      console.log("integração com o back", data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleReset = () => {
+    reset({
+      concurso: undefined,
+      cargo: undefined,
+      data_inicial: "",
+      data_final: "",
+      is_active: true,
+    });
+  };
+
+  return (
+    <BaseScreen
+      breadcrumbItems={breadcrumbItems}
+      title="Consulta de convocação de candidatos"
+    >
+      <Content >
+        <Row  align="middle" justify="space-between">
+          <Typography.Title level={4} style={{ margin: 0 }}>
+            {"Busca Processos"}
+          </Typography.Title>
+
+          <Button type="primary" icon={<PlusOutlined />}>
+            Nova convocação
+          </Button>
+        </Row>
+
+        <Row >
+          <Col xs={24} md={12}>
+            <Controller
+              control={control}
+              name="concurso"
+              render={({ field: { onChange, value } }) => (
+                <CustomFormItem
+                  label="Concurso"
+                  validateStatus={formErrors.concurso ? "error" : undefined}
+                  help={formErrors.concurso?.message}
+                  labelCol={{ span: 24 }}
+                >
+                  <Select
+                    style={{ width: "100%" }}
+                    value={value}
+                    onChange={onChange}
+                    options={[
+                      { value: "Concurso A", label: "Concurso A" },
+                      { value: "Concurso B", label: "Concurso B" },
+                      { value: "Concurso C", label: "Concurso C" },
+                    ]}
+                    placeholder="Selecione o concurso"
+                  />
+                </CustomFormItem>
+              )}
+            />
+
+            <Row gutter={16}>
+              <Col xs={24} sm={12}>
+                <Controller
+                  control={control}
+                  name="data_inicial"
+                  render={({ field: { onChange, value } }) => (
+                    <CustomFormItem
+                      label="Data Inicial"
+                      validateStatus={
+                        formErrors.data_inicial ? "error" : undefined
+                      }
+                      help={formErrors.data_inicial?.message}
+                      labelCol={{ span: 24 }}
+                    >
+                      <DatePicker
+                        style={{ width: "100%" }}
+                        value={value ? dayjs(value) : undefined}
+                        onChange={(date) =>
+                          onChange(date ? date.toISOString() : "")
+                        }
+                        placeholder="Selecione a data inicial"
+                        format="DD/MM/YYYY"
+                      />
+                    </CustomFormItem>
+                  )}
+                />
+              </Col>
+
+              <Col xs={24} sm={12}>
+                <Controller
+                  control={control}
+                  name="data_final"
+                  render={({ field: { onChange, value } }) => (
+                    <CustomFormItem
+                      label="Data Final"
+                      validateStatus={
+                        formErrors.data_final ? "error" : undefined
+                      }
+                      help={formErrors.data_final?.message}
+                      labelCol={{ span: 24 }}
+                    >
+                      <DatePicker
+                        style={{ width: "100%" }}
+                        value={value ? dayjs(value) : undefined}
+                        onChange={(date) =>
+                          onChange(date ? date.toISOString() : "")
+                        }
+                        placeholder="Selecione a data final"
+                        format="DD/MM/YYYY"
+                      />
+                    </CustomFormItem>
+                  )}
+                />
+              </Col>
+            </Row>
+
+            <Row >
+              <Col xs={24} sm={24}>
+                <Controller
+                  control={control}
+                  name="cargo"
+                  render={({ field: { onChange, value } }) => (
+                    <CustomFormItem
+                      label="Cargo"
+                      validateStatus={formErrors.cargo ? "error" : undefined}
+                      help={formErrors.cargo?.message}
+                      labelCol={{ span: 24 }}
+                    >
+                      <Select
+                        style={{ width: "100%" }}
+                        value={value}
+                        onChange={onChange}
+                        options={[
+                          { value: "Analista", label: "Analista" },
+                          { value: "Técnico", label: "Técnico" },
+                          { value: "Assistente", label: "Assistente" },
+                        ]}
+                        placeholder="Selecione o cargo"
+                      />
+                    </CustomFormItem>
+                  )}
+                />
+              </Col>
+
+              <Space>
+                <Button onClick={handleReset}>Limpar filtros</Button>
+                <Button type="primary" onClick={handleSubmit(handleSub)}>
+                  Pesquisar
+                </Button>
+              </Space>
+            </Row>
+          </Col>
+
+          {/* <Col xs={24} md={24}>
+            <ConvocacaoTable
+              // loading={isLoading}
+              data={mockData || data}
+              pagination={{
+                current: listRequest.pagination.pageNumber,
+                defaultPageSize: 10,
+                position: ["bottomLeft"],
+                total: mockData.length,
+                showTotal: () =>
+                  `Mostrando ${listRequest.pagination.pageNumber} - 10 registro(s) do total de ${mockData.length}`,
+              }}
+              onChange={onAntTableChange}
+            />
+          </Col> */}
+        </Row>
+      </Content>
+      <Divider style={{ margin: 0 }} />
+    </BaseScreen>
+  );
+};
+
+export default Administracao;
