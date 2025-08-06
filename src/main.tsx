@@ -23,6 +23,10 @@ export const theme = {
     colorBgBase: "#FFFFFF",
     colorTextLightSolid: "#ffffff",
     colorError: '#DB001B',
+    colorBgLayout:  "#FFFFFF",
+    colorTextDescription: "#161718"
+
+ 
   },
   components: {
     Layout: {
@@ -52,7 +56,7 @@ function ThemedApp() {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ConfigProvider locale={ptBR} theme={theme}>
-            <Provider store={store}>
+        <Provider store={store}>
           <QueryClientProvider client={queryClient}>
             <ThemedApp>
             </ThemedApp>    

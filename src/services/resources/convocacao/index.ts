@@ -1,15 +1,15 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxios, appAxiosServico1 } from "../../axios";
-import type { IProduct, IProcessoConvocacao, IConcursoOptions } from "./IConvocacao";
-import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
+import type { ISample, IProcessoConvocacao } from "./IConvocacao";
+import type { IBackendWithSubOptions, IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
   getProcessosConvocacao: () => `/api/processos-convocacao`,
   getConcursos: () => `/api/concursos`,
-  createProduct: () => `api/products/create`,
-  editProduct: (id:number) => `api/products/update/${id}/`,
-  deleteProduct: (id:number) => `api/products/delete/${id}/`,
+  createSample: () => `api/sample/create`,
+  editSample: (id:number) => `api/sample/update/${id}/`,
+  deleteSample: (id:number) => `api/sample/delete/${id}/`,
 };
 
 
@@ -30,7 +30,7 @@ export const getProcessosConvocacao = (
       signal,
       ...axiosRequestConfig,
     })
-    .then((response) => response.data.results);
+    .then((response) => response.data);
 
   return {
     response,
@@ -40,14 +40,14 @@ export const getProcessosConvocacao = (
 
  
 
-export const createProduct = (
-  NewProduct: IProcessoConvocacao,
+export const createSample = (
+  NewSample: IProcessoConvocacao,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
   const response = appAxios
-    .post<IProcessoConvocacao>(URL.createProduct(), NewProduct, {
+    .post<IProcessoConvocacao>(URL.createSample(), NewSample, {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })
@@ -60,14 +60,14 @@ export const createProduct = (
 };
 
 
-export const editProduct = (
-  NewProduct: IProduct,
+export const editSample = (
+  NewSample: ISample,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
   const response = appAxios
-    .put<IProduct>(URL.editProduct(NewProduct.id!), NewProduct, {
+    .put<ISample>(URL.editSample(NewSample.id!), NewSample, {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })
@@ -81,14 +81,14 @@ export const editProduct = (
 
 
 
-export const deleteProduct = (
+export const deleteSample = (
   id: number,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
    const { signal, abort } = new AbortController();
 
   const response = appAxiosServico1
-    .delete(URL.deleteProduct(id),  {
+    .delete(URL.deleteSample(id),  {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })
@@ -101,13 +101,13 @@ export const deleteProduct = (
 };
 
 // TODO adicionar JWT no header Authorization
-export const getConcursosOptions = (
+export const getConcursosData = (
    axiosRequestConfig?: AxiosRequestConfig
 ) => {
    const { signal, abort } = new AbortController();
 
   const response = appAxios
-    .get<IConcursoOptions[]>(URL.getConcursos(), {
+    .get<IBackendWithSubOptions[]>(URL.getConcursos(), {
        signal,
       ...axiosRequestConfig,
     })

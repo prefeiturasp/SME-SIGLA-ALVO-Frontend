@@ -38,3 +38,9 @@ export const CustomFormItem = styled(FormItem)`
     display: block;
   }
 `;
+
+export const CustomLabel = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px; /* espaço entre texto e ícone */
+`;

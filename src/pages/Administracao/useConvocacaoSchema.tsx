@@ -2,8 +2,8 @@ import * as yup from "yup";
 
 const useConvocacaoSchema = () => {
   return yup.object({
-    concurso: yup.string().required("campo obrigatório"),
-    cargo: yup.string().required("campo obrigatório"),
+    concurso: yup.string(),
+    cargo: yup.string(),
     data_inicial: yup
       .string()
       .required("campo obrigatório")

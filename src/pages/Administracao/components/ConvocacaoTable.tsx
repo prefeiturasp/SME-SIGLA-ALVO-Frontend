@@ -24,7 +24,7 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
     },
 
     {
-      title: "Data Convocação",
+      title: "Data de Convocação",
       dataIndex: "data_convocacao",
       key: "data_convocacao",
       render: (text: string) => dayjs(text).format("DD/MM/YYYY"),
@@ -51,7 +51,6 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
           <DeleteButton
             type={"default"}
             icon={<DeleteOutlineOutlinedIcon />}
-            disabled={false}
             onClick={() => console.log("delete")}
           />
 
@@ -65,7 +64,7 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
 
   return (
     <>
-      <CustomTitle level={4} style={{ margin: "2.375rem  0 1rem 0" }}>
+      <CustomTitle level={4} style={{ margin: "1rem 0" }}>
         {"Resultados"}
       </CustomTitle>
 

@@ -1,10 +1,11 @@
 import { Avatar, Space, Typography } from 'antd';
 import type { IProcessoConvocacao } from '../../services/resources/convocacao/IConvocacao';
-import { DownOutlined, UserOutlined } from '@ant-design/icons';
-const { Text } = Typography;
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
+import { useTheme } from "styled-components";
+import { CustomLabel } from '../../pages/BaseScreen/styles';
 
-
-export interface INewProductModalData extends IProcessoConvocacao {
+export interface INewSampleModalData extends IProcessoConvocacao {
   description: string;
 }
 
@@ -15,15 +16,16 @@ export type TitleItem =
 
  
 
-
-
-export const UserAvatar: React.FC = ( ) => {
  
-  
+export const UserAvatar: React.FC = () => {
+  const theme = useTheme();
   return (
-    <Space size="middle">
-      <Avatar size="default" icon={<UserOutlined />} />     
-      <Text>João Pedro  <DownOutlined style={{ fontSize: 10, marginLeft: 4 }} /></Text>  
+    <Space size="small" >
+      <Avatar size="default" style={{ background: 'none' }}  icon={<AccountCircleRoundedIcon sx={{ color: theme.token.colorPrimary }}/>} />            
+      
+      <CustomLabel>
+        João Pedro <ArrowDropDownIcon />
+      </CustomLabel>
     </Space>
   );
 };

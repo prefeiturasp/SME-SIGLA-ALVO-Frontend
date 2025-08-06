@@ -1,4 +1,5 @@
 import { Breadcrumb, Typography, type MenuProps } from "antd";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import type { IProcessoConvocacao } from "../../services/resources/convocacao/IConvocacao";
 import React from "react";
 import { Layout, Menu, theme } from "antd";
@@ -7,14 +8,15 @@ import icon from "../../assets/alvo-img.png";
 import { UserAvatar } from "../../components/UserAvatar/UserAvatar";
 import { useNavigate } from "react-router-dom";
 
-export interface INewProductModalData extends IProcessoConvocacao {
+export interface INewSampleModalData extends IProcessoConvocacao {
   description: string;
 }
 
 export type TitleItem = { title: string } | { title: React.ReactElement };
-import { DownOutlined } from "@ant-design/icons";
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { CustomLabel } from "./styles";
 
-interface INewProductModalProps {
+interface INewSampleModalProps {
   children: React.ReactNode;
   breadcrumbItems: TitleItem[];
   title: string;
@@ -23,7 +25,7 @@ interface INewProductModalProps {
 const { Header, Content, Footer } = Layout;
 
 
-const BaseScreen: React.FC<INewProductModalProps> = ({
+const BaseScreen: React.FC<INewSampleModalProps> = ({
   children,
   breadcrumbItems,
   title,
@@ -39,25 +41,25 @@ const menuItens: MenuProps["items"] = [
   {
     key: "sub1",
     label: 
-    <span>
-      Administração <DownOutlined style={{ fontSize: 10, marginLeft: 4 }} />
-    </span>,  
+    <CustomLabel>
+      Administração <ArrowDropDownIcon />
+    </CustomLabel>,
     onClick: () => navigate("/administracao"), 
   },
   {
     key: "sub2",
     label: 
-    <span>
-      Processos <DownOutlined style={{ fontSize: 10, marginLeft: 4 }} />
-    </span>,  
+    <CustomLabel>
+      Processos <ArrowDropDownIcon />
+    </CustomLabel>,
     onClick: () => navigate("/processos"), 
   },
   {
     key: "sub3",
     label: 
-    <span>
-      Consultas e Relatórios <DownOutlined style={{ fontSize: 10, marginLeft: 4 }} />
-    </span>,  
+        <CustomLabel>
+      Consultas e Relatórios <ArrowDropDownIcon />
+    </CustomLabel>,    
      children: [
       { key: 9, label: "option9" },
       { key: 10, label: "option10" },
@@ -71,7 +73,7 @@ const menuItens: MenuProps["items"] = [
     <Layout
       style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
     >
-      <Header style={{ display: "flex", alignItems: "center", padding:'0 1.5rem' }}>
+      <Header style={{ display: "flex", alignItems: "center", padding:'0 1.5rem', boxShadow: '0px 4px 20px 0px rgba(0, 0, 0, 0.1)' }}>
          <img
           src={icon}
           alt="Imagem do sistema Alvo"
@@ -86,9 +88,9 @@ const menuItens: MenuProps["items"] = [
         <UserAvatar />
       </Header>
 
-      <Content style={{ padding: "0 1.5rem" }}>
-        <Breadcrumb   separator=">" style={{ margin: "16px 0" }} items={breadcrumbItems} />
-        <Typography.Title level={2} style={{ margin: 0 ,fontWeight: 700 }} >
+      <Content style={{ padding: "1.5rem"}}>
+        <Breadcrumb separator={<KeyboardArrowRightIcon  />}  items={breadcrumbItems} />
+        <Typography.Title level={2} style={{ margin:"1rem 0" ,fontWeight: 700 }} >
           {title}
         </Typography.Title>
         <div

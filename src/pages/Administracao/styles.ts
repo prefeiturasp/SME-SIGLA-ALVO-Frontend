@@ -37,13 +37,19 @@ export const CustomFormItem = styled(FormItem)`
   .ant-row {
     display: block;
   }
+
+  .ant-form-item-label > label {
+    font-weight: 700;
+  }
+    margin-bottom:1rem;
 `;
+
 
 export const SeparatorCol = styled(Col)`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 12px;
+  padding-top: 20px;
 
  
 `;

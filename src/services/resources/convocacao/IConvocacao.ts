@@ -5,7 +5,7 @@ export interface IProcessoConvocacao {
 }
 
 
-export interface IProduct extends IProcessoConvocacao {
+export interface ISample extends IProcessoConvocacao {
   id : number|undefined;
 }
 
@@ -18,11 +18,14 @@ export interface IFiltroProcessos {
 }
 
   
-export interface IConcursoOptions {
+
+
+export interface IOptions {
   value: string;
   label: string;   
 }
 
+ 
  
 
  

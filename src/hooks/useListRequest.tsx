@@ -12,8 +12,8 @@ const useListRequest = <T,>(defaultState: IListRequest<T>) => {
       sorter: SorterResult<T> | SorterResult<T>[]) =>
       setListRequest((prev) => ({
         pagination: {
-          pageNumber: pagination.current || prev.pagination.pageNumber,
-          pageSize: pagination.pageSize || prev.pagination.pageSize,
+          page: pagination.current || prev.pagination.page,
+          page_size: pagination.page_size || prev.pagination.page_size,
         },
         filters: { ...prev.filters, ...Object(filters) },
         ...(!!(sorter as SorterResult<any>).order && {
@@ -32,7 +32,7 @@ const useListRequest = <T,>(defaultState: IListRequest<T>) => {
         ...prevListRequest,
         pagination: {
           ...prevListRequest.pagination,
-          pageNumber: prevListRequest.pagination.pageNumber - 1,
+          page: prevListRequest.pagination.page - 1,
         },
       })),
     []

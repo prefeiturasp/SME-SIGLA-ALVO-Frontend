@@ -5,23 +5,41 @@ const middlewares = jsonServer.defaults();
 
 // ===== Gerar dados fake =====
 function generateData() {
-  const processos = [];
+  // Concursos no formato { value, label, cargos[] }
+  const concursos = Array.from({ length: 10 }).map(() => {
+    const concursoUuid = faker.string.uuid();
 
-  for (let i = 1; i <= 50; i++) {
+    const cargos = Array.from({ length: faker.number.int({ min: 2, max: 5 }) }).map((_, i) => ({
+      value: i + 1,
+      label: `Cargo ${faker.person.jobTitle()}`
+    }));
+
+    return {
+      value: concursoUuid,
+      label: `Concurso ${faker.person.fullName()}`,
+      cargos
+    };
+  });
+
+  // Processos vinculados a concursos (usando value como ID)
+  const processos = Array.from({ length: 50 }).map((_, i) => {
     const diasAtras = Math.floor(Math.random() * 30);
     const dataConvocacao = new Date();
     dataConvocacao.setDate(dataConvocacao.getDate() - diasAtras);
 
-    processos.push({
-      id: i,
+    const concurso = faker.helpers.arrayElement(concursos);
+
+    return {
+      id: i + 1,
       nome: `Processo ${faker.company.name()}`,
       uuid: faker.string.uuid(),
       data_convocacao: dataConvocacao.toISOString(),
-      status: faker.helpers.arrayElement(['Finalizado', 'Em andamento', 'Cancelado'])
-    });
-  }
+      status: faker.helpers.arrayElement(['Finalizado', 'Em andamento', 'Cancelado']),
+      concursoValue: concurso.value
+    };
+  });
 
-  return { processos };
+  return { processos, concursos };
 }
 
 // Banco fake em memória
@@ -29,13 +47,13 @@ const db = generateData();
 
 server.use(middlewares);
 
-// ===== Rota customizada com filtro + paginação =====
+// ===== Rota processos-convocacao com filtro =====
 server.get('/api/processos-convocacao', (req, res) => {
   let data = db.processos;
 
-  // Filtro por datas
-  const { data_inicial, data_final, pageNumber = 1, pageSize = 10 } = req.query;
+  const { data_inicial, data_final, concursoValue, pageNumber = 1, pageSize = 10 } = req.query;
 
+  // Filtro por datas
   if (data_inicial && data_final) {
     const inicio = new Date(data_inicial);
     const fim = new Date(data_final);
@@ -44,6 +62,11 @@ server.get('/api/processos-convocacao', (req, res) => {
       const dataConv = new Date(item.data_convocacao);
       return dataConv >= inicio && dataConv <= fim;
     });
+  }
+
+  // Filtro por concurso
+  if (concursoValue) {
+    data = data.filter(item => String(item.concursoValue) === String(concursoValue));
   }
 
   // Paginação
@@ -64,17 +87,12 @@ server.get('/api/processos-convocacao', (req, res) => {
   });
 });
 
-// ===== NOVA ROTA: Concursos (options) =====
+// ===== Rota concursos no formato { value, label, cargos[] } =====
 server.get('/api/concursos', (req, res) => {
-  const concursos = Array.from({ length: 10 }).map((_, index) => ({
-    value: index + 1,
-    label: `Concurso ${faker.company.name()}`
-  }));
-
-  res.jsonp(concursos);
+  res.jsonp(db.concursos);
 });
 
-// ===== Rotas padrão JSON Server (caso precise) =====
+// ===== Rotas padrão JSON Server =====
 server.use(jsonServer.router(db));
 
 const PORT = 3000;

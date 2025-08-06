@@ -3,7 +3,7 @@
 
 // import { API } from "../api";
 
-// import type { IProduct, IProcessoConvocacao } from "../api/resources/products/IProduct";
+// import type { ISample, IProcessoConvocacao } from "../api/resources/sample/ISample";
 // import type { NotificationInstance } from "antd/es/notification/interface";
 
 // const useConvocacao = (api: NotificationInstance) => {

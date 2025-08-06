@@ -21,35 +21,6 @@ export const DeleteLink = styled.a`
   
 `;
 
-export const DeleteButton = styled(Button)`
-  color: ${({ theme }) => theme.token.colorError};
-  border: none;
-  background: unset;
-  font-size: 16px;
-   width:24px;
-
-  &:hover {
-    opacity: 0.5;
-    color: ${({ theme }) => theme.token.colorError};
-    background: transparent;
-  }
-`;
-
-export const EditButton = styled(Button)`
-  color: ${({ theme }) => theme.token.colorPrimary};
-  border: none;
-  background: unset;
-  font-size: 16px;
-   width:24px;
-
-  &:hover {
-    opacity: 0.5;
-    color: ${({ theme }) => theme.token.colorPrimary};
-    background: unset;
-  }
-`;
-
-
 
 
 
@@ -103,3 +74,60 @@ export const StyledTable = styled(Table)`
     margin-right: auto; /* empurra só o texto total para esquerda */
   }
 ` as typeof Table;
+
+
+
+ 
+
+ const BaseIconButton = styled(Button)`
+  border: none;
+  background: unset;
+  font-size: 16px;
+  width: 24px;
+  box-shadow: none;
+
+  &:hover {
+    opacity: 0.5;
+    background: unset;
+    box-shadow: none;
+  }
+
+  &:focus,
+  &:active {
+    box-shadow: none;
+  }
+
+  &:disabled,
+  &.ant-btn[disabled] {
+    background: unset !important;
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+`;
+
+ export const EditButton = styled(BaseIconButton)`
+  color: ${({ theme }) => theme.token.colorPrimary};
+
+  &:hover {
+    color: ${({ theme }) => theme.token.colorPrimary};
+  }
+
+  &:disabled,
+  &.ant-btn[disabled] {
+    color: ${({ theme }) => theme.token.colorPrimary};
+  }
+`;
+
+ export const DeleteButton = styled(BaseIconButton)`
+  color: ${({ theme }) => theme.token.colorError};
+
+  &:hover {
+    color: ${({ theme }) => theme.token.colorError};
+  }
+
+  &:disabled,
+  &.ant-btn[disabled] {
+    color: ${({ theme }) => theme.token.colorError};
+  }
+`;
