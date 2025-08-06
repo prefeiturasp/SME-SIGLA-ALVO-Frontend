@@ -17,13 +17,13 @@ export interface IFiltroProcessos {
   data_final: string;
 }
 
+  
+export interface IConcursoOptions {
+  value: string;
+  label: string;   
+}
+
  
 
+ 
 
-
-export interface PaginatedResponse<T> {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: T[];
-}

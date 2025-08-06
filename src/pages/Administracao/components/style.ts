@@ -24,7 +24,7 @@ export const DeleteLink = styled.a`
 export const DeleteButton = styled(Button)`
   color: ${({ theme }) => theme.token.colorError};
   border: none;
-  background: transparent;
+  background: unset;
   font-size: 16px;
    width:24px;
 
@@ -38,14 +38,14 @@ export const DeleteButton = styled(Button)`
 export const EditButton = styled(Button)`
   color: ${({ theme }) => theme.token.colorPrimary};
   border: none;
-  background: transparent;
+  background: unset;
   font-size: 16px;
    width:24px;
 
   &:hover {
     opacity: 0.5;
     color: ${({ theme }) => theme.token.colorPrimary};
-    background: transparent;
+    background: unset;
   }
 `;
 
@@ -68,6 +68,8 @@ export const CustomTitle = styled(Typography.Title).attrs({ level: 4 })`
   font-weight: 700;
   margin: 2.375rem 0 1rem 0;
 `;
+
+
 
 
 

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Modal as AntModal } from "antd";
+import { Modal as AntModal, Col } from "antd";
 import FormItem from "antd/es/form/FormItem";
 
 export const SelectContainer = styled.div`
@@ -38,3 +38,13 @@ export const CustomFormItem = styled(FormItem)`
     display: block;
   }
 `;
+
+export const SeparatorCol = styled(Col)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 12px;
+
+ 
+`;
+

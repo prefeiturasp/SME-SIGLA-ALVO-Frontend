@@ -5,40 +5,16 @@ import BaseScreen, { type TitleItem } from "../BaseScreen";
 import useConvocacaoSchema from "./useConvocacaoSchema";
 import { Divider, Select, DatePicker, Row, Col, Space, Button } from "antd";
 import { Controller, useForm } from "react-hook-form";
-import { CustomFormItem } from "./styles";
+import { CustomFormItem, SeparatorCol } from "./styles";
 import { Content } from "antd/es/layout/layout";
 import { yupResolver } from "@hookform/resolvers/yup";
-import type { IFiltroProcessos, IProcessoConvocacao } from "../../services/resources/convocacao/IConvocacao";
+import type { IFiltroProcessos } from "../../services/resources/convocacao/IConvocacao";
 import dayjs from "dayjs";
 import ConvocacaoTable from "./components/ConvocacaoTable";
 import useListRequest from "../../hooks/useListRequest";
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../services";
-
-const mockData: IProcessoConvocacao[] = Array.from({ length: 288 }).map(
-  (_, index) => {
-    const concursos = [
-      "Concurso A",
-      "Concurso B",
-      "Concurso C",
-      "Concurso D",
-      "Concurso E",
-    ];
-    const status = [
-      "Em andamento",
-      "Finalizado",
-
-    ];
-    const randomConcurso = concursos[index % concursos.length];
-    const randomStatus = status[index % status.length];
-
-    return {
-      nome: `${randomConcurso} ${index + 1}`,
-      status: randomStatus,
-      data_convocacao: `2025-06-${String((index % 28) + 1).padStart(2, "0")}`,      
-    };
-  }
-);
+const { Text } = Typography;
 
 const breadcrumbItems = [
   {
@@ -52,28 +28,36 @@ const breadcrumbItems = [
   },
 ] as TitleItem[];
 
-
 const Administracao: React.FC = () => {
-
   const defaultValues = {
-      concurso: undefined,
-      cargo: undefined,
-      data_convocacao: "",
-      data_inicial: "",
-      data_final: "",
-    }
-  const { listRequest, setListRequest, onAntTableChange } = useListRequest<IFiltroProcessos>({
-    pagination: { pageNumber: 1, pageSize: 10 },
+    concurso: undefined,
+    cargo: undefined,
+    data_convocacao: "",
+    data_inicial: "",
+    data_final: "",
+  };
+  const { listRequest, setListRequest, onAntTableChange } =
+    useListRequest<IFiltroProcessos>({
+      pagination: { pageNumber: 1, pageSize: 10 },
+    });
+
+  const { data: concursosOptions, isLoading: concursosIsLoading } = useQuery({
+    queryKey: ["getConcursosOptions"],
+    queryFn: ({ signal }) =>
+      API.Convocacao.getConcursosOptions({ signal }).response,
+    staleTime: 1000 * 60 * 5, // 5 mins
+    retry: 0,
   });
 
-  console.log("listRequest", listRequest);
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["permissions", "products", listRequest],
+  const {
+    data: processosConvocacaoData,
+    isLoading: processosConvocacaoIsLoading,
+  } = useQuery({
+    queryKey: ["getProcessosConvocacao", listRequest],
     queryFn: ({ signal }) =>
       API.Convocacao.getProcessosConvocacao(listRequest, { signal }).response,
     staleTime: 1000 * 60 * 5, // 5 mins
-    retry:0
+    retry: 0,
   });
 
   const {
@@ -91,9 +75,9 @@ const Administracao: React.FC = () => {
 
   const handleSub = async (data: IFiltroProcessos) => {
     try {
-        console.log("integração com o back", data);
-        
-        setListRequest((prevState) => ({
+      console.log("integração com o back", data);
+
+      setListRequest((prevState) => ({
         ...prevState,
         filters: data,
       }));
@@ -111,8 +95,8 @@ const Administracao: React.FC = () => {
       breadcrumbItems={breadcrumbItems}
       title="Consulta de convocação de candidatos"
     >
-      <Content >
-        <Row  align="middle" justify="space-between">
+      <Content>
+        <Row align="middle" justify="space-between">
           <Typography.Title level={4} style={{ margin: 0 }}>
             {"Busca Processos"}
           </Typography.Title>
@@ -122,7 +106,7 @@ const Administracao: React.FC = () => {
           </Button>
         </Row>
 
-        <Row >
+        <Row>
           <Col xs={24} md={12}>
             <Controller
               control={control}
@@ -138,19 +122,16 @@ const Administracao: React.FC = () => {
                     style={{ width: "100%" }}
                     value={value}
                     onChange={onChange}
-                    options={[
-                      { value: "Concurso A", label: "Concurso A" },
-                      { value: "Concurso B", label: "Concurso B" },
-                      { value: "Concurso C", label: "Concurso C" },
-                    ]}
+                    options={concursosOptions || []}
                     placeholder="Selecione o concurso"
+                    loading={concursosIsLoading}
                   />
                 </CustomFormItem>
               )}
             />
 
-            <Row gutter={16}>
-              <Col xs={24} sm={12}>
+            <Row gutter={16} align="middle">
+              <Col xs={24} sm={11}>
                 <Controller
                   control={control}
                   name="data_inicial"
@@ -177,7 +158,14 @@ const Administracao: React.FC = () => {
                 />
               </Col>
 
-              <Col xs={24} sm={12}>
+              <SeparatorCol
+                xs={24}
+                sm={2}
+              >
+                <Text strong>até</Text>
+              </SeparatorCol>
+
+              <Col xs={24} sm={11}>
                 <Controller
                   control={control}
                   name="data_final"
@@ -205,7 +193,7 @@ const Administracao: React.FC = () => {
               </Col>
             </Row>
 
-            <Row >
+            <Row>
               <Col xs={24} sm={24}>
                 <Controller
                   control={control}
@@ -244,19 +232,19 @@ const Administracao: React.FC = () => {
 
           <Col xs={24} md={24}>
             <ConvocacaoTable
-              loading={isLoading}
-              data={data||[]}
+              loading={processosConvocacaoIsLoading}
+              data={processosConvocacaoData || []}
               pagination={{
                 current: listRequest.pagination.pageNumber,
                 defaultPageSize: 10,
                 position: ["bottomLeft"],
-                total: data?.length,
+                total: processosConvocacaoData?.length,
                 showTotal: () =>
-                  `Mostrando ${listRequest.pagination.pageNumber} - 10 registro(s) do total de ${data?.length}`,
+                  `Mostrando ${listRequest.pagination.pageNumber} - 10 registro(s) do total de ${processosConvocacaoData?.length}`,
               }}
               onChange={onAntTableChange}
             />
-          </Col> 
+          </Col>
         </Row>
       </Content>
       <Divider style={{ margin: 0 }} />

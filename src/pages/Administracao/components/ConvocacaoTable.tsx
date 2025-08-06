@@ -44,9 +44,9 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
           <EditButton
             type={"default"}
             icon={<ModeEditOutlineOutlinedIcon />}
-            disabled={false}
+            disabled
             onClick={() => console.log("edit")}
-          />
+           />
 
           <DeleteButton
             type={"default"}

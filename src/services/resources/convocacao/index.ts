@@ -1,7 +1,7 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxios, appAxiosServico1 } from "../../axios";
-import type { IProduct, IProcessoConvocacao, PaginatedResponse } from "./IConvocacao";
-import type { IListRequest } from "../../../types/IListRequest";
+import type { IProduct, IProcessoConvocacao, IConcursoOptions } from "./IConvocacao";
+import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
@@ -90,6 +90,25 @@ export const deleteProduct = (
   const response = appAxiosServico1
     .delete(URL.deleteProduct(id),  {
       signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getConcursosOptions = (
+   axiosRequestConfig?: AxiosRequestConfig
+) => {
+   const { signal, abort } = new AbortController();
+
+  const response = appAxios
+    .get<IConcursoOptions[]>(URL.getConcursos(), {
+       signal,
       ...axiosRequestConfig,
     })
     .then((response) => response.data);

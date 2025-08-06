@@ -64,6 +64,16 @@ server.get('/api/processos-convocacao', (req, res) => {
   });
 });
 
+// ===== NOVA ROTA: Concursos (options) =====
+server.get('/api/concursos', (req, res) => {
+  const concursos = Array.from({ length: 10 }).map((_, index) => ({
+    value: index + 1,
+    label: `Concurso ${faker.company.name()}`
+  }));
+
+  res.jsonp(concursos);
+});
+
 // ===== Rotas padrão JSON Server (caso precise) =====
 server.use(jsonServer.router(db));
 
