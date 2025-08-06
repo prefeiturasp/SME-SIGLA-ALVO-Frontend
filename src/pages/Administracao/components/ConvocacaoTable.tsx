@@ -1,56 +1,38 @@
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import React from "react";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import dayjs from "dayjs";
-import type { INewProductForm } from "../../../services/resources/products/IProduct";
+import type { IProcessoConvocacao } from "../../../services/resources/convocacao/IConvocacao";
 import {
   CustomLink,
   CustomTitle,
-  Icon,
-  DeleteLink,
   StyledTable,
   DeleteButton,
   EditButton,
 } from "./style";
-import { DeleteOutlined, EditFilled, EditOutlined } from "@ant-design/icons";
-import { Button, Image, Typography } from "antd";
 
- 
- 
-const { Title } = Typography;
-
-interface ConvocacaoTableProps extends TableProps<INewProductForm> {
-  data: INewProductForm[];
+interface ConvocacaoTableProps extends TableProps<IProcessoConvocacao> {
+  data: IProcessoConvocacao[];
 }
-
 const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
-  const columns: ColumnsType<INewProductForm> = [
+  const columns: ColumnsType<IProcessoConvocacao> = [
     {
       title: "Processo",
-      dataIndex: "concurso",
-      key: "concurso",
+      dataIndex: "nome",
+      key: "nome",
     },
+
     {
-      title: "Cargo",
-      dataIndex: "cargo",
-      key: "cargo",
-    },
-    {
-      title: "Data Inicial",
-      dataIndex: "data_inicial",
-      key: "data_inicial",
-      render: (text: string) => dayjs(text).format("DD/MM/YYYY"),
-    },
-    {
-      title: "Data Final",
-      dataIndex: "data_final",
-      key: "data_final",
+      title: "Data Convocação",
+      dataIndex: "data_convocacao",
+      key: "data_convocacao",
       render: (text: string) => dayjs(text).format("DD/MM/YYYY"),
     },
     {
       title: "Status",
-      dataIndex: "is_active",
-      key: "is_active",
-      render: (active: boolean) => (active ? "Ativo" : "Inativo"),
+      dataIndex: "status",
+      key: "status",
     },
     {
       width: "12%",
@@ -58,23 +40,22 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
       dataIndex: "",
       key: "x",
       render: (row) => (
-        <div style={{ display: "flex", gap: "1rem",  }}>
- 
+        <div style={{ display: "flex", gap: "1rem" }}>
           <EditButton
             type={"default"}
-            icon={<Icon onClick={() => console.log("edit")}>edit</Icon>}
+            icon={<ModeEditOutlineOutlinedIcon />}
             disabled={false}
+            onClick={() => console.log("edit")}
           />
 
- 
           <DeleteButton
             type={"default"}
-            icon={              
-                <Icon onClick={() => console.log("delete")}>delete</Icon>              
-            }
+            icon={<DeleteOutlineOutlinedIcon />}
             disabled={false}
-            onClick={() => console.log(row)}
+            onClick={() => console.log("delete")}
           />
+
+
 
           <CustomLink onClick={() => console.log(row)}>Finalizar</CustomLink>
         </div>
@@ -88,11 +69,10 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
         {"Resultados"}
       </CustomTitle>
 
- 
       <StyledTable
         columns={columns}
         dataSource={data}
-        rowKey={(record) => `${record.concurso}-${record.cargo}`}
+        rowKey={(record) => `${record.nome}`}
         bordered
         rowClassName={(_, index) =>
           index % 2 === 0 ? "row-white" : "row-gray"

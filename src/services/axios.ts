@@ -5,7 +5,7 @@ export const appAxiosMock = axios.create({
 });
 
 export const appAxios = axios.create({
-  baseURL: "http://127.0.0.1:8000", //todo add in .env
+  baseURL: "http://localhost:3000", //todo add in .env
 });
 
 export const appAxiosServico1 = axios.create({
@@ -17,7 +17,7 @@ export const appAxiosServico2 = axios.create({
 });
 
 export const appAxiosServico3 = axios.create({
-  baseURL: "http://127.0.0.1:8000", //todo add in .env
+  baseURL: "http://localhost:3000", //todo add in .env
 });
 
 //import.meta.env.VITE_API,

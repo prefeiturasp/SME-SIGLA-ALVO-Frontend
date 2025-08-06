@@ -2,20 +2,20 @@ import { Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 import BaseScreen, { type TitleItem } from "../BaseScreen";
-import useProductsSchema from "./useProductsSchema";
+import useConvocacaoSchema from "./useConvocacaoSchema";
 import { Divider, Select, DatePicker, Row, Col, Space, Button } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { CustomFormItem } from "./styles";
 import { Content } from "antd/es/layout/layout";
 import { yupResolver } from "@hookform/resolvers/yup";
-import type { INewProductForm } from "../../services/resources/products/IProduct";
+import type { IFiltroProcessos, IProcessoConvocacao } from "../../services/resources/convocacao/IConvocacao";
 import dayjs from "dayjs";
 import ConvocacaoTable from "./components/ConvocacaoTable";
 import useListRequest from "../../hooks/useListRequest";
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../services";
 
-const mockData: INewProductForm[] = Array.from({ length: 50 }).map(
+const mockData: IProcessoConvocacao[] = Array.from({ length: 288 }).map(
   (_, index) => {
     const concursos = [
       "Concurso A",
@@ -24,22 +24,18 @@ const mockData: INewProductForm[] = Array.from({ length: 50 }).map(
       "Concurso D",
       "Concurso E",
     ];
-    const cargos = [
-      "Analista",
-      "Técnico",
-      "Assistente",
-      "Coordenador",
-      "Gestor",
+    const status = [
+      "Em andamento",
+      "Finalizado",
+
     ];
     const randomConcurso = concursos[index % concursos.length];
-    const randomCargo = cargos[index % cargos.length];
+    const randomStatus = status[index % status.length];
 
     return {
-      concurso: `${randomConcurso} ${index + 1}`,
-      cargo: randomCargo,
-      data_inicial: `2025-06-${String((index % 28) + 1).padStart(2, "0")}`,
-      data_final: `2025-07-${String((index % 28) + 1).padStart(2, "0")}`,
-      is_active: index % 2 === 0,
+      nome: `${randomConcurso} ${index + 1}`,
+      status: randomStatus,
+      data_convocacao: `2025-06-${String((index % 28) + 1).padStart(2, "0")}`,      
     };
   }
 );
@@ -56,17 +52,28 @@ const breadcrumbItems = [
   },
 ] as TitleItem[];
 
+
 const Administracao: React.FC = () => {
-  const { listRequest, onAntTableChange } = useListRequest<INewProductForm>({
+
+  const defaultValues = {
+      concurso: undefined,
+      cargo: undefined,
+      data_convocacao: "",
+      data_inicial: "",
+      data_final: "",
+    }
+  const { listRequest, setListRequest, onAntTableChange } = useListRequest<IFiltroProcessos>({
     pagination: { pageNumber: 1, pageSize: 10 },
   });
+
   console.log("listRequest", listRequest);
 
   const { data, isLoading } = useQuery({
     queryKey: ["permissions", "products", listRequest],
     queryFn: ({ signal }) =>
-      API.Products.getProductsData(listRequest, { signal }).response,
+      API.Convocacao.getProcessosConvocacao(listRequest, { signal }).response,
     staleTime: 1000 * 60 * 5, // 5 mins
+    retry:0
   });
 
   const {
@@ -74,37 +81,29 @@ const Administracao: React.FC = () => {
     handleSubmit,
     reset,
     formState: { errors: formErrors },
-  } = useForm<INewProductForm>({
-    defaultValues: {
-      concurso: undefined,
-      cargo: undefined,
-      data_convocacao: "",
-      data_inicial: "",
-      data_final: "",
-      is_active: true,
-    } as any,
-    resolver: yupResolver(useProductsSchema()),
+  } = useForm<IFiltroProcessos>({
+    defaultValues: defaultValues,
+    resolver: yupResolver(useConvocacaoSchema()),
     reValidateMode: "onChange",
     mode: "all",
     shouldFocusError: false,
   });
 
-  const handleSub = async (data: INewProductForm) => {
+  const handleSub = async (data: IFiltroProcessos) => {
     try {
-      console.log("integração com o back", data);
+        console.log("integração com o back", data);
+        
+        setListRequest((prevState) => ({
+        ...prevState,
+        filters: data,
+      }));
     } catch (error) {
       console.log(error);
     }
   };
 
   const handleReset = () => {
-    reset({
-      concurso: undefined,
-      cargo: undefined,
-      data_inicial: "",
-      data_final: "",
-      is_active: true,
-    });
+    reset(defaultValues);
   };
 
   return (
@@ -243,21 +242,21 @@ const Administracao: React.FC = () => {
             </Row>
           </Col>
 
-          {/* <Col xs={24} md={24}>
+          <Col xs={24} md={24}>
             <ConvocacaoTable
-              // loading={isLoading}
-              data={mockData || data}
+              loading={isLoading}
+              data={data||[]}
               pagination={{
                 current: listRequest.pagination.pageNumber,
                 defaultPageSize: 10,
                 position: ["bottomLeft"],
-                total: mockData.length,
+                total: data?.length,
                 showTotal: () =>
-                  `Mostrando ${listRequest.pagination.pageNumber} - 10 registro(s) do total de ${mockData.length}`,
+                  `Mostrando ${listRequest.pagination.pageNumber} - 10 registro(s) do total de ${data?.length}`,
               }}
               onChange={onAntTableChange}
             />
-          </Col> */}
+          </Col> 
         </Row>
       </Content>
       <Divider style={{ margin: 0 }} />

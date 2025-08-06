@@ -1,5 +1,5 @@
 import { Breadcrumb, Typography, type MenuProps } from "antd";
-import type { INewProductForm } from "../../services/resources/products/IProduct";
+import type { IProcessoConvocacao } from "../../services/resources/convocacao/IConvocacao";
 import React from "react";
 import { Layout, Menu, theme } from "antd";
 import icon from "../../assets/alvo-img.png";
@@ -7,7 +7,7 @@ import icon from "../../assets/alvo-img.png";
 import { UserAvatar } from "../../components/UserAvatar/UserAvatar";
 import { useNavigate } from "react-router-dom";
 
-export interface INewProductModalData extends INewProductForm {
+export interface INewProductModalData extends IProcessoConvocacao {
   description: string;
 }
 

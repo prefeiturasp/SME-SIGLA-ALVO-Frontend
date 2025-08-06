@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-const useProductsSchema = () => {
+const useConvocacaoSchema = () => {
   return yup.object({
     concurso: yup.string().required("campo obrigatório"),
     cargo: yup.string().required("campo obrigatório"),
@@ -16,8 +16,7 @@ const useProductsSchema = () => {
         if (!data_inicial || !value) return true; 
         return new Date(value) >= new Date(data_inicial);
       }),
-    is_active: yup.boolean().required(),
   });
 };
 
-export default useProductsSchema;
+export default useConvocacaoSchema;

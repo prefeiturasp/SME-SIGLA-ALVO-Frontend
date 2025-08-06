@@ -59,12 +59,6 @@ export const Icon = styled.span`
   font-size: 24px;
   line-height: 1;
   display: inline-block;
-
-  //  font-variation-settings: 
-  //   "FILL" 0,
-  //   "wght" 400,
-  //   "GRAD" 0,
-  //   "opsz" 24;
 `;
 
  

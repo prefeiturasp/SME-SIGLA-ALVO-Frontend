@@ -3,26 +3,26 @@
 
 // import { API } from "../api";
 
-// import type { IProduct, INewProductForm } from "../api/resources/products/IProduct";
+// import type { IProduct, IProcessoConvocacao } from "../api/resources/products/IProduct";
 // import type { NotificationInstance } from "antd/es/notification/interface";
 
 // const useConvocacao = (api: NotificationInstance) => {
  
 
 //   const {
-//     data: dataAllProductsTable,
-//     isFetching: isLoadingProductsTable,
-//     refetch: isRefetchProductsTable,
+//     data: dataAllConvocacaoTable,
+//     isFetching: isLoadingConvocacaoTable,
+//     refetch: isRefetchConvocacaoTable,
 //   } = useQuery({
-//     queryKey: ["dataAllProductsTable"],
+//     queryKey: ["dataAllConvocacaoTable"],
 //     refetchOnWindowFocus: false,
-//     queryFn: () => API.Products.getProductsData().response,
+//     queryFn: () => API.Convocacao.getProcessosConvocacao().response,
 //   });
 
 
 //   return {
-//     isLoadingProductsTable,
-//     dataAllProductsTable,
+//     isLoadingConvocacaoTable,
+//     dataAllConvocacaoTable,
 //   };
 // };
 

@@ -1,10 +1,10 @@
 import { Avatar, Space, Typography } from 'antd';
-import type { INewProductForm } from '../../services/resources/products/IProduct';
+import type { IProcessoConvocacao } from '../../services/resources/convocacao/IConvocacao';
 import { DownOutlined, UserOutlined } from '@ant-design/icons';
 const { Text } = Typography;
 
 
-export interface INewProductModalData extends INewProductForm {
+export interface INewProductModalData extends IProcessoConvocacao {
   description: string;
 }
 
