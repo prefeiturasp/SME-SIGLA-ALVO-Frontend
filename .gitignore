@@ -1,0 +1,77 @@
+# GERAL
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# DEPENDÊNCIAS
+node_modules/
+bower_components/
+jspm_packages/
+.pnp/
+.pnp.js
+
+# BUILD & DIST
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+
+# CONFIGURAÇÕES LOCAIS
+.env
+.env.*.local
+.vscode/
+.idea/
+*.log
+*.tsbuildinfo
+*.sublime-project
+*.sublime-workspace
+
+# TESTES
+/jest-cache/
+/jest-config/
+/coverage/
+/test-results/
+/__snapshots__/
+/cypress/screenshots/
+/cypress/videos/
+
+# SISTEMAS DE VERSÃO
+*.orig
+
+# DOCKER / CI
+.docker/
+docker-compose.override.yml
+
+# VITE / NEXT / REACT
+.vite/
+.vite-cache/
+.next/
+.cache/
+.eslintcache
+
+# COVERAGE
+coverage/
+*.lcov
+
+# SISTEMAS OPERACIONAIS
+*.swp
+*.lock
+*.bak
+*.tmp
+*~
+
+
+# SEGURANÇA
+*.pem
+*.key
+*.crt
+
+
+# EXTRAS OPCIONAIS
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
