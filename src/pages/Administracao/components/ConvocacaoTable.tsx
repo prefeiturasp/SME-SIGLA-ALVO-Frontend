@@ -4,13 +4,8 @@ import React from "react";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import dayjs from "dayjs";
 import type { IProcessoConvocacao } from "../../../services/resources/convocacao/IConvocacao";
-import {
-  CustomLink,
-  CustomTitle,
-  StyledTable,
-  DeleteButton,
-  EditButton,
-} from "./style";
+import { CustomTitle, StyledTable } from "./style";
+import { Button, Space } from "antd";
 
 interface ConvocacaoTableProps extends TableProps<IProcessoConvocacao> {
   data: IProcessoConvocacao[];
@@ -40,24 +35,29 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
       dataIndex: "",
       key: "x",
       render: (row) => (
-        <div style={{ display: "flex", gap: "1rem" }}>
-          <EditButton
-            type={"default"}
+        <Space size="small">
+          <Button
+            type={"link"}
             icon={<ModeEditOutlineOutlinedIcon />}
             disabled
             onClick={() => console.log("edit")}
-           />
+          />
 
-          <DeleteButton
-            type={"default"}
+          <Button
+            type={"link"}
+            danger
             icon={<DeleteOutlineOutlinedIcon />}
             onClick={() => console.log("delete")}
           />
 
-
-
-          <CustomLink onClick={() => console.log(row)}>Finalizar</CustomLink>
-        </div>
+          <Button
+            color="primary"
+            variant="link"
+            onClick={() => console.log(row)}
+          >
+            Finalizar
+          </Button>
+        </Space>
       ),
     },
   ];

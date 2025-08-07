@@ -1,10 +1,10 @@
 import { Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-
+import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import BaseScreen, { type TitleItem } from "../BaseScreen";
 import useConvocacaoSchema from "./useConvocacaoSchema";
-import { Divider, Select, DatePicker, Row, Col, Space, Button } from "antd";
-import { Controller, useForm } from "react-hook-form";
+import {  Select, DatePicker, Row, Col, Space, Button } from "antd";
+import { Controller, useForm, type Resolver } from "react-hook-form";
 import { CustomFormItem, SeparatorCol } from "./styles";
 import { Content } from "antd/es/layout/layout";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -15,6 +15,8 @@ import useListRequest from "../../hooks/useListRequest";
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../services";
  
+import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+
 const { Text } = Typography;
 
 const breadcrumbItems = [
@@ -32,13 +34,13 @@ const breadcrumbItems = [
 const Administracao: React.FC = () => {
   const defaultValues = {
     concurso: undefined,
-    cargo: undefined,
-    data_convocacao: "",
+    cargo: undefined,   
     data_inicial: "",
     data_final: "",
-  };
+  } as IFiltroProcessos;
 
-  const {
+
+   const {
     control,
     handleSubmit,
     reset,
@@ -46,7 +48,7 @@ const Administracao: React.FC = () => {
     formState: { errors: formErrors },
   } = useForm<IFiltroProcessos>({
     defaultValues: defaultValues,
-    resolver: yupResolver(useConvocacaoSchema()),
+    resolver: yupResolver(useConvocacaoSchema()) as Resolver<IFiltroProcessos>,
     reValidateMode: "onChange",
     mode: "all",
     shouldFocusError: false,
@@ -98,6 +100,7 @@ const Administracao: React.FC = () => {
 
   const handleReset = () => {
     reset(defaultValues);
+    handleSub(defaultValues);
   };
 
   return (
@@ -107,7 +110,7 @@ const Administracao: React.FC = () => {
     >
       <Content>
         <Row align={'top'} justify="space-between">
-          <Typography.Title level={4} style={{ margin: ' 0' }}>
+          <Typography.Title level={4} style={{ margin: '0 0 1rem 0' }} >
             {"Busca Processos"}
           </Typography.Title>
 
@@ -116,7 +119,7 @@ const Administracao: React.FC = () => {
           </Button>
         </Row>
 
-        <Row style={{ margin: '0 0 0.75rem 0' }}> 
+        <Row > 
           <Col xs={24} md={12} >
             <Controller
               control={control}
@@ -135,6 +138,7 @@ const Administracao: React.FC = () => {
                     options={concursosOptions || []}
                     placeholder="Selecione o concurso"
                     loading={concursosIsLoading}
+                    suffixIcon={<KeyboardArrowDownRoundedIcon  sx={{ color: "#032B68" }}/>}
                   />
                 </CustomFormItem>
               )}
@@ -162,6 +166,7 @@ const Administracao: React.FC = () => {
                         }
                         placeholder="Selecione a data inicial"
                         format="DD/MM/YYYY"
+                        suffixIcon={<CalendarMonthRoundedIcon   sx={{ color: "#032B68" }} />}
                       />
                     </CustomFormItem>
                   )}
@@ -193,7 +198,8 @@ const Administracao: React.FC = () => {
                         }
                         placeholder="Selecione a data final"
                         format="DD/MM/YYYY"
-                      />
+                        suffixIcon={<CalendarMonthRoundedIcon   sx={{ color: "#032B68" }} />}
+                    />
                     </CustomFormItem>
                   )}
                 />
@@ -222,6 +228,7 @@ const Administracao: React.FC = () => {
                             : []
                         }
                         placeholder="Selecione o cargo"
+                        suffixIcon={<KeyboardArrowDownRoundedIcon  sx={{ color: "#032B68" }}/>}
                       />
                     </CustomFormItem>
                   )}
@@ -229,7 +236,9 @@ const Administracao: React.FC = () => {
               </Col>
 
               <Space style={{ margin: '1.5rem 0 1.5rem 0' }}>
-                <Button onClick={handleReset}>Limpar filtros</Button>
+                  
+                
+                <Button  color="primary" variant="outlined" onClick={handleReset}>Limpar filtros</Button>
                 <Button type="primary" onClick={handleSubmit(handleSub)}>
                   Pesquisar
                 </Button>
@@ -238,7 +247,7 @@ const Administracao: React.FC = () => {
           </Col>
           </Row>
 
-         <Row style={{ margin: '.75rem 0' }}> 
+         <Row  > 
           <Col xs={24} md={24}>
             <ConvocacaoTable
               loading={processosConvocacaoIsLoading}
@@ -257,8 +266,7 @@ const Administracao: React.FC = () => {
         </Row>
 
       </Content>
-      <Divider style={{ margin: 0 }} />
-    </BaseScreen>
+     </BaseScreen>
   );
 };
 

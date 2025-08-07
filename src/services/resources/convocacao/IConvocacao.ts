@@ -11,10 +11,10 @@ export interface ISample extends IProcessoConvocacao {
 
 
 export interface IFiltroProcessos {
-  concurso: string;
-  cargo: string;
-  data_inicial: string;
-  data_final: string;
+  concurso?: string;
+  cargo?: string;
+  data_inicial?: string;
+  data_final?: string;
 }
 
   

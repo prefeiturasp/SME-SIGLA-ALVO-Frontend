@@ -25,5 +25,5 @@
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "src/styled.d.ts"]
+  "include": ["src", "src/styled.d.ts", "src/global.d.ts"]
 }

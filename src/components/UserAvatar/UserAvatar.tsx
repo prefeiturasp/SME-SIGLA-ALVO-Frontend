@@ -21,7 +21,7 @@ export const UserAvatar: React.FC = () => {
   const theme = useTheme();
   return (
     <Space size="small" >
-      <Avatar size="default" style={{ background: 'none' }}  icon={<AccountCircleRoundedIcon sx={{ color: theme.token.colorPrimary }}/>} />            
+      <Avatar size="default"  style={{ background: 'none' }}  icon={<AccountCircleRoundedIcon sx={{ fontSize :"2.5rem", color: theme.token.colorPrimary }}/>} />            
       
       <CustomLabel>
         João Pedro <ArrowDropDownIcon />

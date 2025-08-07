@@ -96,7 +96,7 @@ const menuItens: MenuProps["items"] = [
         <div
           style={{
             background: colorBgContainer,
-            minHeight: "75vh",
+            minHeight: "30vh",
             padding: 24,
             borderRadius: borderRadiusLG,
           }}

@@ -1,5 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import './index.css'
+
 import App from "./App.tsx";
 import ptBR from "antd/es/locale/pt_BR";
 import { store } from "./store/store.ts";
@@ -11,7 +13,6 @@ import { theme as antdTheme, ConfigProvider } from "antd";
 
 const { useToken } = antdTheme;
 
-
 const queryClient = new QueryClient();
 
 export const theme = {
@@ -22,25 +23,33 @@ export const theme = {
     colorBgContainer: "#FFFFFF",
     colorBgBase: "#FFFFFF",
     colorTextLightSolid: "#ffffff",
-    colorError: '#DB001B',
-    colorBgLayout:  "#FFFFFF",
-    colorTextDescription: "#161718"
-
- 
+    colorError: "#DB001B",
+    colorBgLayout: "#FFFFFF",
+    colorTextDescription: "#161718",
+    fontSize: 16,
+    fontWeightStrong: 700,
+    fontWeight: 700,
   },
   components: {
     Layout: {
       headerBg: "#FFFFFF",
-      
+    },
+    Table: {
+      headerBg: "#EBEBED",
+      headerSplitColor: "transparent",
+      rowBg: "#FFFFFF", 
+      rowSelectedBg: "#F6F6F6", 
     },
     Pagination: {
       colorPrimary: "#ffffff",
       itemActiveBg: "#05409A",      
     },
+    Button: {
+      fontWeight: 700,
+    },
   },
 };
-  
- 
+
 function ThemedApp() {
   const { token } = useToken();
 
@@ -51,17 +60,14 @@ function ThemedApp() {
   );
 }
 
-
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ConfigProvider locale={ptBR} theme={theme}>
-        <Provider store={store}>
-          <QueryClientProvider client={queryClient}>
-            <ThemedApp>
-            </ThemedApp>    
-          </QueryClientProvider>
-        </Provider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <ThemedApp></ThemedApp>
+        </QueryClientProvider>
+      </Provider>
     </ConfigProvider>
   </StrictMode>
 );
