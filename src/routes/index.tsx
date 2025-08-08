@@ -7,7 +7,7 @@ import ProtectedRoute from "./protected";
 import NotFound from "../pages/NotFound";
 import { Home } from "../pages/Home/Home";
 import { Processos } from "../pages/Processos";
-import Administracao from "../pages/Administracao";
+import ProcessosConvocacao from "../pages/ProcessosConvocacao";
 
 //TODO ADD FEATURE FLAG
 
@@ -17,8 +17,8 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: "/administracao",
-    element: <Administracao />,
+    path: "/processos/convocacao",
+    element: <ProcessosConvocacao />,
   },
   {
     path: "/processos",
@@ -29,6 +29,14 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
+  },
+    {
     path: "/dashboard",
     element: (
       <ProtectedRoute>

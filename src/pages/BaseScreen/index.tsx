@@ -44,7 +44,7 @@ const menuItens: MenuProps["items"] = [
     <CustomLabel>
       Administração <ArrowDropDownIcon />
     </CustomLabel>,
-    onClick: () => navigate("/administracao"), 
+    onClick: () => navigate("/processos/convocacao"), 
   },
   {
     key: "sub2",
