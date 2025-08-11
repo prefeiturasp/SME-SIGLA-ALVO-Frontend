@@ -10,5 +10,15 @@ export default defineConfig({
         icon: true,
       },
     }),
-  ],
+  ],   
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./src/setupTests.ts",
+    css: true, // permite importar css no teste (útil para antd)
+    coverage: {
+      reporter: ["text", "html"],
+      exclude: ["node_modules/", "src/setupTests.ts"],
+    },
+  },
 });

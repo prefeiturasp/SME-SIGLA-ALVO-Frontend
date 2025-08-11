@@ -23,10 +23,10 @@ const breadcrumbItems = [
 
 
 
-export const Home: React.FC = () => (
+export const Sample: React.FC = () => (
 
     <BaseScreen breadcrumbItems={breadcrumbItems}  title='Consulta de convocação de candidatos'>
-        Home Sample
+        Sample
     </BaseScreen>
 
  );

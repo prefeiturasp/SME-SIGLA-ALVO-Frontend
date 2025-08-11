@@ -145,8 +145,8 @@ const ProcessosConvocacao: React.FC = () => {
               </Col>
 
               <Space style={{ margin: "1.5rem 0" }}>
-                <Button onClick={handleReset}>Limpar filtros</Button>
-                <Button type="primary" onClick={handleSubmit(handleSub)}>Pesquisar</Button>
+                <Button onClick={handleReset}>Limpar filtros</Button>                
+                <Button type="primary" data-testid="submit"  onClick={handleSubmit(handleSub)}>Pesquisar</Button>
               </Space>
             </Row>
           </Col>

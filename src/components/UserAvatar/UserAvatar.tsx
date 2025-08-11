@@ -1,4 +1,4 @@
-import { Avatar, Space, Typography } from 'antd';
+import { Avatar, Space } from 'antd';
 import type { IProcessoConvocacao } from '../../services/resources/convocacao/IConvocacao';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
@@ -21,7 +21,7 @@ export const UserAvatar: React.FC = () => {
   const theme = useTheme();
   return (
     <Space size="small" >
-      <Avatar size="default"  style={{ background: 'none' }}  icon={<AccountCircleRoundedIcon sx={{ fontSize :"2.5rem", color: theme.token.colorPrimary }}/>} />            
+      {/* <Avatar size="default"  style={{ background: 'none' }}  icon={<AccountCircleRoundedIcon sx={{ fontSize :"2.5rem", color: theme.token.colorPrimary }}/>} />             */}
       
       <CustomLabel>
         João Pedro <ArrowDropDownIcon />

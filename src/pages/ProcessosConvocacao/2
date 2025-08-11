@@ -1,0 +1,125 @@
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, beforeEach, vi } from "vitest";
+import ProcessosConvocacao from "./index";
+import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { ConfigProvider, theme as antdTheme } from "antd";
+import ptBR from "antd/locale/pt_BR";
+import { ThemeProvider } from "styled-components";
+
+// // mock do useQuery
+// vi.mock("@tanstack/react-query", async (importOriginal) => {
+//   const actual = await importOriginal<typeof import("@tanstack/react-query")>();
+//   return {
+//     ...actual,
+//     useQuery: vi.fn(),
+//   };
+// });
+
+import * as ReactQuery from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
+
+
+const AllProviders = ({ children }: { children: React.ReactNode }) => {
+  const { token } = antdTheme.useToken(); // agora é hook válido
+  return (
+    <ConfigProvider locale={ptBR} theme={{ token }}>
+      <MemoryRouter>
+        {/* <QueryClientProvider client={queryClient}> */}
+         {children}
+        {/* </QueryClientProvider> */}
+      </MemoryRouter>
+    </ConfigProvider>
+  );
+};
+
+export function renderWithClient(client: QueryClient, ui: React.ReactElement) {
+  const { rerender, ...result } = render(
+    <QueryClientProvider client={client}>{ui}</QueryClientProvider>
+  )
+  return {
+    ...result,
+    rerender: (rerenderUi: React.ReactElement) =>
+      rerender(
+        <QueryClientProvider client={client}>{rerenderUi}</QueryClientProvider>
+      ),
+  }
+}
+
+
+
+const setup = (queriesMock: any) => {
+  // (ReactQuery.useQuery as unknown as vi.Mock).mockImplementation(queriesMock);
+  // return render(<ProcessosConvocacao />, { wrapper: AllProviders });
+
+return renderWithClient(
+      queryClient,
+      <ProcessosConvocacao />
+      
+    )
+
+};
+
+describe("Página Administração", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("adicionando filtros de datas com intervalo válido e clicando em pesquisar", () => {
+    setup(() => ({ data: [], isLoading: false }));
+    fireEvent.change(screen.getByLabelText(/data inicial/i), {
+      target: { value: "2025-01-01" },
+    });
+    fireEvent.change(screen.getByLabelText(/data final/i), {
+      target: { value: "2025-01-31" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /pesquisar/i }));
+    expect(ReactQuery.useQuery).toHaveBeenCalled();
+  });
+
+  it("adicionando filtros de datas com intervalo inválido e clicando em pesquisar", () => {
+    setup(() => ({ data: [], isLoading: false }));
+    fireEvent.change(screen.getByLabelText(/data inicial/i), {
+      target: { value: "2025-02-01" },
+    });
+    fireEvent.change(screen.getByLabelText(/data final/i), {
+      target: { value: "2025-01-01" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /pesquisar/i }));
+    expect(screen.getByText(/intervalo inválido/i)).toBeInTheDocument();
+  });
+
+  it("selecionando concurso, depois cargo e clicando em pesquisar", () => {
+    setup(() => ({
+      data: [{ id: 1, nome: "Cargo Teste" }],
+      isLoading: false,
+    }));
+    fireEvent.change(screen.getByLabelText(/concurso/i), {
+      target: { value: "Concurso X" },
+    });
+    fireEvent.change(screen.getByLabelText(/cargo/i), {
+      target: { value: "Cargo Teste" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /pesquisar/i }));
+    expect(screen.getByText(/cargo teste/i)).toBeInTheDocument();
+  });
+});
+
+
+
+// const createWrapper = () => {
+//   // ✅ creates a new QueryClient for each test
+//   const queryClient = new QueryClient()
+//   return ({ children }) => (
+//     <QueryClientProvider client={queryClient}>
+//       {children}
+//     </QueryClientProvider>
+//   )
+// }
+
+// test('my first test', async () => {
+//   const { result } = renderHook(() => useCustomHook(), {
+//     wrapper: createWrapper(),
+//   })
+// })
