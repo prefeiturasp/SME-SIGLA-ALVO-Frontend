@@ -3,7 +3,7 @@ import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutl
 import React from "react";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import dayjs from "dayjs";
-import type { IProcessoConvocacao } from "../../../services/resources/convocacao/IConvocacao";
+import type { IProcessoConvocacao } from "../../../../services/resources/convocacao/IConvocacao";
 import { CustomTitle, StyledTable } from "./style";
 import { Button, Space } from "antd";
 

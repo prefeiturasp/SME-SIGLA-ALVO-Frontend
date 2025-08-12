@@ -2,12 +2,13 @@ import { Typography, Select, DatePicker, Row, Col, Space, Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
-import BaseScreen, { type TitleItem } from "../BaseScreen";
+import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import { Controller } from "react-hook-form";
 import { CustomFormItem, SeparatorCol } from "./styles";
 import { Content } from "antd/es/layout/layout";
 import ConvocacaoTable from "./components/ConvocacaoTable";
-import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao"; 
+import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
+import { useNavigate } from "react-router-dom"; 
 
 const { Text } = Typography;
 
@@ -17,7 +18,8 @@ const breadcrumbItems = [
   { title: "Consulta de candidatos" },
 ] as TitleItem[];
 
-const ProcessosConvocacao: React.FC = () => {
+const ConvocacaoCandidatos: React.FC = () => {
+  const navigate = useNavigate();
   const {
     control,
     handleSubmit,
@@ -41,7 +43,13 @@ const ProcessosConvocacao: React.FC = () => {
           <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>
             Busca Processos
           </Typography.Title>
-          <Button type="primary" icon={<PlusOutlined />}>Nova convocação</Button>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />}
+            onClick={() => navigate("/processos/convocacao/nova")}
+          >
+            Nova convocação
+          </Button>
         </Row>
 
         <Row>
@@ -173,4 +181,4 @@ const ProcessosConvocacao: React.FC = () => {
   );
 };
 
-export default ProcessosConvocacao;
+export default ConvocacaoCandidatos;

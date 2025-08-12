@@ -41,7 +41,7 @@ export const CustomFormItem = styled(FormItem)`
   .ant-form-item-label > label {
     font-weight: 700;
   }
-    margin-bottom:1rem;
+  margin-bottom: 1rem;
 `;
 
 
