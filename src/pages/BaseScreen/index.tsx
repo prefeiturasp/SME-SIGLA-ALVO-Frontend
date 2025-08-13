@@ -35,7 +35,7 @@ const BaseScreen: React.FC<INewSampleModalProps> = ({
   } = theme.useToken();
 
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
 const menuItens: MenuProps["items"] = [
   {
@@ -44,7 +44,7 @@ const menuItens: MenuProps["items"] = [
     <CustomLabel>
       Administração <ArrowDropDownIcon />
     </CustomLabel>,
-    // onClick: () => navigate("/processos/convocacao"), 
+    onClick: () => navigate("/processos/convocacao"), 
   },
   {
     key: "sub2",
@@ -52,7 +52,7 @@ const menuItens: MenuProps["items"] = [
     <CustomLabel>
       Processos <ArrowDropDownIcon />
     </CustomLabel>,
-    // onClick: () => navigate("/processos"), 
+    onClick: () => navigate("/processos"), 
   },
   {
     key: "sub3",

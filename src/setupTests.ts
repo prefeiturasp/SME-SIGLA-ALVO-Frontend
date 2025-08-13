@@ -3,15 +3,12 @@ import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 
+// extends Vitest's expect method with methods from react-testing-library
 expect.extend(matchers);
 
-// Mock do getComputedStyle para jsdom
 Object.defineProperty(window, 'getComputedStyle', {
   value: () => ({
-    getPropertyValue: () => '',  // retorna string vazia para qualquer propriedade
-    // pode adicionar outros métodos se necessário, por exemplo:
-    // length: 0,
-    // item: () => null,
+    getPropertyValue: () => '',
   }),
   writable: true,
 });

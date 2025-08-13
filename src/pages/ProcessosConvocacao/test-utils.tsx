@@ -1,4 +1,3 @@
-// src/test-utils.tsx
 import React, { type PropsWithChildren } from "react";
 import { render } from "@testing-library/react";
 import { Provider } from "react-redux";
@@ -11,25 +10,20 @@ import { MemoryRouter } from "react-router-dom";
 
 const { useToken } = antdTheme;
 
-interface ProvidersWrapperProps extends PropsWithChildren {
-  withRouter?: boolean;
-}
+function ProvidersWrapper({ children }: PropsWithChildren) {
+  const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } },
+});
 
-function ProvidersWrapper({ children, withRouter }: ProvidersWrapperProps) {
-  const queryClient = new QueryClient();
   const { token } = useToken();
-
-  const content = withRouter ? (
-    <MemoryRouter>{children}</MemoryRouter>
-  ) : (
-    children
-  );
 
   return (
     <ConfigProvider locale={ptBR}>
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider theme={{ token }}>{content}</ThemeProvider>
+          <ThemeProvider theme={{ token }}>
+           <MemoryRouter>{children}</MemoryRouter>
+          </ThemeProvider>
         </QueryClientProvider>
       </Provider>
     </ConfigProvider>
@@ -38,10 +32,10 @@ function ProvidersWrapper({ children, withRouter }: ProvidersWrapperProps) {
 
 function renderWithProviders(
   ui: React.ReactElement,
-  { withRouter = false, ...options } = {}
+  { ...options } = {}
 ) {
   return render(ui, {
-    wrapper: (props) => <ProvidersWrapper withRouter={withRouter} {...props} />,
+    wrapper: (props) => <ProvidersWrapper {...props} />,
     ...options,
   });
 }

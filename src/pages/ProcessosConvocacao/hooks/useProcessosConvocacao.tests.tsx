@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
-import { useProcessosConvocacao } from "../hooks/useProcessosConvocacao";
+import { useProcessosConvocacao } from "./useProcessosConvocacao";
 
 const createTestQueryClient = () =>
   new QueryClient({
