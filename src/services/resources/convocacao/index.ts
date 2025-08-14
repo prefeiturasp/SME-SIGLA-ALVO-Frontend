@@ -6,7 +6,9 @@ import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
   getProcessosConvocacao: () => `/api/processos-convocacao`,
-  getConcursos: () => `/api/concursos`,
+  getConcursos: () => `/api/processos-convocacao/concursos/`,
+  getCargos: () => `/api/processos-convocacao/cargos/`,
+  getCargosPorConcurso: (concursoUuid: string) => `/api/processos-convocacao/cargos-por-concurso/?concurso_uuid=${concursoUuid}`,
   createSample: () => `api/sample/create`,
   editSample: (id:number) => `api/sample/update/${id}/`,
   deleteSample: (id:number) => `api/sample/delete/${id}/`,
@@ -108,6 +110,45 @@ export const getConcursosData = (
 
   const response = appAxios
     .get<IBackendWithSubOptions[]>(URL.getConcursos(), {
+       signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getCargosData = (
+   axiosRequestConfig?: AxiosRequestConfig
+) => {
+   const { signal, abort } = new AbortController();
+
+  const response = appAxios
+    .get<IBackendWithSubOptions[]>(URL.getCargos(), {
+       signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getCargosPorConcursoData = (
+  concursoUuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+   const { signal, abort } = new AbortController();
+
+  const response = appAxios
+    .get<IBackendWithSubOptions[]>(URL.getCargosPorConcurso(concursoUuid), {
        signal,
       ...axiosRequestConfig,
     })
