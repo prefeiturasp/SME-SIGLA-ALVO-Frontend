@@ -9,9 +9,9 @@ import { vi } from "vitest";
   const submitSpy = vi.fn()
   const  resetSpy = vi.fn()
 
-const mockLogin = vi.fn((email, password) => {
-  return Promise.resolve({ email, password });
-});
+// const mockLogin = vi.fn((email, password) => {
+//   return Promise.resolve({ email, password });
+// });
 
      const concursosOptions = {
     concursos: [{ label: "Concurso 1", value: "c1" }],
@@ -28,8 +28,7 @@ it("deve mostrar erro quando data inicial for maior que data final", async () =>
       onSubmit2={submitSpy}
       onReset={resetSpy}
       onAntTableChange={vi.fn()}
-      login={mockLogin}
-    />
+     />
   );
 
   fireEvent.change(document.getElementById("data_inicial")!, {
@@ -56,7 +55,8 @@ it("deve mostrar erro quando data inicial for maior que data final", async () =>
     ).toBeInTheDocument();
   });
 
-  expect(mockLogin).not.toHaveBeenCalled();
+  expect(submitSpy).not.toHaveBeenCalled();
+  // expect(mockLogin).not.toHaveBeenCalled();
 });
 
 
@@ -71,7 +71,7 @@ it("deve submeter com datas válidas e verificar o que foi enviado", async () =>
       onSubmit2={submitSpy}
       onReset={resetSpy}
       onAntTableChange={vi.fn()}
-      login={mockLogin}
+      // login={mockLogin}
     />
   );
 

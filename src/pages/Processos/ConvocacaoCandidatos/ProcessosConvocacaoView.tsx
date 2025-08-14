@@ -13,8 +13,7 @@ interface Props {
   onSubmit2: (data: any) => void;
   onReset: () => void;
   onAntTableChange: any;
-  login: any;
-}
+ }
 
 export default function ProcessosConvocacaoView({
   concursosOptions,
@@ -24,9 +23,8 @@ export default function ProcessosConvocacaoView({
   onSubmit2,
   onReset,
   onAntTableChange,
-  login
-}: Props) {
-  
+ }: Props) {
+
   const {
     control,
     register,
@@ -52,8 +50,7 @@ export default function ProcessosConvocacaoView({
       }
     }
 
-    await login(data.email, data.password);
-    onSubmit2(data);
+     onSubmit2(data);
     reset();
   };
 
