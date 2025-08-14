@@ -41,9 +41,10 @@ interface Props {
   concursosOptions?: any;
   processosConvocacaoData?: { results?: any[]; count?: number };
   processosLoading: boolean;
+  concursosIsLoading: boolean;
   paginationPage: number;
-  onSubmit2: (data: any) => void;
-  onReset: () => void;
+  handleSub: (data: any) => void;
+  handleReset: () => void;
   onAntTableChange: any;
   listRequest: IListRequest<IFiltroProcessos>
  }
@@ -55,22 +56,26 @@ export default function ProcessosConvocacaoView({
   concursosOptions,
   processosConvocacaoData,
   processosLoading,
+  concursosIsLoading,
   paginationPage,
-  onSubmit2,
-  onReset,
+  handleSub,
+  handleReset,
   onAntTableChange,
   listRequest
+  
  }: Props) {
+
+      const navigate = useNavigate();
 
   const {
     control,
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors: formErrors },
     reset,
     setError,
-    clearErrors
-  } = useForm();
+    clearErrors,
+   } = useForm();
 
 
   
@@ -87,9 +92,8 @@ export default function ProcessosConvocacaoView({
       }
     }
 
-     onSubmit2(data);
-    reset();
-  };
+     handleSub(data);
+   };
 
   return (
 
@@ -121,7 +125,7 @@ export default function ProcessosConvocacaoView({
                     <CustomFormItem
                       label="Concurso"
                       validateStatus={
-                        formErrors.concurso_uuid ? "error" : undefined
+                        formErrors.concurso_uuid ? "error" : undefinedf
                       }
                       help={formErrors.concurso_uuid?.message}
                       labelCol={{ span: 24 }}
@@ -250,8 +254,8 @@ export default function ProcessosConvocacaoView({
                   </Space>
                 </Row>
               </Col>
-            </Row>
-     */}
+            </Row> */}
+    
             <Row>
               <Col xs={24}>
                 <ConvocacaoTable
@@ -280,7 +284,7 @@ export default function ProcessosConvocacaoView({
             render={({ field }) => (
               <CustomFormItem
                 label="Data Inicial"
-                validateStatus={errors.data_inicial ? "error" : undefined}
+                validateStatus={formErrors.data_inicial ? "error" : undefined}
                 labelCol={{ span: 24 }}
               >
                 <TextField
@@ -292,7 +296,7 @@ export default function ProcessosConvocacaoView({
                     field.onChange(e.target.value);
                     clearErrors("data_final");
                   }}
-                  error={!!errors.data_inicial}
+                  error={!!formErrors.data_inicial}
                 />
               </CustomFormItem>
             )}
@@ -306,8 +310,8 @@ export default function ProcessosConvocacaoView({
             render={({ field }) => (
               <CustomFormItem
                 label="Data Final"
-                validateStatus={errors.data_final ? "error" : undefined}
-                help={errors.data_final?.message}
+                validateStatus={formErrors.data_final ? "error" : undefined}
+                help={formErrors.data_final?.message}
                 labelCol={{ span: 24 }}
               >
                 <TextField
@@ -324,7 +328,7 @@ export default function ProcessosConvocacaoView({
                     field.onChange(e.target.value);
                     clearErrors("data_final");
                   }}
-                  error={!!errors.data_final}
+                  error={!!formErrors.data_final}
                 />
               </CustomFormItem>
             )}

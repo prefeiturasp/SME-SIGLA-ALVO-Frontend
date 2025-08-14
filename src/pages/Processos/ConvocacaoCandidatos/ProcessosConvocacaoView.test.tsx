@@ -18,15 +18,17 @@ const concursosOptions = {
   cargos: [{ label: "Cargo 1", value: "cg1" }],
 };
 
+    
 it("deve mostrar erro quando data inicial for maior que data final", async () => {
   renderWithProviders(
     <ProcessosConvocacaoView
       concursosOptions={concursosOptions}
       processosConvocacaoData={{ results: [], count: 0 }}
       processosLoading={false}
+      concursosIsLoading={false}
       paginationPage={1}
-      onSubmit2={submitSpy}
-      onReset={resetSpy}
+      handleSub={submitSpy}
+      handleReset={resetSpy}
       onAntTableChange={vi.fn()}
       listRequest={{ pagination: { page: 1, page_size: 10 } }}
     />
@@ -58,9 +60,10 @@ it("deve submeter com datas válidas e verificar o que foi enviado", async () =>
       concursosOptions={concursosOptions}
       processosConvocacaoData={{ results: [], count: 0 }}
       processosLoading={false}
+      concursosIsLoading={false}
       paginationPage={1}
-      onSubmit2={submitSpy}
-      onReset={resetSpy}
+      handleSub={submitSpy}
+      handleReset={resetSpy}
       onAntTableChange={vi.fn()}
       listRequest={{ pagination: { page: 1, page_size: 10 } }}
       // login={mockLogin}

@@ -1,9 +1,7 @@
-
-
+import { useNavigate } from "react-router-dom";
 import ProcessosConvocacaoView from "./ProcessosConvocacaoView";
 
 import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
- 
 
 export default function ProcessosConvocacaoContainer() {
   const {
@@ -23,20 +21,17 @@ export default function ProcessosConvocacaoContainer() {
     processosQuery,
   } = useProcessosConvocacao();
 
-
-
- 
-
   return (
     <ProcessosConvocacaoView
+      handleSub={handleSub}
+      handleReset={handleReset}
+      concursosIsLoading={concursosIsLoading}
       concursosOptions={concursosOptions}
       paginationPage={1}
-      onSubmit2={handleSub}
       onAntTableChange={onAntTableChange}
       processosConvocacaoData={processosQuery.data}
-      processosLoading={concursosIsLoading}
-    onReset={handleReset}
-    listRequest={listRequest}
+      processosLoading={processosConvocacaoIsLoading}
+      listRequest={listRequest}
     />
   );
 }
