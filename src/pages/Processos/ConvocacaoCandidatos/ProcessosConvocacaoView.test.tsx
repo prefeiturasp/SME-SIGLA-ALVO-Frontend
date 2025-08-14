@@ -2,43 +2,43 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ProcessosConvocacaoView from "./ProcessosConvocacaoView";
 import { vi } from "vitest";
+import { renderWithProviders } from "./test-utils";
 
-  const handleSubmit = vi.fn();
+const handleSubmit = vi.fn();
 
- 
-  const submitSpy = vi.fn()
-  const  resetSpy = vi.fn()
+const submitSpy = vi.fn();
+const resetSpy = vi.fn();
 
 // const mockLogin = vi.fn((email, password) => {
 //   return Promise.resolve({ email, password });
 // });
 
-     const concursosOptions = {
-    concursos: [{ label: "Concurso 1", value: "c1" }],
-    cargos: [{ label: "Cargo 1", value: "cg1" }],
-  };
+const concursosOptions = {
+  concursos: [{ label: "Concurso 1", value: "c1" }],
+  cargos: [{ label: "Cargo 1", value: "cg1" }],
+};
 
 it("deve mostrar erro quando data inicial for maior que data final", async () => {
-  render(
+  renderWithProviders(
     <ProcessosConvocacaoView
       concursosOptions={concursosOptions}
-      processosData={{ results: [], count: 0 }}
+      processosConvocacaoData={{ results: [], count: 0 }}
       processosLoading={false}
       paginationPage={1}
       onSubmit2={submitSpy}
       onReset={resetSpy}
       onAntTableChange={vi.fn()}
-     />
+      listRequest={{ pagination: { page: 1, page_size: 10 } }}
+    />
   );
 
   fireEvent.change(document.getElementById("data_inicial")!, {
-    target: { value: "2025-08-20" }
+    target: { value: "2025-08-20" },
   });
 
   fireEvent.change(document.getElementById("data_final")!, {
-    target: { value: "2025-08-10" }
+    target: { value: "2025-08-10" },
   });
- 
 
   fireEvent.submit(screen.getByRole("button"));
 
@@ -52,32 +52,30 @@ it("deve mostrar erro quando data inicial for maior que data final", async () =>
   // expect(mockLogin).not.toHaveBeenCalled();
 });
 
-
-
 it("deve submeter com datas válidas e verificar o que foi enviado", async () => {
-  render(
+  renderWithProviders(
     <ProcessosConvocacaoView
       concursosOptions={concursosOptions}
-      processosData={{ results: [], count: 0 }}
+      processosConvocacaoData={{ results: [], count: 0 }}
       processosLoading={false}
       paginationPage={1}
       onSubmit2={submitSpy}
       onReset={resetSpy}
       onAntTableChange={vi.fn()}
+      listRequest={{ pagination: { page: 1, page_size: 10 } }}
       // login={mockLogin}
     />
   );
 
   // Preencher datas
   fireEvent.change(document.getElementById("data_inicial")!, {
-    target: { value: "2025-08-10" }
+    target: { value: "2025-08-10" },
   });
 
   fireEvent.change(document.getElementById("data_final")!, {
-    target: { value: "2025-08-20" }
+    target: { value: "2025-08-20" },
   });
 
- 
   // Submeter formulário
   fireEvent.submit(screen.getByRole("button"));
 

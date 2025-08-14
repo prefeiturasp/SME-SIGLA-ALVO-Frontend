@@ -4,6 +4,7 @@ import ProcessosConvocacaoView from "./ProcessosConvocacaoView";
 
 import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
  
+
 export default function ProcessosConvocacaoContainer() {
   const {
     control,
@@ -32,9 +33,10 @@ export default function ProcessosConvocacaoContainer() {
       paginationPage={1}
       onSubmit2={handleSub}
       onAntTableChange={onAntTableChange}
-       processosData={processosQuery.data}
+      processosConvocacaoData={processosQuery.data}
       processosLoading={concursosIsLoading}
     onReset={handleReset}
+    listRequest={listRequest}
     />
   );
 }
