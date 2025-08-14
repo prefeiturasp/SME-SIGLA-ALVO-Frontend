@@ -38,14 +38,7 @@ it("deve mostrar erro quando data inicial for maior que data final", async () =>
   fireEvent.change(document.getElementById("data_final")!, {
     target: { value: "2025-08-10" }
   });
-
-  fireEvent.change(screen.getByRole("textbox", { name: /email/i }), {
-    target: { value: "test@mail.com" }
-  });
-
-  fireEvent.change(screen.getByLabelText(/password/i), {
-    target: { value: "password" }
-  });
+ 
 
   fireEvent.submit(screen.getByRole("button"));
 
@@ -84,15 +77,7 @@ it("deve submeter com datas válidas e verificar o que foi enviado", async () =>
     target: { value: "2025-08-20" }
   });
 
-  // Preencher email e senha
-  fireEvent.change(screen.getByRole("textbox", { name: /email/i }), {
-    target: { value: "test@mail.com" }
-  });
-
-  fireEvent.change(screen.getByLabelText(/password/i), {
-    target: { value: "password" }
-  });
-
+ 
   // Submeter formulário
   fireEvent.submit(screen.getByRole("button"));
 
@@ -107,8 +92,6 @@ it("deve submeter com datas válidas e verificar o que foi enviado", async () =>
     expect.objectContaining({
       data_inicial: "2025-08-10",
       data_final: "2025-08-20",
-      email: "test@mail.com",
-      password: "password"
     })
   );
 });
