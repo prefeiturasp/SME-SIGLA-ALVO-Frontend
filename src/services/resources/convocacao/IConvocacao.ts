@@ -1,7 +1,8 @@
 export interface IProcessoConvocacao {
-  nome: string;
+  concurso_nome: string;
   data_convocacao: string;
   status: string; 
+  uuid: string; 
 }
 
 
@@ -11,10 +12,10 @@ export interface ISample extends IProcessoConvocacao {
 
 
 export interface IFiltroProcessos {
-  concurso?: string;
+  concurso_uuid?: string;
   cargo?: string;
-  data_inicial?: string;
-  data_final?: string;
+  data_convocacao_inicio?: string;
+  data_convocacao_fim?: string;
 }
 
   

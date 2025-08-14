@@ -61,15 +61,15 @@ type FormFields = {
   tipo_processo: string;
   descricao: string;
   cargo: string;
-  data_inicial: string;
-  data_final: string;
+  data_convocacao_inicio: string;
+  data_convocacao_fim: string;
 };
 
 export const NovaConvocacaoCandidatos: React.FC = () => {
   const { data: concursosOptions, isLoading: concursosIsLoading } = useQuery({
-  queryKey: ["getConcursosData"],
+  queryKey: ["getConcursosOptions"],
   queryFn: ({ signal }) =>
-    API.Convocacao.getConcursosData({ signal }).response,
+    API.Convocacao.getConcursosOptions({ signal }).response,
   staleTime: 1000 * 60 * 5,
   retry: 0,
 });
@@ -93,8 +93,8 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
       tipo_processo: undefined,
       descricao: undefined,
       cargo: "",
-      data_inicial: "",
-      data_final: "",
+      data_convocacao_inicio: "",
+      data_convocacao_fim: "",
     },
   });
 
@@ -104,8 +104,8 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
     watchFields.concurso &&
     watchFields.tipo_processo &&
     watchFields.descricao &&
-    watchFields.data_inicial &&
-    watchFields.data_final &&
+    watchFields.data_convocacao_inicio &&
+    watchFields.data_convocacao_fim &&
     watchFields.cargo;
 
   const handleSub = (data: FormFields) => {
@@ -122,8 +122,8 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
       tipo_processo: "",
       descricao: "",
       cargo: "",
-      data_inicial: "",
-      data_final: "",
+      data_convocacao_inicio: "",
+      data_convocacao_fim: "",
     });
     setCargoSelecionado(undefined);
     setArquivoSelecionado(undefined);
@@ -205,7 +205,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
   <Col xs={24} sm={12}>
     <Controller
       control={control}
-      name="data_inicial"
+      name="data_convocacao_inicio"
       render={({ field }) => (
         <CustomFormItem label="Data de publicação">
                       <DatePicker
@@ -225,7 +225,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
   <Col xs={24} sm={12}>
     <Controller
       control={control}
-      name="data_final"
+      name="data_convocacao_fim"
       render={({ field }) => (
         <CustomFormItem label="Data de convocação">
                       <DatePicker

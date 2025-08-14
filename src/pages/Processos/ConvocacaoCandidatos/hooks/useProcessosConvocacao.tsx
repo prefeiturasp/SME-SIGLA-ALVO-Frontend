@@ -6,14 +6,11 @@ import dayjs from "dayjs";
 import { API } from "../../../../services";
 import useConvocacaoSchema from "../useConvocacaoSchema";
 import type { IFiltroProcessos } from "../../../../services/resources/convocacao/IConvocacao";
-import useListRequest from "../../../../hooks/useListRequest";
+import useListRequest, { removeUndefinedFields } from "../../../../hooks/useListRequest";
 
 export const useProcessosConvocacao = () => {
   const defaultValues: IFiltroProcessos = {
-    concurso: undefined,
-    cargo: undefined,
-    data_inicial: "",
-    data_final: "",
+ 
   };
 
   const {
@@ -36,16 +33,14 @@ export const useProcessosConvocacao = () => {
     });
 
   const { data: concursosOptions, isLoading: concursosIsLoading } = useQuery({
-    queryKey: ["getConcursosData"],
+    queryKey: ["getConcursosOptions"],
     queryFn: ({ signal }) =>
-      API.Convocacao.getConcursosData({ signal }).response,
+      API.Convocacao.getConcursosOptions({ signal }).response,
     staleTime: 1000 * 60 * 5,
     retry: 0,
   });
 
-  const selectedConcurso = concursosOptions?.find(
-    (c) => c.value === watch("concurso")
-  );
+  
 
   const {
     data: processosConvocacaoData,
@@ -59,9 +54,11 @@ export const useProcessosConvocacao = () => {
   });
 
   const handleSub = async (data: IFiltroProcessos) => {
+    
     setListRequest((prevState) => ({
       ...prevState,
-      filters: data,
+      page:1,
+    filters: removeUndefinedFields(data),
     }));
   };
 
@@ -76,7 +73,6 @@ export const useProcessosConvocacao = () => {
     formErrors,
     concursosOptions,
     concursosIsLoading,
-    selectedConcurso,
     processosConvocacaoData,
     processosConvocacaoIsLoading,
     listRequest,

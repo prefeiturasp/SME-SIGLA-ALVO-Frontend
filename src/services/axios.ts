@@ -5,7 +5,7 @@ export const appAxiosMock = axios.create({
 });
 
 export const appAxios = axios.create({
-  baseURL: "http://localhost:3000", //todo add in .env
+  baseURL: "http://127.0.0.1:8000", //todo add in .env
 });
 
 export const appAxiosServico1 = axios.create({

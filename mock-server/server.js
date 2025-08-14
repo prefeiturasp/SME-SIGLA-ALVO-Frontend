@@ -51,12 +51,12 @@ server.use(middlewares);
 server.get('/api/processos-convocacao', (req, res) => {
   let data = db.processos;
 
-  const { data_inicial, data_final, concursoValue, pageNumber = 1, pageSize = 10 } = req.query;
+  const { data_convocacao_inicio, data_convocacao_fim, concursoValue, pageNumber = 1, pageSize = 10 } = req.query;
 
   // Filtro por datas
-  if (data_inicial && data_final) {
-    const inicio = new Date(data_inicial);
-    const fim = new Date(data_final);
+  if (data_convocacao_inicio && data_convocacao_fim) {
+    const inicio = new Date(data_convocacao_inicio);
+    const fim = new Date(data_convocacao_fim);
 
     data = data.filter(item => {
       const dataConv = new Date(item.data_convocacao);

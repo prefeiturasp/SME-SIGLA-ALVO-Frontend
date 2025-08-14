@@ -5,11 +5,11 @@ import type { IBackendWithSubOptions, IListRequest, PaginatedResponse } from "..
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
-  getProcessosConvocacao: () => `/api/processos-convocacao`,
-  getConcursos: () => `/api/concursos`,
-  createSample: () => `api/sample/create`,
-  editSample: (id:number) => `api/sample/update/${id}/`,
-  deleteSample: (id:number) => `api/sample/delete/${id}/`,
+  getProcessosConvocacao: () => `/api/v1/processos-convocacao/`,
+  getConcursosOptions: () => `/api/v1/processos-convocacao/filtros/`,
+  createSample: () => `api/v1/sample/create`,
+  editSample: (id:number) => `api/v1/sample/update/${id}/`,
+  deleteSample: (id:number) => `api/v1/sample/delete/${id}/`,
 };
 
 
@@ -101,13 +101,13 @@ export const deleteSample = (
 };
 
 // TODO adicionar JWT no header Authorization
-export const getConcursosData = (
+export const getConcursosOptions = (
    axiosRequestConfig?: AxiosRequestConfig
 ) => {
    const { signal, abort } = new AbortController();
 
   const response = appAxios
-    .get<IBackendWithSubOptions[]>(URL.getConcursos(), {
+    .get<IBackendWithSubOptions>(URL.getConcursosOptions(), {
        signal,
       ...axiosRequestConfig,
     })

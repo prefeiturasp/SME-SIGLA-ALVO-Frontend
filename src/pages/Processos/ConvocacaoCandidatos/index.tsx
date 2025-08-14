@@ -8,13 +8,25 @@ import { CustomFormItem, SeparatorCol } from "./styles";
 import { Content } from "antd/es/layout/layout";
 import ConvocacaoTable from "./components/ConvocacaoTable";
 import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
 const { Text } = Typography;
 
 const breadcrumbItems = [
-  { title: <a href="/"><Text strong>Home</Text></a> },
-  { title: <a href="/processos"><Text strong>Processos</Text></a> },
+  {
+    title: (
+      <a href="/">
+        <Text strong>Home</Text>
+      </a>
+    ),
+  },
+  {
+    title: (
+      <a href="/processos">
+        <Text strong>Processos</Text>
+      </a>
+    ),
+  },
   { title: "Consulta de candidatos" },
 ] as TitleItem[];
 
@@ -26,7 +38,6 @@ const ConvocacaoCandidatos: React.FC = () => {
     formErrors,
     concursosOptions,
     concursosIsLoading,
-    selectedConcurso,
     processosConvocacaoData,
     processosConvocacaoIsLoading,
     listRequest,
@@ -37,14 +48,17 @@ const ConvocacaoCandidatos: React.FC = () => {
   } = useProcessosConvocacao();
 
   return (
-    <BaseScreen breadcrumbItems={breadcrumbItems} title="Consulta de convocação de candidatos">
+    <BaseScreen
+      breadcrumbItems={breadcrumbItems}
+      title="Consulta de convocação de candidatos"
+    >
       <Content>
         <Row align="top" justify="space-between">
           <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>
             Busca Processos
           </Typography.Title>
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             icon={<PlusOutlined />}
             onClick={() => navigate("/processos/convocacao/nova")}
           >
@@ -56,21 +70,25 @@ const ConvocacaoCandidatos: React.FC = () => {
           <Col xs={24} md={12}>
             <Controller
               control={control}
-              name="concurso"
+              name="concurso_uuid"
               render={({ field }) => (
                 <CustomFormItem
                   label="Concurso"
-                  validateStatus={formErrors.concurso ? "error" : undefined}
-                  help={formErrors.concurso?.message}
+                  validateStatus={
+                    formErrors.concurso_uuid ? "error" : undefined
+                  }
+                  help={formErrors.concurso_uuid?.message}
                   labelCol={{ span: 24 }}
                 >
                   <Select
                     {...field}
                     style={{ width: "100%" }}
-                    options={concursosOptions || []}
+                    options={concursosOptions?.concursos || []}
                     placeholder="Selecione o concurso"
                     loading={concursosIsLoading}
-                    suffixIcon={<KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />}
+                    suffixIcon={
+                      <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
+                    }
                   />
                 </CustomFormItem>
               )}
@@ -80,47 +98,67 @@ const ConvocacaoCandidatos: React.FC = () => {
               <Col xs={24} sm={11}>
                 <Controller
                   control={control}
-                  name="data_inicial"
+                  name="data_convocacao_inicio"
                   render={({ field }) => (
                     <CustomFormItem
                       label="Data de Convocação"
-                      validateStatus={formErrors.data_inicial ? "error" : undefined}
-                      help={formErrors.data_inicial?.message}
+                      validateStatus={
+                        formErrors.data_convocacao_inicio ? "error" : undefined
+                      }
+                      help={formErrors.data_convocacao_inicio?.message}
                       labelCol={{ span: 24 }}
                     >
                       <DatePicker
                         style={{ width: "100%" }}
                         value={field.value ? dayjs(field.value) : undefined}
-                        onChange={(date) => field.onChange(date ? date.toISOString() : "")}
+                        onChange={(date) =>
+                          field.onChange(
+                            date ? dayjs(date).format("YYYY-MM-DD") : ""
+                          )
+                        }
                         placeholder="Selecione a data inicial"
                         format="DD/MM/YYYY"
-                        suffixIcon={<CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />}
+                        suffixIcon={
+                          <CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />
+                        }
                       />
                     </CustomFormItem>
                   )}
                 />
               </Col>
 
-              <SeparatorCol xs={24} sm={2}><Text strong>até</Text></SeparatorCol>
+              <SeparatorCol xs={24} sm={2}>
+                <Text strong>até</Text>
+              </SeparatorCol>
 
               <Col xs={24} sm={11}>
                 <Controller
                   control={control}
-                  name="data_final"
+                  name="data_convocacao_fim"
                   render={({ field }) => (
                     <CustomFormItem
                       label=" "
-                      validateStatus={formErrors.data_final ? "error" : undefined}
-                      help={formErrors.data_final?.message}
+                      validateStatus={
+                        formErrors.data_convocacao_fim ? "error" : undefined
+                      }
+                      help={formErrors.data_convocacao_fim?.message}
                       labelCol={{ span: 24 }}
                     >
                       <DatePicker
                         style={{ width: "100%" }}
+                        
+
                         value={field.value ? dayjs(field.value) : undefined}
-                        onChange={(date) => field.onChange(date ? date.toISOString() : "")}
+                        onChange={(date) =>
+                          field.onChange(
+                            date ? dayjs(date).format("YYYY-MM-DD") : ""
+                          )
+                        }
                         placeholder="Selecione a data final"
                         format="DD/MM/YYYY"
-                        suffixIcon={<CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />}
+                        suffixIcon={
+                          <CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />
+                        }
                       />
                     </CustomFormItem>
                   )}
@@ -143,9 +181,15 @@ const ConvocacaoCandidatos: React.FC = () => {
                       <Select
                         {...field}
                         style={{ width: "100%" }}
-                        options={selectedConcurso ? selectedConcurso.cargos : []}
+                        options={
+                          concursosOptions ? concursosOptions.cargos : []
+                        }
                         placeholder="Selecione o cargo"
-                        suffixIcon={<KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />}
+                        suffixIcon={
+                          <KeyboardArrowDownRoundedIcon
+                            sx={{ color: "#032B68" }}
+                          />
+                        }
                       />
                     </CustomFormItem>
                   )}
@@ -154,7 +198,9 @@ const ConvocacaoCandidatos: React.FC = () => {
 
               <Space style={{ margin: "1.5rem 0" }}>
                 <Button onClick={handleReset}>Limpar filtros</Button>
-                <Button type="primary" onClick={handleSubmit(handleSub)}>Pesquisar</Button>
+                <Button type="primary" onClick={handleSubmit(handleSub)}>
+                  Pesquisar
+                </Button>
               </Space>
             </Row>
           </Col>
@@ -167,10 +213,12 @@ const ConvocacaoCandidatos: React.FC = () => {
               data={processosConvocacaoData?.results || []}
               pagination={{
                 current: listRequest.pagination.page,
+                pageSize: 10,
                 defaultPageSize: 10,
                 position: ["bottomLeft"],
                 total: processosConvocacaoData?.count,
-                showTotal: () => `Mostrando ${listRequest.pagination.page} - 10 registro(s) do total de ${processosConvocacaoData?.count}`,
+                showTotal: () =>
+                  `Mostrando ${listRequest.pagination.page} - 10 registro(s) do total de ${processosConvocacaoData?.count}`,
               }}
               onChange={onAntTableChange}
             />

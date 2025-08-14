@@ -5,9 +5,7 @@ import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import { useTheme } from "styled-components";
 import { CustomLabel } from '../../pages/BaseScreen/styles';
 
-export interface INewSampleModalData extends IProcessoConvocacao {
-  description: string;
-}
+ 
 
 export type TitleItem = 
   | { title: string }

@@ -14,8 +14,8 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
   const columns: ColumnsType<IProcessoConvocacao> = [
     {
       title: "Processo",
-      dataIndex: "nome",
-      key: "nome",
+      dataIndex: "concurso_nome",
+      key: "concurso_nome",
     },
 
     {
@@ -62,8 +62,11 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
     },
   ];
 
+  console.log('processosConvocacaoData',data)
+
   return (
     <>
+
       <CustomTitle level={4} style={{ margin: "1rem 0" }}>
         {"Resultados"}
       </CustomTitle>
@@ -71,7 +74,7 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
       <StyledTable
         columns={columns}
         dataSource={data}
-        rowKey={(record) => `${record.nome}`}
+        rowKey={(record) => `${record.uuid}`}
         bordered
         rowClassName={(_, index) =>
           index % 2 === 0 ? "row-white" : "row-gray"
