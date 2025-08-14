@@ -34,15 +34,15 @@ it("deve mostrar erro quando data inicial for maior que data final", async () =>
     />
   );
 
-  fireEvent.change(document.getElementById("data_inicial")!, {
+  fireEvent.change(document.getElementById("data_convocacao_inicio")!, {
     target: { value: "2025-08-20" },
   });
 
-  fireEvent.change(document.getElementById("data_final")!, {
+  fireEvent.change(document.getElementById("data_convocacao_fim")!, {
     target: { value: "2025-08-10" },
   });
 
-  fireEvent.submit(screen.getByRole("button"));
+  fireEvent.submit(screen.getByTestId("submit-button"));
 
   await waitFor(() => {
     expect(
@@ -71,16 +71,16 @@ it("deve submeter com datas válidas e verificar o que foi enviado", async () =>
   );
 
   // Preencher datas
-  fireEvent.change(document.getElementById("data_inicial")!, {
+  fireEvent.change(document.getElementById("data_convocacao_inicio")!, {
     target: { value: "2025-08-10" },
   });
 
-  fireEvent.change(document.getElementById("data_final")!, {
+  fireEvent.change(document.getElementById("data_convocacao_fim")!, {
     target: { value: "2025-08-20" },
   });
 
   // Submeter formulário
-  fireEvent.submit(screen.getByRole("button"));
+  fireEvent.submit(screen.getByTestId("submit-button"));
 
   // Esperar que o submit tenha sido chamado
   await waitFor(() => expect(submitSpy).toHaveBeenCalled());
@@ -91,8 +91,8 @@ it("deve submeter com datas válidas e verificar o que foi enviado", async () =>
 
   expect(calledWith).toEqual(
     expect.objectContaining({
-      data_inicial: "2025-08-10",
-      data_final: "2025-08-20",
+      data_convocacao_inicio: "2025-08-10",
+      data_convocacao_fim: "2025-08-20",
     })
   );
 });
