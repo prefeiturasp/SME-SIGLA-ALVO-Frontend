@@ -1,18 +1,20 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import ConvocacaoTable from "../components/ConvocacaoTable";
-import type { IProcessoConvocacao } from "../../../services/resources/convocacao/IConvocacao";
+import type { IProcessoConvocacao } from "../../../../services/resources/convocacao/IConvocacao";
 
 const mockData: IProcessoConvocacao[] = [
   {
-    nome: "Processo 1",
+    concurso_nome: "Processo 1",
     data_convocacao: "2025-08-01T13:02:13.806Z",
     status: "Em andamento",
+    uuid:'1'
   },
   {
-    nome: "Processo 2",
+    concurso_nome: "Processo 2",
     data_convocacao: "2025-07-15T13:02:13.806Z",
     status: "Concluído",
+    uuid:'2'
   },
 ];
 

@@ -5,6 +5,7 @@ import { type IListRequest } from '../types/IListRequest';
 import { type IFullListRequest } from '../types/IListRequest';
  
 const useListRequest = <T,>(defaultState: IListRequest<T>) => {
+  
   const [listRequest, setListRequest] = useState(defaultState);
   const onAntTableChange: TableProps<any>['onChange'] = useCallback(
     (pagination: TablePaginationConfig,
@@ -13,7 +14,7 @@ const useListRequest = <T,>(defaultState: IListRequest<T>) => {
       setListRequest((prev) => ({
         pagination: {
           page: pagination.current || prev.pagination.page,
-          page_size: pagination.page_size || prev.pagination.page_size,
+          page_size: pagination.pageSize || prev.pagination.page_size,
         },
         filters: { ...prev.filters, ...Object(filters) },
         ...(!!(sorter as SorterResult<any>).order && {
@@ -44,6 +45,15 @@ const useListRequest = <T,>(defaultState: IListRequest<T>) => {
     backToPreviusPage,
   };
 };
+
+ 
+
+export const removeUndefinedFields = <T extends object>(obj: T): {
+  [K in keyof T as T[K] extends undefined ? never : K]: T[K]
+} => Object.fromEntries(
+  Object.entries(obj).filter(([_, value]) => value !== undefined)
+) as any;
+
 
 export const useFullListRequest = <Filter, Type>(
   defaultState: IFullListRequest<Filter> = {}
