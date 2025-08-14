@@ -118,3 +118,42 @@ export const getConcursosOptions = (
     abort,
   };
 };
+
+// TODO adicionar JWT no header Authorization
+export const getCargosData = (
+   axiosRequestConfig?: AxiosRequestConfig
+) => {
+   const { signal, abort } = new AbortController();
+
+  const response = appAxios
+    .get<IBackendWithSubOptions[]>(URL.getCargos(), {
+       signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getCargosPorConcursoData = (
+  concursoUuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+   const { signal, abort } = new AbortController();
+
+  const response = appAxios
+    .get<IBackendWithSubOptions[]>(URL.getCargosPorConcurso(concursoUuid), {
+       signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
