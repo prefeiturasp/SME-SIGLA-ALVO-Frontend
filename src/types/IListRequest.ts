@@ -30,6 +30,7 @@ export interface IBackendOptions {
   value: string;
   label: string;
 }
-export interface IBackendWithSubOptions extends IBackendOptions {
+export interface IBackendWithSubOptions {
     cargos: IBackendOptions[]
+    concursos: IBackendOptions[]
 }

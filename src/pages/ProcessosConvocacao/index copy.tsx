@@ -1,0 +1,204 @@
+import { Typography, Select, DatePicker, Row, Col, Space, Button } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import BaseScreen, { type TitleItem } from "../BaseScreen";
+import { Controller } from "react-hook-form";
+import { CustomFormItem, SeparatorCol } from "./styles";
+import { Content } from "antd/es/layout/layout";
+import ConvocacaoTable from "./components/ConvocacaoTable";
+import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
+import TextField from "@mui/material/TextField";
+
+const { Text } = Typography;
+
+const breadcrumbItems = [
+  {
+    title: (
+      <a href="/">
+        <Text strong>Home</Text>
+      </a>
+    ),
+  },
+  {
+    title: (
+      <a href="/processos">
+        <Text strong>Processos</Text>
+      </a>
+    ),
+  },
+  { title: "Consulta de candidatos" },
+] as TitleItem[];
+
+const ProcessosConvocacao: React.FC = () => {
+  const {
+    control,
+    handleSubmit,
+    formErrors,
+    concursosOptions,
+    processosConvocacaoData,
+    processosConvocacaoIsLoading,
+    listRequest,
+    onAntTableChange,
+    handleSub,
+    handleReset,
+   } = useProcessosConvocacao();
+
+  return (
+    <BaseScreen
+      breadcrumbItems={breadcrumbItems}
+      title="Consulta de convocação de candidatos"
+    >
+      <Content>
+        <Row align="top" justify="space-between">
+          <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>
+            Busca Processos
+          </Typography.Title>
+          <Button type="primary" icon={<PlusOutlined />}>
+            Nova convocação
+          </Button>
+        </Row>
+
+        <Row>
+          <Col xs={24} md={12}>
+            <Controller
+              control={control}
+              name="concurso"
+              render={({ field }) => (
+                <CustomFormItem
+                  label="Concurso"
+                  validateStatus={formErrors.concurso ? "error" : undefined}
+                  help={formErrors.concurso?.message}
+                  labelCol={{ span: 24 }}
+                >
+                  <Select
+                    {...field}
+                    id="concurso-label"
+                    options={concursosOptions?.concursos}
+                  ></Select>
+                </CustomFormItem>
+              )}
+            />
+
+            <Row gutter={16} align="middle">
+              <Col xs={24} sm={11}>
+                <Controller
+                  control={control}
+                  name="data_inicial"
+                  render={({ field }) => (
+                    <CustomFormItem
+                      label="Data de Convocação"
+                      validateStatus={
+                        formErrors.data_inicial ? "error" : undefined
+                      }
+                      help={formErrors.data_inicial?.message}
+                      labelCol={{ span: 24 }}
+                    >
+                      <TextField
+                        {...field}
+                        type="date"
+                        fullWidth
+                        onChange={(e) => field.onChange(e.target.value)}
+                        error={!!formErrors.data_inicial}
+                      />
+                    </CustomFormItem>
+                  )}
+                />
+              </Col>
+
+              <SeparatorCol xs={24} sm={2}>
+                <Text strong>até</Text>
+              </SeparatorCol>
+
+              <Col xs={24} sm={11}>
+                <Controller
+                  control={control}
+                  name="data_final"
+                  render={({ field }) => (
+                    <CustomFormItem
+                      label=" "
+                      validateStatus={
+                        formErrors.data_final ? "error" : undefined
+                      }
+                      help={formErrors.data_final?.message}
+                      labelCol={{ span: 24 }}
+                    >
+                      <TextField
+                        {...field}
+                        type="date"
+                        fullWidth
+                        InputProps={{
+                          endAdornment: (
+                            <CalendarMonthRoundedIcon
+                              sx={{ color: "#032B68" }}
+                            />
+                          ),
+                        }}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        error={!!formErrors.data_final}
+                      />
+                    </CustomFormItem>
+                  )}
+                />
+              </Col>
+            </Row>
+
+            <Row>
+              <Col xs={24}>
+                <Controller
+                  control={control}
+                  name="cargo"
+                  render={({ field }) => (
+                    <CustomFormItem
+                      label="Cargo"
+                      validateStatus={formErrors.cargo ? "error" : undefined}
+                      help={formErrors.cargo?.message}
+                      labelCol={{ span: 24 }}
+                    >
+   
+                      <Select
+                        {...field}
+                         options={concursosOptions?.cargos}
+                      />
+                    </CustomFormItem>
+                  )}
+                />
+              </Col>
+
+              <Space style={{ margin: "1.5rem 0" }}>
+                <Button onClick={handleReset}>Limpar filtros</Button>
+                <Button
+                  type="primary"
+                  data-testid="submit"
+                  onClick={handleSubmit(handleSub)}
+                >
+                  Pesquisar
+                </Button>
+              </Space>
+            </Row>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col xs={24}>
+            <ConvocacaoTable
+              loading={processosConvocacaoIsLoading}
+              data={processosConvocacaoData?.results || []}
+              pagination={{
+                current: listRequest.pagination.page,
+                defaultPageSize: 10,
+                position: ["bottomLeft"],
+                total: processosConvocacaoData?.count,
+                showTotal: () =>
+                  `Mostrando ${listRequest.pagination.page} - 10 registro(s) do total de ${processosConvocacaoData?.count}`,
+              }}
+              onChange={onAntTableChange}
+            />
+          </Col>
+        </Row>
+      </Content>
+    </BaseScreen>
+  );
+};
+
+export default ProcessosConvocacao;

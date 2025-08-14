@@ -6,3 +6,4 @@ package-lock.json
 .env.dev
 .env.homolog
 .env.prod
+/coverage

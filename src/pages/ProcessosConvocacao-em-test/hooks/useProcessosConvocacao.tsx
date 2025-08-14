@@ -1,4 +1,12 @@
- 
+import { Typography, Select, DatePicker, Row, Col, Space, Button } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import BaseScreen, { type TitleItem } from "../../BaseScreen";
+import { Controller } from "react-hook-form";
+import { CustomFormItem, SeparatorCol } from "../styles";
+import { Content } from "antd/es/layout/layout";
+import ConvocacaoTable from "../components/ConvocacaoTable";
 
 // src/pages/ProcessosConvocacao/hooks/useProcessosConvocacao.ts
 import { useForm, type Resolver } from "react-hook-form";
@@ -18,22 +26,19 @@ export const useProcessosConvocacao = () => {
     data_final: "",
   };
 
-  const form= useForm<IFiltroProcessos>({
-    defaultValues,
-    resolver: yupResolver(useConvocacaoSchema()) as Resolver<IFiltroProcessos>,
-    reValidateMode: "onChange",
-    mode: "all",
-    shouldFocusError: false,
-  });
-
-
   const {
     control,
     handleSubmit,
     reset,
     watch,
     formState: { errors: formErrors },
-  } =form
+  } = useForm<IFiltroProcessos>({
+    defaultValues,
+    resolver: yupResolver(useConvocacaoSchema()) as Resolver<IFiltroProcessos>,
+    reValidateMode: "onChange",
+    mode: "all",
+    shouldFocusError: false,
+  });
 
   const { listRequest, setListRequest, onAntTableChange } =
     useListRequest<IFiltroProcessos>({
@@ -48,23 +53,10 @@ export const useProcessosConvocacao = () => {
     retry: 0,
   });
 
+  const selectedConcurso = concursosOptions?.find(
+    (c) => c.value === watch("concurso")
+  );
 
-  const concursosQuery = useQuery({
-    queryKey: ["getConcursosData"],
-    queryFn: ({ signal }) => API.Convocacao.getConcursosData({ signal }).response,
-    staleTime: 1000 * 60 * 5,
-    retry: 0,
-  });
-
-  const processosQuery = useQuery({
-    queryKey: ["getProcessosConvocacao", listRequest],
-    queryFn: ({ signal }) => API.Convocacao.getProcessosConvocacao(listRequest, { signal }).response,
-    staleTime: 1000 * 60 * 5,
-    retry: 0,
-  });
-
-
- 
   const {
     data: processosConvocacaoData,
     isLoading: processosConvocacaoIsLoading,
@@ -94,16 +86,15 @@ export const useProcessosConvocacao = () => {
     formErrors,
     concursosOptions,
     concursosIsLoading,
+    selectedConcurso,
     processosConvocacaoData,
     processosConvocacaoIsLoading,
     listRequest,
     onAntTableChange,
     handleSub,
     handleReset,
+    dayjs,
     watch,
-    form,
-    processosQuery,
-    concursosQuery
   };
 };
 

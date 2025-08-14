@@ -107,7 +107,7 @@ export const getConcursosData = (
    const { signal, abort } = new AbortController();
 
   const response = appAxios
-    .get<IBackendWithSubOptions[]>(URL.getConcursos(), {
+    .get<IBackendWithSubOptions>(URL.getConcursos(), {
        signal,
       ...axiosRequestConfig,
     })
