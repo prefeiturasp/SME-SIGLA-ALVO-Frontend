@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import ConvocacaoTable from "../components/ConvocacaoTable";
+import ConvocacaoTable from "./ConvocacaoTable";
 import type { IProcessoConvocacao } from "../../../../services/resources/convocacao/IConvocacao";
 
 const mockData: IProcessoConvocacao[] = [

@@ -7,7 +7,6 @@ import { ConfigProvider, theme as antdTheme } from "antd";
 import { ThemeProvider } from "styled-components";
 import ptBR from "antd/es/locale/pt_BR";
 import { MemoryRouter } from "react-router-dom";
-import { AppRoutes } from "../routes";
 
 const { useToken } = antdTheme;
 
@@ -23,7 +22,7 @@ function ProvidersWrapper({ children }: PropsWithChildren) {
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={{ token }}>
-           <AppRoutes/>
+           <MemoryRouter>{children}</MemoryRouter>
           </ThemeProvider>
         </QueryClientProvider>
       </Provider>
