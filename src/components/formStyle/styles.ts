@@ -11,23 +11,7 @@ export const SelectDivider = styled.div`
   width: 49%;
 `;
 
-export const CustomModal = styled(AntModal)`
-  .ant-modal-content {
-    padding: 2rem 2rem 1.5rem 2rem;
-    border-radius: 2px;
-  }
-  .ant-modal-header {
-    padding: 0;
-  }
-  .ant-modal-footer {
-    padding: 1.5rem 0 0 0;
-    .ant-btn-primary {
-      border-radius: 2px;
-    }
-  }
-  .ant-modal-body {
-  }
-`;
+ 
 
 export const CustomFormItem = styled(FormItem)`
   padding-bottom: 0;
@@ -38,6 +22,15 @@ export const CustomFormItem = styled(FormItem)`
     display: block;
   }
 
+    .ant-input,
+  .ant-select,
+  .ant-picker,
+  .ant-input-number,
+  .MuiInputBase-root {
+    width: 100%;
+    height: 2.5rem;
+  }
+    
   .ant-form-item-label > label {
     font-weight: 700;
   }

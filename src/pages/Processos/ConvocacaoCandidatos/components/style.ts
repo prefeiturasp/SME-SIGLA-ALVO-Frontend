@@ -20,7 +20,10 @@ export const StyledTable = styled(Table)`
 
   .ant-table-pagination {
     display: flex;
-    justify-content: flex-end; 
+    justify-content: flex-end;
+    .ant-pagination-item{
+    border-radius:5px
+    } 
   }
 
   .ant-pagination-total-text {

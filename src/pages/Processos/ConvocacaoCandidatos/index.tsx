@@ -4,7 +4,7 @@ import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import { Controller } from "react-hook-form";
-import { CustomFormItem, SeparatorCol } from "./styles";
+import { CustomFormItem, SeparatorCol } from "../../../components/formStyle/styles";
 import { Content } from "antd/es/layout/layout";
 import ConvocacaoTable from "./components/ConvocacaoTable";
 import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
@@ -59,8 +59,7 @@ const ConvocacaoCandidatos: React.FC = () => {
           </Typography.Title>
           <Button
             type="primary"
-                                style={{ height: "2.5rem"  }}
-
+            size="large"
             icon={<PlusOutlined />}
             onClick={() => navigate("/processos/convocacao/nova")}
           >
@@ -81,12 +80,10 @@ const ConvocacaoCandidatos: React.FC = () => {
                   }
                   help={formErrors.concurso_uuid?.message}
                   labelCol={{ span: 24 }}
-                    
-
                 >
                   <Select
                     {...field}
-                    style={{ width: "100%",height: "2.5rem"  }}
+                    
                     options={concursosOptions?.concursos || []}
                     placeholder="Selecione o concurso"
                     loading={concursosIsLoading}
@@ -113,7 +110,7 @@ const ConvocacaoCandidatos: React.FC = () => {
                       labelCol={{ span: 24 }}
                     >
                       <DatePicker
-                    style={{ width: "100%",height: "2.5rem"  }}
+                        
                         value={field.value ? dayjs(field.value) : undefined}
                         onChange={(date) =>
                           field.onChange(
@@ -149,9 +146,7 @@ const ConvocacaoCandidatos: React.FC = () => {
                       labelCol={{ span: 24 }}
                     >
                       <DatePicker
-                    style={{ width: "100%",height: "2.5rem"  }}
                         
-
                         value={field.value ? dayjs(field.value) : undefined}
                         onChange={(date) =>
                           field.onChange(
@@ -184,7 +179,7 @@ const ConvocacaoCandidatos: React.FC = () => {
                     >
                       <Select
                         {...field}
-                    style={{ width: "100%",height: "2.5rem"  }}
+                        
                         options={
                           concursosOptions ? concursosOptions.cargos : []
                         }
@@ -201,10 +196,14 @@ const ConvocacaoCandidatos: React.FC = () => {
               </Col>
 
               <Space style={{ margin: "1.5rem 0" }}>
-                <Button                     style={{ width: "100%",height: "2.5rem"  }}
- onClick={handleReset}>Limpar filtros</Button>
-                <Button                     style={{ width: "100%",height: "2.5rem"  }}
-type="primary" onClick={handleSubmit(handleSub)}>
+                <Button type="primary" ghost size="large" onClick={handleReset}>
+                  Limpar filtros
+                </Button>
+                <Button
+                  size="large"
+                  type="primary"
+                  onClick={handleSubmit(handleSub)}
+                >
                   Pesquisar
                 </Button>
               </Space>
