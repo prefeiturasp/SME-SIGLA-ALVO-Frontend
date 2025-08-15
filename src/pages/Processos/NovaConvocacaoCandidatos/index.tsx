@@ -41,8 +41,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 
-import { useQuery } from "@tanstack/react-query";
-import { API } from "../../../services"; 
+import { useConcursos } from "./hooks/useConcursos";
 
 
 
@@ -61,21 +60,15 @@ type FormFields = {
   tipo_processo: string;
   descricao: string;
   cargo: string;
-  data_convocacao_inicio: string;
-  data_convocacao_fim: string;
+  data_final: string;
 };
 
 export const NovaConvocacaoCandidatos: React.FC = () => {
-  const { data: concursosOptions, isLoading: concursosIsLoading } = useQuery({
-  queryKey: ["getConcursosOptions"],
-  queryFn: ({ signal }) =>
-    API.Convocacao.getConcursosOptions({ signal }).response,
-  staleTime: 1000 * 60 * 5,
-  retry: 0,
-});
-  console.log(concursosOptions)
+  const { concursosData, concursosIsLoading } = useConcursos();
+
   const [cargoSelecionado, setCargoSelecionado] = useState<string | undefined>();
   const [arquivoSelecionado, setArquivoSelecionado] = useState<string | undefined>();
+  const [cargosDisponiveis, setCargosDisponiveis] = useState<{ value: string; label: string }[]>([]);
   const [cardData, setCardData] = useState({
     vagas: 0,
     autorizacoes: 0,
@@ -85,7 +78,6 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
 
   const {
     control,
-    handleSubmit,
     reset,
   } = useForm<FormFields>({
     defaultValues: {
@@ -93,20 +85,37 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
       tipo_processo: undefined,
       descricao: undefined,
       cargo: "",
-      data_convocacao_inicio: "",
-      data_convocacao_fim: "",
+      data_final: "",
     },
   });
 
   const watchFields = useWatch({ control });
 
-  const isBuscaProcessosPreenchido =
-    watchFields.concurso &&
-    watchFields.tipo_processo &&
-    watchFields.descricao &&
-    watchFields.data_convocacao_inicio &&
-    watchFields.data_convocacao_fim &&
-    watchFields.cargo;
+  const isCargoLiberado = watchFields.concurso;
+
+  const buscarCargosDoConcurso = (concursoValue: string) => {
+    if (!concursoValue) {
+      setCargosDisponiveis([]);
+      return;
+    }
+
+    const concursoSelecionado = concursosData.find(
+      (c) => c.value === concursoValue
+    );
+    console.log(concursoSelecionado)
+    if (concursoSelecionado && concursoSelecionado.cargos) {
+      setCargosDisponiveis(concursoSelecionado.cargos);
+    }
+
+    setCargoSelecionado(undefined);
+
+    setCardData({
+      vagas: 0,
+      autorizacoes: 0,
+      reservas: 0,
+      convocar: 0,
+    });
+  };
 
   const handleSub = (data: FormFields) => {
     console.log("Enviando dados para o backend:", {
@@ -122,37 +131,33 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
       tipo_processo: "",
       descricao: "",
       cargo: "",
-      data_convocacao_inicio: "",
-      data_convocacao_fim: "",
+      data_final: "",
     });
     setCargoSelecionado(undefined);
     setArquivoSelecionado(undefined);
+    setCargosDisponiveis([]);
   };
 
   const buscarDadosDoCargo = () => {
     if (!cargoSelecionado) return;
 
     setTimeout(() => {
-      if (cargoSelecionado === "PROF.ED.INF.E ENS.FUND.I") {
         setCardData({
           vagas: 385,
           autorizacoes: 0,
           reservas: 407,
           convocar: 0,
-        });
-      } else {
-        setCardData({ vagas: 0, autorizacoes: 0, reservas: 0, convocar: 0 });
-      }
+      });
     }, 1000);
   };
 
   return (
     <BaseScreen
       breadcrumbItems={breadcrumbItems}
-      title="Nova Convocação de Candidatos"
+      title="Processo de convocação de candidatos"
     >
       <Card style={{ borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", marginBottom: 24 }}>
-        <Typography.Title level={4}>Dados do Processo</Typography.Title>
+        <Typography.Title level={4}>Busca Processos</Typography.Title>
 
         <Row gutter={16}>
           <Col xs={24} md={12}>
@@ -160,106 +165,82 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
               control={control}
               name="concurso"
               render={({ field }) => (
-                <CustomFormItem label="Concurso">
+                <CustomFormItem label={<strong>Concurso</strong>}>
                   <Select
-                    {...field}
-                    placeholder="Selecione o concurso"
-                    style={{ width: "100%" }}
-                    options={concursosOptions || []}
-                    loading={concursosIsLoading}
-                  />
+                     {...field}
+                     placeholder="Selecione o concurso"
+                     style={{ width: "65%" }}
+                     options={concursosData || []}
+                     loading={concursosIsLoading}
+                     onChange={(value) => {
+                       field.onChange(value);
+                       buscarCargosDoConcurso(value);
+                     }}
+                   />
                 </CustomFormItem>
               )}
             />
-
             <Controller
               control={control}
               name="tipo_processo"
               render={({ field }) => (
-                <CustomFormItem label="Tipo de processo">
+                <CustomFormItem label={<strong>Tipo de processo</strong>}>
                   <Select
                     {...field}
                     placeholder="Selecione o tipo de processo"
-                    style={{ width: "100%" }}
+                    style={{ width: "65%" }}
                     options={[{ value: "Escolha", label: "Escolha" }]}
                   />
                 </CustomFormItem>
               )}
             />
-
             <Controller
               control={control}
               name="descricao"
               render={({ field }) => (
-                <CustomFormItem label="Descrição">
+                <CustomFormItem label={<strong>Descrição</strong>}>
                   <Input
                     {...field}
                     placeholder="Digite a descrição"
-                    style={{ width: "100%" }}
+                    style={{ width: "65%" }}
                   />
                 </CustomFormItem>
               )}
             />
-
-            <Row gutter={8}>
-  <Col xs={24} sm={12}>
-    <Controller
-      control={control}
-      name="data_convocacao_inicio"
-      render={({ field }) => (
-        <CustomFormItem label="Data de publicação">
-                      <DatePicker
-              {...field}
-              placeholder="Data de publicação"
-              style={{ width: "100%" }}
-              format="DD/MM/YYYY"
-              suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
-              value={field.value ? dayjs(field.value) : undefined}
-              onChange={(date) => field.onChange(date ? date.toISOString() : "")}
-            />
-        </CustomFormItem>
-      )}
-    />
-  </Col>
-
-  <Col xs={24} sm={12}>
-    <Controller
-      control={control}
-      name="data_convocacao_fim"
-      render={({ field }) => (
-        <CustomFormItem label="Data de convocação">
-                      <DatePicker
-              {...field}
-              placeholder="Data de convocação"
-              style={{ width: "100%" }}
-              format="DD/MM/YYYY"
-              suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
-              value={field.value ? dayjs(field.value) : undefined}
-              onChange={(date) => field.onChange(date ? date.toISOString() : "")}
-            />
-        </CustomFormItem>
-      )}
-    />
-  </Col>
-</Row>
-
+              <Controller
+                control={control}
+                name="data_final"
+                render={({ field }) => (
+                  <CustomFormItem label={<strong>Data de convocação</strong>}>
+                    <DatePicker
+                      {...field}
+                      placeholder="Data de convocação"
+                      style={{ width: "25%" }}
+                      format="DD/MM/YYYY"
+                      suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
+                      value={field.value ? dayjs(field.value) : undefined}
+                      onChange={(date) => field.onChange(date ? date.toISOString() : "")}
+                    />
+                  </CustomFormItem>
+                )}
+              />
             <Controller
               control={control}
               name="cargo"
               render={({ field }) => (
-                <CustomFormItem label="Número de convocados">
+                <CustomFormItem label={<strong>Número de convocados</strong>}>
                   <Input
                     {...field}
                     placeholder="Insira o número de candidatos convocados"
-                    style={{ width: "100%" }}
+                    style={{ width: "65%" }}
                   />
 
-                  {!isBuscaProcessosPreenchido && (
+                  {!isCargoLiberado && (
                     <Text 
                       type="secondary" 
                       style={{ fontSize:12, color: 'gray', marginTop: 18, display: 'block' }}
                     >
-                      * Preencha todos os campos acima para liberar a seleção de Cargo.
+                      * Selecione o concurso para liberar a seleção de Cargo.
                     </Text>
                   )}
                 </CustomFormItem>
@@ -279,10 +260,9 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
             style={{ width: "32%" }}
             value={cargoSelecionado}
             onChange={setCargoSelecionado}
-            disabled={!isBuscaProcessosPreenchido}
-          >
-            <Option value="PROF.ED.INF.E ENS.FUND.I">PROF.ED.INF.E ENS.FUND.I</Option>
-          </Select>
+            disabled={!isCargoLiberado}
+            options={cargosDisponiveis}
+          />
 
           <PrimaryButton
             type="primary"
@@ -321,7 +301,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
 
           <Select
             placeholder="Selecione o arquivo"
-            style={{ width: "100%" }}
+            style={{ width: "32%" }}
             value={arquivoSelecionado}
             onChange={setArquivoSelecionado}
             disabled={!cargoSelecionado}

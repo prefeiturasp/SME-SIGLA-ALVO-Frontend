@@ -15,6 +15,8 @@ export const theme = {
     fontSize: 16,
     fontWeightStrong: 700,
     fontWeight: 700,
+    controlHeight: 44,  
+
   },
   components: {
     Layout: {
@@ -31,7 +33,8 @@ export const theme = {
       itemActiveBg: "#05409A",      
     },
     Button: {
-      fontWeight: 700,
+      controlHeight: 44, 
+      fontWeight: 700,      
     },
   },
 };

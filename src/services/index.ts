@@ -1,2 +1,2 @@
 export * as API from "./resources";
-export { appAxios, appAxiosMock } from "./axios";
+export { appAxios, appAxiosMock, appAxiosConcursos } from "./axios";
