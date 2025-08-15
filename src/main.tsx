@@ -46,6 +46,7 @@ export const theme = {
     },
     Button: {
       fontWeight: 700,
+      
     },
   },
 };
