@@ -1,11 +1,32 @@
+// src/pages/ProcessosConvocacao/hooks/useProcessosConvocacao.ts
+import { useForm, type Resolver } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import { API } from "../../../../services";
+import useConvocacaoSchema from "../useConvocacaoSchema";
 import type { IFiltroProcessos } from "../../../../services/resources/convocacao/IConvocacao";
-import useListRequest, {
-  removeUndefinedFields,
-} from "../../../../hooks/useListRequest";
+import useListRequest, { removeUndefinedFields } from "../../../../hooks/useListRequest";
 
 export const useProcessosConvocacao = () => {
+  const defaultValues: IFiltroProcessos = {
+ 
+  };
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors: formErrors },
+  } = useForm<IFiltroProcessos>({
+    defaultValues,
+    resolver: yupResolver(useConvocacaoSchema()) as Resolver<IFiltroProcessos>,
+    reValidateMode: "onChange",
+    mode: "all",
+    shouldFocusError: false,
+  });
+
   const { listRequest, setListRequest, onAntTableChange } =
     useListRequest<IFiltroProcessos>({
       pagination: { page: 1, page_size: 10 },
@@ -19,6 +40,8 @@ export const useProcessosConvocacao = () => {
     retry: 0,
   });
 
+  
+
   const {
     data: processosConvocacaoData,
     isLoading: processosConvocacaoIsLoading,
@@ -31,14 +54,23 @@ export const useProcessosConvocacao = () => {
   });
 
   const handleSub = async (data: IFiltroProcessos) => {
+    
     setListRequest((prevState) => ({
       ...prevState,
-      page: 1,
-      filters: removeUndefinedFields(data),
+      page:1,
+    filters: removeUndefinedFields(data),
     }));
   };
 
+  const handleReset = () => {
+    reset(defaultValues);
+    handleSub(defaultValues);
+  };
+
   return {
+    control,
+    handleSubmit,
+    formErrors,
     concursosOptions,
     concursosIsLoading,
     processosConvocacaoData,
@@ -46,5 +78,8 @@ export const useProcessosConvocacao = () => {
     listRequest,
     onAntTableChange,
     handleSub,
+    handleReset,
+    dayjs,
+    watch,
   };
 };
