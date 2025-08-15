@@ -117,7 +117,7 @@ const ConvocacaoCandidatos: React.FC = () => {
                             date ? dayjs(date).format("YYYY-MM-DD") : ""
                           )
                         }
-                        placeholder="Selecione a data inicial"
+                        placeholder="inicio"
                         format="DD/MM/YYYY"
                         suffixIcon={
                           <CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />
@@ -136,6 +136,8 @@ const ConvocacaoCandidatos: React.FC = () => {
                 <Controller
                   control={control}
                   name="data_convocacao_fim"
+                                        
+
                   render={({ field }) => (
                     <CustomFormItem
                       label=" "
@@ -153,7 +155,7 @@ const ConvocacaoCandidatos: React.FC = () => {
                             date ? dayjs(date).format("YYYY-MM-DD") : ""
                           )
                         }
-                        placeholder="Selecione a data final"
+                        placeholder="Fim"
                         format="DD/MM/YYYY"
                         suffixIcon={
                           <CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />
