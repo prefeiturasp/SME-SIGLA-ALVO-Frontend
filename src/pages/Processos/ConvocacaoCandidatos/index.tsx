@@ -169,12 +169,12 @@ const ConvocacaoCandidatos: React.FC = () => {
               <Col xs={24}>
                 <Controller
                   control={control}
-                  name="cargo"
+                  name="cargo_uuid"
                   render={({ field }) => (
                     <CustomFormItem
                       label="Cargo"
-                      validateStatus={formErrors.cargo ? "error" : undefined}
-                      help={formErrors.cargo?.message}
+                      validateStatus={formErrors.cargo_uuid ? "error" : undefined}
+                      help={formErrors.cargo_uuid?.message}
                       labelCol={{ span: 24 }}
                     >
                       <Select
