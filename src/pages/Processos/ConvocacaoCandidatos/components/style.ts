@@ -26,13 +26,14 @@ export const StyledTable = styled(Table)`
     } 
   }
 
-  .ant-pagination-total-text {
-    margin-right: auto; 
-  }
   
+  
+   .ant-pagination-total-text {
+    margin-right: auto; 
+    color: #727679;
+  }
   box-shadow: 0px 6px 18px 0px rgba(0, 0, 0, 0.06);
 ` as typeof Table;
 
-
-
+ 
   

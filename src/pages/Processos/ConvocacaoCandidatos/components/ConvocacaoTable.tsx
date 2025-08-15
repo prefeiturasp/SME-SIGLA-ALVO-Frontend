@@ -62,8 +62,7 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
     },
   ];
 
-  console.log('processosConvocacaoData',data)
-
+ 
   return (
     <>
 
