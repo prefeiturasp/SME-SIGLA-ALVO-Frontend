@@ -9,8 +9,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-"test": "vitest --environment jsdom"
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"    
   },
+  
   "dependencies": {
     "@mui/x-date-pickers": "^7.0.0",
     "@emotion/react": "^11.14.0",

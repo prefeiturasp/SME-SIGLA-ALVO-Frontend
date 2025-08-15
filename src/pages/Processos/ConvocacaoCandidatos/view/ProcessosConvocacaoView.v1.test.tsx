@@ -1,8 +1,8 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 import ProcessosConvocacaoView from "./ProcessosConvocacaoView";
 import { vi } from "vitest";
-import { renderWithProviders } from "./test-utils";
+import { renderWithProviders } from "../../../../utils/test-utils";
+import type { IBackendWithSubOptions } from "../../../../types/IListRequest";
 
 const handleSubmit = vi.fn();
 
@@ -16,9 +16,8 @@ const resetSpy = vi.fn();
 const concursosOptions = {
   concursos: [{ label: "Concurso 1", value: "c1" }],
   cargos: [{ label: "Cargo 1", value: "cg1" }],
-};
+} as IBackendWithSubOptions;
 
-    
 it("deve mostrar erro quando data inicial for maior que data final", async () => {
   renderWithProviders(
     <ProcessosConvocacaoView
@@ -26,9 +25,7 @@ it("deve mostrar erro quando data inicial for maior que data final", async () =>
       processosConvocacaoData={{ results: [], count: 0 }}
       processosLoading={false}
       concursosIsLoading={false}
-      paginationPage={1}
       handleSub={submitSpy}
-      handleReset={resetSpy}
       onAntTableChange={vi.fn()}
       listRequest={{ pagination: { page: 1, page_size: 10 } }}
     />
@@ -61,9 +58,7 @@ it("deve submeter com datas válidas e verificar o que foi enviado", async () =>
       processosConvocacaoData={{ results: [], count: 0 }}
       processosLoading={false}
       concursosIsLoading={false}
-      paginationPage={1}
       handleSub={submitSpy}
-      handleReset={resetSpy}
       onAntTableChange={vi.fn()}
       listRequest={{ pagination: { page: 1, page_size: 10 } }}
       // login={mockLogin}

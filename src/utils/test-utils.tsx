@@ -1,12 +1,13 @@
 import React, { type PropsWithChildren } from "react";
 import { render } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { store } from "../../../store/store";
+import { store } from "../store/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConfigProvider, theme as antdTheme } from "antd";
 import { ThemeProvider } from "styled-components";
 import ptBR from "antd/es/locale/pt_BR";
 import { MemoryRouter } from "react-router-dom";
+import { AppRoutes } from "../routes";
 
 const { useToken } = antdTheme;
 
@@ -22,7 +23,7 @@ function ProvidersWrapper({ children }: PropsWithChildren) {
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={{ token }}>
-           <MemoryRouter>{children}</MemoryRouter>
+           <AppRoutes/>
           </ThemeProvider>
         </QueryClientProvider>
       </Provider>

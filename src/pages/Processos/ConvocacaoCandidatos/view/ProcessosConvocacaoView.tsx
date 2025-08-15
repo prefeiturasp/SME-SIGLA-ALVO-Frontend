@@ -1,20 +1,25 @@
-import React from "react";
-import { TextField, Select } from "@mui/material";
+import {
+  TextField,
+  Select,
+  MenuItem,
+  CircularProgress,
+  InputAdornment,
+} from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 
-import { Typography, DatePicker, Row, Col, Space, Button } from "antd";
+import { Typography, Row, Col, Space, Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
-import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
-import BaseScreen, { type TitleItem } from "../../BaseScreen";
+import BaseScreen, { type TitleItem } from "../../../BaseScreen";
 import { CustomFormItem, SeparatorCol } from "./styles";
 import { Content } from "antd/es/layout/layout";
-import ConvocacaoTable from "./components/ConvocacaoTable";
-import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
+import ConvocacaoTable from "../components/ConvocacaoTable";
 import { useNavigate } from "react-router-dom";
-import dayjs from "dayjs";
-import type { IFiltroProcessos } from "../../../services/resources/convocacao/IConvocacao";
-import type { IListRequest } from "../../../types/IListRequest";
+import type { IFiltroProcessos } from "../../../../services/resources/convocacao/IConvocacao";
+import type {
+  IBackendWithSubOptions,
+  IListRequest,
+} from "../../../../types/IListRequest";
 
 const { Text } = Typography;
 
@@ -37,13 +42,11 @@ const breadcrumbItems = [
 ] as TitleItem[];
 
 interface Props {
-  concursosOptions?: any;
+  concursosOptions?: IBackendWithSubOptions;
   processosConvocacaoData?: { results?: any[]; count?: number };
   processosLoading: boolean;
   concursosIsLoading: boolean;
-  paginationPage: number;
   handleSub: (data: any) => void;
-  handleReset: () => void;
   onAntTableChange: any;
   listRequest: IListRequest<IFiltroProcessos>;
 }
@@ -53,28 +56,40 @@ export default function ProcessosConvocacaoView({
   processosConvocacaoData,
   processosLoading,
   concursosIsLoading,
-  paginationPage,
   handleSub,
-  handleReset,
   onAntTableChange,
   listRequest,
 }: Props) {
   const navigate = useNavigate();
 
+  const defaultValues = {
+    concurso_uuid: "",
+    data_convocacao_inicio: "",
+    data_convocacao_fim: "",
+    cargo: "",
+  };
   const {
     control,
-    register,
     handleSubmit,
     formState: { errors: formErrors },
     reset,
     setError,
     clearErrors,
-  } = useForm();
+  } = useForm({
+    defaultValues: defaultValues,
+  });
+  const handleReset = () => {
+    reset(defaultValues);
+    handleSub(defaultValues);
+  };
 
   const onSubmit = async (data: any) => {
     // validação de datas
     if (data.data_convocacao_inicio && data.data_convocacao_fim) {
-      if (new Date(data.data_convocacao_inicio) > new Date(data.data_convocacao_fim)) {
+      if (
+        new Date(data.data_convocacao_inicio) >
+        new Date(data.data_convocacao_fim)
+      ) {
         setError("data_convocacao_fim", {
           type: "manual",
           message: "Data final não pode ser menor que data inicial",
@@ -117,87 +132,76 @@ export default function ProcessosConvocacaoView({
                     validateStatus={
                       formErrors.concurso_uuid ? "error" : undefined
                     }
-                    help={formErrors.concurso_uuid?.message}
                     labelCol={{ span: 24 }}
                   >
                     <Select
                       {...field}
                       style={{ width: "100%" }}
-                      options={concursosOptions?.concursos || []}
-                      placeholder="Selecione o concurso"
-                      loading={concursosIsLoading}
-                      suffixIcon={
-                        <KeyboardArrowDownRoundedIcon
-                          sx={{ color: "#032B68" }}
-                        />
-                      }
-                    />
+                      //  placeholder="Selecione o concurso"
+                      // loading={concursosIsLoading}
+                      // suffixIcon={
+                      //   <KeyboardArrowDownRoundedIcon
+                      //     sx={{ color: "#032B68" }}
+                      //   />
+                      // }
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 200, // altura máxima em px
+                            overflowY: "auto",
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="" disabled>
+                        Selecione o concurso
+                      </MenuItem>
+
+                      {concursosIsLoading ? (
+                        <MenuItem disabled>
+                          <CircularProgress size={20} />
+                        </MenuItem>
+                      ) : (
+                        (concursosOptions?.concursos || []).map((c) => (
+                          <MenuItem key={c.value} value={c.value}>
+                            {c.label}
+                          </MenuItem>
+                        ))
+                      )}
+                    </Select>
                   </CustomFormItem>
                 )}
               />
 
               <Row gutter={16} align="middle">
                 <Col xs={24} sm={11}>
-                  {/* <Controller
+                  <Controller
                     control={control}
                     name="data_convocacao_inicio"
                     render={({ field }) => (
                       <CustomFormItem
-                        label="Data de Convocação"
+                        label="Data Inicial"
                         validateStatus={
                           formErrors.data_convocacao_inicio
                             ? "error"
                             : undefined
                         }
-                        help={formErrors.data_convocacao_inicio?.message}
                         labelCol={{ span: 24 }}
                       >
-                        <DatePicker
-                          style={{ width: "100%" }}
-                          value={field.value ? dayjs(field.value) : undefined}
-                          onChange={(date) =>
-                            field.onChange(
-                              date ? dayjs(date).format("YYYY-MM-DD") : ""
-                            )
-                          }
-                          placeholder="Selecione a data inicial"
-                          format="DD/MM/YYYY"
+                        <TextField
+                          {...field}
                           id="data_convocacao_inicio"
-
-                          suffixIcon={
-                            <CalendarMonthRoundedIcon
-                              sx={{ color: "#032B68" }}
-                            />
-                          }
+                          type="date"
+                          fullWidth
+                          onChange={(e) => {
+                            field.onChange(e.target.value);
+                            clearErrors("data_convocacao_fim");
+                          }}
+                          error={!!formErrors.data_convocacao_inicio}
                         />
                       </CustomFormItem>
                     )}
-                  /> */}
-                  <Controller
-                  control={control}
-                  name="data_convocacao_inicio"
-                  render={({ field }) => (
-                    <CustomFormItem
-                      label="Data Inicial"
-                      validateStatus={
-                        formErrors.data_convocacao_inicio ? "error" : undefined
-                      }
-                      labelCol={{ span: 24 }}
-                    >
-                      <TextField
-                        {...field}
-                        id="data_convocacao_inicio"
-                        type="date"
-                        fullWidth
-                        onChange={(e) => {
-                          field.onChange(e.target.value);
-                          clearErrors("data_convocacao_fim");
-                        }}
-                        error={!!formErrors.data_convocacao_inicio}
-                      />
-                    </CustomFormItem>
-                  )}
-                />
+                  />
                 </Col>
 
                 <SeparatorCol xs={24} sm={2}>
@@ -205,72 +209,42 @@ export default function ProcessosConvocacaoView({
                 </SeparatorCol>
 
                 <Col xs={24} sm={11}>
-
-                 <Controller
-                  control={control}
-                  name="data_convocacao_fim"
-                  render={({ field }) => (
-                    <CustomFormItem
-                      label="Data Final"
-                      validateStatus={
-                        formErrors.data_convocacao_fim ? "error" : undefined
-                      }
-                      help={formErrors.data_convocacao_fim?.message}
-                      labelCol={{ span: 24 }}
-                    >
-                      <TextField
-                        {...field}
-                        id="data_convocacao_fim"
-                        type="date"
-                        fullWidth
-                        InputProps={{
-                          endAdornment: (
-                            <CalendarMonthRoundedIcon
-                              sx={{ color: "#032B68" }}
-                            />
-                          ),
-                        }}
-                        onChange={(e) => {
-                          field.onChange(e.target.value);
-                          clearErrors("data_convocacao_fim");
-                        }}
-                        error={!!formErrors.data_convocacao_fim}
-                      />
-                    </CustomFormItem>
-                  )}
-                />
-                
-                  {/* <Controller
+                  <Controller
                     control={control}
                     name="data_convocacao_fim"
                     render={({ field }) => (
                       <CustomFormItem
-                        label=" "
+                        label="Data Final"
                         validateStatus={
                           formErrors.data_convocacao_fim ? "error" : undefined
                         }
                         help={formErrors.data_convocacao_fim?.message}
                         labelCol={{ span: 24 }}
                       >
-                        <DatePicker
-                          style={{ width: "100%" }}
-                          value={field.value ? dayjs(field.value) : undefined}
-                          onChange={(date) =>
-                            field.onChange(
-                              date ? dayjs(date).format("YYYY-MM-DD") : ""
-                            )
-                          }
+                        <TextField
+                          {...field}
+                          id="data_convocacao_fim"
+                          type="date"
+                          fullWidth
+                          // InputProps={{
+                          //   endAdornment: (
+                          //     <InputAdornment position="end">
+                          //       <CalendarMonthRoundedIcon
+                          //         sx={{ color: "#032B68" }}
+                          //       />
+                          //     </InputAdornment>
+                          //   ),
+                          // }}
                           placeholder="Selecione a data final"
-                          format="DD/MM/YYYY"
-                          suffixIcon={
-                            <CalendarMonthRoundedIcon
-                              sx={{ color: "#032B68" }}
-                            />
-                          }
+                          onChange={(e) => {
+                            field.onChange(e.target.value);
+                            clearErrors("data_convocacao_fim");
+                          }}
+                          error={!!formErrors.data_convocacao_fim}
                         />
                       </CustomFormItem>
                     )}
-                  /> */}
+                  />
                 </Col>
               </Row>
 
@@ -289,16 +263,31 @@ export default function ProcessosConvocacaoView({
                         <Select
                           {...field}
                           style={{ width: "100%" }}
-                          options={
-                            concursosOptions ? concursosOptions.cargos : []
-                          }
-                          placeholder="Selecione o cargo"
-                          suffixIcon={
-                            <KeyboardArrowDownRoundedIcon
-                              sx={{ color: "#032B68" }}
-                            />
-                          }
-                        />
+                          MenuProps={{
+                            PaperProps: {
+                              style: {
+                                maxHeight: 200, // altura máxima em px
+                                overflowY: "auto",
+                              },
+                            },
+                          }}
+                        >
+                          <MenuItem value="" disabled>
+                            Selecione o cargo
+                          </MenuItem>
+
+                          {concursosIsLoading ? (
+                            <MenuItem disabled>
+                              <CircularProgress size={20} />
+                            </MenuItem>
+                          ) : (
+                            (concursosOptions?.cargos || []).map((c) => (
+                              <MenuItem key={c.value} value={c.value}>
+                                {c.label}
+                              </MenuItem>
+                            ))
+                          )}
+                        </Select>
                       </CustomFormItem>
                     )}
                   />
@@ -337,11 +326,7 @@ export default function ProcessosConvocacaoView({
             </Col>
 
             <Row gutter={16} align="middle">
-              
-
-              <Col xs={24} sm={11}>
-               
-              </Col>
+              <Col xs={24} sm={11}></Col>
             </Row>
 
             {/* <button data-testid="submit-button"  type="submit">SUBMIT</button> */}
