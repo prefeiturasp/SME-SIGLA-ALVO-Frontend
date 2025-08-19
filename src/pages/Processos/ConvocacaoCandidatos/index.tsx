@@ -4,7 +4,7 @@ import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import { Controller } from "react-hook-form";
-import { CustomFormItem, SeparatorCol } from "./styles";
+import { CustomFormItem, SeparatorCol } from "../../../components/formStyle/styles";
 import { Content } from "antd/es/layout/layout";
 import ConvocacaoTable from "./components/ConvocacaoTable";
 import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
@@ -59,6 +59,7 @@ const ConvocacaoCandidatos: React.FC = () => {
           </Typography.Title>
           <Button
             type="primary"
+            size="large"
             icon={<PlusOutlined />}
             onClick={() => navigate("/processos/convocacao/nova")}
           >
@@ -82,7 +83,7 @@ const ConvocacaoCandidatos: React.FC = () => {
                 >
                   <Select
                     {...field}
-                    style={{ width: "100%" }}
+                    
                     options={concursosOptions?.concursos || []}
                     placeholder="Selecione o concurso"
                     loading={concursosIsLoading}
@@ -109,14 +110,14 @@ const ConvocacaoCandidatos: React.FC = () => {
                       labelCol={{ span: 24 }}
                     >
                       <DatePicker
-                        style={{ width: "100%" }}
+                        
                         value={field.value ? dayjs(field.value) : undefined}
                         onChange={(date) =>
                           field.onChange(
                             date ? dayjs(date).format("YYYY-MM-DD") : ""
                           )
                         }
-                        placeholder="Selecione a data inicial"
+                        placeholder="inicio"
                         format="DD/MM/YYYY"
                         suffixIcon={
                           <CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />
@@ -135,6 +136,8 @@ const ConvocacaoCandidatos: React.FC = () => {
                 <Controller
                   control={control}
                   name="data_convocacao_fim"
+                                        
+
                   render={({ field }) => (
                     <CustomFormItem
                       label=" "
@@ -145,16 +148,14 @@ const ConvocacaoCandidatos: React.FC = () => {
                       labelCol={{ span: 24 }}
                     >
                       <DatePicker
-                        style={{ width: "100%" }}
                         
-
                         value={field.value ? dayjs(field.value) : undefined}
                         onChange={(date) =>
                           field.onChange(
                             date ? dayjs(date).format("YYYY-MM-DD") : ""
                           )
                         }
-                        placeholder="Selecione a data final"
+                        placeholder="Fim"
                         format="DD/MM/YYYY"
                         suffixIcon={
                           <CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />
@@ -170,17 +171,17 @@ const ConvocacaoCandidatos: React.FC = () => {
               <Col xs={24}>
                 <Controller
                   control={control}
-                  name="cargo"
+                  name="cargo_uuid"
                   render={({ field }) => (
                     <CustomFormItem
                       label="Cargo"
-                      validateStatus={formErrors.cargo ? "error" : undefined}
-                      help={formErrors.cargo?.message}
+                      validateStatus={formErrors.cargo_uuid ? "error" : undefined}
+                      help={formErrors.cargo_uuid?.message}
                       labelCol={{ span: 24 }}
                     >
                       <Select
                         {...field}
-                        style={{ width: "100%" }}
+                        
                         options={
                           concursosOptions ? concursosOptions.cargos : []
                         }
@@ -197,8 +198,14 @@ const ConvocacaoCandidatos: React.FC = () => {
               </Col>
 
               <Space style={{ margin: "1.5rem 0" }}>
-                <Button onClick={handleReset}>Limpar filtros</Button>
-                <Button type="primary" onClick={handleSubmit(handleSub)}>
+                <Button type="primary" ghost size="large" onClick={handleReset}>
+                  Limpar filtros
+                </Button>
+                <Button
+                  size="large"
+                  type="primary"
+                  onClick={handleSubmit(handleSub)}
+                >
                   Pesquisar
                 </Button>
               </Space>

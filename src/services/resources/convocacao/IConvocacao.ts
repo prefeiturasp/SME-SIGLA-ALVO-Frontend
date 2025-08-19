@@ -13,7 +13,7 @@ export interface ISample extends IProcessoConvocacao {
 
 export interface IFiltroProcessos {
   concurso_uuid?: string;
-  cargo?: string;
+  cargo_uuid?: string;
   data_convocacao_inicio?: string;
   data_convocacao_fim?: string;
 }
