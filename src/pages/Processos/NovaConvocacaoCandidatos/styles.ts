@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { Button, Card, Form } from "antd";
 
 export const StyledCardPequeno = styled(Card)`
-  width: 170px;
+  width: 200px;
   padding: 0;
   border-radius: 5px;
   overflow: hidden;

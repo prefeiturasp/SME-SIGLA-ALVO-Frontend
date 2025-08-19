@@ -67,7 +67,6 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
   const { concursosData, concursosIsLoading } = useConcursos();
 
   const [cargoSelecionado, setCargoSelecionado] = useState<string | undefined>();
-  const [arquivoSelecionado, setArquivoSelecionado] = useState<string | undefined>();
   const [cargosDisponiveis, setCargosDisponiveis] = useState<{ value: string; label: string }[]>([]);
   const [cardData, setCardData] = useState({
     vagas: 0,
@@ -134,7 +133,6 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
       data_final: "",
     });
     setCargoSelecionado(undefined);
-    setArquivoSelecionado(undefined);
     setCargosDisponiveis([]);
   };
 
@@ -177,6 +175,15 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
                        buscarCargosDoConcurso(value);
                      }}
                    />
+
+                  {!isCargoLiberado && (
+                    <Text 
+                      type="secondary" 
+                      style={{ fontSize:12, color: 'gray', marginTop: 2, display: 'block' }}
+                    >
+                      * Selecione o concurso para liberar a opção de Cargo.
+                    </Text>
+                  )}
                 </CustomFormItem>
               )}
             />
@@ -184,12 +191,16 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
               control={control}
               name="tipo_processo"
               render={({ field }) => (
-                <CustomFormItem label={<strong>Tipo de processo</strong>}>
+                <CustomFormItem label={<strong>Tipo de Escolha</strong>}>
                   <Select
                     {...field}
-                    placeholder="Selecione o tipo de processo"
+                    placeholder="Selecione o tipo de escolha"
                     style={{ width: "65%" }}
-                    options={[{ value: "Escolha", label: "Escolha" }]}
+                    options={[
+                      { value: "Nova Autorização", label: "Nova Autorização" },
+                      { value: "Reposição", label: "Reposição" },
+                      { value: "Reconvocação", label: "Reconvocação" }
+                    ]}
                   />
                 </CustomFormItem>
               )}
@@ -211,11 +222,11 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
                 control={control}
                 name="data_final"
                 render={({ field }) => (
-                  <CustomFormItem label={<strong>Data de convocação</strong>}>
+                  <CustomFormItem label={<strong>Data da convocação</strong>}>
                     <DatePicker
                       {...field}
-                      placeholder="Data de convocação"
-                      style={{ width: "25%" }}
+                      placeholder="Selecione a data da convocação"
+                      style={{ width: "65%" }}
                       format="DD/MM/YYYY"
                       suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
                       value={field.value ? dayjs(field.value) : undefined}
@@ -226,23 +237,16 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
               />
             <Controller
               control={control}
-              name="cargo"
+              name="data_final"
               render={({ field }) => (
-                <CustomFormItem label={<strong>Número de convocados</strong>}>
-                  <Input
+                <CustomFormItem label={<strong>Data corte de Vagas</strong>}>
+                  <DatePicker
                     {...field}
-                    placeholder="Insira o número de candidatos convocados"
+                    placeholder="Selecione a data corte de vagas"
                     style={{ width: "65%" }}
+                    format="DD/MM/YYYY"
+                    suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
                   />
-
-                  {!isCargoLiberado && (
-                    <Text 
-                      type="secondary" 
-                      style={{ fontSize:12, color: 'gray', marginTop: 18, display: 'block' }}
-                    >
-                      * Selecione o concurso para liberar a seleção de Cargo.
-                    </Text>
-                  )}
                 </CustomFormItem>
               )}
             />
@@ -274,66 +278,65 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
           </PrimaryButton>
 
           <Row gutter={16} justify="start">
-            {[
-              { title: "Vagas", value: cardData.vagas, icon: <GroupAddIcon /> },
-              { title: "Autorizações", value: cardData.autorizacoes, icon: <ApprovalIcon />  },
-              { title: "Reservas", value: cardData.reservas, icon: <CalendarMonthIcon /> },
-              { title: "Convocar", value: cardData.convocar, icon: <CampaignIcon /> },
-            ].map(({ title, value, icon }) => (
-              <Col key={title}>
-                <StyledCardPequeno styles={{ body: { padding: 0 } }}>
-                  <div style={{ display: "flex", height: 64 }}>
-                    <CardIconContainer>{icon}</CardIconContainer>
-                    <CardContentContainer>
-                      <div style={{ fontSize: 14, fontWeight: 500 }}>{title}</div>
-                      <div style={{ fontSize: 18, fontWeight: "bold", color: "#05409A" }}>{value}</div>
-                    </CardContentContainer>
-                  </div>
-                </StyledCardPequeno>
-              </Col>
-            ))}
+            <Col>
+              <div style={{ marginBottom: 20 }}>
+                <Text strong style={{ fontSize: 16 }}>Número de Vagas</Text>
+              </div>
+              <StyledCardPequeno styles={{ body: { padding: 0 } }}>
+                <div style={{ display: "flex", height: 64 }}>
+                  <CardIconContainer>{<CampaignIcon />}</CardIconContainer>
+                  <CardContentContainer>
+                    <div style={{ fontSize: 14, fontWeight: "bold" }}>Vagas</div>
+                    <div style={{ fontSize: 18, fontWeight: "bold", color: "#05409A" }}>{cardData.vagas}</div>
+                  </CardContentContainer>
+                </div>
+              </StyledCardPequeno>
+            </Col>
+            
+            <Col>
+              <div style={{ marginBottom: 8 }}>
+                <Text strong style={{ fontSize: 16 }}>Candidatos a convocar</Text>
+              </div>
+              <Row gutter={8}>
+                {[
+                  { title: "Ampla", value: cardData.autorizacoes, icon: <GroupAddIcon /> },
+                  { title: "NNA", value: cardData.reservas, icon: <GroupAddIcon /> },
+                  { title: "PcD", value: cardData.convocar, icon: <GroupAddIcon /> },
+                ].map(({ title, value, icon }) => (
+                  <Col key={title}>
+                    <StyledCardPequeno styles={{ body: { padding: 0 } }}>
+                      <div style={{ display: "flex", height: 64 }}>
+                        <CardIconContainer>{icon}</CardIconContainer>
+                        <CardContentContainer>
+                          <div style={{ fontSize: 14, fontWeight: "bold" }}>{title}</div>
+                          <div style={{ fontSize: 18, fontWeight: "bold", color: "#05409A" }}>{value}</div>
+                        </CardContentContainer>
+                      </div>
+                    </StyledCardPequeno>
+                  </Col>
+                ))}
+              </Row>
+            </Col>
           </Row>
 
           <Divider style={{ margin: "0px" }} />
 
           <Title level={3}>Configuração do cargo</Title>
-          <Text strong>Arquivo de orientação</Text>
-
-          <Select
-            placeholder="Selecione o arquivo"
-            style={{ width: "32%" }}
-            value={arquivoSelecionado}
-            onChange={setArquivoSelecionado}
-            disabled={!cargoSelecionado}
-          >
-            <Option value="orientacoes_professores">
-              ORIENTAÇÕES PROFESSORES FUND. II E MÉDIO
-            </Option>
-          </Select>
 
           <Space wrap>
             <ActionButton
               icon={
                 <VisibilityIcon
                   style={{
-                    color: arquivoSelecionado ? "#05409A" : "gray",
+                    color: "#05409A",
                   }}
                 />
               }
-              disabled={!arquivoSelecionado}
-              style={
-                arquivoSelecionado
-                  ? {
-                      border: "1px solid #05409A",
-                      color: "#05409A",
-                      backgroundColor: "#fff",
-                    }
-                  : {
-                      border: "1px solid #d9d9d9", // cor padrão AntD cinza
-                      color: "gray",
-                      backgroundColor: "#f5f5f5",
-                    }
-              }
+              style={{
+                border: "1px solid #05409A",
+                color: "#05409A",
+                backgroundColor: "#fff",
+              }}
             >
               Visualizar vagas
             </ActionButton>
@@ -342,24 +345,15 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
               icon={
                 <AdsClickIcon
                   style={{
-                    color: arquivoSelecionado ? "#05409A" : "gray",
+                    color: "#05409A",
                   }}
                 />
               }
-              disabled={!arquivoSelecionado}
-              style={
-                arquivoSelecionado
-                  ? {
-                      border: "1px solid #05409A",
-                      color: "#05409A",
-                      backgroundColor: "#fff",
-                    }
-                  : {
-                      border: "1px solid #d9d9d9",
-                      color: "gray",
-                      backgroundColor: "#f5f5f5",
-                    }
-              }
+              style={{
+                border: "1px solid #05409A",
+                color: "#05409A",
+                backgroundColor: "#fff",
+              }}
             >
               Selecionar candidatos
             </ActionButton>

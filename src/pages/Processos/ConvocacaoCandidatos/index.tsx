@@ -50,7 +50,7 @@ const ConvocacaoCandidatos: React.FC = () => {
   return (
     <BaseScreen
       breadcrumbItems={breadcrumbItems}
-      title="Consulta de convocação de candidatos"
+      title="Convocação de Candidatos"
     >
       <Content>
         <Row align="top" justify="space-between">
