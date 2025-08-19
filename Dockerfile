@@ -5,7 +5,7 @@ WORKDIR /app
 COPY . ./
 RUN export NODE_PATH=src/ \
     && npm install \
-    && npm run-script build
+    && npm run build
 
 # replace strings, this way we can pass parameters to static files.
 # For more details:
@@ -14,7 +14,7 @@ RUN export NODE_PATH=src/ \
 FROM nginx:alpine
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
