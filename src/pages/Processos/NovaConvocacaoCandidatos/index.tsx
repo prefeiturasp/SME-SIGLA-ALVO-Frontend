@@ -42,6 +42,7 @@ import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 
 import { useConcursos } from "./hooks/useConcursos";
+import SelecionarCandidatos from "./components/SelecionarCandidatos";
 
 
 
@@ -60,7 +61,8 @@ type FormFields = {
   tipo_processo: string;
   descricao: string;
   cargo: string;
-  data_final: string;
+  data_convocacao: string;
+  data_corte_vagas: string;
 };
 
 export const NovaConvocacaoCandidatos: React.FC = () => {
@@ -74,6 +76,8 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
     reservas: 0,
     convocar: 0,
   });
+  const [popupSelecionarCandidatos, setPopupSelecionarCandidatos] = useState(false);
+  const [candidatosSelecionados, setCandidatosSelecionados] = useState(0);
 
   const {
     control,
@@ -84,7 +88,8 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
       tipo_processo: undefined,
       descricao: undefined,
       cargo: "",
-      data_final: "",
+      data_convocacao: "",
+      data_corte_vagas: "",
     },
   });
 
@@ -130,10 +135,19 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
       tipo_processo: "",
       descricao: "",
       cargo: "",
-      data_final: "",
+      data_convocacao: "",
+      data_corte_vagas: "",
     });
     setCargoSelecionado(undefined);
     setCargosDisponiveis([]);
+  };
+
+  const handleAbrirPopupSelecionarCandidatos = () => {
+    setPopupSelecionarCandidatos(true);
+  };
+
+  const handleCandidatosSelecionados = (quantidade: number) => {
+    setCandidatosSelecionados(quantidade);
   };
 
   const buscarDadosDoCargo = () => {
@@ -218,26 +232,26 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
                 </CustomFormItem>
               )}
             />
-              <Controller
-                control={control}
-                name="data_final"
-                render={({ field }) => (
-                  <CustomFormItem label={<strong>Data da convocação</strong>}>
-                    <DatePicker
-                      {...field}
-                      placeholder="Selecione a data da convocação"
-                      style={{ width: "65%" }}
-                      format="DD/MM/YYYY"
-                      suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
-                      value={field.value ? dayjs(field.value) : undefined}
-                      onChange={(date) => field.onChange(date ? date.toISOString() : "")}
-                    />
-                  </CustomFormItem>
-                )}
-              />
+                          <Controller
+              control={control}
+              name="data_convocacao"
+              render={({ field }) => (
+                <CustomFormItem label={<strong>Data da convocação</strong>}>
+                  <DatePicker
+                    {...field}
+                    placeholder="Selecione a data da convocação"
+                    style={{ width: "65%" }}
+                    format="DD/MM/YYYY"
+                    suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
+                    value={field.value ? dayjs(field.value) : undefined}
+                    onChange={(date) => field.onChange(date ? date.toISOString() : "")}
+                  />
+                </CustomFormItem>
+              )}
+            />
             <Controller
               control={control}
-              name="data_final"
+              name="data_corte_vagas"
               render={({ field }) => (
                 <CustomFormItem label={<strong>Data corte de Vagas</strong>}>
                   <DatePicker
@@ -246,6 +260,8 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
                     style={{ width: "65%" }}
                     format="DD/MM/YYYY"
                     suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
+                    value={field.value ? dayjs(field.value) : undefined}
+                    onChange={(date) => field.onChange(date ? date.toISOString() : "")}
                   />
                 </CustomFormItem>
               )}
@@ -354,6 +370,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
                 color: "#05409A",
                 backgroundColor: "#fff",
               }}
+              onClick={handleAbrirPopupSelecionarCandidatos}
             >
               Selecionar candidatos
             </ActionButton>
@@ -370,7 +387,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
           <Row gutter={16} justify="start">
             {[
               { title: "Escolas selecionadas", value: 0, icon: <SchoolIcon /> },
-              { title: "Candidatos selecionados", value: 0, icon: <GroupIcon />  },
+              { title: "Candidatos selecionados", value: candidatosSelecionados, icon: <GroupIcon />  },
             ].map(({ title, value, icon }) => (
               <Col key={title}>
                 <StyledCardGrande styles={{ body: { padding: 0 } }}>
@@ -391,6 +408,16 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
           </AddButton>
         </Space>
       </Card>
+
+      <SelecionarCandidatos
+        visible={popupSelecionarCandidatos}
+        onClose={() => setPopupSelecionarCandidatos(false)}
+        concurso={watchFields.concurso}
+        cargo={cargoSelecionado}
+        vagas={cardData.vagas}
+        autorizacoes={cardData.autorizacoes}
+        onCandidatosSelecionados={handleCandidatosSelecionados}
+      />
     </BaseScreen>
   );
 };
