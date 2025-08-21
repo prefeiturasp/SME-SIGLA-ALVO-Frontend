@@ -28,6 +28,35 @@ export interface IOptions {
 
  
  
+export interface IUnidadeEscolar {
+  uuid:string;
+  eol: string;
+  dre: string;
+  tipo: string; 
+  unidade: string; 
+  vagas_definitivas: number; 
+  vagas_precarias: number; 
+}
+
+
 
  
 
+
+export interface IConvocacaoModal {
+    id : number|undefined;
+
+  dre: string;
+  escola: string;
+  stock: number;
+  price: number;
+  is_active:boolean;
+}
+
+export interface IConvocacaoFiltros {
+    
+
+  dre: string;
+  escola: string;
+  
+}

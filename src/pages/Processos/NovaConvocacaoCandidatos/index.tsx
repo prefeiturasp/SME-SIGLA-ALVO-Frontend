@@ -11,19 +11,17 @@ import {
   Card,
 } from "antd";
 
-import {
-  PlusOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
-import ApprovalIcon from '@mui/icons-material/Approval';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import CampaignIcon from '@mui/icons-material/Campaign';
-import SchoolIcon from '@mui/icons-material/School';
-import GroupIcon from '@mui/icons-material/Group';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import AdsClickIcon from '@mui/icons-material/AdsClick';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import ApprovalIcon from "@mui/icons-material/Approval";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import CampaignIcon from "@mui/icons-material/Campaign";
+import SchoolIcon from "@mui/icons-material/School";
+import GroupIcon from "@mui/icons-material/Group";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import AdsClickIcon from "@mui/icons-material/AdsClick";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 
 import {
   StyledCardPequeno,
@@ -39,11 +37,12 @@ import {
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import dayjs from "dayjs";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import { useConcursos } from "./hooks/useConcursos";
-
-
+import VisualizarVagasModal from "./components/VisualizarVagasModal/VisualizarVagasModal";
+import type { IConvocacaoModal } from "../../../services/resources/convocacao/IConvocacao";
+import type { IBackendWithSubOptions } from "../../../types/IListRequest";
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -66,9 +65,26 @@ type FormFields = {
 export const NovaConvocacaoCandidatos: React.FC = () => {
   const { concursosData, concursosIsLoading } = useConcursos();
 
-  const [cargoSelecionado, setCargoSelecionado] = useState<string | undefined>();
-  const [arquivoSelecionado, setArquivoSelecionado] = useState<string | undefined>();
-  const [cargosDisponiveis, setCargosDisponiveis] = useState<{ value: string; label: string }[]>([]);
+  const [cargoSelecionado, setCargoSelecionado] = useState<
+    string | undefined
+  >();
+  const [arquivoSelecionado, setArquivoSelecionado] = useState<
+    string | undefined
+  >();
+  const [cargosDisponiveis, setCargosDisponiveis] = useState<
+    { value: string; label: string }[]
+  >([]);
+
+
+  const location = useLocation();
+  let state = location.state as IBackendWithSubOptions;
+
+  console.log("cargos,concursos", state);
+
+  const handleOpenVisualizarVagasModal = () => {
+    setOpenVisualizarVagasModal(true);
+  };
+
   const [cardData, setCardData] = useState({
     vagas: 0,
     autorizacoes: 0,
@@ -76,10 +92,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
     convocar: 0,
   });
 
-  const {
-    control,
-    reset,
-  } = useForm<FormFields>({
+  const { control, reset } = useForm<FormFields>({
     defaultValues: {
       concurso: undefined,
       tipo_processo: undefined,
@@ -102,7 +115,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
     const concursoSelecionado = concursosData.find(
       (c) => c.value === concursoValue
     );
-    console.log(concursoSelecionado)
+    console.log(concursoSelecionado);
     if (concursoSelecionado && concursoSelecionado.cargos) {
       setCargosDisponiveis(concursoSelecionado.cargos);
     }
@@ -142,13 +155,30 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
     if (!cargoSelecionado) return;
 
     setTimeout(() => {
-        setCardData({
-          vagas: 385,
-          autorizacoes: 0,
-          reservas: 407,
-          convocar: 0,
+      setCardData({
+        vagas: 385,
+        autorizacoes: 0,
+        reservas: 407,
+        convocar: 0,
       });
     }, 1000);
+  };
+
+ 
+
+  const [openVisualizarVagasModal, setOpenVisualizarVagasModal] =  useState<boolean>(true);
+
+
+  const handleCloseVisualizarVagas = () => { 
+    setOpenVisualizarVagasModal(false);
+  };
+
+  const confirmVisualizarVagas = async (data: IConvocacaoModal) => {
+    try {
+      console.log("e", data);      
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -156,7 +186,23 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
       breadcrumbItems={breadcrumbItems}
       title="Processo de convocação de candidatos"
     >
-      <Card style={{ borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", marginBottom: 24 }}>
+         <VisualizarVagasModal
+          isOpen={openVisualizarVagasModal}
+          onCancel={handleCloseVisualizarVagas}
+          onConfirm={confirmVisualizarVagas}
+          loading={false}
+          concurso="200803471730 - 200803471730"
+          cargo="PROF.ENS.FUND.II E MED.-BIOL.PROG.SAUDE"
+        />
+     
+
+      <Card
+        style={{
+          borderRadius: 8,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          marginBottom: 24,
+        }}
+      >
         <Typography.Title level={4}>Busca Processos</Typography.Title>
 
         <Row gutter={16}>
@@ -167,16 +213,16 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
               render={({ field }) => (
                 <CustomFormItem label={<strong>Concurso</strong>}>
                   <Select
-                     {...field}
-                     placeholder="Selecione o concurso"
-                     style={{ width: "65%" }}
-                     options={concursosData || []}
-                     loading={concursosIsLoading}
-                     onChange={(value) => {
-                       field.onChange(value);
-                       buscarCargosDoConcurso(value);
-                     }}
-                   />
+                    {...field}
+                    placeholder="Selecione o concurso"
+                    style={{ width: "65%" }}
+                    options={concursosData || []}
+                    loading={concursosIsLoading}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      buscarCargosDoConcurso(value);
+                    }}
+                  />
                 </CustomFormItem>
               )}
             />
@@ -207,23 +253,27 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
                 </CustomFormItem>
               )}
             />
-              <Controller
-                control={control}
-                name="data_final"
-                render={({ field }) => (
-                  <CustomFormItem label={<strong>Data de convocação</strong>}>
-                    <DatePicker
-                      {...field}
-                      placeholder="Data de convocação"
-                      style={{ width: "25%" }}
-                      format="DD/MM/YYYY"
-                      suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
-                      value={field.value ? dayjs(field.value) : undefined}
-                      onChange={(date) => field.onChange(date ? date.toISOString() : "")}
-                    />
-                  </CustomFormItem>
-                )}
-              />
+            <Controller
+              control={control}
+              name="data_final"
+              render={({ field }) => (
+                <CustomFormItem label={<strong>Data de convocação</strong>}>
+                  <DatePicker
+                    {...field}
+                    placeholder="Data de convocação"
+                    style={{ width: "25%" }}
+                    format="DD/MM/YYYY"
+                    suffixIcon={
+                      <CalendarMonthIcon style={{ color: "#05409A" }} />
+                    }
+                    value={field.value ? dayjs(field.value) : undefined}
+                    onChange={(date) =>
+                      field.onChange(date ? date.toISOString() : "")
+                    }
+                  />
+                </CustomFormItem>
+              )}
+            />
             <Controller
               control={control}
               name="cargo"
@@ -236,9 +286,14 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
                   />
 
                   {!isCargoLiberado && (
-                    <Text 
-                      type="secondary" 
-                      style={{ fontSize:12, color: 'gray', marginTop: 18, display: 'block' }}
+                    <Text
+                      type="secondary"
+                      style={{
+                        fontSize: 12,
+                        color: "gray",
+                        marginTop: 18,
+                        display: "block",
+                      }}
                     >
                       * Selecione o concurso para liberar a seleção de Cargo.
                     </Text>
@@ -276,17 +331,39 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
           <Row gutter={16} justify="start">
             {[
               { title: "Vagas", value: cardData.vagas, icon: <GroupAddIcon /> },
-              { title: "Autorizações", value: cardData.autorizacoes, icon: <ApprovalIcon />  },
-              { title: "Reservas", value: cardData.reservas, icon: <CalendarMonthIcon /> },
-              { title: "Convocar", value: cardData.convocar, icon: <CampaignIcon /> },
+              {
+                title: "Autorizações",
+                value: cardData.autorizacoes,
+                icon: <ApprovalIcon />,
+              },
+              {
+                title: "Reservas",
+                value: cardData.reservas,
+                icon: <CalendarMonthIcon />,
+              },
+              {
+                title: "Convocar",
+                value: cardData.convocar,
+                icon: <CampaignIcon />,
+              },
             ].map(({ title, value, icon }) => (
               <Col key={title}>
                 <StyledCardPequeno styles={{ body: { padding: 0 } }}>
                   <div style={{ display: "flex", height: 64 }}>
                     <CardIconContainer>{icon}</CardIconContainer>
                     <CardContentContainer>
-                      <div style={{ fontSize: 14, fontWeight: 500 }}>{title}</div>
-                      <div style={{ fontSize: 18, fontWeight: "bold", color: "#05409A" }}>{value}</div>
+                      <div style={{ fontSize: 14, fontWeight: 500 }}>
+                        {title}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 18,
+                          fontWeight: "bold",
+                          color: "#05409A",
+                        }}
+                      >
+                        {value}
+                      </div>
                     </CardContentContainer>
                   </div>
                 </StyledCardPequeno>
@@ -313,6 +390,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
 
           <Space wrap>
             <ActionButton
+              onClick={handleOpenVisualizarVagasModal}
               icon={
                 <VisibilityIcon
                   style={{
@@ -364,11 +442,17 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
               Selecionar candidatos
             </ActionButton>
 
-            <ActionButton icon={<UploadFileIcon style={{ color: "gray" }} />} disabled>
+            <ActionButton
+              icon={<UploadFileIcon style={{ color: "gray" }} />}
+              disabled
+            >
               Exportação de convocados
             </ActionButton>
 
-            <ActionButton icon={<UploadFileIcon style={{ color: "gray" }} />} disabled>
+            <ActionButton
+              icon={<UploadFileIcon style={{ color: "gray" }} />}
+              disabled
+            >
               Exportação de vagas
             </ActionButton>
           </Space>
@@ -376,15 +460,36 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
           <Row gutter={16} justify="start">
             {[
               { title: "Escolas selecionadas", value: 0, icon: <SchoolIcon /> },
-              { title: "Candidatos selecionados", value: 0, icon: <GroupIcon />  },
+              {
+                title: "Candidatos selecionados",
+                value: 0,
+                icon: <GroupIcon />,
+              },
             ].map(({ title, value, icon }) => (
               <Col key={title}>
                 <StyledCardGrande styles={{ body: { padding: 0 } }}>
                   <div style={{ display: "flex", height: 64 }}>
                     <CardIconContainer>{icon}</CardIconContainer>
                     <CardContentContainer>
-                      <div style={{ fontSize: 14, fontWeight: 500, whiteSpace: "nowrap", textAlign: "center" }}>{title}</div>
-                      <div style={{ fontSize: 18, fontWeight: "bold", color: "#05409A" }}>{value}</div>
+                      <div
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 500,
+                          whiteSpace: "nowrap",
+                          textAlign: "center",
+                        }}
+                      >
+                        {title}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 18,
+                          fontWeight: "bold",
+                          color: "#05409A",
+                        }}
+                      >
+                        {value}
+                      </div>
                     </CardContentContainer>
                   </div>
                 </StyledCardGrande>
