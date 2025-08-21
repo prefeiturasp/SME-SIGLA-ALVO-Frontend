@@ -59,7 +59,7 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
   const theme = useTheme();
 
   const [openAdicionarNovaEscola, setOpenAdicionarNovaEscola] =
-    useState<boolean>(true);
+    useState<boolean>(false);
 
  
 

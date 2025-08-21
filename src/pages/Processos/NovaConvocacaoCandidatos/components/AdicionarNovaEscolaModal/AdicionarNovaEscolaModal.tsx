@@ -1,153 +1,155 @@
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import CheckIcon from "@mui/icons-material/Check";
-import React, { useState } from "react";
-import type { TableProps } from "antd";
-import {
-  Button,
-  Flex,
-  InputNumber,
-  Popconfirm,
-  Space,
-  Table,
-  Typography,
-} from "antd";
-import type { TableColumnsType } from "antd";
-import { Controller, useForm } from "react-hook-form";
-import { useTheme } from "styled-components";
-import type { IUnidadeEscolar } from "../../../../../services/resources/convocacao/IConvocacao";
-import { StyledTable } from "./style";
+import { Button, Select, Space, Typography } from "antd";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import { PlusOutlined } from "@ant-design/icons";
 
-interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
-  dataIndex: keyof IUnidadeEscolar;
-  title: any;
-  record: IUnidadeEscolar;
-  control: any;
+const { Text } = Typography;
+
+import { Col, Divider, Input, Row } from "antd";
+import { Controller, useForm } from "react-hook-form";
+import { CustomFormItem } from "./styles";
+import { Content } from "antd/es/layout/layout";
+import type { IConvocacaoFiltros } from "../../../../../services/resources/convocacao/IConvocacao";
+import UnidadeEscolarTable from "../UnidadeEscolarTable/UnidadeEscolarTable";
+
+import { useTheme } from "styled-components";
+import {
+  CustomModal,
+  TextBlue,
+} from "../../../../../components/estilosCompartilhados/styles";
+import AdicionarEscolaTable from "../AdicionarEscolaTable/AdicionarEscolaTable";
+
+interface INewAdicionarNovaEscolaModalProps {
+  isOpen: boolean;
+  onConfirm: (data: IConvocacaoFiltros) => void;
+  onCancel: () => void;
+  loading: boolean;
 }
 
-const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
-  dataIndex,
-  title,
-  record,
-  control,
-  children,
-  ...restProps
+const AdicionarNovaEscolaModal: React.FC<INewAdicionarNovaEscolaModalProps> = ({
+  onCancel,
+  onConfirm,
+  isOpen,
+  loading,
 }) => {
-  return (
-    <td {...restProps}>
-      <Controller
-        name={`${record.uuid}.${dataIndex}`}
-        control={control}
-        rules={{ required: `${title} é obrigatório` }}
-        render={({ field }) => (
-          <InputNumber {...field} min={0} style={{ width: "100%" }} />
-        )}
-      />
-    </td>
-  );
-};
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors: formErrors },
+  } = useForm<IConvocacaoFiltros>({
+    reValidateMode: "onChange",
+    mode: "all",
+    shouldFocusError: false,
+  });
 
-interface AdicionarEscolaTableProps extends TableProps<IUnidadeEscolar> {}
-
-const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
-  ...rest
-}) => {
-  const { control, getValues } = useForm({});
-  const [data, setData] = useState<IUnidadeEscolar[]>([
-    {
-      uuid: "1",
-      eol: "string",
-      dre: "string",
-      tipo: "string",
-      unidade: "string",
-      vagas_definitivas: 1,
-      vagas_precarias: 1,
-    },
-    {
-      uuid: "2",
-      eol: "string",
-      dre: "string",
-      tipo: "string",
-      unidade: "string",
-      vagas_definitivas: 1,
-      vagas_precarias: 1,
-    },
-  ]);
-  const theme = useTheme();
-
-  const adicionarEscola = () => {
-    const values = getValues();
-    console.log("Chamou adicionarEscola:", values);
-
-    // Exemplo: adiciona um novo item com valores default
-    const novaEscola: IUnidadeEscolar = {
-      uuid: String(Date.now()),
-      eol: "novo eol",
-      dre: "nova dre",
-      tipo: "nova tipo",
-      unidade: "nova unidade",
-      vagas_definitivas: 0,
-      vagas_precarias: 0,
-    };
-    setData((prev) => [...prev, novaEscola]);
+  const onFinish = async (data: IConvocacaoFiltros) => {
+    try {
+      await onConfirm(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const columns: TableColumnsType<IUnidadeEscolar> = [
-    { title: "DRE", dataIndex: "dre" },
-    { title: "Tipo de unidade", dataIndex: "tipo" },
-    { title: "Unidade Escolar", dataIndex: "unidade" },
-    {
-      title: "Vagas definitivas",
-      dataIndex: "vagas_definitivas",
-      editable: true,
-    },
-    {
-      title: "Vagas precárias",
-      dataIndex: "vagas_precarias",
-      editable: true,
-    },
-  ];
-
-  const mergedColumns: TableProps<IUnidadeEscolar>["columns"] = columns.map(
-    (col) => {
-      if (!(col as any).editable) return col;
-      return {
-        ...col,
-        onCell: (record: IUnidadeEscolar) => ({
-          record,
-          dataIndex: col.dataIndex,
-          title: col.title,
-          control,
-        }),
-      };
-    }
-  );
+  const theme = useTheme();
 
   return (
-    <Flex gap="middle" vertical>
-      <Button
-        type="primary"
-        icon={<CheckIcon style={{ color: "white" }} />}
-        onClick={adicionarEscola}
-        style={{ width: "fit-content" }}
-      >
-        Adicionar Escola
-      </Button>
-
-      <StyledTable<IUnidadeEscolar>
-        {...rest}
-        rowKey="uuid"
-        style={{ margin: "1.5rem 0" }}
-        components={{
-          body: { cell: EditableCell },
+    <CustomModal
+      title={"Nova escola"}
+      onOk={handleSubmit(onFinish)}
+      onCancel={onCancel}
+      closable={false}
+      open={isOpen}
+      centered
+      afterClose={() => {
+        reset();
+      }}
+      width="85rem"
+      confirmLoading={loading}
+      focusTriggerAfterClose={false}
+      maskClosable={false}
+      okText={"Salvar"}
+      footer={
+        <Button
+          key="salvar"
+          type="primary"
+          size="large"
+          onClick={() => onCancel()}
+        >
+          Voltar
+        </Button>
+      }
+    >
+      <Content
+        style={{
+          padding: "0.5rem",
         }}
-        bordered
-        dataSource={data}
-        columns={mergedColumns}
-        rowClassName="editable-row"
-        pagination={false}
+      >
+        <Row
+          gutter={16}
+          style={{
+            padding: "0.5rem 0 1.5rem 0",
+          }}
+        ></Row>
+
+        <Row gutter={16}>
+          <Col xs={24} md={6}>
+            <Controller
+              control={control}
+              name="dre"
+              render={({ field }) => (
+                <CustomFormItem
+                  label={"DRE"}
+                  validateStatus={formErrors.dre ? "error" : undefined}
+                  help={formErrors.dre?.message}
+                  labelCol={{ span: 24 }}
+                >
+                  <Select
+                    {...field}
+                    options={[]}
+                    placeholder="(Todas)"
+                    loading={false}
+                    suffixIcon={
+                      <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
+                    }
+                  />
+                </CustomFormItem>
+              )}
+            />
+          </Col>
+          <Col xs={24} md={6}>
+            <Controller
+              control={control}
+              name="escola"
+              render={({ field }) => (
+                <CustomFormItem
+                  label="Escola"
+                  validateStatus={formErrors.escola ? "error" : undefined}
+                  help={formErrors.escola?.message}
+                  labelCol={{ span: 24 }}
+                >
+                  <Input {...field} placeholder="" />
+                </CustomFormItem>
+              )}
+            />
+          </Col>
+        </Row>
+
+        <Button size="large" type="primary">
+          Filtrar
+        </Button>
+
+        <AdicionarEscolaTable
+          loading={false}
+     
+        />
+      </Content>
+      <Divider
+        style={{
+          margin: 0,
+        }}
       />
-    </Flex>
+    </CustomModal>
   );
 };
 
-export default AdicionarEscolaTable;
+export default AdicionarNovaEscolaModal;

@@ -7,14 +7,13 @@ import {
   InputNumber,
   Popconfirm,
   Space,
-  Table,
   Typography,
 } from "antd";
-import type { TableColumnsType, TableRowSelection } from "antd";
+import type { TableColumnsType } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { useTheme } from "styled-components";
 import type { IUnidadeEscolar } from "../../../../../services/resources/convocacao/IConvocacao";
-import { StyledTable } from "./style";
+import { StyledTable } from "../../../../../components/estilosCompartilhados/styles";
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
