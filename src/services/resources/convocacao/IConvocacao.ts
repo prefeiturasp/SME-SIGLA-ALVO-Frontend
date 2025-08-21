@@ -36,6 +36,7 @@ export interface IUnidadeEscolar {
   unidade: string; 
   vagas_definitivas: number; 
   vagas_precarias: number; 
+  editable?:boolean;
 }
 
 

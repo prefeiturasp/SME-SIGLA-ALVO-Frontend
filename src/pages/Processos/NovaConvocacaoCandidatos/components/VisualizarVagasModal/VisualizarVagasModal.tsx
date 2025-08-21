@@ -56,7 +56,6 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
 
    
 
-  const theme = useTheme();
 
   const [openAdicionarNovaEscola, setOpenAdicionarNovaEscola] =
     useState<boolean>(false);
@@ -73,7 +72,7 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
     setOpenAdicionarNovaEscola(true);
   };
 
-  const confirmAdicionarNovaEscola = async (data: IConvocacaoModal) => {
+  const confirmAdicionarNovaEscola = async (data: IConvocacaoFiltros) => {
     try {
       console.log("e", data);
     } catch (e) {

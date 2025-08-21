@@ -15,7 +15,7 @@ import type { TableColumnsType } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { useTheme } from "styled-components";
 import type { IUnidadeEscolar } from "../../../../../services/resources/convocacao/IConvocacao";
-import { StyledTable } from "./style";
+import { StyledTable } from "../../../../../components/estilosCompartilhados/styles";
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   dataIndex: keyof IUnidadeEscolar;
@@ -107,20 +107,7 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
     },
   ];
 
-  const mergedColumns: TableProps<IUnidadeEscolar>["columns"] = columns.map(
-    (col) => {
-      if (!(col as any).editable) return col;
-      return {
-        ...col,
-        onCell: (record: IUnidadeEscolar) => ({
-          record,
-          dataIndex: col.dataIndex,
-          title: col.title,
-          control,
-        }),
-      };
-    }
-  );
+ 
 
   return (
     <Flex gap="middle" vertical>
@@ -137,12 +124,12 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
         {...rest}
         rowKey="uuid"
         style={{ margin: "1.5rem 0" }}
-        components={{
-          body: { cell: EditableCell },
-        }}
+        // components={{
+        //   body: { cell: EditableCell },
+        // }}
         bordered
         dataSource={data}
-        columns={mergedColumns}
+        columns={columns}
         rowClassName="editable-row"
         pagination={false}
       />

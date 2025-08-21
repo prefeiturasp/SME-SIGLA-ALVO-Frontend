@@ -41,7 +41,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import { useConcursos } from "./hooks/useConcursos";
 import VisualizarVagasModal from "./components/VisualizarVagasModal/VisualizarVagasModal";
-import type { IConvocacaoModal } from "../../../services/resources/convocacao/IConvocacao";
+import type { IConvocacaoFiltros, IConvocacaoModal } from "../../../services/resources/convocacao/IConvocacao";
 import type { IBackendWithSubOptions } from "../../../types/IListRequest";
 
 const { Option } = Select;
@@ -173,7 +173,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
     setOpenVisualizarVagasModal(false);
   };
 
-  const confirmVisualizarVagas = async (data: IConvocacaoModal) => {
+  const confirmVisualizarVagas = async (data: IConvocacaoFiltros) => {
     try {
       console.log("e", data);      
     } catch (e) {

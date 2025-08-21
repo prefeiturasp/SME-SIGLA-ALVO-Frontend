@@ -4,8 +4,10 @@ import React from "react";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import dayjs from "dayjs";
 import type { IProcessoConvocacao } from "../../../../services/resources/convocacao/IConvocacao";
-import { CustomTitle, StyledTable } from "./style";
+import { CustomTitle } from "./style";
+
 import { Button, Space } from "antd";
+import { StyledTable } from "../../../../components/estilosCompartilhados/styles";
 
 interface ConvocacaoTableProps extends TableProps<IProcessoConvocacao> {
   data: IProcessoConvocacao[];
