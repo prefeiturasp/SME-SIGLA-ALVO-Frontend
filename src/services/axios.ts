@@ -12,6 +12,11 @@ export const appAxiosServico1 = axios.create({
   baseURL: "http://+59566985688:8000", //todo add in .env
 });
 
+export const appAxiosCandidatos = axios.create({
+  baseURL: "http://localhost:8002", //todo add in .env
+});
+
+
 export const appAxiosConcursos = axios.create({
   baseURL: "http://localhost:8001", //todo add in .env
 });
