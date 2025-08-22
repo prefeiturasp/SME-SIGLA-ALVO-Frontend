@@ -9,9 +9,11 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "jest"
+    "test": "jest",
+    "coverage": "jest --coverage"
   },
   "dependencies": {
+    "@babel/preset-typescript": "^7.27.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.1.1",
@@ -27,6 +29,7 @@
     "react-hook-form": "^7.58.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.7.1",
+    "react-select": "^5.10.2",
     "start": "^5.1.0",
     "styled-components": "^6.1.19",
     "uuid": "^11.1.0",

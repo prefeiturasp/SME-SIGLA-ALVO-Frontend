@@ -11,5 +11,8 @@ export default {
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
   },
+  transformIgnorePatterns: [
+    '/node_modules/(?!antd|@ant-design|rc-.*|@babel/runtime)',
+  ],
 };
 

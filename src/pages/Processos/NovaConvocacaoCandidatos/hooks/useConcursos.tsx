@@ -12,7 +12,7 @@ export const useConcursos = () => {
   });
 
   return {
-    concursosData: concursosData?.results || [],
+    concursosData: concursosData || [],
     concursosIsLoading,
   };
 };
