@@ -123,7 +123,7 @@ export const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
         footer={null}
         width={1104}
         centered
-        destroyOnClose
+        destroyOnHidden
         style={{ 
           maxWidth: '100vw',
           maxHeight: '100vh'
