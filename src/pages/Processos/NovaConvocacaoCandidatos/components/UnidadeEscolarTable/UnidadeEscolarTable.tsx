@@ -5,15 +5,14 @@ import {
   Button,
   Flex,
   InputNumber,
-  Popconfirm,
-  Space,
-  Typography,
+  Tooltip,
 } from "antd";
 import type { TableColumnsType } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { useTheme } from "styled-components";
 import type { IUnidadeEscolar } from "../../../../../services/resources/convocacao/IConvocacao";
 import { StyledTable } from "../../../../../components/estilosCompartilhados/styles";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
@@ -40,7 +39,7 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
           control={control}
           rules={{ required: `${title} é obrigatório` }}
           render={({ field }) => (
-            <InputNumber {...field} min={0} style={{ width: "100%" }} />
+            <InputNumber {...field} min={0} controls={false} style={{ width: 80 }} />
           )}
         />
       ) : (
@@ -106,42 +105,35 @@ const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
       title: "Vagas definitivas",
       dataIndex: "vagas_definitivas",
       editable: true,
-    },
+    } as any,
     {
       title: "Vagas precárias",
       dataIndex: "vagas_precarias",
       editable: true,
-    },
+    } as any,
     {
       title: "Ações",
       key: "acoes",
+      width: 64, // fixa a largura
+      align: "center" as const,
       render: (_: any, record: IUnidadeEscolar) => {
         const editable = isEditing(record);
         return editable ? (
-          <span>
-            <Typography.Link
-              onClick={() => save(record.uuid)}
-              style={{ marginInlineEnd: 8 }}
-            >
-              Salvar
-            </Typography.Link>
-            <Popconfirm title="Cancelar edição?" onConfirm={cancel}>
-              <a>Cancelar</a>
-            </Popconfirm>
-          </span>
+          <div style={{ width: 56, display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Tooltip title="Salvar">
+              <Button type="link" onClick={() => save(record.uuid)} icon={<CheckOutlined style={{ color: theme.token.colorPrimary }} />} />
+            </Tooltip>
+            <Tooltip title="Cancelar">
+              <Button type="link" onClick={cancel} icon={<CloseOutlined style={{ color: '#ff4d4f' }} />} />
+            </Tooltip>
+          </div>
         ) : (
-          <Space size="small">
-            <Button
-              disabled={editingKey !== ""}
-              onClick={() => edit(record)}
-              type="link"
-              icon={
-                <ModeEditOutlineOutlinedIcon
-                  style={{ color: theme.token.colorPrimary }}
-                />
-              }
-            />
-          </Space>
+          <div style={{ width: 56, display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Tooltip title="Editar vagas">
+              <Button type="link" disabled={editingKey !== ''} onClick={() => edit(record)} icon={<ModeEditOutlineOutlinedIcon style={{ color: theme.token.colorPrimary }} />} />
+            </Tooltip>
+            <Button type="link" style={{ visibility: 'hidden' }} icon={<CloseOutlined />} />
+          </div>
         );
       },
     },
@@ -149,34 +141,30 @@ const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
 
   const mergedColumns: TableProps<IUnidadeEscolar>["columns"] = columns.map(
     (col) => {
-      if (!(col as any).editable) return col;
+      if (!(col as any).editable) return col as any;
       return {
         ...col,
         onCell: (record: IUnidadeEscolar) => ({
           record,
-          dataIndex: col.dataIndex,
+          dataIndex: (col as any).dataIndex,
           title: col.title,
           editing: isEditing(record),
           control,
         }),
-      };
+      } as any;
     }
   );
 
-  const rowSelection: TableRowSelection<IUnidadeEscolar> = {
+  const rowSelection: any = {
     selectedRowKeys,
-    onChange: (newSelectedRowKeys) => setSelectedRowKeys(newSelectedRowKeys),
+    onChange: (newSelectedRowKeys: React.Key[]) => setSelectedRowKeys(newSelectedRowKeys),
   };
-
- 
- 
 
   return (
     <Flex gap="middle" vertical>
-
       <StyledTable<IUnidadeEscolar>
         {...rest}
-         rowKey="uuid" 
+        rowKey="uuid"
         style={{ margin: "1.5rem 0" }}
         components={{
           body: { cell: EditableCell },

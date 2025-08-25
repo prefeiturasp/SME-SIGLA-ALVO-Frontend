@@ -4,17 +4,13 @@ import { PlusOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
-import { Col, Divider, Input, InputNumber, Row } from "antd";
+import { Col, Divider, Input, Row } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { CustomFormItem } from "./styles";
 import { Content } from "antd/es/layout/layout";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { Modal as AntModal } from "antd";
-import type { IConvocacaoFiltros, IConvocacaoModal } from "../../../../../services/resources/convocacao/IConvocacao";
-import useEditProductsSchema from "./useEditProductsSchema";
+import type { IConvocacaoFiltros } from "../../../../../services/resources/convocacao/IConvocacao";
 import UnidadeEscolarTable from "../UnidadeEscolarTable/UnidadeEscolarTable";
 
-import { useTheme } from "styled-components";
 import {
   CustomModal,
   TextBlue,
@@ -36,7 +32,7 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
   onConfirm,
   isOpen,
   loading,
-   concurso,
+  concurso,
   cargo,
 }) => {
  
@@ -54,21 +50,14 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
     shouldFocusError: false,
   });
 
-   
-
-
   const [openAdicionarNovaEscola, setOpenAdicionarNovaEscola] =
     useState<boolean>(false);
 
- 
-
   const handleCloseAdicionarEscola = () => {
- 
     setOpenAdicionarNovaEscola(false);
   };
 
   const handleOpenAdicionarEscola = () => {
- 
     setOpenAdicionarNovaEscola(true);
   };
 
@@ -80,6 +69,15 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
     }
   };
 
+  // Handlers for action buttons
+  const handleAtualizarVagas = () => {
+    console.log("Atualizar vagas");
+  };
+
+  const handleFiltrar = () => {
+    console.log("Filtrar");
+  };
+
 
     const onFinish = async (data: IConvocacaoFiltros) => {
     try {
@@ -88,10 +86,6 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
       console.log(error);
     }
   };
-
-   
-
- 
 
   return (
     <CustomModal
@@ -141,13 +135,6 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
           padding: "0.5rem",
         }}
       >
-        <AdicionarNovaEscolaModal
-          isOpen={openAdicionarNovaEscola}
-          onCancel={handleCloseAdicionarEscola}
-          onConfirm={confirmAdicionarNovaEscola}
-          loading={false}
-         />
-
         <Row
           gutter={16}
           style={{
@@ -210,10 +197,10 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
 
         <Row>
           <Space size={24} style={{ margin: "0" }}>
-            <Button type="primary" ghost size="large">
+            <Button type="primary" ghost size="large" onClick={handleAtualizarVagas}>
               Atualizar vagas
             </Button>
-            <Button size="large" type="primary">
+            <Button size="large" type="primary" onClick={handleFiltrar}>
               Filtrar
             </Button>
           </Space>
@@ -223,20 +210,20 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
           loading={false}
           originData={[
             {
-              uuid: "1",
-              eol: "string",
-              dre: "string",
-              tipo: "string",
-              unidade: "string",
+              uuid: "3b178725-a14a-42d7-97cc-4fb1e3837f5b",
+              eol: "480100",
+              dre: "Guaianases",
+              tipo: "UE",
+              unidade: "Escola Guaianases",
               vagas_definitivas: 1,
               vagas_precarias: 1,
             },
             {
-              uuid: "2",
-              eol: "string",
-              dre: "string",
-              tipo: "string",
-              unidade: "string",
+              uuid: "e81d73ef-5121-4237-9bcd-69d174354051",
+              eol: "480100",
+              dre: "Guaianases",
+              tipo: "UE",
+              unidade: "Escola Campo Limpo",
               vagas_definitivas: 1,
               vagas_precarias: 1,
             },
@@ -248,7 +235,14 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
           margin: 0,
         }}
       />
+      <AdicionarNovaEscolaModal
+          isOpen={openAdicionarNovaEscola}
+          onCancel={handleCloseAdicionarEscola}
+          onConfirm={confirmAdicionarNovaEscola}
+          loading={false}
+         />
     </CustomModal>
+    
   );
 };
 

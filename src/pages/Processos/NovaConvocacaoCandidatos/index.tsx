@@ -1,20 +1,14 @@
 import React, { useState } from "react";
-import {
-  Typography,
-  Card,
-} from "antd";
+import { Typography, Card } from "antd";
 
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import { useForm, useWatch } from "react-hook-form";
 import { Link } from "react-router-dom";
 
 import { useConcursos } from "./hooks/useConcursos";
-import type {
-  IConvocacaoFiltros,
-} from "../../../services/resources/convocacao/IConvocacao";
+import type { IConvocacaoFiltros } from "../../../services/resources/convocacao/IConvocacao";
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
-
 
 const breadcrumbItems = [
   { title: <Link to="/">Home</Link> },
@@ -40,7 +34,7 @@ type FormFields = {
 
 export const NovaConvocacaoCandidatos: React.FC = () => {
   const { concursosData, concursosIsLoading } = useConcursos();
-  
+
   const { control, reset } = useForm<FormFields>({
     defaultValues: {
       concurso: undefined,
@@ -56,40 +50,42 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
 
   const isCargoLiberado = watchFields.concurso;
   const [cargosDisponiveis, setCargosDisponiveis] = useState<
-		{ value: string; label: string }[]
-	>([]);
-	const [cardData, setCardData] = useState({
-		vagas: 0,
-		autorizacoes: 0,
-		reservas: 0,
-		convocar: 0,
-	});
-	const [cargoSelecionado, setCargoSelecionado] = useState<string | undefined>();
-	const [podeVisualizarVagas, setPodeVisualizarVagas] = useState(false);
-	const buscarCargosDoConcurso = (concursoValue: string) => {
-		if (!concursoValue) {
-		setCargosDisponiveis([]);
-		return;
-		}
+    { value: string; label: string }[]
+  >([]);
+  const [cardData, setCardData] = useState({
+    vagas: 0,
+    autorizacoes: 0,
+    reservas: 0,
+    convocar: 0,
+  });
+  const [cargoSelecionado, setCargoSelecionado] = useState<
+    string | undefined
+  >();
+  const [podeVisualizarVagas, setPodeVisualizarVagas] = useState(false);
+  const buscarCargosDoConcurso = (concursoValue: string) => {
+    if (!concursoValue) {
+      setCargosDisponiveis([]);
+      return;
+    }
 
-		const concursoSelecionado = concursosData.find(
-		(c) => c.value === concursoValue,
-		);
+    const concursoSelecionado = concursosData.find(
+      (c) => c.value === concursoValue,
+    );
 
-		if (concursoSelecionado && concursoSelecionado.cargos) {
-		setCargosDisponiveis(concursoSelecionado.cargos);
-		}
+    if (concursoSelecionado && concursoSelecionado.cargos) {
+      setCargosDisponiveis(concursoSelecionado.cargos);
+    }
 
-		setCargoSelecionado(undefined);
-		setPodeVisualizarVagas(false);
+    setCargoSelecionado(undefined);
+    setPodeVisualizarVagas(false);
 
-		setCardData({
-		vagas: 0,
-		autorizacoes: 0,
-		reservas: 0,
-		convocar: 0,
-		});
-	};
+    setCardData({
+      vagas: 0,
+      autorizacoes: 0,
+      reservas: 0,
+      convocar: 0,
+    });
+  };
 
   const handleSub = (data: FormFields) => {
     console.log("Enviando dados para o backend:", {
@@ -113,20 +109,16 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
     setPodeVisualizarVagas(false);
   };
 
- 
-
-  
-
   // Labels selecionados para concurso e cargo
-  const selectedConcursoLabel = (
+  const selectedConcursoLabel =
     ((concursosData as unknown as ConcursoOption[]) || []).find(
       (opt) => opt.value === watchFields.concurso,
-    )?.label || ""
-  );
+    )?.label || "";
 
-  const selectedCargoLabel = (
-    cargosDisponiveis.find((opt) => opt.value === cargoSelecionado)?.label || ""
-  );
+  const selectedCargoLabel =
+    ((cargosDisponiveis as unknown as ConcursoOption[]) || []).find(
+      (opt) => opt.value === watchFields.cargo,
+    )?.label || "";
 
   return (
     <BaseScreen
@@ -156,12 +148,13 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
         setCargoSelecionado={setCargoSelecionado}
         cargosDisponiveis={cargosDisponiveis}
         cardData={cardData}
-		setCardData={setCardData}
+        setCardData={setCardData}
         podeVisualizarVagas={podeVisualizarVagas}
-		setPodeVisualizarVagas={setPodeVisualizarVagas}
+        setPodeVisualizarVagas={setPodeVisualizarVagas}
         selectedConcursoLabel={selectedConcursoLabel}
         selectedCargoLabel={selectedCargoLabel}
-        concursoId={watchFields.concurso}
+        watchFields={watchFields}
+        control={control}
       />
     </BaseScreen>
   );

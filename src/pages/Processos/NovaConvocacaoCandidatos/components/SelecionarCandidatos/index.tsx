@@ -33,8 +33,8 @@ interface SelecionarCandidatosProps {
 export const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
   visible,
   onClose,
-  concurso = "200803471730 - 200803471730",
-  cargo = "PROF.ENS.FUND.II E MED.-BIOL.PROG.SAUDE",
+  concurso,
+  cargo,
   vagas = 9,
   autorizacoes = 0,
   onCandidatosSelecionados

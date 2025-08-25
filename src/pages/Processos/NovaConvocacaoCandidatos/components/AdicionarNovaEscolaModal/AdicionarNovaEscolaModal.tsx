@@ -69,14 +69,22 @@ const AdicionarNovaEscolaModal: React.FC<INewAdicionarNovaEscolaModalProps> = ({
       maskClosable={false}
       okText={"Salvar"}
       footer={
-        <Button
-          key="salvar"
-          type="primary"
-          size="large"
-          onClick={() => onCancel()}
-        >
-          Voltar
-        </Button>
+        <Space  size={24}>
+          <Button
+            key="voltar"
+            size="large"
+            onClick={() => onCancel()}
+          >
+            Voltar
+          </Button>
+          <Button
+            key="adicionar"
+            type="primary"
+            size="large"
+          >
+            Adicionar escola
+          </Button>
+        </Space>
       }
     >
       <Content
