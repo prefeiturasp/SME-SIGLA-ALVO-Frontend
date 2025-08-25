@@ -39,3 +39,14 @@ if (!('ResizeObserver' in global)) {
 	// @ts-ignore
 	global.ResizeObserver = ResizeObserverMock
 }
+
+// Override incondicional do getComputedStyle (JSDOM define mas lança "not implemented")
+	Object.defineProperty(window, 'getComputedStyle', {
+		writable: true,
+		value: () => ({
+			getPropertyValue: () => '',
+			overflow: 'visible',
+			overflowX: 'visible',
+			overflowY: 'visible',
+		}),
+	});
