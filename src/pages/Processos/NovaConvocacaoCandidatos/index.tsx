@@ -144,8 +144,6 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
 
       <Cargo
         isCargoLiberado={isCargoLiberado as any}
-        cargoSelecionado={cargoSelecionado}
-        setCargoSelecionado={setCargoSelecionado}
         cargosDisponiveis={cargosDisponiveis}
         cardData={cardData}
         setCardData={setCardData}

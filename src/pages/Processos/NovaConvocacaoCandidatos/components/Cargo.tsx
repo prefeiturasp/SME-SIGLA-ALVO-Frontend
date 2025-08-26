@@ -30,8 +30,6 @@ export type Option = { value: string; label: string };
 
 interface CargoProps {
   isCargoLiberado: string | undefined;
-  cargoSelecionado?: string;
-  setCargoSelecionado: (value?: string) => void;
   cargosDisponiveis: Option[];
   cardData: {
     vagas: number;
@@ -47,8 +45,6 @@ interface CargoProps {
   }) => void;
   selectedConcursoLabel: string;
   selectedCargoLabel: string;
-  popupSelecionarCandidatos: boolean;
-  closeSelecionarCandidatos: () => void;
   onCandidatosSelecionados?: (qtd: number) => void;
   setPodeVisualizarVagas: (podeVisualizarVagas: boolean) => void;
   podeVisualizarVagas: boolean;
@@ -60,11 +56,8 @@ const Cargo: React.FC<CargoProps> = ({
   isCargoLiberado,
   selectedConcursoLabel,
   selectedCargoLabel,
-  closeSelecionarCandidatos,
   onCandidatosSelecionados,
   setPodeVisualizarVagas,
-  cargoSelecionado,
-  setCargoSelecionado,
   cargosDisponiveis,
   cardData,
   setCardData,
@@ -74,8 +67,7 @@ const Cargo: React.FC<CargoProps> = ({
 }) => {
   const [popupSelecionarCandidatos, setPopupSelecionarCandidatos] =
     useState(false);
-  const [candidatosSelecionados, setCandidatosSelecionados] = useState(0);
-
+  
   const handleOpenVisualizarVagasModal = () => {
     setOpenVisualizarVagasModal(true);
   };
@@ -102,14 +94,9 @@ const Cargo: React.FC<CargoProps> = ({
     setPopupSelecionarCandidatos(false);
   };
 
-  const handleCandidatosSelecionados = (quantidade: number) => {
-    setCandidatosSelecionados(quantidade);
-  };
-
   const buscarDadosDoCargo = () => {
     if (!watchFields.cargo) return;
 
-    setTimeout(() => {
       setCardData({
         vagas: 385,
         autorizacoes: 0,
@@ -125,7 +112,7 @@ const Cargo: React.FC<CargoProps> = ({
           watchFields.data_corte_vagas,
       );
       setPodeVisualizarVagas(camposPreenchidos);
-    }, 1000);
+
   };
 
   return (
