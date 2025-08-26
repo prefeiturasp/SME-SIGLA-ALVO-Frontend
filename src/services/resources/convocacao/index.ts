@@ -10,6 +10,8 @@ export const URL = {
   createSample: () => `api/v1/sample/create`,
   editSample: (id:number) => `api/v1/sample/update/${id}/`,
   deleteSample: (id:number) => `api/v1/sample/delete/${id}/`,
+  getCargos: () => `/api/v1/cargos/`,
+  getCargosPorConcurso: (concursoUuid: string) => `/api/v1/cargos/concurso/${concursoUuid}/`,
 };
 
 
