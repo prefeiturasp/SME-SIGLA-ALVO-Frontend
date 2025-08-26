@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { message } from 'antd';
 import SelecionarCandidatos from '../index';
@@ -73,12 +73,16 @@ describe('SelecionarCandidatos', () => {
 
       const classificacaoInput = screen.getByDisplayValue('1');
       
-      await user.clear(classificacaoInput);
-      await user.type(classificacaoInput, '123');
+      await act(async () => {
+        await user.clear(classificacaoInput);
+        await user.type(classificacaoInput, '123');
+      });
       expect(classificacaoInput).toHaveValue('123');
 
-      await user.clear(classificacaoInput);
-      await user.type(classificacaoInput, 'abc123def');
+      await act(async () => {
+        await user.clear(classificacaoInput);
+        await user.type(classificacaoInput, 'abc123def');
+      });
       expect(classificacaoInput).toHaveValue('123');
     });
 
@@ -96,12 +100,16 @@ describe('SelecionarCandidatos', () => {
       const quantidadeInput = numericInputs[1];
       expect(quantidadeInput).toBeInTheDocument();
       
-      await user.clear(quantidadeInput);
-      await user.type(quantidadeInput, '456');
+      await act(async () => {
+        await user.clear(quantidadeInput);
+        await user.type(quantidadeInput, '456');
+      });
       expect(quantidadeInput).toHaveValue('456');
 
-      await user.clear(quantidadeInput);
-      await user.type(quantidadeInput, 'xyz789@#$');
+      await act(async () => {
+        await user.clear(quantidadeInput);
+        await user.type(quantidadeInput, 'xyz789@#$');
+      });
       expect(quantidadeInput).toHaveValue('789');
     });
 
@@ -112,25 +120,37 @@ describe('SelecionarCandidatos', () => {
       const autorizacaoInputs = screen.getAllByPlaceholderText('Digite apenas números');
       expect(autorizacaoInputs).toHaveLength(3);
 
-      await user.type(autorizacaoInputs[0], '123');
+      await act(async () => {
+        await user.type(autorizacaoInputs[0], '123');
+      });
       expect(autorizacaoInputs[0]).toHaveValue('123');
 
-      await user.clear(autorizacaoInputs[0]);
-      await user.type(autorizacaoInputs[0], 'abc123def');
+      await act(async () => {
+        await user.clear(autorizacaoInputs[0]);
+        await user.type(autorizacaoInputs[0], 'abc123def');
+      });
       expect(autorizacaoInputs[0]).toHaveValue('123');
 
-      await user.type(autorizacaoInputs[1], '456');
+      await act(async () => {
+        await user.type(autorizacaoInputs[1], '456');
+      });
       expect(autorizacaoInputs[1]).toHaveValue('456');
 
-      await user.clear(autorizacaoInputs[1]);
-      await user.type(autorizacaoInputs[1], '456xyz');
+      await act(async () => {
+        await user.clear(autorizacaoInputs[1]);
+        await user.type(autorizacaoInputs[1], '456xyz');
+      });
       expect(autorizacaoInputs[1]).toHaveValue('456');
 
-      await user.type(autorizacaoInputs[2], '789');
+      await act(async () => {
+        await user.type(autorizacaoInputs[2], '789');
+      });
       expect(autorizacaoInputs[2]).toHaveValue('789');
 
-      await user.clear(autorizacaoInputs[2]);
-      await user.type(autorizacaoInputs[2], '@#$789');
+      await act(async () => {
+        await user.clear(autorizacaoInputs[2]);
+        await user.type(autorizacaoInputs[2], '@#$789');
+      });
       expect(autorizacaoInputs[2]).toHaveValue('789');
     });
 
@@ -139,7 +159,9 @@ describe('SelecionarCandidatos', () => {
 
       const classificacaoInput = screen.getByDisplayValue('1');
       
-      fireEvent.keyDown(classificacaoInput, { key: 'a' });
+      await act(async () => {
+        fireEvent.keyDown(classificacaoInput, { key: 'a' });
+      });
       
       expect(message.warning).toHaveBeenCalledWith('Digite apenas números');
     });
@@ -154,7 +176,9 @@ describe('SelecionarCandidatos', () => {
       expect(screen.queryByText('Convocados por autorizações digitadas')).not.toBeInTheDocument();
 
       const buscarButton = screen.getByText('Buscar candidatos por autorizações digitadas');
-      await user.click(buscarButton);
+      await act(async () => {
+        await user.click(buscarButton);
+      });
 
       await waitFor(() => {
         expect(screen.getByText('Convocados por autorizações digitadas')).toBeInTheDocument();
@@ -180,7 +204,9 @@ describe('SelecionarCandidatos', () => {
       render(<SelecionarCandidatos {...defaultProps} />);
 
       const buscarButton = screen.getByText('Buscar candidatos por autorizações digitadas');
-      await user.click(buscarButton);
+      await act(async () => {
+        await user.click(buscarButton);
+      });
 
       await waitFor(() => {
         expect(screen.getByText('Buscando candidatos...')).toBeInTheDocument();
@@ -196,7 +222,9 @@ describe('SelecionarCandidatos', () => {
       render(<SelecionarCandidatos {...defaultProps} onClose={mockOnClose} />);
 
       const cancelarButton = screen.getByText('Cancelar');
-      await user.click(cancelarButton);
+      await act(async () => {
+        await user.click(cancelarButton);
+      });
 
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
@@ -215,14 +243,18 @@ describe('SelecionarCandidatos', () => {
       );
 
       const buscarButton = screen.getByText('Buscar candidatos por autorizações digitadas');
-      await user.click(buscarButton);
+      await act(async () => {
+        await user.click(buscarButton);
+      });
 
       await waitFor(() => {
         expect(screen.getByText('Convocados por autorizações digitadas')).toBeInTheDocument();
       });
 
       const selecionarButton = screen.getByText('Selecionar');
-      await user.click(selecionarButton);
+      await act(async () => {
+        await user.click(selecionarButton);
+      });
 
       expect(mockOnCandidatosSelecionados).toHaveBeenCalledWith(2);
       expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -242,7 +274,9 @@ describe('SelecionarCandidatos', () => {
       );
 
       const selecionarButton = screen.getByText('Selecionar');
-      await user.click(selecionarButton);
+      await act(async () => {
+        await user.click(selecionarButton);
+      });
 
       expect(mockOnCandidatosSelecionados).toHaveBeenCalledWith(0);
       expect(mockOnClose).toHaveBeenCalledTimes(1);

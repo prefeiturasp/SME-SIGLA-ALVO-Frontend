@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import NovaConvocacaoCandidatos from '../index';
@@ -77,9 +77,13 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const concursoSelect = screen.getByText('Selecione o concurso');
-    await user.click(concursoSelect);
+    await act(async () => {
+      await user.click(concursoSelect);
+    });
 
-    await user.click(await screen.findByText('Concurso de Analista'));
+    await act(async () => {
+      await user.click(await screen.findByText('Concurso de Analista'));
+    });
 
     await waitFor(() => {
       expect(
@@ -96,8 +100,12 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const concursoSelect = screen.getByText('Selecione o concurso');
-    await user.click(concursoSelect);
-    await user.click(await screen.findByText('Concurso de Analista'));
+    await act(async () => {
+      await user.click(concursoSelect);
+    });
+    await act(async () => {
+      await user.click(await screen.findByText('Concurso de Analista'));
+    });
 
     await waitFor(() => {
       expect(screen.queryByText('* Selecione o concurso para liberar a opção de Cargo.')).not.toBeInTheDocument();
@@ -138,7 +146,9 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const descricaoInput = screen.getByPlaceholderText('Digite a descrição');
-    await user.type(descricaoInput, 'Descrição de teste para convocação');
+    await act(async () => {
+      await user.type(descricaoInput, 'Descrição de teste para convocação');
+    });
     expect(descricaoInput).toHaveValue('Descrição de teste para convocação');
   });
 
@@ -176,12 +186,16 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const tipoProcessoSelect = screen.getByText('Selecione o tipo de escolha');
-    await user.click(tipoProcessoSelect);
+    await act(async () => {
+      await user.click(tipoProcessoSelect);
+    });
 
     const novaAutorizacaoOptions = screen.getAllByText('Nova Autorização');
     expect(novaAutorizacaoOptions).toHaveLength(2);
     
-    await user.click(novaAutorizacaoOptions[0]);
+    await act(async () => {
+      await user.click(novaAutorizacaoOptions[0]);
+    });
 
     expect(screen.getAllByText('Nova Autorização')).toHaveLength(2);
   });
@@ -193,7 +207,9 @@ describe('NovaConvocacaoCandidatos', () => {
     const dataConvocacaoPicker = screen.getByPlaceholderText('Selecione a data da convocação');
     expect(dataConvocacaoPicker).toBeInTheDocument();
     
-    await user.click(dataConvocacaoPicker);
+    await act(async () => {
+      await user.click(dataConvocacaoPicker);
+    });
     
     expect(dataConvocacaoPicker).toBeInTheDocument();
   });
@@ -205,7 +221,9 @@ describe('NovaConvocacaoCandidatos', () => {
     const dataCortePicker = screen.getByPlaceholderText('Selecione a data corte de vagas');
     expect(dataCortePicker).toBeInTheDocument();
     
-    await user.click(dataCortePicker);
+    await act(async () => {
+      await user.click(dataCortePicker);
+    });
     
     expect(dataCortePicker).toBeInTheDocument();
   });
@@ -215,15 +233,23 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const concursoSelect = screen.getByText('Selecione o concurso');
-    await user.click(concursoSelect);
-    await user.click(await screen.findByText('Concurso de Analista'));
+    await act(async () => {
+      await user.click(concursoSelect);
+    });
+    await act(async () => {
+      await user.click(await screen.findByText('Concurso de Analista'));
+    });
 
     await waitFor(() => {
       expect(screen.queryByText('* Selecione o concurso para liberar a opção de Cargo.')).not.toBeInTheDocument();
     });
 
-    await user.click(concursoSelect);
-    await user.click(await screen.findByText('Concurso de Professor'));
+    await act(async () => {
+      await user.click(concursoSelect);
+    });
+    await act(async () => {
+      await user.click(await screen.findByText('Concurso de Professor'));
+    });
 
     expect(screen.getByText('Cargos')).toBeInTheDocument();
   });
@@ -233,8 +259,12 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const concursoSelect = screen.getByText('Selecione o concurso');
-    await user.click(concursoSelect);
-    await user.click(await screen.findByText('Concurso de Analista'));
+    await act(async () => {
+      await user.click(concursoSelect);
+    });
+    await act(async () => {
+      await user.click(await screen.findByText('Concurso de Analista'));
+    });
 
     await waitFor(() => {
       expect(screen.queryByText('* Selecione o concurso para liberar a opção de Cargo.')).not.toBeInTheDocument();
@@ -278,15 +308,21 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const descricaoInput = screen.getByPlaceholderText('Digite a descrição');
-    await user.type(descricaoInput, 'Descrição de teste');
+    await act(async () => {
+      await user.type(descricaoInput, 'Descrição de teste');
+    });
 
     const tipoProcessoSelect = screen.getByText('Selecione o tipo de escolha');
-    await user.click(tipoProcessoSelect);
+    await act(async () => {
+      await user.click(tipoProcessoSelect);
+    });
     
     const reposicaoOptions = screen.getAllByText('Reposição');
     expect(reposicaoOptions).toHaveLength(2);
     
-    await user.click(reposicaoOptions[0]);
+    await act(async () => {
+      await user.click(reposicaoOptions[0]);
+    });
 
     expect(descricaoInput).toHaveValue('Descrição de teste');
     expect(screen.getAllByText('Reposição')).toHaveLength(2);
@@ -307,8 +343,12 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const concursoSelect = screen.getByText('Selecione o concurso');
-    await user.click(concursoSelect);
-    await user.click(await screen.findByText('Concurso de Professor'));
+    await act(async () => {
+      await user.click(concursoSelect);
+    });
+    await act(async () => {
+      await user.click(await screen.findByText('Concurso de Professor'));
+    });
 
     await waitFor(() => {
       expect(screen.queryByText('* Selecione o concurso para liberar a opção de Cargo.')).not.toBeInTheDocument();
@@ -351,12 +391,18 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const descricaoInput = screen.getByPlaceholderText('Digite a descrição');
-    await user.type(descricaoInput, 'Descrição para teste de submissão');
+    await act(async () => {
+      await user.type(descricaoInput, 'Descrição para teste de submissão');
+    });
 
     const tipoProcessoSelect = screen.getByText('Selecione o tipo de escolha');
-    await user.click(tipoProcessoSelect);
+    await act(async () => {
+      await user.click(tipoProcessoSelect);
+    });
     const novaAutorizacaoOptions = screen.getAllByText('Nova Autorização');
-    await user.click(novaAutorizacaoOptions[0]);
+    await act(async () => {
+      await user.click(novaAutorizacaoOptions[0]);
+    });
 
     expect(descricaoInput).toHaveValue('Descrição para teste de submissão');
     expect(screen.getAllByText('Nova Autorização')).toHaveLength(2);
@@ -402,22 +448,36 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const concursoSelect = screen.getByText('Selecione o concurso');
-    await user.click(concursoSelect);
-    await user.click(await screen.findByText('Concurso de Analista'));
+    await act(async () => {
+      await user.click(concursoSelect);
+    });
+    await act(async () => {
+      await user.click(await screen.findByText('Concurso de Analista'));
+    });
 
     const descricaoInput = screen.getByPlaceholderText('Digite a descrição');
-    await user.type(descricaoInput, 'Descrição que será limpa');
+    await act(async () => {
+      await user.type(descricaoInput, 'Descrição que será limpa');
+    });
 
     const tipoProcessoSelect = screen.getByText('Selecione o tipo de escolha');
-    await user.click(tipoProcessoSelect);
+    await act(async () => {
+      await user.click(tipoProcessoSelect);
+    });
     const reposicaoOptions = screen.getAllByText('Reposição');
-    await user.click(reposicaoOptions[0]);
+    await act(async () => {
+      await user.click(reposicaoOptions[0]);
+    });
 
     expect(descricaoInput).toHaveValue('Descrição que será limpa');
     expect(screen.getAllByText('Reposição')).toHaveLength(2);
 
-    await user.click(concursoSelect);
-    await user.click(await screen.findByText('Concurso de Professor'));
+    await act(async () => {
+      await user.click(concursoSelect);
+    });
+    await act(async () => {
+      await user.click(await screen.findByText('Concurso de Professor'));
+    });
 
     expect(screen.getByText('Cargos')).toBeInTheDocument();
   });
@@ -450,8 +510,12 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const concursoSelect = screen.getByText('Selecione o concurso');
-    await user.click(concursoSelect);
-    await user.click(await screen.findByText('Concurso de Analista'));
+    await act(async () => {
+      await user.click(concursoSelect);
+    });
+    await act(async () => {
+      await user.click(await screen.findByText('Concurso de Analista'));
+    });
 
     await waitFor(() => {
       expect(screen.queryByText('* Selecione o concurso para liberar a opção de Cargo.')).not.toBeInTheDocument();
@@ -481,8 +545,12 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
     const concursoSelect = screen.getByText('Selecione o concurso');
-    await user.click(concursoSelect);
-    await user.click(await screen.findByText('Concurso de Analista'));
+    await act(async () => {
+      await user.click(concursoSelect);
+    });
+    await act(async () => {
+      await user.click(await screen.findByText('Concurso de Analista'));
+    });
 
     await waitFor(() => {
       expect(screen.queryByText('* Selecione o concurso para liberar a opção de Cargo.')).not.toBeInTheDocument();
