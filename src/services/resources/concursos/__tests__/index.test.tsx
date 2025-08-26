@@ -1,12 +1,9 @@
-// /home/eudes-spassu/Área de Trabalho/COGEP-SME/SME-SIGLA-ALVO-Frontend/src/services/resources/concursos/__tests__/index.test.tsx
-
 import { appAxiosConcursos } from '../../../axios';
 import { getConcursos, URL } from '../index';
 import type { PaginatedResponse } from '../../../../types/IListRequest';
 import type { IConcurso } from '../IConcursos';
 import queryParamsSerializer from '../../../../utils/queryParamsSerializer';
 
-// Mock do axios e de outras dependências
 jest.mock('../../../axios');
 jest.mock('../../../../utils/queryParamsSerializer');
 
@@ -131,13 +128,10 @@ describe('Concursos Service', () => {
 
     it('deve permitir chamar a função abort sem erros de sintaxe', () => {
       const { abort } = getConcursos();
-      
-      // Verificamos apenas que a função existe e tem o tipo correto
+
       expect(typeof abort).toBe('function');
-      
-      // Verificamos que pode ser chamada (mas não executamos para evitar problemas com JSDOM)
+
       expect(() => {
-        // Simulamos uma chamada sem executar realmente
         if (typeof abort === 'function') {
           return true;
         }
