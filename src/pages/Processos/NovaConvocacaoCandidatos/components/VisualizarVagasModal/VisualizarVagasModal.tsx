@@ -118,7 +118,12 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
               >
                 Cancelar
               </Button>
-              <Button key="salvar" type="primary" size="large">
+              <Button
+                key="salvar"
+                type="primary"
+                size="large"
+                onClick={handleSubmit(onFinish)}
+              >
                 Salvar
               </Button>
             </Space>
