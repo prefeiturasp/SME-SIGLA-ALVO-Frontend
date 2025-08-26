@@ -1,11 +1,10 @@
-import { Typography, Select, DatePicker, Row, Col, Space, Button } from "antd";
+import { Typography, Select, DatePicker, Row, Col, Space, Button, Card } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import { Controller } from "react-hook-form";
 import { CustomFormItem, SeparatorCol } from "../../../components/formStyle/styles";
-import { Content } from "antd/es/layout/layout";
 import ConvocacaoTable from "./components/ConvocacaoTable";
 import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
 import { useNavigate } from "react-router-dom";
@@ -52,7 +51,8 @@ const ConvocacaoCandidatos: React.FC = () => {
       breadcrumbItems={breadcrumbItems}
       title="Convocação de Candidatos"
     >
-      <Content>
+      <Card style={{ borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", marginBottom: 24 }}>
+      
         <Row align="top" justify="space-between">
           <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>
             Busca Processos
@@ -61,7 +61,8 @@ const ConvocacaoCandidatos: React.FC = () => {
             type="primary"
             size="large"
             icon={<PlusOutlined />}
-            onClick={() => navigate("/processos/convocacao/nova")}
+            disabled={!concursosOptions}
+            onClick={() => navigate("/processos/convocacao/nova",{state:concursosOptions})}
           >
             Nova convocação
           </Button>
@@ -231,7 +232,7 @@ const ConvocacaoCandidatos: React.FC = () => {
             />
           </Col>
         </Row>
-      </Content>
+      </Card>
     </BaseScreen>
   );
 };
