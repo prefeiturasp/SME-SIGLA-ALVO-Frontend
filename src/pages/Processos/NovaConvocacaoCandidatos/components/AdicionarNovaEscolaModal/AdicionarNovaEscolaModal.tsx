@@ -81,6 +81,7 @@ const AdicionarNovaEscolaModal: React.FC<INewAdicionarNovaEscolaModalProps> = ({
             key="adicionar"
             type="primary"
             size="large"
+            onClick={handleSubmit(onFinish)}
           >
             Adicionar escola
           </Button>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import NovaConvocacaoCandidatos from '../index';
@@ -76,11 +76,13 @@ describe('NovaConvocacaoCandidatos', () => {
     const user = userEvent.setup();
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
-    const concursoSelect = screen.getByText('Selecione o concurso');
-    await user.click(concursoSelect);
+  const antContainer = screen.getByTestId('concurso-select');
+  const antSelector = antContainer.querySelector('.ant-select-selector') as HTMLElement;
 
+  fireEvent.mouseDown(antSelector);
+
+    await user.click(await screen.findByRole('option', { name: 'Concurso de Analista' }));
     await user.click(await screen.findByText('Concurso de Analista'));
-
     await waitFor(() => {
       expect(
         screen.queryByText('* Selecione o concurso para liberar a opção de Cargo.')
