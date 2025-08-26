@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { Modal, Typography, Row, Col, Input, Button, Space, message, Table, Spin } from 'antd';
+import { Modal, Typography, Col, Button, Space, message, Table, Spin } from 'antd';
 import { 
   GlobalFonts,
-  ModalContainer, 
-  ModalTitle, 
+    ModalTitle, 
   CompetitionInfo, 
   InfoItem, 
   InputGroup, 
-  RadioGroup, 
   TableContainer, 
   TableHeader, 
   TableRow, 
@@ -15,7 +13,7 @@ import {
   ButtonContainer,
   StyledInput,
   StyledText
-} from './styles';
+} from '../../styles';
 import { useCandidatos } from '../../hooks/useCandidatos';
 
 const { Title, Text } = Typography;
