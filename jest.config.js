@@ -12,6 +12,7 @@ export default {
     "/node_modules/",
     "<rootDir>/__tests__/",
     "<rootDir>/src/routes/",
+    "<rootDir>/src/utils/",
     "<rootDir>/src/pages/NotFound/",
     "<rootDir>/src/pages/Dashboard/",
   ],
