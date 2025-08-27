@@ -8,6 +8,13 @@ export default {
   collectCoverage: true,
   coverageReporters: ['text', 'html'],
   coverageDirectory: 'coverage',
+  coveragePathIgnorePatterns: [
+    "/node_modules/",
+    "<rootDir>/__tests__/",
+    "<rootDir>/src/routes/",
+    "<rootDir>/src/pages/NotFound/",
+    "<rootDir>/src/pages/Dashboard/",
+  ],
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
   },
