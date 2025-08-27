@@ -643,4 +643,18 @@ describe('NovaConvocacaoCandidatos', () => {
     expect(screen.getByText('Selecione o concurso')).toBeInTheDocument();
     expect(screen.getByText('Cargos')).toBeInTheDocument();
   });
+
+  test('altera o valor do campo Data da convocação', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<NovaConvocacaoCandidatos />);
+
+    const dataInput = screen.getByPlaceholderText('Selecione a data da convocação') as HTMLInputElement;
+    expect(dataInput).toBeInTheDocument();
+
+    await user.clear(dataInput);
+    await user.type(dataInput, '10/02/2025');
+    await user.keyboard('{Enter}');
+
+    await waitFor(() => expect(dataInput.value).toBe('10/02/2025'));
+  });
 });

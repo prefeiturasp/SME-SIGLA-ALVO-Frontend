@@ -41,7 +41,6 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
           <Button
             type={"link"}
             icon={<ModeEditOutlineOutlinedIcon />}
-            disabled
             onClick={() => console.log("edit")}
           />
 

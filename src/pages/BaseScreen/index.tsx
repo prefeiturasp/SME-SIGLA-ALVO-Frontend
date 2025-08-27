@@ -7,6 +7,7 @@ import icon from "../../assets/alvo-img.png";
 
 import { UserAvatar } from "../../components/UserAvatar/UserAvatar";
 import { useNavigate } from "react-router-dom";
+import { GlobalMenuWidth } from "./styles";
 
 export interface INewSampleModalData extends IProcessoConvocacao {
   description: string;
@@ -44,7 +45,10 @@ const menuItens: MenuProps["items"] = [
     <CustomLabel>
       Administração <ArrowDropDownIcon />
     </CustomLabel>,
-    onClick: () => navigate("/processos/convocacao"), 
+    children: [
+      { key: 1, label: "Concursos" },
+      { key: 2, label: "Escolas" },
+    ],
   },
   {
     key: "sub2",
@@ -52,19 +56,20 @@ const menuItens: MenuProps["items"] = [
     <CustomLabel>
       Processos <ArrowDropDownIcon />
     </CustomLabel>,
-    onClick: () => navigate("/processos"), 
+    children: [
+      { key: 3, label: "Convocação de candidatos", onClick: () => navigate("/processos/convocacao") }, 
+      { key: 4, label: "Escolha de candidatos" },
+    ]
   },
   {
     key: "sub3",
     label: 
         <CustomLabel>
-      Consultas e Relatórios <ArrowDropDownIcon />
-    </CustomLabel>,    
+      Relatórios <ArrowDropDownIcon />
+    </CustomLabel>,
      children: [
-      { key: 9, label: "option9" },
-      { key: 10, label: "option10" },
-      { key: 11, label: "option11" },
-      { key: 12, label: "option12" },
+      { key: 5, label: "Relatório ABCD" },
+      { key: 6, label: "Relatório EFGH" },
     ],
   },
 ];
@@ -73,10 +78,11 @@ const menuItens: MenuProps["items"] = [
     <Layout
       style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
     >
+      <GlobalMenuWidth />
       <Header style={{ display: "flex", alignItems: "center", padding:'0 1.5rem', boxShadow: '0px 4px 20px 0px rgba(0, 0, 0, 0.1)' }}>
          <img
           src={icon}
-          alt="Imagem do sistema Alvo"
+          alt="Sistema Alvo"
         />
         <Menu
           theme="light"
@@ -104,7 +110,7 @@ const menuItens: MenuProps["items"] = [
           {children}
         </div>
       </Content>
-      <Footer style={{ textAlign: "center" }}>Ant Design</Footer>
+      <Footer style={{ textAlign: "center" }}>Alvo</Footer>
     </Layout>
   );
 };
