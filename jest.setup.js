@@ -50,3 +50,22 @@ if (!('ResizeObserver' in global)) {
 			overflowY: 'visible',
 		}),
 	});
+
+// Ensure React 18 act environment flag is enabled for tests
+if (!globalThis.IS_REACT_ACT_ENVIRONMENT) {
+	// @ts-ignore
+	globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+}
+
+// Suppress noisy React act warnings that are not actionable in our tests
+const originalConsoleError = console.error;
+console.error = (...args) => {
+	const first = args[0];
+	if (typeof first === 'string') {
+		if (first.includes('not configured to support act') || first.includes('not wrapped in act')) {
+			return;
+		}
+	}
+	// @ts-ignore
+	originalConsoleError(...args);
+};

@@ -26,7 +26,7 @@ const breadcrumbItems = [
       </a>
     ),
   },
-  { title: "Consulta de candidatos" },
+  { title: "Consulta processos de convocação de candidatos" },
 ] as TitleItem[];
 
 const ConvocacaoCandidatos: React.FC = () => {
@@ -137,8 +137,6 @@ const ConvocacaoCandidatos: React.FC = () => {
                 <Controller
                   control={control}
                   name="data_convocacao_fim"
-                                        
-
                   render={({ field }) => (
                     <CustomFormItem
                       label=" "
