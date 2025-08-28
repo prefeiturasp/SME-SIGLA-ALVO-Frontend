@@ -12,7 +12,6 @@ export const SelectDivider = styled.div`
 `;
 
  
-
 export const CustomFormItem = styled(FormItem)`
   padding-bottom: 0;
   display: flex;
@@ -31,10 +30,19 @@ export const CustomFormItem = styled(FormItem)`
     height: 2.5rem;
   }
     
+  .ant-form-item-label {
+    padding-bottom: 0;
+    margin-bottom: -4px; /* encosta mais o label do campo */
+  }
   .ant-form-item-label > label {
     font-weight: 700;
+    margin-bottom: 0;
+    line-height: 1.05;
   }
-  margin-bottom: 1rem;
+  .ant-form-item-control {
+    margin-top: -4px; /* aproxima o campo do label */
+  }
+  margin-bottom: 0.125rem;
 `;
 
 
