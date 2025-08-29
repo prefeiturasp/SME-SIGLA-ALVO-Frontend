@@ -139,13 +139,14 @@ const Cargo: React.FC<CargoProps> = ({
           size="large"
           onClick={buscarDadosDoCargo}
           disabled={!watchFields.cargo}
+          style={{ alignSelf: "flex-start" }}
         >
           Buscar
         </PrimaryButton>
 
-        <Row gutter={16} justify="start">
-          <Col>
-            <div style={{ marginBottom: 20 }}>
+        <Row gutter={0} justify="start" align="top">
+          <Col style={{ paddingLeft: 0, paddingRight: 0 }}>
+            <div style={{ marginBottom: 0 }}>
               <Text strong style={{ fontSize: 16 }}>
                 Número de Vagas
               </Text>
@@ -169,14 +170,14 @@ const Cargo: React.FC<CargoProps> = ({
             </StyledCardPequeno>
           </Col>
 
-          <Col>
-            <div style={{ marginBottom: 8 }}>
+          <Col style={{ paddingLeft: 0, paddingRight: 0 }}>
+            <div style={{ marginBottom: 0 }}>
               <Text strong style={{ fontSize: 16 }}>
                 Candidatos a convocar
               </Text>
             </div>
-            <Row gutter={16} justify="start">
-              <Col>
+            <Row gutter={0} justify="start">
+              <Col style={{ paddingLeft: 0, paddingRight: 0 }}>
                 <div style={{ display: "flex", gap: 8 }}>
                   <StyledCardPequeno styles={{ body: { padding: 0 } }}>
                     <div style={{ display: "flex", height: 64 }}>
@@ -247,7 +248,7 @@ const Cargo: React.FC<CargoProps> = ({
 
         <Space wrap>
           <ActionButton
-            // disabled={!podeVisualizarVagas}
+            disabled={!podeVisualizarVagas}
             onClick={handleOpenVisualizarVagasModal}
             icon={
               <VisibilityIcon
@@ -266,17 +267,18 @@ const Cargo: React.FC<CargoProps> = ({
           </ActionButton>
 
           <ActionButton
+            disabled={!podeVisualizarVagas}
             icon={
               <AdsClickIcon
                 style={{
-                  color: "#05409A",
+                  color: podeVisualizarVagas ? "#05409A" : "gray",
                 }}
               />
             }
             style={{
-              border: "1px solid #05409A",
-              color: "#05409A",
-              backgroundColor: "#fff",
+              border: `1px solid ${podeVisualizarVagas ? "#05409A" : "#d9d9d9"}`,
+              color: podeVisualizarVagas ? "#05409A" : "gray",
+              backgroundColor: podeVisualizarVagas ? "#fff" : "#f5f5f5",
             }}
             onClick={handleAbrirPopupSelecionarCandidatos}
           >

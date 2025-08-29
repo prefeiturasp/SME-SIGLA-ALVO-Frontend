@@ -8,7 +8,7 @@ export const StyledCardPequeno = styled(Card)`
   border-radius: 5px;
   overflow: hidden;
   border: 1px solid #cecacaff;
-  margin: 10px 8px;
+  margin: 1rem 1rem 1rem 0;
 `;
 
 export const StyledCardGrande = styled(Card)`
@@ -38,7 +38,7 @@ export const CardContentContainer = styled.div`
 `;
 
 export const ActionButton = styled(Button)`
-  margin: 0.625rem 0.5rem;
+  margin: 0.625rem 0.5rem 0.625rem 0;
   border-radius: 0.3125rem;
 `;
 
@@ -47,7 +47,7 @@ export const PrimaryButton = styled(Button)`
   color: #fff;
   border: none;
   border-radius: 0.25rem;
-  margin: 0.625rem 0.5rem;
+  margin: 1rem 0;
   &:hover {
     background-color: #38388bff !important;
     color: #fff !important;

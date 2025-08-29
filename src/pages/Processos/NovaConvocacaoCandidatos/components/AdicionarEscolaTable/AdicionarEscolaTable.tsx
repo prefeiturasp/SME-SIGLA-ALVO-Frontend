@@ -59,27 +59,38 @@ interface AdicionarEscolaTableProps extends TableProps<IUnidadeEscolar> {}
 const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
   ...rest
 }) => {
-  const { control, getValues } = useForm({});
-  const [data, setData] = useState<IUnidadeEscolar[]>([
-      {
-        uuid: "3b178725-a14a-42d7-97cc-4fb1e3837f5b",
-        eol: "480100",
-        dre: "Guaianases",
-        tipo: "UE",
-        unidade: "Escola Guaianases",
-        vagas_definitivas: 1,
-        vagas_precarias: 1,
-      },
-      {
-        uuid: "e81d73ef-5121-4237-9bcd-69d174354051",
-        eol: "480100",
-        dre: "Guaianases",
-        tipo: "UE",
-        unidade: "Escola Campo Limpo",
-        vagas_definitivas: 1,
-        vagas_precarias: 1,
-      },
-    ]);
+  const initialData: IUnidadeEscolar[] = [
+    {
+      uuid: "3b178725-a14a-42d7-97cc-4fb1e3837f5b",
+      eol: "480100",
+      dre: "Guaianases",
+      tipo: "UE",
+      unidade: "Escola Guaianases",
+      vagas_definitivas: 1,
+      vagas_precarias: 1,
+    },
+    {
+      uuid: "e81d73ef-5121-4237-9bcd-69d174354051",
+      eol: "480100",
+      dre: "Guaianases",
+      tipo: "UE",
+      unidade: "Escola Campo Limpo",
+      vagas_definitivas: 1,
+      vagas_precarias: 1,
+    },
+  ];
+
+  const { control, getValues } = useForm({
+    defaultValues: initialData.reduce((acc, item) => {
+      acc[item.uuid] = {
+        vagas_definitivas: item.vagas_definitivas,
+        vagas_precarias: item.vagas_precarias,
+      };
+      return acc;
+    }, {} as Record<string, Partial<IUnidadeEscolar>>),
+  });
+
+  const [data, setData] = useState<IUnidadeEscolar[]>(initialData);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [editingKey, setEditingKey] = useState("");
   const theme = useTheme();
