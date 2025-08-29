@@ -1,19 +1,23 @@
 import React, { useState } from "react";
-import { Typography, Card } from "antd";
+import { Typography, Card, Row, Button } from "antd";
 
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import { useForm, useWatch } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { PlusOutlined } from "@ant-design/icons";
 
 import { useConcursos } from "./hooks/useConcursos";
 import type { IConvocacaoFiltros } from "../../../services/resources/convocacao/IConvocacao";
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
 
+const { Text } = Typography;
+
+
 const breadcrumbItems = [
-  { title: <Link to="/">Home</Link> },
-  { title: <Link to="/processos">Processos</Link> },
-  { title: <Link to="/processos/convocacao">Convocação de candidatos</Link> },
+  { title: <Link to="/"><Text strong>Home</Text></Link> },
+  { title: <Link to="/processos"><Text strong>Processos</Text></Link> },
+  { title: <Link to="/processos/convocacao"><Text strong>Convocação de candidatos</Text></Link> },
   { title: "Nova Convocação" },
 ] as TitleItem[];
 
@@ -123,14 +127,19 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
       breadcrumbItems={breadcrumbItems}
       title="Processo de convocação de candidatos"
     >
-      <Card
-        style={{
-          borderRadius: 8,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          marginBottom: 24,
-        }}
-      >
-        <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>Busca Processos</Typography.Title>
+      <Card style={{ borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", marginBottom: 24 }}>
+      <Row align="top" justify="space-between">
+          <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>
+            Busca Processos
+          </Typography.Title>
+          <Button
+            type="primary"
+            size="large"
+            icon={<PlusOutlined />}
+          >
+            Nova convocação
+          </Button>
+        </Row>
         <FormPrincipal
           control={control}
           concursosData={((concursosData as unknown as ConcursoOption[]) || [])}

@@ -1,5 +1,5 @@
 import type { AxiosRequestConfig } from "axios";
-import { appAxios, appAxiosServico1 } from "../../axios";
+import { appAxiosProcessoConvocacao } from "../../axios";
 import type { ISample, IProcessoConvocacao } from "./IConvocacao";
 import type { IBackendWithSubOptions, IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
@@ -25,7 +25,7 @@ export const getProcessosConvocacao = (
   const { pagination, filters, ...rest } = listRequest;
   const { signal, abort } = new AbortController();
 
-  const response = appAxios
+  const response = appAxiosProcessoConvocacao
     .get<PaginatedResponse<IProcessoConvocacao>>(URL.getProcessosConvocacao(), {
       params: { ...pagination, ...filters, ...rest },
       paramsSerializer: queryParamsSerializer,
@@ -48,7 +48,7 @@ export const createSample = (
 ) => {
   const { signal, abort } = new AbortController();
 
-  const response = appAxios
+  const response = appAxiosProcessoConvocacao
     .post<IProcessoConvocacao>(URL.createSample(), NewSample, {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
@@ -68,7 +68,7 @@ export const editSample = (
 ) => {
   const { signal, abort } = new AbortController();
 
-  const response = appAxios
+  const response = appAxiosProcessoConvocacao
     .put<ISample>(URL.editSample(NewSample.id!), NewSample, {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
@@ -89,7 +89,7 @@ export const deleteSample = (
 ) => {
    const { signal, abort } = new AbortController();
 
-  const response = appAxiosServico1
+  const response = appAxiosProcessoConvocacao
     .delete(URL.deleteSample(id),  {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
@@ -108,7 +108,7 @@ export const getConcursosOptions = (
 ) => {
    const { signal, abort } = new AbortController();
 
-  const response = appAxios
+  const response = appAxiosProcessoConvocacao
     .get<IBackendWithSubOptions>(URL.getConcursosOptions(), {
        signal,
       ...axiosRequestConfig,
@@ -127,7 +127,7 @@ export const getCargosData = (
 ) => {
    const { signal, abort } = new AbortController();
 
-  const response = appAxios
+  const response = appAxiosProcessoConvocacao
     .get<IBackendWithSubOptions[]>(URL.getCargos(), {
        signal,
       ...axiosRequestConfig,
@@ -147,7 +147,7 @@ export const getCargosPorConcursoData = (
 ) => {
    const { signal, abort } = new AbortController();
 
-  const response = appAxios
+  const response = appAxiosProcessoConvocacao
     .get<IBackendWithSubOptions[]>(URL.getCargosPorConcurso(concursoUuid), {
        signal,
       ...axiosRequestConfig,

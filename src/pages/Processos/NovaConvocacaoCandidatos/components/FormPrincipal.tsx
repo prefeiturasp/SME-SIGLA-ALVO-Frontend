@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { Controller } from "react-hook-form";
 import type { Control } from "react-hook-form";
-import { CustomFormItem } from "../styles";
+import { CustomFormItem } from "../../../../components/formStyle/styles";
 
 const { Text } = Typography;
 
@@ -44,30 +44,23 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           control={control}
           name="concurso"
           render={({ field }) => (
-            <CustomFormItem label={<strong>Concurso</strong>}>
-              <div style={{ width: "100%" }}>
-                <Select
-                  {...field}
-                  data-testid="concurso-select"
-                  placeholder="Selecione o concurso"
-                  style={{ width: "65%" }}
-                  options={concursosData || []}
-                  loading={concursosIsLoading}
-                  onChange={(value) => {
-                    field.onChange(value as string);
-                    buscarCargosDoConcurso(value as string);
-                  }}
-                />
-              </div>
+            <CustomFormItem label="Concurso" labelCol={{ span: 24 }}>
+              <Select
+                {...field}
+                data-testid="concurso-select"
+                placeholder="Selecione o concurso"
+                style={{ width: "100%" }}
+                options={concursosData || []}
+                loading={concursosIsLoading}
+                onChange={(value) => {
+                  field.onChange(value as string);
+                  buscarCargosDoConcurso(value as string);
+                }}
+              />
               {!isCargoLiberado && (
                 <Text
                   type="secondary"
-                  style={{
-                    fontSize: 12,
-                    color: "gray",
-                    marginTop: 2,
-                    display: "block",
-                  }}
+                  style={{ fontSize: 12, color: "gray", marginTop: 2, display: "block" }}
                 >
                   * Selecione o concurso para liberar a opção de Cargo.
                 </Text>
@@ -79,11 +72,11 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           control={control}
           name="tipo_processo"
           render={({ field }) => (
-            <CustomFormItem label={<strong>Tipo de Escolha</strong>}>
+            <CustomFormItem label="Tipo de Escolha" labelCol={{ span: 24 }}>
               <Select
                 {...field}
                 placeholder="Selecione o tipo de escolha"
-                style={{ width: "65%" }}
+                style={{ width: "100%" }}
                 options={[
                   { value: "Nova Autorização", label: "Nova Autorização" },
                   { value: "Reposição", label: "Reposição" },
@@ -97,12 +90,8 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           control={control}
           name="descricao"
           render={({ field }) => (
-            <CustomFormItem label={<strong>Descrição</strong>}>
-              <Input
-                {...field}
-                placeholder="Digite a descrição"
-                style={{ width: "65%" }}
-              />
+            <CustomFormItem label="Descrição" labelCol={{ span: 24 }}>
+              <Input {...field} placeholder="Digite a descrição" style={{ width: "100%" }} />
             </CustomFormItem>
           )}
         />
@@ -110,17 +99,15 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           control={control}
           name="data_convocacao"
           render={({ field }) => (
-            <CustomFormItem label={<strong>Data da convocação</strong>}>
+            <CustomFormItem label="Data da convocação" labelCol={{ span: 24 }}>
               <DatePicker
                 {...field}
                 placeholder="Selecione a data da convocação"
-                style={{ width: "65%" }}
+                style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
                 value={field.value ? dayjs(field.value) : undefined}
-                onChange={(date) =>
-                  field.onChange(date ? date.toISOString() : "")
-                }
+                onChange={(date) => field.onChange(date ? date.toISOString() : "")}
               />
             </CustomFormItem>
           )}
@@ -129,17 +116,15 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           control={control}
           name="data_corte_vagas"
           render={({ field }) => (
-            <CustomFormItem label={<strong>Data corte de Vagas</strong>}>
+            <CustomFormItem label="Data corte de Vagas" labelCol={{ span: 24 }}>
               <DatePicker
                 {...field}
                 placeholder="Selecione a data corte de vagas"
-                style={{ width: "65%" }}
+                style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
                 value={field.value ? dayjs(field.value) : undefined}
-                onChange={(date) =>
-                  field.onChange(date ? date.toISOString() : "")
-                }
+                onChange={(date) => field.onChange(date ? date.toISOString() : "")}
               />
             </CustomFormItem>
           )}

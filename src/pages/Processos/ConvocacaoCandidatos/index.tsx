@@ -49,10 +49,9 @@ const ConvocacaoCandidatos: React.FC = () => {
   return (
     <BaseScreen
       breadcrumbItems={breadcrumbItems}
-      title="Convocação de Candidatos"
+      title="Processo de convocação de candidatos"
     >
       <Card style={{ borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", marginBottom: 24 }}>
-      
         <Row align="top" justify="space-between">
           <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>
             Busca Processos
