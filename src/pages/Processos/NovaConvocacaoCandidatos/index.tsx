@@ -68,8 +68,8 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
       return;
     }
 
-    const concursoSelecionado = concursosData.find(
-      (c) => c.value === concursoValue,
+    const concursoSelecionado = ((concursosData as unknown as ConcursoOption[]) || []).find(
+      (c: ConcursoOption) => c.value === concursoValue,
     );
 
     if (concursoSelecionado && concursoSelecionado.cargos) {
@@ -116,9 +116,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
     )?.label || "";
 
   const selectedCargoLabel =
-    ((cargosDisponiveis as unknown as ConcursoOption[]) || []).find(
-      (opt) => opt.value === watchFields.cargo,
-    )?.label || "";
+    (cargosDisponiveis || []).find((opt) => opt.value === watchFields.cargo)?.label || "";
 
   return (
     <BaseScreen
@@ -132,10 +130,10 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
           marginBottom: 24,
         }}
       >
-        <Typography.Title level={4}>Busca Processos</Typography.Title>
+        <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>Busca Processos</Typography.Title>
         <FormPrincipal
           control={control}
-          concursosData={concursosData}
+          concursosData={((concursosData as unknown as ConcursoOption[]) || [])}
           concursosIsLoading={concursosIsLoading}
           isCargoLiberado={isCargoLiberado}
           buscarCargosDoConcurso={buscarCargosDoConcurso}

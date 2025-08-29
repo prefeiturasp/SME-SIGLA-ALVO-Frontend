@@ -84,7 +84,6 @@ const ConvocacaoCandidatos: React.FC = () => {
                 >
                   <Select
                     {...field}
-                    
                     options={concursosOptions?.concursos || []}
                     placeholder="Selecione o concurso"
                     loading={concursosIsLoading}
@@ -147,7 +146,6 @@ const ConvocacaoCandidatos: React.FC = () => {
                       labelCol={{ span: 24 }}
                     >
                       <DatePicker
-                        
                         value={field.value ? dayjs(field.value) : undefined}
                         onChange={(date) =>
                           field.onChange(
@@ -180,7 +178,6 @@ const ConvocacaoCandidatos: React.FC = () => {
                     >
                       <Select
                         {...field}
-                        
                         options={
                           concursosOptions ? concursosOptions.cargos : []
                         }
@@ -223,8 +220,11 @@ const ConvocacaoCandidatos: React.FC = () => {
                 defaultPageSize: 10,
                 position: ["bottomLeft"],
                 total: processosConvocacaoData?.count,
-                showTotal: () =>
-                  `Mostrando ${listRequest.pagination.page} - 10 registro(s) do total de ${processosConvocacaoData?.count}`,
+                showTotal: (total, range) => (
+                  <span style={{ marginLeft: 16 }}>
+                    {`Mostrando ${range[0]}-${range[1]} de ${total} registro(s)`}
+                  </span>
+                ),
               }}
               onChange={onAntTableChange}
             />
