@@ -12,10 +12,6 @@ export const TextBlue = styled(Text)`
  
 `;
 
-
-
-
-
 export const CustomModal = styled(Modal)`
   .ant-modal-title {
     font-weight: 700;
@@ -63,8 +59,7 @@ export const StyledTable = styled(Table)`
     } 
   }
 
-  
-  
+
    .ant-pagination-total-text {
     margin-right: auto; 
     color: #727679;
