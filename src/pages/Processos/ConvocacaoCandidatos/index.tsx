@@ -49,12 +49,12 @@ const ConvocacaoCandidatos: React.FC = () => {
   return (
     <BaseScreen
       breadcrumbItems={breadcrumbItems}
-      title="Processo de convocação de candidatos"
+      title="Convocação de candidatos"
     >
       <Card style={{ borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", marginBottom: 24 }}>
         <Row align="top" justify="space-between">
           <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>
-            Busca Processos
+            Busca processos
           </Typography.Title>
           <Button
             type="primary"
@@ -221,7 +221,7 @@ const ConvocacaoCandidatos: React.FC = () => {
                 total: processosConvocacaoData?.count,
                 showTotal: (total, range) => (
                   <span style={{ marginLeft: 16 }}>
-                    {`Mostrando ${range[0]}-${range[1]} de ${total} registro(s)`}
+                    {`Mostrando ${(range?.[0] ?? 0)}-${(range?.[1] ?? 0)} de ${(total ?? 0)} registro(s)`}
                   </span>
                 ),
               }}

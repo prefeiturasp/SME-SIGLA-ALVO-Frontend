@@ -1,8 +1,6 @@
 import axios from "axios";
 
 const getEnv = (key: string, fallback: string) => {
-  const viteVal = (typeof import.meta !== "undefined" && (import.meta as any)?.env?.[key]) as string | undefined;
-  if (viteVal) return viteVal;
   const nodeVal = (typeof process !== "undefined" && process.env && (process.env as any)[key]) as string | undefined;
   return nodeVal || fallback;
 };

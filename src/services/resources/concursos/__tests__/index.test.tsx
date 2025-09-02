@@ -27,18 +27,17 @@ describe('Concursos Service', () => {
       count: 2,
       next: null,
       previous: null,
+      page_size: 10,
       results: [
         {
-          id: 1,
-          nome: 'Concurso Teste 1',
-          codigo: 'CT001',
-          ativo: true
+          label: 'Concurso Teste 1',
+          value: 'CT001',
+          cargos: [],
         },
         {
-          id: 2,
-          nome: 'Concurso Teste 2',
-          codigo: 'CT002',
-          ativo: false
+          label: 'Concurso Teste 2',
+          value: 'CT002',
+          cargos: [],
         }
       ]
     };

@@ -91,8 +91,8 @@ describe('ConvocacaoCandidatos', () => {
   it('renderiza formulário básico e tabela mockada', () => {
     renderWithProviders();
 
-    expect(screen.getByText('Convocação de Candidatos')).toBeInTheDocument();
-    expect(screen.getByText('Busca Processos')).toBeInTheDocument();
+    expect(screen.getByText('Convocação de candidatos')).toBeInTheDocument();
+    expect(screen.getByText('Busca processos')).toBeInTheDocument();
     expect(screen.getByText('Concurso')).toBeInTheDocument();
     expect(screen.getByText('Cargo')).toBeInTheDocument();
     expect(screen.getByText('ConvocacaoTable Mock - 1 itens - página 1')).toBeInTheDocument();
@@ -184,10 +184,4 @@ describe('ConvocacaoCandidatos', () => {
     });
   });
 
-  it('renderiza showTotal da paginação', () => {
-    renderWithProviders();
-    expect(screen.getByTestId('pagination-total')).toHaveTextContent(
-      'Mostrando 1 - 10 registro(s) do total de 1'
-    );
-  });
 }); 

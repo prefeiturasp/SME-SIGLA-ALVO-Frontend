@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Typography, Col, Button, Space, message, Table, Spin } from 'antd';
 import { 
-  GlobalFonts,
-    ModalTitle, 
+  ModalTitle, 
   CompetitionInfo, 
   InfoItem, 
   InputGroup, 
@@ -28,7 +27,7 @@ interface SelecionarCandidatosProps {
   onCandidatosSelecionados?: (quantidade: number) => void;
 }
 
-export const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
+const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
   visible,
   onClose,
   concurso,
@@ -114,7 +113,6 @@ export const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
 
   return (
     <>
-      <GlobalFonts />
       <Modal
         open={visible}
         onCancel={onClose}
