@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Typography, Col, Button, Space, message, Table, Spin } from 'antd';
-import {
+import { 
   ModalTitle, 
   CompetitionInfo, 
   InfoItem, 
