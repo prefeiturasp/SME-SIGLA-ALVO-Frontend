@@ -6,7 +6,7 @@ import { Layout, Menu, theme } from "antd";
 import icon from "../../assets/alvo-img.png";
 
 import { UserAvatar } from "../../components/UserAvatar/UserAvatar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { GlobalMenuWidth } from "./styles";
 
 export interface INewSampleModalData extends IProcessoConvocacao {
@@ -37,6 +37,22 @@ const BaseScreen: React.FC<INewSampleModalProps> = ({
 
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Função para determinar qual menu deve estar selecionado baseado na URL
+  const getSelectedKeys = () => {
+    const path = location.pathname;
+    
+    if (path.startsWith('/processos')) {
+      return ['sub2']; // Processos
+    } else if (path.startsWith('/administracao') || path.startsWith('/admin')) {
+      return ['sub1']; // Administração
+    } else if (path.startsWith('/relatorios') || path.startsWith('/relatorio')) {
+      return ['sub3']; // Relatórios
+    }
+    
+    return []; // Nenhum selecionado se não corresponder a nenhuma seção
+  };
 
 const menuItens: MenuProps["items"] = [
   {
@@ -59,6 +75,7 @@ const menuItens: MenuProps["items"] = [
     children: [
       { key: 3, label: "Convocação de candidatos", onClick: () => navigate("/processos/convocacao") }, 
       { key: 4, label: "Escolha de candidatos" },
+      { key: 5, label: "Importação de dados", onClick: () => navigate("/processos/importacao-dados") },
     ]
   },
   {
@@ -87,7 +104,7 @@ const menuItens: MenuProps["items"] = [
         <Menu
           theme="light"
           mode="horizontal"
-          defaultSelectedKeys={["1"]}
+          selectedKeys={getSelectedKeys()}
           items={menuItens}
           style={{ flex: 1, marginLeft: "1.5rem" }}
         />

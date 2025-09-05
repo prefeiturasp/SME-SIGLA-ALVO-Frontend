@@ -9,7 +9,7 @@ import { Provider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { ThemeProvider } from "styled-components";
-import { theme as antdTheme, ConfigProvider } from "antd";
+import { theme as antdTheme, ConfigProvider, App as AntdApp } from "antd";
 import { theme } from "./theme.tsx";
 
 const { useToken } = antdTheme;
@@ -31,11 +31,13 @@ function ThemedApp() {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ConfigProvider locale={ptBR} theme={theme}>
-      <Provider store={store}>
-        <QueryClientProvider client={queryClient}>
-          <ThemedApp></ThemedApp>
-        </QueryClientProvider>
-      </Provider>
+      <AntdApp>
+        <Provider store={store}>
+          <QueryClientProvider client={queryClient}>
+            <ThemedApp></ThemedApp>
+          </QueryClientProvider>
+        </Provider>
+      </AntdApp>
     </ConfigProvider>
   </StrictMode>
 );
