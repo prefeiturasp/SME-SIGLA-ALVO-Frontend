@@ -96,6 +96,8 @@ describe('Candidatos Service', () => {
 
   describe('AbortController', () => {
     it('expõe uma função abort', () => {
+      mockAxios.get.mockResolvedValueOnce({ data: mockCandidatosData });
+      
       const { abort } = getCandidatos();
       expect(typeof abort).toBe('function');
       expect(() => {
