@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider as SCThemeProvider } from 'styled-components';
 import { theme as appTheme } from '../../../../theme';
+import { renderWithProviders } from '../../../../test-utils';
 import ConvocacaoCandidatos from '../index';
 
 // Mock Controller para evitar necessidade de control real
@@ -81,15 +82,15 @@ describe('ConvocacaoCandidatos', () => {
     jest.clearAllMocks();
   });
 
-  const renderWithProviders = () =>
-    render(
+  const renderComponent = () =>
+    renderWithProviders(
       <SCThemeProvider theme={appTheme as any}>
         <ConvocacaoCandidatos />
       </SCThemeProvider>
     );
 
   it('renderiza formulário básico e tabela mockada', () => {
-    renderWithProviders();
+    renderComponent();
 
     expect(screen.getByText('Convocação de candidatos')).toBeInTheDocument();
     expect(screen.getByText('Busca processos')).toBeInTheDocument();
@@ -103,7 +104,7 @@ describe('ConvocacaoCandidatos', () => {
     const { concursosOptions } = require('../hooks/useProcessosConvocacao');
     const { mockNavigate } = require('react-router-dom');
 
-    renderWithProviders();
+    renderComponent();
 
     const novaBtn = screen.getByRole('button', { name: /nova convocação/i });
     await user.click(novaBtn);
@@ -115,7 +116,7 @@ describe('ConvocacaoCandidatos', () => {
     const user = userEvent.setup();
     const { hookMocks } = require('../hooks/useProcessosConvocacao');
 
-    renderWithProviders();
+    renderComponent();
 
     const pesquisarBtn = screen.getByRole('button', { name: /pesquisar/i });
     await user.click(pesquisarBtn);
@@ -127,7 +128,7 @@ describe('ConvocacaoCandidatos', () => {
     const user = userEvent.setup();
     const { hookMocks } = require('../hooks/useProcessosConvocacao');
 
-    renderWithProviders();
+    renderComponent();
 
     const limparBtn = screen.getByRole('button', { name: /limpar filtros/i });
     await user.click(limparBtn);
@@ -137,7 +138,7 @@ describe('ConvocacaoCandidatos', () => {
 
   it('altera o valor do campo Data de Convocação (inicio)', async () => {
     const user = userEvent.setup();
-    renderWithProviders();
+    renderComponent();
 
     const inicioInput = screen.getByPlaceholderText('inicio') as HTMLInputElement;
     expect(inicioInput).toBeInTheDocument();
@@ -161,7 +162,7 @@ describe('ConvocacaoCandidatos', () => {
 
   it('altera o valor do campo Data de Convocação (Fim)', async () => {
     const user = userEvent.setup();
-    renderWithProviders();
+    renderComponent();
 
     const fimInput = screen.getByPlaceholderText('Fim') as HTMLInputElement;
     expect(fimInput).toBeInTheDocument();
