@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import dayjs from "dayjs";
-import { Row, Col, Select, DatePicker, Radio, type RadioChangeEvent, Checkbox } from "antd";
+import { Row, Col, Select, DatePicker, Radio, Checkbox } from "antd";
 import { Controller } from "react-hook-form";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -19,6 +19,8 @@ import {
   PrimaryButton,
 } from "../Habilitados/styles";
 import { useCargos } from "../../NovaConvocacaoCandidatos/hooks/useCargos";
+import UltimasImportacoesDeVagasTable from "./components/UltimasImportacoesDeVagasTable";
+import { useUltimasImportacoes } from "./hooks/useUltimasImportacoes";
 
 
 
@@ -38,13 +40,23 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
     importacoesArquivos,
     importacoesArquivosIsLoading,
   } = useImportacaoDados();
+
+
+
+  const {
+    processosConvocacaoData,
+    processosConvocacaoIsLoading,
+    listRequest,
+    onAntTableChange,
+  } = useUltimasImportacoes();
+
+
+  // TODO Fazer somente a opção Arquivo
+
+
   const { cargosData, cargosIsLoading } = useCargos();
   const watchedFile = watch("arquivo");
-  const [value, setValue] = useState(1);
 
-  const onChange = (e: RadioChangeEvent) => {
-    setValue(e.target.value);
-  };
 
   return (
     <TabContentContainer>
@@ -92,7 +104,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
                         ),
                       }
                     ]}
-                  /> 
+                  />
                 </CustomFormItem>
               )}
             />
@@ -204,7 +216,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
           </Col>
         </Row>
 
-    <Row gutter={[0, 16]}>
+        <Row gutter={[0, 16]}>
           <Col xs={24} sm={9}>
 
             <Controller
@@ -219,7 +231,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
                   help={formErrors.ignorar_primeira_linha?.message}
                   labelCol={{ span: 24 }}
                 >
-                   <Checkbox {...field}>Ignorar a 1ª linha (arquivo com cabeçalho)</Checkbox>
+                  <Checkbox {...field}>Ignorar a 1ª linha (arquivo com cabeçalho)</Checkbox>
                 </CustomFormItem>
               )}
             />
@@ -268,11 +280,40 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
                         ),
                       }
                     ]}
-                  /> 
+                  />
                 </CustomFormItem>
               )}
             />
 
+          </Col>
+        </Row>
+        <Row gutter={[0, 16]}>
+          <Col xs={24} sm={24}>
+
+            <UltimasImportacoesDeVagasTable
+              loading={processosConvocacaoIsLoading}
+              data={processosConvocacaoData?.results || [{
+                uuid: '111',
+                metodo_de_importacao: 'WebService',
+                data_de_fechamento_do_modulo: dayjs(),
+                cargo: '2650 - ESP.INF.TEC.CULT.DESP.-BIBLIOTECA',
+                opcoes_de_importacao: 'Ajustar',
+                data_importacao: dayjs()
+              }]}
+              pagination={{
+                current: listRequest.pagination.page,
+                pageSize: 10,
+                defaultPageSize: 10,
+                position: ["bottomLeft"],
+                total: processosConvocacaoData?.count,
+                showTotal: (total, range) => (
+                  <span style={{ marginLeft: 16 }}>
+                    {`Mostrando ${(range?.[0] ?? 0)}-${(range?.[1] ?? 0)} de ${(total ?? 0)} registro(s)`}
+                  </span>
+                ),
+              }}
+              onChange={onAntTableChange}
+            />
           </Col>
         </Row>
 

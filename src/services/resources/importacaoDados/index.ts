@@ -1,12 +1,14 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosImportaArquivos } from "../../axios";
 import type { 
-  IImportacaoFundacao
+  IImportacaoFundacao,
+  IUltimasImportacoesVagas
 } from "./IImportacaoArquivos";
 import type { PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
+  getUltimasImportacoesArquivos: () => `/api/v1/importacao-arquivos/`,
   getImportacaoArquivos: () => `/api/v1/importacao-arquivos/`,
   postImportacaoArquivos: () => `/api/v1/importacao-arquivos/`,
 };
@@ -48,6 +50,29 @@ export const getImportacaoArquivos = (
 
   const response = appAxiosImportaArquivos
     .get<PaginatedResponse<IImportacaoFundacao>>(URL.getImportacaoArquivos(), {
+      params,
+      paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+
+// // TODO adicionar JWT no header Authorization
+export const getUltimasImportacoesArquivos = (
+  params?: Record<string, any>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosImportaArquivos
+    .get<PaginatedResponse<IUltimasImportacoesVagas>>(URL.getUltimasImportacoesArquivos(), {
       params,
       paramsSerializer: queryParamsSerializer,
       signal,

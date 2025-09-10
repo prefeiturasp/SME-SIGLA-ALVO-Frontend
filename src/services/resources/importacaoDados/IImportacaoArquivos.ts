@@ -4,6 +4,14 @@ export interface IImportacaoFundacao {
   concurso: string;
   data_importacao: string;
 }
+export interface IUltimasImportacoesVagas {
+  uuid: string;
+  metodo_de_importacao: string;
+  data_de_fechamento_do_modulo: string;
+  cargo: string;
+  opcoes_de_importacao: string;
+  data_importacao: string;  
+}
 
 // export interface IConcursoFundacao {
 //   value: string;
