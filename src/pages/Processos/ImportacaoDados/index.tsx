@@ -23,7 +23,7 @@ const breadcrumbItems = [
 ] as TitleItem[];
 
 const ImportacaoDados: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("fundacao");
+  const [activeTab, setActiveTab] = useState("vagas");
   const [showHistorico, setShowHistorico] = useState(false);
   const [showLayoutPadrao, setShowLayoutPadrao] = useState(false);
   
@@ -48,7 +48,10 @@ const ImportacaoDados: React.FC = () => {
     {
       key: "vagas",
       label: "Vagas",
-      children: <Vagas />,
+      children: <Vagas
+          onShowHistorico={handleShowHistorico}
+          onShowLayoutPadrao={handleShowLayoutPadrao}
+      />,
     },
     {
       key: "vagas-sistema",

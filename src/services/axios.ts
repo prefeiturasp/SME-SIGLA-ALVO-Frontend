@@ -22,5 +22,6 @@ export const appAxiosImportaArquivos = axios.create({
 });
 
 
-
-
+export const appAxiosVagas = axios.create({
+  baseURL: getEnv("VAGAS_API_URL", "http://127.0.0.1:8003"),
+});

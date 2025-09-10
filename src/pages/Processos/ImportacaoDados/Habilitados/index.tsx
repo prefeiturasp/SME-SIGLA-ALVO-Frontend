@@ -93,7 +93,7 @@ const Habilitados: React.FC<HabilitadosProps> = ({ onShowHistorico, onShowLayout
                   help={formErrors.arquivo?.message}
                   labelCol={{ span: 24 }}
                 >
-                  <StyledUpload
+                  <StyledUpload                  
                     beforeUpload={(file) => {
                       handleFileUpload(file);
                       return false; // Impede o upload automático
