@@ -1,5 +1,7 @@
-import React from "react";
-import { Row, Col, Select } from "antd";
+import React, { useState } from "react";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import dayjs from "dayjs";
+import { Row, Col, Select, DatePicker, Radio, type RadioChangeEvent, Checkbox } from "antd";
 import { Controller } from "react-hook-form";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -38,6 +40,11 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
   } = useImportacaoDados();
   const { cargosData, cargosIsLoading } = useCargos();
   const watchedFile = watch("arquivo");
+  const [value, setValue] = useState(1);
+
+  const onChange = (e: RadioChangeEvent) => {
+    setValue(e.target.value);
+  };
 
   return (
     <TabContentContainer>
@@ -45,12 +52,88 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
         <SectionTitle>
           Vagas
         </SectionTitle>
+        <Row gutter={[0, 16]}>
+          <Col xs={24} sm={9}>
+
+            <Controller
+              control={control}
+              name="metodo_de_importacao"
+              render={({ field }) => (
+                <CustomFormItem
+                  label="Método de importação"
+                  validateStatus={
+                    formErrors.metodo_de_importacao ? "error" : undefined
+                  }
+                  help={formErrors.metodo_de_importacao?.message}
+                  labelCol={{ span: 24 }}
+                >
+                  <Radio.Group
+                    buttonStyle="outline"
+                    defaultValue={1}
+
+                    {...field}
+                    options={[
+                      {
+                        value: 1,
+                        className: 'option-1',
+                        label: (
+                          <>
+                            WebService
+                          </>
+                        ),
+                      },
+                      {
+                        value: 2,
+                        className: 'option-2',
+                        label: (
+                          <>
+                            Arquivo
+                          </>
+                        ),
+                      }
+                    ]}
+                  /> 
+                </CustomFormItem>
+              )}
+            />
+
+          </Col>
+        </Row>
+
 
         <Row gutter={[0, 16]}>
           <Col xs={24} sm={9}>
-             
+            <Controller
+              control={control}
+              name="data_fechamento_modulo"
+              render={({ field }) => (
+                <CustomFormItem
+                  label="Data de fechamento do módulo"
+                  validateStatus={
+                    formErrors.data_fechamento_modulo ? "error" : undefined
+                  }
+                  help={formErrors.data_fechamento_modulo?.message}
+                  labelCol={{ span: 24 }}
+                >
+                  <DatePicker
+                    value={field.value ? dayjs(field.value) : undefined}
+                    onChange={(date) =>
+                      field.onChange(
+                        date ? dayjs(date).format("YYYY-MM-DD") : ""
+                      )
+                    }
+                    placeholder="Selecione a data desejada"
+                    format="DD/MM/YYYY"
+                    suffixIcon={
+                      <CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />
+                    }
+                  />
+                </CustomFormItem>
+              )}
+            />
           </Col>
         </Row>
+
 
         <Row gutter={[0, 16]}>
           <Col xs={24} sm={9}>
@@ -86,7 +169,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
             />
           </Col>
         </Row>
-        
+
         <Row gutter={[0, 8]}>
           <Col xs={24} sm={9}>
             <Controller
@@ -120,19 +203,91 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
             />
           </Col>
         </Row>
-        
+
+    <Row gutter={[0, 16]}>
+          <Col xs={24} sm={9}>
+
+            <Controller
+              control={control}
+              name="ignorar_primeira_linha"
+              render={({ field }) => (
+                <CustomFormItem
+                  label="Opções de importação"
+                  validateStatus={
+                    formErrors.ignorar_primeira_linha ? "error" : undefined
+                  }
+                  help={formErrors.ignorar_primeira_linha?.message}
+                  labelCol={{ span: 24 }}
+                >
+                   <Checkbox {...field}>Ignorar a 1ª linha (arquivo com cabeçalho)</Checkbox>
+                </CustomFormItem>
+              )}
+            />
+
+          </Col>
+        </Row>
+
+
+        <Row gutter={[0, 16]}>
+          <Col xs={24} sm={9}>
+
+            <Controller
+              control={control}
+              name="opcoes_de_importacao"
+              render={({ field }) => (
+                <CustomFormItem
+                  label="Opções de importação"
+                  validateStatus={
+                    formErrors.opcoes_de_importacao ? "error" : undefined
+                  }
+                  help={formErrors.opcoes_de_importacao?.message}
+                  labelCol={{ span: 24 }}
+                >
+                  <Radio.Group
+                    buttonStyle="outline"
+                    defaultValue={1}
+
+                    {...field}
+                    options={[
+                      {
+                        value: 1,
+                        className: 'option-1',
+                        label: (
+                          <>
+                            Ajustar
+                          </>
+                        ),
+                      },
+                      {
+                        value: 2,
+                        className: 'option-2',
+                        label: (
+                          <>
+                            Substituir
+                          </>
+                        ),
+                      }
+                    ]}
+                  /> 
+                </CustomFormItem>
+              )}
+            />
+
+          </Col>
+        </Row>
+
       </SectionCard>
-      
+
       {/* Botões de Ação */}
       <ActionButtonsContainer>
-              
+
         <SecondaryButton
           size="large"
           onClick={handleSubmit(handleEnviarForm)}
         >
           Importar
         </SecondaryButton>
-        
+
         <PrimaryButton
           type="primary"
           size="large"

@@ -22,6 +22,7 @@ export const SectionCard = styled(Card)`
 
 // Títulos das seções
 export const SectionTitle = styled(Typography.Title).attrs({ level: 4 })`
+  margin-top: 0 !important;  
   margin-bottom: 1.5rem !important;
   color: #333 !important;
 `;
