@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { App } from "antd";
 import { API } from "../../../../../services";
 import useImportacaoVagasSchema from "./useImportacaoVagasSchema";
-import type { IImportacaoVagasFiltros, IImportacaoVagasPayload } from "./types";
+import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
 
 export const useImportacaoDados = () => {
   const queryClient = useQueryClient();
@@ -15,6 +15,7 @@ export const useImportacaoDados = () => {
     arquivo: null,
     tipo: "VAGAS",
     metodo_de_importacao:1,
+    ignorar_primeira_linha:false,
   };
 
   const {
@@ -23,12 +24,13 @@ export const useImportacaoDados = () => {
     reset,
     watch,
     setValue,
-    formState: { errors: formErrors },
-  } = useForm<IImportacaoVagasFiltros>({
+    clearErrors,
+    formState: { errors: formErrors,isValid },
+  } = useForm<IImportacaoVagasForm>({
     defaultValues,
-    resolver: yupResolver(useImportacaoVagasSchema()) as Resolver<IImportacaoVagasFiltros>,
+    resolver: yupResolver(useImportacaoVagasSchema()) as Resolver<IImportacaoVagasForm>,
     reValidateMode: "onChange",
-    mode: "all",
+    mode: "onChange",
     shouldFocusError: false,
   });
 
@@ -36,8 +38,7 @@ export const useImportacaoDados = () => {
   const postImportacaoArquivosMutation = useMutation({
     mutationFn: (payload: IImportacaoVagasPayload) => API.ImportacaoDados.postImportacaoArquivos(payload).response,
     onSuccess: () => {
-      console.log("Sucesso");
-      // Invalidar queries relacionadas após sucesso
+       // Invalidar queries relacionadas após sucesso
       queryClient.invalidateQueries({ queryKey: ["getImportacaoArquivosHabilitados"] });
       
       // Mostrar notificação de sucesso
@@ -59,17 +60,6 @@ export const useImportacaoDados = () => {
     },
   });
 
-  // Effect para mostrar notificação de erro
-  // useEffect(() => {
-  //   if (postImportacaoArquivosMutation.error) {
-  //     notification.error({
-  //       message: "Erro na Importação",
-  //       description: "Ocorreu um erro ao processar a importação dos dados. Tente novamente.",
-  //       placement: "top",
-  //       duration: 3.5,
-  //     });
-  //   }
-  // }, [postImportacaoArquivosMutation.error]);
 
   // Query para buscar importações com parâmetros
   const { data: importacoesArquivos, isLoading: importacoesArquivosIsLoading } = useQuery({
@@ -85,16 +75,13 @@ export const useImportacaoDados = () => {
     retry: 0,
   });
 
-  const handleEnviarForm = async (data: IImportacaoVagasFiltros) => {
-    if (!data.arquivo || !data.cargo) {
-      console.error("Arquivo e cargo são obrigatórios");
-      return;
-    }
+  const handleEnviarForm = async (data: IImportacaoVagasForm) => {
+    console.error("Arquivo e cargo são obrigatórios", data);
+
 
     const payload: IImportacaoVagasPayload = {
-      cargo: data.cargo!,
       arquivo: data.arquivo!,
-      tipo: "HABILITADOS",
+      tipo: "VAGAS",
     };
 
     try {
@@ -111,8 +98,9 @@ export const useImportacaoDados = () => {
   };
 
   const handleFileUpload = (file: File) => {
-    setValue("arquivo", file);
-  };
+   setValue("arquivo", file, { shouldValidate: true });
+    clearErrors("arquivo"); 
+    };
 
   return {
     control,
@@ -126,6 +114,7 @@ export const useImportacaoDados = () => {
     watch,
     isCreatingImportacao: postImportacaoArquivosMutation.isPending,
     createImportacaoError: postImportacaoArquivosMutation.error,
+    isValid
   };
 };
 

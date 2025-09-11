@@ -16,13 +16,14 @@ export const URL = {
 //TODO Deixar genérico
 // TODO adicionar JWT no header Authorization
 export const postImportacaoArquivos = (
-  payload: { cargo: string; arquivo: File; tipo: string },
+  payload: { cargo?: string; arquivo: File; tipo: string },
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
   const formData = new FormData();
-  formData.append('cargo', payload.cargo);
+
+  if(payload.cargo)formData.append('cargo', payload.cargo);
   formData.append('arquivo', payload.arquivo);
   formData.append('tipo', payload.tipo);
   const response = appAxiosImportaArquivos

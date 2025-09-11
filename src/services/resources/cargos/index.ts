@@ -5,7 +5,7 @@ import type { PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
-  getCargos: () => `/api/v1/vagas/?formato=select`,
+  getCargos: () => `/api/v1/cargos/?formato=select`,
 };
 
 

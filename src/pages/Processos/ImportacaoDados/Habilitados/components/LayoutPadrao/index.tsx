@@ -1,8 +1,8 @@
 import React from "react";
-import { Table, Button, Typography } from "antd";
-import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
+import { Table,  Typography } from "antd";
 import { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from "./styles";
-import { SecondaryButton, PrimaryButton } from "../../styles";
+import { SecondaryButton, PrimaryButton } from "../../../../../../components/estilosCompartilhados/styles";
+
  const columns  = [
     {
       title: "Ordem",

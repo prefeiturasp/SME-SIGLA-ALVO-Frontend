@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import dayjs from "dayjs";
 import { Row, Col, Select, DatePicker, Radio, Checkbox } from "antd";
@@ -17,11 +17,10 @@ import {
   ActionButtonsContainer,
   SecondaryButton,
   PrimaryButton,
-} from "../Habilitados/styles";
+} from "../../../../components/estilosCompartilhados/styles";
 import { useCargos } from "../../NovaConvocacaoCandidatos/hooks/useCargos";
 import UltimasImportacoesDeVagasTable from "./components/UltimasImportacoesDeVagasTable";
-import { useUltimasImportacoes } from "./hooks/useUltimasImportacoes";
-
+ 
 
 
 interface VagasProps {
@@ -29,7 +28,7 @@ interface VagasProps {
   onShowLayoutPadrao: () => void;
 }
 
-const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) => {
+const Vagas: React.FC<VagasProps> = ({  onShowLayoutPadrao }) => {
   const {
     control,
     formErrors,
@@ -39,15 +38,13 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
     watch,
     importacoesArquivos,
     importacoesArquivosIsLoading,
-  } = useImportacaoDados();
+    isCreatingImportacao,
+    isValid=false,
+    } = useImportacaoDados();
 
 
 
-  const {
-    processosConvocacaoData,
-    processosConvocacaoIsLoading
-  } = useUltimasImportacoes();
-
+  
 
   // TODO Fazer somente a opção Arquivo
 
@@ -55,8 +52,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
   const { cargosData, cargosIsLoading } = useCargos();
   const watchedFile = watch("arquivo");
   const watchedMetodoImportacao = watch("metodo_de_importacao");
-
-
+ 
   return (
     <TabContentContainer>
       <SectionCard>
@@ -241,7 +237,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
                   labelCol={{ span: 24 }}
                   style={{marginTop:'1rem'}}
                 >
-                  <Checkbox {...field}>Ignorar a 1ª linha (arquivo com cabeçalho)</Checkbox>
+                  <Checkbox {...field} checked={field.value}>Ignorar a 1ª linha (arquivo com cabeçalho)</Checkbox>
                 </CustomFormItem>
               )}
             />
@@ -301,14 +297,14 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
           <Col xs={24} sm={24}>
 
             <UltimasImportacoesDeVagasTable
-              loading={processosConvocacaoIsLoading}
-              data={processosConvocacaoData?.results || [{
+              loading={importacoesArquivosIsLoading}
+              data={importacoesArquivos?.results || [{
                 uuid: '111',
                 metodo_de_importacao: 'WebService',
-                data_de_fechamento_do_modulo: dayjs(),
+                data_de_fechamento_do_modulo: dayjs().toString(),
                 cargo: '2650 - ESP.INF.TEC.CULT.DESP.-BIBLIOTECA',
                 opcoes_de_importacao: 'Ajustar',
-                data_importacao: dayjs()
+                data_importacao: dayjs().toString()
               }]}
               pagination={false}
             />
@@ -323,6 +319,8 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
         <SecondaryButton
           size="large"
           onClick={handleSubmit(handleEnviarForm)}
+          disabled={isCreatingImportacao || !isValid} 
+          loading={importacoesArquivosIsLoading}
         >
           Importar
         </SecondaryButton>

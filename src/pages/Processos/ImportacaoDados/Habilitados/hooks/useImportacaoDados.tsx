@@ -23,6 +23,7 @@ export const useImportacaoDados = () => {
     reset,
     watch,
     setValue,
+    clearErrors,
     formState: { errors: formErrors },
   } = useForm<IImportacaoHabilitadosFiltros>({
     defaultValues,
@@ -111,7 +112,10 @@ export const useImportacaoDados = () => {
   };
 
   const handleFileUpload = (file: File) => {
-    setValue("arquivo", file);
+     setValue("arquivo", file, { shouldValidate: true });
+    clearErrors("arquivo"); 
+
+
   };
 
   return {

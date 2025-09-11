@@ -14,7 +14,7 @@ export interface IImportacaoHabilitadosPayload {
   arquivo: File;
   tipo: string;
 }
-export interface IImportacaoVagasFiltros {
+export interface IImportacaoVagasForm {
   cargo: string | undefined;
   arquivo: File | null;
   data_fechamento_modulo?: string;
@@ -23,8 +23,7 @@ export interface IImportacaoVagasFiltros {
   ignorar_primeira_linha:boolean;
 }
 export interface IImportacaoVagasPayload {
-  cargo: string;
+  cargo?: string;
   arquivo: File;
-  tipo: string;
-  
+  tipo: string;  
 }
