@@ -3,15 +3,7 @@ import { Table, Button, Typography } from "antd";
 import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
 import { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from "./styles";
 import { SecondaryButton, PrimaryButton } from "../../styles";
-
-const { Title } = Typography;
-
-interface LayoutPadraoProps {
-  onVoltar: () => void;
-}
-
-const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ onVoltar }) => {
-  const columns = [
+ const columns  = [
     {
       title: "Ordem",
       dataIndex: "ordem",
@@ -51,7 +43,7 @@ const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ onVoltar }) => {
     },
   ];
 
-  const dataSource = [
+  const dataSourceDefault = [
     {
       key: "1",
       ordem: 1,
@@ -245,6 +237,16 @@ const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ onVoltar }) => {
       regrasValidacao: "Campo obrigatório",
     },
   ];
+const { Title } = Typography;
+
+interface LayoutPadraoProps {
+  onVoltar: () => void;
+  dataSource?:any[],
+  title?:string,
+ }
+
+const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ onVoltar,dataSource=dataSourceDefault, title='Layout: Arquivo de Aprovados (HABILITADOS)' }) => {
+ 
 
   const handleSalvarArquivo = () => {
     // Implementar lógica para salvar arquivo
@@ -255,7 +257,7 @@ const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ onVoltar }) => {
     <div>
       <LayoutContainer>
         <HeaderSection>
-          <Title level={3}>Layout: Arquivo de Aprovados (HABILITADOS)</Title>
+          <Title level={3}>{title}</Title>
         </HeaderSection>
         
         <TableContainer>

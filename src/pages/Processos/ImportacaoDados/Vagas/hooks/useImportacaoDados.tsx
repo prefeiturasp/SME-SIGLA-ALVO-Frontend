@@ -14,6 +14,7 @@ export const useImportacaoDados = () => {
     cargo: undefined,
     arquivo: null,
     tipo: "VAGAS",
+    metodo_de_importacao:1,
   };
 
   const {
@@ -72,11 +73,11 @@ export const useImportacaoDados = () => {
 
   // Query para buscar importações com parâmetros
   const { data: importacoesArquivos, isLoading: importacoesArquivosIsLoading } = useQuery({
-    queryKey: ["getImportacaoArquivosHabilitados"],
+    queryKey: ["getImportacaoArquivosVagas"],
     queryFn: ({ signal }) =>
-      API.ImportacaoDados.getImportacaoArquivos(
+      API.ImportacaoDados.getUltimasImportacoesArquivos(
         { 
-          tipo: "HABILITADOS",
+          tipo: "VAGAS",
         }, 
         { signal }
       ).response,

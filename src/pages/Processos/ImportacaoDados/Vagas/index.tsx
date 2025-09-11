@@ -45,9 +45,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
 
   const {
     processosConvocacaoData,
-    processosConvocacaoIsLoading,
-    listRequest,
-    onAntTableChange,
+    processosConvocacaoIsLoading
   } = useUltimasImportacoes();
 
 
@@ -56,6 +54,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
 
   const { cargosData, cargosIsLoading } = useCargos();
   const watchedFile = watch("arquivo");
+  const watchedMetodoImportacao = watch("metodo_de_importacao");
 
 
   return (
@@ -113,74 +112,84 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
         </Row>
 
 
-        <Row gutter={[0, 16]}>
-          <Col xs={24} sm={9}>
-            <Controller
-              control={control}
-              name="data_fechamento_modulo"
-              render={({ field }) => (
-                <CustomFormItem
-                  label="Data de fechamento do módulo"
-                  validateStatus={
-                    formErrors.data_fechamento_modulo ? "error" : undefined
-                  }
-                  help={formErrors.data_fechamento_modulo?.message}
-                  labelCol={{ span: 24 }}
-                >
-                  <DatePicker
-                    value={field.value ? dayjs(field.value) : undefined}
-                    onChange={(date) =>
-                      field.onChange(
-                        date ? dayjs(date).format("YYYY-MM-DD") : ""
-                      )
-                    }
-                    placeholder="Selecione a data desejada"
-                    format="DD/MM/YYYY"
-                    suffixIcon={
-                      <CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />
-                    }
-                  />
-                </CustomFormItem>
-              )}
-            />
-          </Col>
-        </Row>
+
+        {watchedMetodoImportacao === 1 &&
+          <>
+            <Row gutter={[0, 16]}>
+              <Col xs={24} sm={9}>
+                <Controller
+                  control={control}
+                  name="data_fechamento_modulo"
+                  render={({ field }) => (
+                    <CustomFormItem
+                      label="Data de fechamento do módulo"
+                      validateStatus={
+                        formErrors.data_fechamento_modulo ? "error" : undefined
+                      }
+                      help={formErrors.data_fechamento_modulo?.message}
+                      labelCol={{ span: 24 }}
+                    >
+                      <DatePicker
+                        value={field.value ? dayjs(field.value) : undefined}
+                        onChange={(date) =>
+                          field.onChange(
+                            date ? dayjs(date).format("YYYY-MM-DD") : ""
+                          )
+                        }
+                        placeholder="Selecione a data desejada"
+                        format="DD/MM/YYYY"
+                        suffixIcon={
+                          <CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />
+                        }
+                      />
+                    </CustomFormItem>
+                  )}
+                />
+              </Col>
+            </Row>
 
 
-        <Row gutter={[0, 16]}>
-          <Col xs={24} sm={9}>
-            <Controller
-              control={control}
-              name="cargo"
-              render={({ field }) => (
-                <CustomFormItem
-                  label="Cargo"
-                  validateStatus={formErrors.cargo ? "error" : undefined}
-                  help={formErrors.cargo?.message}
-                  labelCol={{ span: 24 }}
-                >
-                  <StyledSelect
-                    {...field}
-                    placeholder="Selecione o cargo"
-                    loading={cargosIsLoading}
-                    allowClear
-                    suffixIcon={<ExpandMoreIcon style={{ fontSize: '1.5rem', color: '#032B68' }} />}
-                  >
-                    {Array.isArray(cargosData) ? cargosData.map((cargo: any) => (
-                      <Select.Option key={cargo.value} value={cargo.value}>
-                        {cargo.label}
-                      </Select.Option>
-                    )) : cargosData?.results?.map((cargo: any) => (
-                      <Select.Option key={cargo.value} value={cargo.value}>
-                        {cargo.label}
-                      </Select.Option>
-                    ))}
-                  </StyledSelect>
-                </CustomFormItem>
-              )}
-            />
-          </Col>
-        </Row>
+            <Row gutter={[0, 16]}>
+              <Col xs={24} sm={9}>
+                <Controller
+                  control={control}
+                  name="cargo"
+                  render={({ field }) => (
+                    <CustomFormItem
+                      label="Cargo"
+                      validateStatus={formErrors.cargo ? "error" : undefined}
+                      help={formErrors.cargo?.message}
+                      labelCol={{ span: 24 }}
+                    >
+                      <StyledSelect
+                        {...field}
+                        placeholder="Selecione o cargo"
+                        loading={cargosIsLoading}
+                        allowClear
+                        suffixIcon={<ExpandMoreIcon style={{ fontSize: '1.5rem', color: '#032B68' }} />}
+                      >
+                        {Array.isArray(cargosData) ? cargosData.map((cargo: any) => (
+                          <Select.Option key={cargo.value} value={cargo.value}>
+                            {cargo.label}
+                          </Select.Option>
+                        )) : cargosData?.results?.map((cargo: any) => (
+                          <Select.Option key={cargo.value} value={cargo.value}>
+                            {cargo.label}
+                          </Select.Option>
+                        ))}
+                      </StyledSelect>
+                    </CustomFormItem>
+                  )}
+                />
+              </Col>
+            </Row>
+          </>
+        }
+
+
+
+        {watchedMetodoImportacao === 2 &&
+<>
 
         <Row gutter={[0, 8]}>
           <Col xs={24} sm={9}>
@@ -224,12 +233,13 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
               name="ignorar_primeira_linha"
               render={({ field }) => (
                 <CustomFormItem
-                  label="Opções de importação"
+                  
                   validateStatus={
                     formErrors.ignorar_primeira_linha ? "error" : undefined
                   }
                   help={formErrors.ignorar_primeira_linha?.message}
                   labelCol={{ span: 24 }}
+                  style={{marginTop:'1rem'}}
                 >
                   <Checkbox {...field}>Ignorar a 1ª linha (arquivo com cabeçalho)</Checkbox>
                 </CustomFormItem>
@@ -238,7 +248,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
 
           </Col>
         </Row>
-
+</>}
 
         <Row gutter={[0, 16]}>
           <Col xs={24} sm={9}>
@@ -300,19 +310,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowHistorico, onShowLayoutPadrao }) =>
                 opcoes_de_importacao: 'Ajustar',
                 data_importacao: dayjs()
               }]}
-              pagination={{
-                current: listRequest.pagination.page,
-                pageSize: 10,
-                defaultPageSize: 10,
-                position: ["bottomLeft"],
-                total: processosConvocacaoData?.count,
-                showTotal: (total, range) => (
-                  <span style={{ marginLeft: 16 }}>
-                    {`Mostrando ${(range?.[0] ?? 0)}-${(range?.[1] ?? 0)} de ${(total ?? 0)} registro(s)`}
-                  </span>
-                ),
-              }}
-              onChange={onAntTableChange}
+              pagination={false}
             />
           </Col>
         </Row>

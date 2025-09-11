@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Typography } from "antd";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import {
   StyledTabs,
@@ -26,7 +26,9 @@ const ImportacaoDados: React.FC = () => {
   const [activeTab, setActiveTab] = useState("vagas");
   const [showHistorico, setShowHistorico] = useState(false);
   const [showLayoutPadrao, setShowLayoutPadrao] = useState(false);
-  
+   
+  const navigate = useNavigate();
+
 
   const handleShowHistorico = () => {
     setShowHistorico(true);
@@ -40,6 +42,11 @@ const ImportacaoDados: React.FC = () => {
     setShowLayoutPadrao(true);
   };
 
+  const handleShowLayoutPadraoVagas = () => {    
+    navigate('/processos/importacao-dados/layout-padrao-vagas')
+  };
+
+
   const handleBackFromLayoutPadrao = () => {
     setShowLayoutPadrao(false);
   };
@@ -50,7 +57,7 @@ const ImportacaoDados: React.FC = () => {
       label: "Vagas",
       children: <Vagas
           onShowHistorico={handleShowHistorico}
-          onShowLayoutPadrao={handleShowLayoutPadrao}
+          onShowLayoutPadrao={handleShowLayoutPadraoVagas}
       />,
     },
     {
@@ -96,6 +103,8 @@ const ImportacaoDados: React.FC = () => {
       </BaseScreen>
     );
   }
+
+  
 
   return (
     <BaseScreen
