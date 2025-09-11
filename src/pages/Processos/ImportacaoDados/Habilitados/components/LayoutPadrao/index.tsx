@@ -1,8 +1,14 @@
 import React from "react";
 import { Table, Button, Typography } from "antd";
 import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
-import { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from "./styles";
-import { SecondaryButton, PrimaryButton } from "../../styles";
+import { 
+  LayoutContainer, 
+  HeaderSection, 
+  TableContainer, 
+  ButtonContainer,
+  SecondaryButton, 
+  PrimaryButton 
+} from "../../../../../../components/estilosCompartilhados/styles";
 
 const { Title } = Typography;
 
