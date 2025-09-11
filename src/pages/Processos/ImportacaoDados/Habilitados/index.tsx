@@ -15,7 +15,7 @@ import {
   ActionButtonsContainer,
   SecondaryButton,
   PrimaryButton,
-} from "./styles";
+} from "../../../../components/estilosCompartilhados/styles";
 import { useConcursos } from "../../NovaConvocacaoCandidatos/hooks/useConcursos";
 
 

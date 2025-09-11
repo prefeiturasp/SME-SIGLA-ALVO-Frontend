@@ -18,7 +18,7 @@ export const appAxiosCandidatos = axios.create({
 });
 
 export const appAxiosImportaArquivos = axios.create({
-  baseURL: getEnv("IMPORTACAO_ARQUIVOS_API_URL", "http://127.0.0.1:8002"),
+  baseURL: getEnv("IMPORTACAO_ARQUIVOS_API_URL", "http://127.0.0.1:8003"),
 });
 
 
