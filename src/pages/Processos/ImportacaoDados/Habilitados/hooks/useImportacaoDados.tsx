@@ -5,11 +5,13 @@ import { App } from "antd";
 import { API } from "../../../../../services";
 import useImportacaoSchema from "./useImportacaoSchema";
 import type { IImportacaoHabilitadosFiltros, IImportacaoHabilitadosPayload } from "./types";
+import { useConcursos } from "../../../NovaConvocacaoCandidatos/hooks/useConcursos";
 // import type { IImportacaoRequest } from "../../../../../services/resources/importacaoDados/IImportacaoArquivos";
 
 export const useImportacaoDados = () => {
   const queryClient = useQueryClient();
   const { notification } = App.useApp();
+  const { concursosData } = useConcursos();
   
   const defaultValues = {
     concurso: undefined,
@@ -76,9 +78,7 @@ export const useImportacaoDados = () => {
     queryKey: ["getImportacaoArquivosHabilitados"],
     queryFn: ({ signal }) =>
       API.ImportacaoDados.getImportacaoArquivos(
-        { 
-          tipo: "HABILITADOS",
-        }, 
+        "habilitados",
         { signal }
       ).response,
     staleTime: 1000 * 60 * 5,
@@ -91,8 +91,18 @@ export const useImportacaoDados = () => {
       return;
     }
 
+    // Buscar dados do concurso selecionado
+    const concursosArray = Array.isArray(concursosData) ? concursosData : concursosData?.results || [];
+    const concursoSelecionado = concursosArray.find((concurso: any) => concurso.value === data.concurso);
+
+    if (!concursoSelecionado) {
+      console.error("Concurso selecionado não encontrado");
+      return;
+    }
+
     const payload: IImportacaoHabilitadosPayload = {
-      concurso: data.concurso!,
+      concurso_nome: concursoSelecionado.label,
+      concurso_uuid: concursoSelecionado.value,
       arquivo: data.arquivo!,
       tipo: "HABILITADOS",
     };
