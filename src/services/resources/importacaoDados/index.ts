@@ -10,9 +10,9 @@ import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
   getLayout: () => `/api/v1/layouts/`,
-  getUltimasImportacoesArquivos: () => `/api/v1/importacao-arquivos/`,
-  getImportacaoArquivos: () => `/api/v1/importacao-arquivos/`,
-  postImportacaoArquivos: () => `/api/v1/importacao-arquivos/`,
+  getUltimasImportacoesArquivos: () => `/api/v1/importacao-arquivo/vagas/`,
+  getImportacaoArquivos: () => `/api/v1/importacao-arquivo/`,
+  postImportacaoArquivos: () => `/api/v1/importacao-arquivo/`,
 };
 
 //TODO Deixar genérico

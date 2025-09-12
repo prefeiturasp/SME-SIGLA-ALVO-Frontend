@@ -51,7 +51,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
   const { cargosData, cargosIsLoading } = useCargos();
   const watchedFile = watch("arquivo");
   const watchedMetodoImportacao = watch("metodo_de_importacao");
-
+ 
   return (
     <TabContentContainer>
       <SectionCard>
