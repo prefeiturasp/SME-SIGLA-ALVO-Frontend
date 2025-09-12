@@ -13,6 +13,15 @@ export interface IUltimasImportacoesVagas {
   data_importacao: string;  
 }
 
+export interface ILayout {
+      key: string,
+      ordem: number,
+      campo: string,
+      tipoDado: string,
+      tamanho: number,
+      regrasValidacao: string,
+}
+
 // export interface IConcursoFundacao {
 //   value: string;
 //   label: string;
@@ -31,8 +40,7 @@ export interface IUltimasImportacoesVagas {
 // export interface IImportacaoRequest {
 //   concurso: string;
 //   arquivo: File;
-//   ignorar_primeira_linha: boolean;
-// }
+ // }
 
 // export interface IImportacaoResponse {
 //   id: string;

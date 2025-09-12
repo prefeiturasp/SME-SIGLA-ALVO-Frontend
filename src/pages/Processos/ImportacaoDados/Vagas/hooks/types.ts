@@ -20,8 +20,7 @@ export interface IImportacaoVagasForm {
   data_fechamento_modulo?: string;
   metodo_de_importacao: number;
   opcoes_de_importacao?: string;
-  ignorar_primeira_linha:boolean;
-}
+ }
 export interface IImportacaoVagasPayload {
   cargo?: string;
   arquivo: File;

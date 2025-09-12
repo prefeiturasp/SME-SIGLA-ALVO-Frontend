@@ -6,17 +6,16 @@ import { API } from "../../../../../services";
 import useImportacaoVagasSchema from "./useImportacaoVagasSchema";
 import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
 
-export const useImportacaoDados = () => {
+export const useImportacaoDadosVagas = () => {
   const queryClient = useQueryClient();
   const { notification } = App.useApp();
-  
+
   const defaultValues = {
     cargo: undefined,
     arquivo: null,
     tipo: "VAGAS",
-    metodo_de_importacao:1,
-    ignorar_primeira_linha:false,
-  };
+    metodo_de_importacao: 1,
+   };
 
   const {
     control,
@@ -25,7 +24,7 @@ export const useImportacaoDados = () => {
     watch,
     setValue,
     clearErrors,
-    formState: { errors: formErrors,isValid },
+    formState: { errors: formErrors, isValid },
   } = useForm<IImportacaoVagasForm>({
     defaultValues,
     resolver: yupResolver(useImportacaoVagasSchema()) as Resolver<IImportacaoVagasForm>,
@@ -38,9 +37,9 @@ export const useImportacaoDados = () => {
   const postImportacaoArquivosMutation = useMutation({
     mutationFn: (payload: IImportacaoVagasPayload) => API.ImportacaoDados.postImportacaoArquivos(payload).response,
     onSuccess: () => {
-       // Invalidar queries relacionadas após sucesso
+      // Invalidar queries relacionadas após sucesso
       queryClient.invalidateQueries({ queryKey: ["getImportacaoArquivosHabilitados"] });
-      
+
       // Mostrar notificação de sucesso
       notification.success({
         message: "Importação Realizada",
@@ -66,9 +65,9 @@ export const useImportacaoDados = () => {
     queryKey: ["getImportacaoArquivosVagas"],
     queryFn: ({ signal }) =>
       API.ImportacaoDados.getUltimasImportacoesArquivos(
-        { 
+        {
           tipo: "VAGAS",
-        }, 
+        },
         { signal }
       ).response,
     staleTime: 1000 * 60 * 5,
@@ -98,9 +97,9 @@ export const useImportacaoDados = () => {
   };
 
   const handleFileUpload = (file: File) => {
-   setValue("arquivo", file, { shouldValidate: true });
-    clearErrors("arquivo"); 
-    };
+    setValue("arquivo", file, { shouldValidate: true });
+    clearErrors("arquivo");
+  };
 
   return {
     control,

@@ -2,8 +2,7 @@ import * as yup from "yup";
 
 const useImportacaoVagasSchema = () => {
   return yup.object({
-    ignorar_primeira_linha:yup.boolean(),
-    metodo_de_importacao: yup.number().required("Método de importação é obrigatório"),
+     metodo_de_importacao: yup.number().required("Método de importação é obrigatório"),
 
     cargo: yup.string().when("metodo_de_importacao", {
       is: 1,

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Typography } from "antd";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import {
   StyledTabs,
@@ -56,7 +56,6 @@ const ImportacaoDados: React.FC = () => {
       key: "vagas",
       label: "Vagas",
       children: <Vagas
-          onShowHistorico={handleShowHistorico}
           onShowLayoutPadrao={handleShowLayoutPadraoVagas}
       />,
     },

@@ -5,7 +5,7 @@ import { Row, Col, Select, DatePicker, Radio, Checkbox } from "antd";
 import { Controller } from "react-hook-form";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useImportacaoDados } from "./hooks/useImportacaoDados";
+import { useImportacaoDadosVagas } from "./hooks/useImportacaoDadosVagas";
 import { CustomFormItem } from "../../../../components/formStyle/styles";
 import {
   TabContentContainer,
@@ -20,15 +20,14 @@ import {
 } from "../../../../components/estilosCompartilhados/styles";
 import { useCargos } from "../../NovaConvocacaoCandidatos/hooks/useCargos";
 import UltimasImportacoesDeVagasTable from "./components/UltimasImportacoesDeVagasTable";
- 
+
 
 
 interface VagasProps {
-  onShowHistorico: () => void;
   onShowLayoutPadrao: () => void;
 }
 
-const Vagas: React.FC<VagasProps> = ({  onShowLayoutPadrao }) => {
+const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
   const {
     control,
     formErrors,
@@ -39,12 +38,12 @@ const Vagas: React.FC<VagasProps> = ({  onShowLayoutPadrao }) => {
     importacoesArquivos,
     importacoesArquivosIsLoading,
     isCreatingImportacao,
-    isValid=false,
-    } = useImportacaoDados();
+    isValid = false,
+  } = useImportacaoDadosVagas();
 
 
 
-  
+
 
   // TODO Fazer somente a opção Arquivo
 
@@ -52,7 +51,7 @@ const Vagas: React.FC<VagasProps> = ({  onShowLayoutPadrao }) => {
   const { cargosData, cargosIsLoading } = useCargos();
   const watchedFile = watch("arquivo");
   const watchedMetodoImportacao = watch("metodo_de_importacao");
- 
+
   return (
     <TabContentContainer>
       <SectionCard>
@@ -185,66 +184,44 @@ const Vagas: React.FC<VagasProps> = ({  onShowLayoutPadrao }) => {
 
 
         {watchedMetodoImportacao === 2 &&
-<>
+          <>
 
-        <Row gutter={[0, 8]}>
-          <Col xs={24} sm={9}>
-            <Controller
-              control={control}
-              name="arquivo"
-              render={() => (
-                <CustomFormItem
-                  label="Arquivo para importação"
-                  validateStatus={formErrors.arquivo ? "error" : undefined}
-                  help={formErrors.arquivo?.message}
-                  labelCol={{ span: 24 }}
-                >
-                  <StyledUpload
-                    beforeUpload={(file) => {
-                      handleFileUpload(file);
-                      return false; // Impede o upload automático
-                    }}
-                    accept=".csv"
-                    showUploadList={false}
-                    multiple={false}
-                  >
-                    <UploadArea>
-                      <span style={{ color: '#666', fontSize: '0.875rem' }}>
-                        {watchedFile ? watchedFile.name : 'Clique ou arraste os arquivos'}
-                      </span>
-                      <UploadFileIcon style={{ fontSize: '1.50rem', color: '#032B68' }} />
-                    </UploadArea>
-                  </StyledUpload>
-                </CustomFormItem>
-              )}
-            />
-          </Col>
-        </Row>
+            <Row gutter={[0, 8]}>
+              <Col xs={24} sm={9}>
+                <Controller
+                  control={control}
+                  name="arquivo"
+                  render={() => (
+                    <CustomFormItem
+                      label="Arquivo para importação"
+                      validateStatus={formErrors.arquivo ? "error" : undefined}
+                      help={formErrors.arquivo?.message}
+                      labelCol={{ span: 24 }}
+                    >
+                      <StyledUpload
+                        beforeUpload={(file) => {
+                          handleFileUpload(file);
+                          return false; // Impede o upload automático
+                        }}
+                        accept=".csv"
+                        showUploadList={false}
+                        multiple={false}
+                      >
+                        <UploadArea>
+                          <span style={{ color: '#666', fontSize: '0.875rem' }}>
+                            {watchedFile ? watchedFile.name : 'Clique ou arraste os arquivos'}
+                          </span>
+                          <UploadFileIcon style={{ fontSize: '1.50rem', color: '#032B68' }} />
+                        </UploadArea>
+                      </StyledUpload>
+                    </CustomFormItem>
+                  )}
+                />
+              </Col>
+            </Row>
 
-        <Row gutter={[0, 16]}>
-          <Col xs={24} sm={9}>
-
-            <Controller
-              control={control}
-              name="ignorar_primeira_linha"
-              render={({ field }) => (
-                <CustomFormItem
-                  
-                  validateStatus={
-                    formErrors.ignorar_primeira_linha ? "error" : undefined
-                  }
-                  help={formErrors.ignorar_primeira_linha?.message}
-                  labelCol={{ span: 24 }}
-                  style={{marginTop:'1rem'}}
-                >
-                  <Checkbox {...field} checked={field.value}>Ignorar a 1ª linha (arquivo com cabeçalho)</Checkbox>
-                </CustomFormItem>
-              )}
-            />
-
-          </Col>
-        </Row>
-</>}
+             
+          </>}
 
         <Row gutter={[0, 16]}>
           <Col xs={24} sm={9}>
@@ -319,7 +296,7 @@ const Vagas: React.FC<VagasProps> = ({  onShowLayoutPadrao }) => {
         <SecondaryButton
           size="large"
           onClick={handleSubmit(handleEnviarForm)}
-          disabled={isCreatingImportacao || !isValid} 
+          disabled={isCreatingImportacao || !isValid}
           loading={importacoesArquivosIsLoading}
         >
           Importar

@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { App } from 'antd';
 import React from 'react';
 import * as yup from 'yup';
-import { useImportacaoDados } from '../useImportacaoDados';
+import { useImportacaoDados } from '../useImportacaoDadosVagas';
 import useImportacaoSchema from '../useImportacaoVagasSchema';
 import type { 
   IImportacaoHabilitadosFiltros, 
