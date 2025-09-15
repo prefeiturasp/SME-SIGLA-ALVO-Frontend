@@ -44,8 +44,8 @@ const Historico: React.FC<HistoricoProps> = ({ data, onVoltar, ...rest }) => {
     },
     {
       title: "Concurso",
-      dataIndex: "concurso",
-      key: "concurso",
+      dataIndex: "concurso_nome",
+      key: "concurso_nome",
     },
     {
       title: "Arquivo",

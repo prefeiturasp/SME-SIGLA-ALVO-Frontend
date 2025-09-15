@@ -10,7 +10,8 @@ export interface IUltimaImportacaoHabilitados {
 }
 
 export interface IImportacaoHabilitadosPayload {
-  concurso: string;
+  concurso_nome: string;
+  concurso_uuid: string;
   arquivo: File;
   tipo: string;
 }

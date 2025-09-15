@@ -1,30 +1,31 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosImportaArquivos } from "../../axios";
 import type { 
-  IImportacaoFundacao
+  IImportacaoFundacao,
+  ILayoutPadrao
 } from "./IImportacaoArquivos";
 import type { PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
-  getImportacaoArquivos: () => `/api/v1/importacao-arquivos/`,
-  postImportacaoArquivos: () => `/api/v1/importacao-arquivos/`,
+  getImportacaoArquivos: (tipo: string) => `/api/v1/importacao-arquivo/${tipo}/`,
+  postImportacaoArquivos: (tipo: string) => `/api/v1/importacao-arquivo/${tipo}/`,
   getLayoutArquivos: () => `/api/v1/layouts/`,
 };
 
 // TODO adicionar JWT no header Authorization
 export const postImportacaoArquivos = (
-  payload: { concurso: string; arquivo: File; tipo: string },
+  payload: { concurso_nome: string; concurso_uuid: string; arquivo: File; tipo: string },
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
   const formData = new FormData();
-  formData.append('concurso', payload.concurso);
+  formData.append('concurso_nome', payload.concurso_nome);
+  formData.append('concurso_uuid', payload.concurso_uuid);
   formData.append('arquivo', payload.arquivo);
-  formData.append('tipo', payload.tipo);
   const response = appAxiosImportaArquivos
-    .post<IImportacaoFundacao>(URL.postImportacaoArquivos(), formData, {
+    .post<IImportacaoFundacao>(URL.postImportacaoArquivos(payload.tipo.toLowerCase()), formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -41,15 +42,13 @@ export const postImportacaoArquivos = (
 
 // // TODO adicionar JWT no header Authorization
 export const getImportacaoArquivos = (
-  params?: Record<string, any>,
+  tipo: string,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
   const response = appAxiosImportaArquivos
-    .get<PaginatedResponse<IImportacaoFundacao>>(URL.getImportacaoArquivos(), {
-      params,
-      paramsSerializer: queryParamsSerializer,
+    .get<PaginatedResponse<IImportacaoFundacao>>(URL.getImportacaoArquivos(tipo), {
       signal,
       ...axiosRequestConfig,
     })
@@ -62,14 +61,14 @@ export const getImportacaoArquivos = (
 };
 
 export const getLayoutArquivos = (
-  params?: Record<string, any>,
+  tipo: string,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
   const response = appAxiosImportaArquivos
-    .get<PaginatedResponse<IImportacaoFundacao>>(URL.getLayoutArquivos(), {
-      params,
+    .get<ILayoutPadrao>(URL.getLayoutArquivos(), {
+      params: { tipo: tipo.toUpperCase() },
       paramsSerializer: queryParamsSerializer,
       signal,
       ...axiosRequestConfig,

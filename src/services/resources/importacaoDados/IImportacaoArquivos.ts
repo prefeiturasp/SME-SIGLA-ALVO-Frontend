@@ -5,6 +5,30 @@ export interface IImportacaoFundacao {
   data_importacao: string;
 }
 
+export interface ILayoutCampo {
+  key: string;
+  campo: string;
+  ordem: number;
+  coluna: string;
+  tamanho: number;
+  tipoDado: string;
+  campo_payload: string;
+  regrasValidacao: string;
+}
+
+export interface ILayoutResult {
+  uuid: string;
+  tipo: string;
+  estrutura: ILayoutCampo[];
+}
+
+export interface ILayoutPadrao {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: ILayoutResult[];
+}
+
 // export interface IConcursoFundacao {
 //   value: string;
 //   label: string;

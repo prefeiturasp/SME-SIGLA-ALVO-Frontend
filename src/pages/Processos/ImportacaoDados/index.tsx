@@ -13,6 +13,8 @@ import Habilitados from "./Habilitados";
 import EscolhasEOL from "./EscolhasEOL";
 import Historico from "./Habilitados/components/Historico";
 import LayoutPadrao from "./Habilitados/components/LayoutPadrao";
+import { useLayoutPadrao } from "./Habilitados/hooks/useLayoutPadrao";
+import type { ILayoutPadrao } from "../../../services/resources/importacaoDados/IImportacaoArquivos";
 
 const { Text } = Typography;
 
@@ -26,6 +28,7 @@ const ImportacaoDados: React.FC = () => {
   const [activeTab, setActiveTab] = useState("fundacao");
   const [showHistorico, setShowHistorico] = useState(false);
   const [showLayoutPadrao, setShowLayoutPadrao] = useState(false);
+  const [layoutTipo, setLayoutTipo] = useState<string>("habilitados");
   
 
   const handleShowHistorico = () => {
@@ -36,7 +39,8 @@ const ImportacaoDados: React.FC = () => {
     setShowHistorico(false);
   };
 
-  const handleShowLayoutPadrao = () => {
+  const handleShowLayoutPadrao = (tipo: string = "habilitados") => {
+    setLayoutTipo(tipo);
     setShowLayoutPadrao(true);
   };
 
@@ -44,11 +48,17 @@ const ImportacaoDados: React.FC = () => {
     setShowLayoutPadrao(false);
   };
 
+  // Hook para buscar dados do layout padrão
+  const { layoutData, isLoading: layoutIsLoading } = useLayoutPadrao({
+    tipo: layoutTipo,
+    enabled: showLayoutPadrao,
+  });
+
   const tabItems = [
     {
       key: "vagas",
       label: "Vagas",
-      children: <Vagas />,
+      children: <Vagas onShowLayoutPadrao={() => handleShowLayoutPadrao("vagas")} />,
     },
     {
       key: "vagas-sistema",
@@ -60,7 +70,7 @@ const ImportacaoDados: React.FC = () => {
       label: "Habilitados",
       children: <Habilitados 
         onShowHistorico={handleShowHistorico}
-        onShowLayoutPadrao={handleShowLayoutPadrao}
+        onShowLayoutPadrao={() => handleShowLayoutPadrao("habilitados")}
       />,
     },
     {
@@ -89,7 +99,11 @@ const ImportacaoDados: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Importação de dados"
       >
-        <LayoutPadrao onVoltar={handleBackFromLayoutPadrao} />
+        <LayoutPadrao 
+          onVoltar={handleBackFromLayoutPadrao}
+          layoutData={layoutData as ILayoutPadrao | undefined}
+          isLoading={layoutIsLoading}
+        />
       </BaseScreen>
     );
   }
