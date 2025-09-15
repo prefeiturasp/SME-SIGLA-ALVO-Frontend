@@ -491,6 +491,73 @@ describe('Habilitados Component', () => {
 describe('LayoutPadrao Component', () => {
   const mockOnVoltar = jest.fn();
 
+  const mockDataSource = [
+    {
+      key: '1',
+      ordem: 1,
+      campo: 'Código de inscrição',
+      tipoDado: 'Texto',
+      tamanho: 10,
+      regrasValidacao: 'Campo obrigatório',
+    },
+    {
+      key: '2',
+      ordem: 2,
+      campo: 'Nome',
+      tipoDado: 'Texto',
+      tamanho: 100,
+      regrasValidacao: 'Campo obrigatório',
+    },
+    {
+      key: '3',
+      ordem: 3,
+      campo: 'CPF',
+      tipoDado: 'Texto',
+      tamanho: 11,
+      regrasValidacao: 'Campo obrigatório',
+    },
+    {
+      key: '4',
+      ordem: 4,
+      campo: 'Data de nascimento',
+      tipoDado: 'Data',
+      tamanho: 10,
+      regrasValidacao: 'Campo obrigatório',
+    },
+    {
+      key: '5',
+      ordem: 5,
+      campo: 'Email',
+      tipoDado: 'Texto',
+      tamanho: 100,
+      regrasValidacao: 'Campo obrigatório',
+    },
+    {
+      key: '6',
+      ordem: 6,
+      campo: 'Telefone',
+      tipoDado: 'Texto',
+      tamanho: 15,
+      regrasValidacao: 'Campo obrigatório',
+    },
+    {
+      key: '7',
+      ordem: 7,
+      campo: 'Endereço',
+      tipoDado: 'Texto',
+      tamanho: 200,
+      regrasValidacao: 'Campo obrigatório',
+    },
+    {
+      key: '8',
+      ordem: 8,
+      campo: 'Cidade',
+      tipoDado: 'Texto',
+      tamanho: 50,
+      regrasValidacao: 'Campo obrigatório',
+    },
+  ];
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -498,7 +565,12 @@ describe('LayoutPadrao Component', () => {
   it('deve renderizar o componente LayoutPadrao corretamente', () => {
     render(
       <TestWrapper>
-        <LayoutPadrao onVoltar={mockOnVoltar} />
+        <LayoutPadrao 
+          loading={false}
+          onVoltar={mockOnVoltar} 
+          dataSource={mockDataSource}
+          title="Layout: Arquivo de Aprovados (HABILITADOS)"
+        />
       </TestWrapper>
     );
 
@@ -507,32 +579,42 @@ describe('LayoutPadrao Component', () => {
     expect(screen.getByText('Exportar')).toBeInTheDocument();
   });
 
-      it('deve mostrar tabela com dados do layout', () => {
-      render(
-        <TestWrapper>
-          <LayoutPadrao onVoltar={mockOnVoltar} />
-        </TestWrapper>
-      );
+  it('deve mostrar tabela com dados do layout', () => {
+    render(
+      <TestWrapper>
+        <LayoutPadrao 
+          loading={false}
+          onVoltar={mockOnVoltar} 
+          dataSource={mockDataSource}
+          title="Layout: Arquivo de Aprovados (HABILITADOS)"
+        />
+      </TestWrapper>
+    );
 
-      expect(screen.getByText('Ordem')).toBeInTheDocument();
-      expect(screen.getByText('Campo')).toBeInTheDocument();
-      expect(screen.getByText('Tipo de dado')).toBeInTheDocument();
-      expect(screen.getByText('Tamanho')).toBeInTheDocument();
-      expect(screen.getByText('Regras de validação')).toBeInTheDocument();
-      
-      // Verifica alguns dados da tabela
-      expect(screen.getByText('Código de inscrição')).toBeInTheDocument();
-      expect(screen.getByText('Nome')).toBeInTheDocument();
-      // Verifica se há pelo menos um campo obrigatório
-      expect(screen.getAllByText('Campo obrigatório')).toHaveLength(8);
-    });
+    expect(screen.getByText('Ordem')).toBeInTheDocument();
+    expect(screen.getByText('Campo')).toBeInTheDocument();
+    expect(screen.getByText('Tipo de dado')).toBeInTheDocument();
+    expect(screen.getByText('Tamanho')).toBeInTheDocument();
+    expect(screen.getByText('Regras de validação')).toBeInTheDocument();
+    
+    // Verifica alguns dados da tabela
+    expect(screen.getByText('Código de inscrição')).toBeInTheDocument();
+    expect(screen.getByText('Nome')).toBeInTheDocument();
+    // Verifica se há pelo menos um campo obrigatório
+    expect(screen.getAllByText('Campo obrigatório')).toHaveLength(8);
+  });
 
   it('deve chamar onVoltar quando botão Voltar é clicado', async () => {
     const user = userEvent.setup();
 
     render(
       <TestWrapper>
-        <LayoutPadrao onVoltar={mockOnVoltar} />
+        <LayoutPadrao 
+          loading={false}
+          onVoltar={mockOnVoltar} 
+          dataSource={mockDataSource}
+          title="Layout: Arquivo de Aprovados (HABILITADOS)"
+        />
       </TestWrapper>
     );
 
@@ -548,7 +630,12 @@ describe('LayoutPadrao Component', () => {
 
     render(
       <TestWrapper>
-        <LayoutPadrao onVoltar={mockOnVoltar} />
+        <LayoutPadrao 
+          loading={false}
+          onVoltar={mockOnVoltar} 
+          dataSource={mockDataSource}
+          title="Layout: Arquivo de Aprovados (HABILITADOS)"
+        />
       </TestWrapper>
     );
 
@@ -563,7 +650,12 @@ describe('LayoutPadrao Component', () => {
   it('deve destacar campos obrigatórios em vermelho', () => {
     render(
       <TestWrapper>
-        <LayoutPadrao onVoltar={mockOnVoltar} />
+        <LayoutPadrao 
+          loading={false}
+          onVoltar={mockOnVoltar} 
+          dataSource={mockDataSource}
+          title="Layout: Arquivo de Aprovados (HABILITADOS)"
+        />
       </TestWrapper>
     );
 
