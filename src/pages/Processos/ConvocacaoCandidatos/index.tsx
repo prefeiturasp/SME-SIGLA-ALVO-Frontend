@@ -26,7 +26,7 @@ const breadcrumbItems = [
       </a>
     ),
   },
-  { title: "Consulta processos de convocação de candidatos" },
+  { title: "Consulta de candidatos" },
 ] as TitleItem[];
 
 const ConvocacaoCandidatos: React.FC = () => {

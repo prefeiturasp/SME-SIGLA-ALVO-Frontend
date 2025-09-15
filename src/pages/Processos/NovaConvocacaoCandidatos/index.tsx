@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Typography, Card, Row, Button } from "antd";
+import { Typography, Card } from "antd";
 
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import { useForm, useWatch } from "react-hook-form";
 import { Link } from "react-router-dom";
-import { PlusOutlined } from "@ant-design/icons";
 
 import { useConcursos } from "./hooks/useConcursos";
 import type { IConvocacaoFiltros } from "../../../services/resources/convocacao/IConvocacao";
@@ -128,18 +127,9 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
       title="Processo de convocação de candidatos"
     >
       <Card style={{ borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", marginBottom: 24 }}>
-      <Row align="top" justify="space-between">
-          <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>
-            Busca Processos
-          </Typography.Title>
-          <Button
-            type="primary"
-            size="large"
-            icon={<PlusOutlined />}
-          >
-            Nova convocação
-          </Button>
-        </Row>
+        <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>
+          Busca Processos
+        </Typography.Title>
         <FormPrincipal
           control={control}
           concursosData={((concursosData as unknown as ConcursoOption[]) || [])}

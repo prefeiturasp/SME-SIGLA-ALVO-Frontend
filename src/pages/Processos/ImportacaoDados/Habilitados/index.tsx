@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Select } from "antd";
+import { Row, Col, Select, Button } from "antd";
 import { Controller } from "react-hook-form";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -13,8 +13,6 @@ import {
   UploadArea,
   StyledUpload,
   ActionButtonsContainer,
-  SecondaryButton,
-  PrimaryButton,
 } from "../../../../components/estilosCompartilhados/styles";
 import { useConcursos } from "../../NovaConvocacaoCandidatos/hooks/useConcursos";
 
@@ -119,25 +117,37 @@ const Habilitados: React.FC<HabilitadosProps> = ({ onShowHistorico, onShowLayout
       
       {/* Botões de Ação */}
       <ActionButtonsContainer>
-        <SecondaryButton
+        <Button
+          type="primary"
+          ghost
           size="large"
           onClick={onShowHistorico}
+          style={{
+            fontWeight: 700,
+            borderRadius: '0.375rem'
+          }}
         >
           Histórico
-        </SecondaryButton>
-        <SecondaryButton
+        </Button>
+        <Button
+          type="primary"
+          ghost
           size="large"
           onClick={handleSubmit(handleEnviarForm)}
+          style={{
+            fontWeight: 700,
+            borderRadius: '0.375rem'
+          }}
         >
           Importar
-        </SecondaryButton>
-        <PrimaryButton
+        </Button>
+        <Button
           type="primary"
           size="large"
           onClick={onShowLayoutPadrao}
         >
           Layout padrão
-        </PrimaryButton>
+        </Button>
       </ActionButtonsContainer>
     </TabContentContainer>
   );
