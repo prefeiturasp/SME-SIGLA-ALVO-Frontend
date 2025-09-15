@@ -3,12 +3,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { App } from 'antd';
 import React from 'react';
 import * as yup from 'yup';
-import { useImportacaoDados } from '../useImportacaoDadosVagas';
+import { useImportacaoDadosVagas } from '../useImportacaoDadosVagas';
 import useImportacaoSchema from '../useImportacaoVagasSchema';
 import type { 
-  IImportacaoHabilitadosFiltros, 
-  IImportacaoHabilitadosPayload,
-  IUltimaImportacaoHabilitados 
+  IImportacaoVagasForm, 
+  IImportacaoVagasPayload
 } from '../types';
 import { API } from '../../../../../../services';
 
@@ -16,8 +15,8 @@ import { API } from '../../../../../../services';
 jest.mock('../../../../../../services', () => ({
   API: {
     ImportacaoDados: {
-      postImportacaoArquivos: jest.fn(),
-      getImportacaoArquivos: jest.fn(),
+      postImportacaoArquivosVagas: jest.fn(),
+      getUltimasImportacoesArquivosVagas: jest.fn(),
     },
   },
 }));
@@ -101,49 +100,45 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
   });
 
   describe('types.ts - Interfaces e Tipos', () => {
-    it('deve definir corretamente IImportacaoHabilitadosFiltros', () => {
-      const filtros: IImportacaoHabilitadosFiltros = {
-        concurso: 'CONCURSO_001',
+    it('deve definir corretamente IImportacaoVagasForm', () => {
+      const form: IImportacaoVagasForm = {
+        cargo: 'CARGO_001',
         arquivo: new File(['test'], 'test.csv', { type: 'text/csv' }),
+        metodo_de_importacao: 1,
+        opcoes_de_importacao: 'opcao1',
       };
 
-      expect(filtros.concurso).toBe('CONCURSO_001');
-      expect(filtros.arquivo).toBeInstanceOf(File);
-      expect(filtros.arquivo?.name).toBe('test.csv');
+      expect(form.cargo).toBe('CARGO_001');
+      expect(form.arquivo).toBeInstanceOf(File);
+      expect(form.arquivo?.name).toBe('test.csv');
+      expect(form.metodo_de_importacao).toBe(1);
+      expect(form.opcoes_de_importacao).toBe('opcao1');
     });
 
-    it('deve definir corretamente IImportacaoHabilitadosFiltros com valores undefined/null', () => {
-      const filtros: IImportacaoHabilitadosFiltros = {
-        concurso: undefined,
+    it('deve definir corretamente IImportacaoVagasForm com valores undefined/null', () => {
+      const form: IImportacaoVagasForm = {
+        cargo: undefined,
         arquivo: null,
+        metodo_de_importacao: 1,
       };
 
-      expect(filtros.concurso).toBeUndefined();
-      expect(filtros.arquivo).toBeNull();
+      expect(form.cargo).toBeUndefined();
+      expect(form.arquivo).toBeNull();
+      expect(form.metodo_de_importacao).toBe(1);
     });
 
-    it('deve definir corretamente IUltimaImportacaoHabilitados', () => {
-      const ultimaImportacao: IUltimaImportacaoHabilitados = {
-        arquivo: 'arquivo.csv',
-        concurso: 'CONCURSO_001',
-        data_importacao: '2024-01-01T10:00:00Z',
-      };
-
-      expect(ultimaImportacao.arquivo).toBe('arquivo.csv');
-      expect(ultimaImportacao.concurso).toBe('CONCURSO_001');
-      expect(ultimaImportacao.data_importacao).toBe('2024-01-01T10:00:00Z');
-    });
-
-    it('deve definir corretamente IImportacaoHabilitadosPayload', () => {
-      const payload: IImportacaoHabilitadosPayload = {
-        concurso: 'CONCURSO_001',
+    it('deve definir corretamente IImportacaoVagasPayload', () => {
+      const payload: IImportacaoVagasPayload = {
+        cargo: 'CARGO_001',
         arquivo: new File(['test'], 'test.csv', { type: 'text/csv' }),
-        tipo: 'HABILITADOS',
+        tipo: 'VAGAS',
+        opcoes_de_importacao: 'opcao1',
       };
 
-      expect(payload.concurso).toBe('CONCURSO_001');
+      expect(payload.cargo).toBe('CARGO_001');
       expect(payload.arquivo).toBeInstanceOf(File);
-      expect(payload.tipo).toBe('HABILITADOS');
+      expect(payload.tipo).toBe('VAGAS');
+      expect(payload.opcoes_de_importacao).toBe('opcao1');
     });
   });
 
@@ -157,18 +152,22 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     it('deve validar dados corretos', async () => {
       const schema = useImportacaoSchema();
       const validData = {
-        concurso: 'CONCURSO_001',
+        cargo: 'CARGO_001',
         arquivo: new File(['test'], 'test.csv', { type: 'text/csv' }),
+        metodo_de_importacao: 1,
+        data_fechamento_modulo: '2024-01-01',
       };
 
       const isValid = await schema.isValid(validData);
       expect(isValid).toBe(true);
     });
 
-    it('deve rejeitar quando concurso está ausente', async () => {
+    it('deve rejeitar quando cargo está ausente', async () => {
       const schema = useImportacaoSchema();
       const invalidData = {
         arquivo: new File(['test'], 'test.csv', { type: 'text/csv' }),
+        metodo_de_importacao: 1,
+        data_fechamento_modulo: '2024-01-01',
       };
 
       const isValid = await schema.isValid(invalidData);
@@ -177,14 +176,15 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       try {
         await schema.validate(invalidData);
       } catch (error) {
-        expect(error.message).toBe('Concurso é obrigatório');
+        expect(error.message).toBe('Cargo é obrigatório, selecione um cargo');
       }
     });
 
     it('deve rejeitar quando arquivo está ausente', async () => {
       const schema = useImportacaoSchema();
       const invalidData = {
-        concurso: 'CONCURSO_001',
+        cargo: 'CARGO_001',
+        metodo_de_importacao: 2,
       };
 
       const isValid = await schema.isValid(invalidData);
@@ -200,8 +200,9 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     it('deve rejeitar arquivo que não é CSV por tipo MIME', async () => {
       const schema = useImportacaoSchema();
       const invalidData = {
-        concurso: 'CONCURSO_001',
+        cargo: 'CARGO_001',
         arquivo: new File(['test'], 'test.txt', { type: 'text/plain' }),
+        metodo_de_importacao: 2,
       };
 
       const isValid = await schema.isValid(invalidData);
@@ -217,8 +218,9 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     it('deve rejeitar arquivo que não é CSV por extensão', async () => {
       const schema = useImportacaoSchema();
       const invalidData = {
-        concurso: 'CONCURSO_001',
+        cargo: 'CARGO_001',
         arquivo: new File(['test'], 'test.txt', { type: 'text/plain' }),
+        metodo_de_importacao: 2,
       };
 
       const isValid = await schema.isValid(invalidData);
@@ -234,8 +236,9 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     it('deve aceitar arquivo CSV por extensão mesmo sem tipo MIME correto', async () => {
       const schema = useImportacaoSchema();
       const validData = {
-        concurso: 'CONCURSO_001',
+        cargo: 'CARGO_001',
         arquivo: new File(['test'], 'test.csv', { type: 'application/octet-stream' }),
+        metodo_de_importacao: 2,
       };
 
       const isValid = await schema.isValid(validData);
@@ -245,8 +248,9 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     it('deve aceitar arquivo CSV por tipo MIME mesmo sem extensão .csv', async () => {
       const schema = useImportacaoSchema();
       const validData = {
-        concurso: 'CONCURSO_001',
+        cargo: 'CARGO_001',
         arquivo: new File(['test'], 'test', { type: 'text/csv' }),
+        metodo_de_importacao: 2,
       };
 
       const isValid = await schema.isValid(validData);
@@ -256,8 +260,9 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     it('deve rejeitar quando arquivo é null/undefined no teste de validação', async () => {
       const schema = useImportacaoSchema();
       const invalidData = {
-        concurso: 'CONCURSO_001',
+        cargo: 'CARGO_001',
         arquivo: null,
+        metodo_de_importacao: 2,
       };
 
       const isValid = await schema.isValid(invalidData);
@@ -282,17 +287,17 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     ];
 
     beforeEach(() => {
-      (API.ImportacaoDados.postImportacaoArquivos as jest.Mock).mockResolvedValue({
+      (API.ImportacaoDados.postImportacaoArquivosVagas as jest.Mock).mockResolvedValue({
         response: mockPostResponse,
       });
-      (API.ImportacaoDados.getImportacaoArquivos as jest.Mock).mockResolvedValue({
+      (API.ImportacaoDados.getUltimasImportacoesArquivosVagas as jest.Mock).mockResolvedValue({
         response: mockGetResponse,
       });
     });
 
     it('deve inicializar com valores padrão corretos', () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
       expect(result.current.control).toBeDefined();
       expect(result.current.handleSubmit).toBeDefined();
@@ -304,27 +309,29 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve executar query para buscar importações', async () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
       // Verificar se o hook inicializa corretamente
       expect(result.current.importacoesArquivosIsLoading).toBe(true);
       expect(result.current.importacoesArquivos).toBeUndefined();
 
       // Verificar se a API foi chamada
-      expect(API.ImportacaoDados.getImportacaoArquivos).toHaveBeenCalledWith(
-        { tipo: 'HABILITADOS' },
+      expect(API.ImportacaoDados.getUltimasImportacoesArquivosVagas).toHaveBeenCalledWith(
+        { tipo: 'VAGAS' },
         expect.objectContaining({ signal: expect.any(AbortSignal) })
       );
     });
 
     it('deve executar handleEnviarForm com sucesso', async () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
       const testFile = new File(['test'], 'test.csv', { type: 'text/csv' });
       const formData = {
-        concurso: 'CONCURSO_001',
+        cargo: 'CARGO_001',
         arquivo: testFile,
+        metodo_de_importacao: 2,
+        opcoes_de_importacao: 'opcao1',
       };
 
       await act(async () => {
@@ -332,44 +339,34 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       });
 
       // Verificar se a API foi chamada com os parâmetros corretos
-      expect(API.ImportacaoDados.postImportacaoArquivos).toHaveBeenCalledWith({
-        concurso: 'CONCURSO_001',
+      expect(API.ImportacaoDados.postImportacaoArquivosVagas).toHaveBeenCalledWith({
         arquivo: testFile,
-        tipo: 'HABILITADOS',
+        tipo: 'VAGAS',
+        opcoes_de_importacao: 'opcao1',
       });
     });
 
 
-    it('deve retornar early quando arquivo ou concurso estão ausentes', async () => {
+    it('deve retornar early quando metodo_de_importacao é 1', async () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
-      const formDataSemArquivo = {
-        concurso: 'CONCURSO_001',
-        arquivo: null,
-      };
-
-      await act(async () => {
-        await result.current.handleEnviarForm(formDataSemArquivo);
-      });
-
-      expect(API.ImportacaoDados.postImportacaoArquivos).not.toHaveBeenCalled();
-
-      const formDataSemConcurso = {
-        concurso: undefined,
+      const formDataComMetodo1 = {
+        cargo: 'CARGO_001',
         arquivo: new File(['test'], 'test.csv', { type: 'text/csv' }),
+        metodo_de_importacao: 1,
       };
 
       await act(async () => {
-        await result.current.handleEnviarForm(formDataSemConcurso);
+        await result.current.handleEnviarForm(formDataComMetodo1);
       });
 
-      expect(API.ImportacaoDados.postImportacaoArquivos).not.toHaveBeenCalled();
+      expect(API.ImportacaoDados.postImportacaoArquivosVagas).not.toHaveBeenCalled();
     });
 
     it('deve executar handleReset corretamente', () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
       act(() => {
         result.current.handleReset();
@@ -381,7 +378,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve executar handleFileUpload corretamente', () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
       const testFile = new File(['test'], 'test.csv', { type: 'text/csv' });
 
@@ -395,15 +392,17 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve mostrar estado de loading durante criação', async () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
       // Verificar estado inicial
       expect(result.current.isCreatingImportacao).toBe(false);
 
       const testFile = new File(['test'], 'test.csv', { type: 'text/csv' });
       const formData = {
-        concurso: 'CONCURSO_001',
+        cargo: 'CARGO_001',
         arquivo: testFile,
+        metodo_de_importacao: 2,
+        opcoes_de_importacao: 'opcao1',
       };
 
       // Executar função para testar cobertura
@@ -412,25 +411,27 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       });
 
       // Verificar se a função foi executada
-      expect(API.ImportacaoDados.postImportacaoArquivos).toHaveBeenCalled();
+      expect(API.ImportacaoDados.postImportacaoArquivosVagas).toHaveBeenCalled();
     });
 
 
 
     it('deve testar catch block no handleEnviarForm', async () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
       // Mock para simular erro no mutateAsync
       const error = new Error('Erro no mutateAsync');
-      (API.ImportacaoDados.postImportacaoArquivos as jest.Mock).mockImplementation(() => {
+      (API.ImportacaoDados.postImportacaoArquivosVagas as jest.Mock).mockImplementation(() => {
         throw error;
       });
 
       const testFile = new File(['test'], 'test.csv', { type: 'text/csv' });
       const formData = {
-        concurso: 'CONCURSO_001',
+        cargo: 'CARGO_001',
         arquivo: testFile,
+        metodo_de_importacao: 2,
+        opcoes_de_importacao: 'opcao1',
       };
 
       await act(async () => {
@@ -442,22 +443,22 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       });
 
       // Verificar se a função foi executada
-      expect(API.ImportacaoDados.postImportacaoArquivos).toHaveBeenCalled();
+      expect(API.ImportacaoDados.postImportacaoArquivosVagas).toHaveBeenCalled();
     });
 
     it('deve configurar query com parâmetros corretos', () => {
       const wrapper = createWrapper();
-      renderHook(() => useImportacaoDados(), { wrapper });
+      renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
-      expect(API.ImportacaoDados.getImportacaoArquivos).toHaveBeenCalledWith(
-        { tipo: 'HABILITADOS' },
+      expect(API.ImportacaoDados.getUltimasImportacoesArquivosVagas).toHaveBeenCalledWith(
+        { tipo: 'VAGAS' },
         expect.objectContaining({ signal: expect.any(AbortSignal) })
       );
     });
 
     it('deve retornar todas as propriedades necessárias', () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
       expect(result.current).toHaveProperty('control');
       expect(result.current).toHaveProperty('handleSubmit');
@@ -470,6 +471,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       expect(result.current).toHaveProperty('watch');
       expect(result.current).toHaveProperty('isCreatingImportacao');
       expect(result.current).toHaveProperty('createImportacaoError');
+      expect(result.current).toHaveProperty('isValid');
     });
   });
 });

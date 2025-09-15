@@ -5,6 +5,7 @@ import React from 'react';
 import * as yup from 'yup';
 import { useImportacaoDados } from '../useImportacaoDados';
 import useImportacaoSchema from '../useImportacaoSchema';
+import { useConcursos } from '../../../../NovaConvocacaoCandidatos/hooks/useConcursos';
 import type { 
   IImportacaoHabilitadosFiltros, 
   IImportacaoHabilitadosPayload,
@@ -16,10 +17,15 @@ import { API } from '../../../../../../services';
 jest.mock('../../../../../../services', () => ({
   API: {
     ImportacaoDados: {
-      postImportacaoArquivos: jest.fn(),
+      postImportacaoArquivosHabilitados: jest.fn(),
       getImportacaoArquivos: jest.fn(),
     },
   },
+}));
+
+// Mock do hook useConcursos
+jest.mock('../../../../NovaConvocacaoCandidatos/hooks/useConcursos', () => ({
+  useConcursos: jest.fn(),
 }));
 
 // Mock completo do console para evitar logs nos testes
@@ -79,6 +85,7 @@ const createWrapper = () => {
 describe('ImportacaoDados Hooks - Cobertura Completa', () => {
   let mockNotification: any;
   let mockQueryClient: any;
+  const mockUseConcursos = useConcursos as jest.MockedFunction<typeof useConcursos>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -97,6 +104,15 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     // Mock do App.useApp
     jest.spyOn(App, 'useApp').mockReturnValue({
       notification: mockNotification,
+    });
+
+    // Mock do useConcursos
+    mockUseConcursos.mockReturnValue({
+      concursosData: [
+        { value: 'CONCURSO_001', label: 'Concurso Teste 1' },
+        { value: 'CONCURSO_002', label: 'Concurso Teste 2' },
+      ],
+      concursosIsLoading: false,
     });
   });
 
@@ -282,7 +298,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     ];
 
     beforeEach(() => {
-      (API.ImportacaoDados.postImportacaoArquivos as jest.Mock).mockResolvedValue({
+      (API.ImportacaoDados.postImportacaoArquivosHabilitados as jest.Mock).mockResolvedValue({
         response: mockPostResponse,
       });
       (API.ImportacaoDados.getImportacaoArquivos as jest.Mock).mockResolvedValue({
@@ -312,8 +328,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
       // Verificar se a API foi chamada
       expect(API.ImportacaoDados.getImportacaoArquivos).toHaveBeenCalledWith(
-        { tipo: 'HABILITADOS' },
-        expect.objectContaining({ signal: expect.any(AbortSignal) })
+        { signal: expect.any(AbortSignal) }
       );
     });
 
@@ -332,8 +347,9 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       });
 
       // Verificar se a API foi chamada com os parâmetros corretos
-      expect(API.ImportacaoDados.postImportacaoArquivos).toHaveBeenCalledWith({
-        concurso: 'CONCURSO_001',
+      expect(API.ImportacaoDados.postImportacaoArquivosHabilitados).toHaveBeenCalledWith({
+        concurso_nome: 'Concurso Teste 1',
+        concurso_uuid: 'CONCURSO_001',
         arquivo: testFile,
         tipo: 'HABILITADOS',
       });
@@ -353,7 +369,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
         await result.current.handleEnviarForm(formDataSemArquivo);
       });
 
-      expect(API.ImportacaoDados.postImportacaoArquivos).not.toHaveBeenCalled();
+      expect(API.ImportacaoDados.postImportacaoArquivosHabilitados).not.toHaveBeenCalled();
 
       const formDataSemConcurso = {
         concurso: undefined,
@@ -364,7 +380,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
         await result.current.handleEnviarForm(formDataSemConcurso);
       });
 
-      expect(API.ImportacaoDados.postImportacaoArquivos).not.toHaveBeenCalled();
+      expect(API.ImportacaoDados.postImportacaoArquivosHabilitados).not.toHaveBeenCalled();
     });
 
     it('deve executar handleReset corretamente', () => {
@@ -412,7 +428,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       });
 
       // Verificar se a função foi executada
-      expect(API.ImportacaoDados.postImportacaoArquivos).toHaveBeenCalled();
+      expect(API.ImportacaoDados.postImportacaoArquivosHabilitados).toHaveBeenCalled();
     });
 
 
@@ -423,7 +439,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
       // Mock para simular erro no mutateAsync
       const error = new Error('Erro no mutateAsync');
-      (API.ImportacaoDados.postImportacaoArquivos as jest.Mock).mockImplementation(() => {
+      (API.ImportacaoDados.postImportacaoArquivosHabilitados as jest.Mock).mockImplementation(() => {
         throw error;
       });
 
@@ -442,7 +458,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       });
 
       // Verificar se a função foi executada
-      expect(API.ImportacaoDados.postImportacaoArquivos).toHaveBeenCalled();
+      expect(API.ImportacaoDados.postImportacaoArquivosHabilitados).toHaveBeenCalled();
     });
 
     it('deve configurar query com parâmetros corretos', () => {
@@ -450,8 +466,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       renderHook(() => useImportacaoDados(), { wrapper });
 
       expect(API.ImportacaoDados.getImportacaoArquivos).toHaveBeenCalledWith(
-        { tipo: 'HABILITADOS' },
-        expect.objectContaining({ signal: expect.any(AbortSignal) })
+        { signal: expect.any(AbortSignal) }
       );
     });
 
