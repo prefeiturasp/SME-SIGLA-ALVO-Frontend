@@ -2,7 +2,7 @@ import React from "react";
 import { Typography } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import BaseScreen, { type TitleItem } from "../../../BaseScreen";
- 
+
 import LayoutPadrao from "../Habilitados/components/LayoutPadrao";
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../../services";
@@ -15,14 +15,20 @@ const breadcrumbItems = [
   { title: "Importação de dados" },
 ] as TitleItem[];
 
-const LayoutPadraoVagas: React.FC = () => {
- 
-   const { data: dataLayout, isLoading: importacoesArquivosIsLoading } = useQuery({
+
+
+interface LayoutPadraoProps {
+  tipo?: string,
+}
+
+const LayoutPadraoVagas: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) => {
+
+  const { data: dataLayout, isLoading: importacoesArquivosIsLoading } = useQuery({
     queryKey: ["getLayout"],
     queryFn: ({ signal }) =>
       API.ImportacaoDados.getLayout(
         {
-          tipo: "VAGAS",
+          tipo: tipo,
         },
         { signal }
       ).response,
@@ -32,15 +38,22 @@ const LayoutPadraoVagas: React.FC = () => {
 
 
   const navigate = useNavigate();
+  
+  const handleVoltar = () => {
+    navigate('/processos/importacao-dados', { state: { tipo: tipo } }); 
+  };
 
-    return (
-      <BaseScreen
-        breadcrumbItems={breadcrumbItems}
-        title="Importação de dados"
-      >
-        <LayoutPadrao title={'Layout: Arquivo de Vagas'} onVoltar={()=> navigate(-1)}  dataSource={dataLayout||[]} />
-      </BaseScreen>
-    ); 
+  return (
+    <BaseScreen
+      breadcrumbItems={breadcrumbItems}
+      title="Importação de dados"
+    >
+      <LayoutPadrao
+        loading={importacoesArquivosIsLoading}
+        title={tipo === 'VAGAS' ? 'Layout: Arquivo de Vagas' : 'Layout: Arquivo de Aprovados (HABILITADOS)'}
+        onVoltar={handleVoltar} dataSource={dataLayout?.results[0].estrutura || []} />
+    </BaseScreen>
+  );
 };
 
 export default LayoutPadraoVagas;

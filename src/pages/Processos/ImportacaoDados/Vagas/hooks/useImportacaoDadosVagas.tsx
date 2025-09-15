@@ -1,13 +1,12 @@
 import { useForm, type Resolver } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { App } from "antd";
 import { API } from "../../../../../services";
 import useImportacaoVagasSchema from "./useImportacaoVagasSchema";
 import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
 
 export const useImportacaoDadosVagas = () => {
-  const queryClient = useQueryClient();
   const { notification } = App.useApp();
 
   const defaultValues = {
@@ -15,7 +14,9 @@ export const useImportacaoDadosVagas = () => {
     arquivo: null,
     tipo: "VAGAS",
     metodo_de_importacao: 1,
-   };
+  };
+
+  const importacaoVagasSchema = useImportacaoVagasSchema();
 
   const {
     control,
@@ -27,20 +28,31 @@ export const useImportacaoDadosVagas = () => {
     formState: { errors: formErrors, isValid },
   } = useForm<IImportacaoVagasForm>({
     defaultValues,
-    resolver: yupResolver(useImportacaoVagasSchema()) as Resolver<IImportacaoVagasForm>,
+    resolver: yupResolver(importacaoVagasSchema) as Resolver<IImportacaoVagasForm>,
     reValidateMode: "onChange",
     mode: "onChange",
     shouldFocusError: false,
   });
 
-  // Mutation para post de importação de arquivos
-  const postImportacaoArquivosMutation = useMutation({
-    mutationFn: (payload: IImportacaoVagasPayload) => API.ImportacaoDados.postImportacaoArquivos(payload).response,
-    onSuccess: () => {
-      // Invalidar queries relacionadas após sucesso
-      queryClient.invalidateQueries({ queryKey: ["getImportacaoArquivosHabilitados"] });
+  // Query para buscar importações com parâmetros
+  const { data: importacoesArquivos, isLoading: importacoesArquivosIsLoading, refetch: importacoesArquivosRefetch } = useQuery({
+    queryKey: ["getImportacaoArquivosVagas"],
+    queryFn: ({ signal }) =>
+      API.ImportacaoDados.getUltimasImportacoesArquivosVagas(
+        {
+          tipo: "VAGAS",
+        },
+        { signal }
+      ).response,
+    staleTime: 1000 * 60 * 5,
+    retry: 0,
+  });
 
-      // Mostrar notificação de sucesso
+  // Mutation para post de importação de arquivos
+  const postImportacaoArquivosVagasMutation = useMutation({
+    mutationFn: (payload: IImportacaoVagasPayload) => API.ImportacaoDados.postImportacaoArquivosVagas(payload).response,
+    onSuccess: () => {
+      importacoesArquivosRefetch();
       notification.success({
         message: "Importação Realizada",
         description: "A importação dos dados foi processada com sucesso!",
@@ -60,31 +72,23 @@ export const useImportacaoDadosVagas = () => {
   });
 
 
-  // Query para buscar importações com parâmetros
-  const { data: importacoesArquivos, isLoading: importacoesArquivosIsLoading } = useQuery({
-    queryKey: ["getImportacaoArquivosVagas"],
-    queryFn: ({ signal }) =>
-      API.ImportacaoDados.getUltimasImportacoesArquivos(
-        {
-          tipo: "VAGAS",
-        },
-        { signal }
-      ).response,
-    staleTime: 1000 * 60 * 5,
-    retry: 0,
-  });
 
   const handleEnviarForm = async (data: IImportacaoVagasForm) => {
-    console.error("Arquivo e cargo são obrigatórios", data);
+
+    if (data.metodo_de_importacao === 1) {
+      console.log("A funcionalidade webservice ainda não foi impementada")
+      return
+    };
 
 
     const payload: IImportacaoVagasPayload = {
       arquivo: data.arquivo!,
       tipo: "VAGAS",
+      opcoes_de_importacao:data.opcoes_de_importacao
     };
 
     try {
-      const result = await postImportacaoArquivosMutation.mutateAsync(payload);
+      const result = await postImportacaoArquivosVagasMutation.mutateAsync(payload);
       console.log("Importação criada com sucesso:", result);
       reset(defaultValues);
     } catch (error) {
@@ -111,8 +115,8 @@ export const useImportacaoDadosVagas = () => {
     handleReset,
     handleFileUpload,
     watch,
-    isCreatingImportacao: postImportacaoArquivosMutation.isPending,
-    createImportacaoError: postImportacaoArquivosMutation.error,
+    isCreatingImportacao: postImportacaoArquivosVagasMutation.isPending,
+    createImportacaoError: postImportacaoArquivosVagasMutation.error,
     isValid
   };
 };

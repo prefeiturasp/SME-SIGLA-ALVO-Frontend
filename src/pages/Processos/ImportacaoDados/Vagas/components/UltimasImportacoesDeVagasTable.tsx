@@ -16,7 +16,8 @@ const UltimasImportacoesDeVagasTable: React.FC<UltimasImportacoesDeVagasTablePro
     {
       title: "Método de importação",
       dataIndex: "metodo_de_importacao",
-      key: "metodo_de_importacao",
+      key: "metodo_de_importacao",      
+      render: () => 'arquivo'      
     },
 
     {
@@ -34,6 +35,8 @@ const UltimasImportacoesDeVagasTable: React.FC<UltimasImportacoesDeVagasTablePro
       title: "Opções de importação",
       dataIndex: "opcoes_de_importacao",
       key: "opcoes_de_importacao",
+      render: () => 'Ajustar'      
+
     },
     {
       title: "Data da importação",

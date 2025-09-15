@@ -13,6 +13,11 @@ export interface IUltimasImportacoesVagas {
   data_importacao: string;  
 }
 
+
+export interface IGetLayout {    
+      atualizado_em: string,
+      estrutura:ILayout[],
+}
 export interface ILayout {
       key: string,
       ordem: number,

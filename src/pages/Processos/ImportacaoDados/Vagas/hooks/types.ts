@@ -22,6 +22,7 @@ export interface IImportacaoVagasForm {
   opcoes_de_importacao?: string;
  }
 export interface IImportacaoVagasPayload {
+  opcoes_de_importacao?: string;
   cargo?: string;
   arquivo: File;
   tipo: string;  

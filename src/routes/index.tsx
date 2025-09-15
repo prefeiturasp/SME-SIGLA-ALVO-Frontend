@@ -31,7 +31,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/processos/importacao-dados/layout-padrao-vagas",
-    element: <LayoutPadraoVagas />,
+    element: <LayoutPadraoVagas tipo={'VAGAS'}/>,
+  },
+    {
+    path: "/processos/importacao-dados/layout-padrao-habilitados",
+    element: <LayoutPadraoVagas tipo={'HABILITADOS'}/>,
   },
   
   {
