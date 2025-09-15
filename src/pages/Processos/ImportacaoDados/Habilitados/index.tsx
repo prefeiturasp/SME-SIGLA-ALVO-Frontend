@@ -144,3 +144,5 @@ const Habilitados: React.FC<HabilitadosProps> = ({ onShowHistorico, onShowLayout
 };
 
 export default Habilitados;
+
+

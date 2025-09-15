@@ -4,6 +4,28 @@ export interface IImportacaoFundacao {
   concurso: string;
   data_importacao: string;
 }
+export interface IUltimasImportacoesVagas {
+  uuid: string;
+  metodo_de_importacao: string;
+  data_de_fechamento_do_modulo: string;
+  cargo: string;
+  opcoes_de_importacao: string;
+  data_importacao: string;  
+}
+
+
+export interface IGetLayout {    
+      atualizado_em: string,
+      estrutura:ILayout[],
+}
+export interface ILayout {
+      key: string,
+      ordem: number,
+      campo: string,
+      tipoDado: string,
+      tamanho: number,
+      regrasValidacao: string,
+}
 
 export interface ILayoutCampo {
   key: string;
@@ -47,8 +69,7 @@ export interface ILayoutPadrao {
 // export interface IImportacaoRequest {
 //   concurso: string;
 //   arquivo: File;
-//   ignorar_primeira_linha: boolean;
-// }
+ // }
 
 // export interface IImportacaoResponse {
 //   id: string;

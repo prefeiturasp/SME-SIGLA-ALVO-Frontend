@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Typography } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import {
   StyledTabs,
@@ -12,10 +12,7 @@ import VagasSistemaIngresso from "./VagasSistemaIngresso";
 import Habilitados from "./Habilitados";
 import EscolhasEOL from "./EscolhasEOL";
 import Historico from "./Habilitados/components/Historico";
-import LayoutPadrao from "./Habilitados/components/LayoutPadrao";
-import { useLayoutPadrao } from "./Habilitados/hooks/useLayoutPadrao";
-import type { ILayoutPadrao } from "../../../services/resources/importacaoDados/IImportacaoArquivos";
-
+ 
 const { Text } = Typography;
 
 const breadcrumbItems = [
@@ -25,11 +22,14 @@ const breadcrumbItems = [
 ] as TitleItem[];
 
 const ImportacaoDados: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("fundacao");
+
+  const location = useLocation();
+  const tipo = location.state?.tipo; 
+  const [activeTab, setActiveTab] = useState(tipo||"VAGAS");
   const [showHistorico, setShowHistorico] = useState(false);
-  const [showLayoutPadrao, setShowLayoutPadrao] = useState(false);
-  const [layoutTipo, setLayoutTipo] = useState<string>("habilitados");
   
+  const navigate = useNavigate();
+
 
   const handleShowHistorico = () => {
     setShowHistorico(true);
@@ -39,26 +39,23 @@ const ImportacaoDados: React.FC = () => {
     setShowHistorico(false);
   };
 
-  const handleShowLayoutPadrao = (tipo: string = "habilitados") => {
-    setLayoutTipo(tipo);
-    setShowLayoutPadrao(true);
+  const handleShowLayoutPadrao = () => {    
+    navigate('/processos/importacao-dados/layout-padrao-habilitados')
+
   };
 
-  const handleBackFromLayoutPadrao = () => {
-    setShowLayoutPadrao(false);
+  const handleShowLayoutPadraoVagas = () => {    
+    navigate('/processos/importacao-dados/layout-padrao-vagas')
   };
 
-  // Hook para buscar dados do layout padrão
-  const { layoutData, isLoading: layoutIsLoading } = useLayoutPadrao({
-    tipo: layoutTipo,
-    enabled: showLayoutPadrao,
-  });
-
+ 
   const tabItems = [
     {
-      key: "vagas",
+      key: "VAGAS",
       label: "Vagas",
-      children: <Vagas onShowLayoutPadrao={() => handleShowLayoutPadrao("vagas")} />,
+      children: <Vagas
+          onShowLayoutPadrao={handleShowLayoutPadraoVagas}
+      />,
     },
     {
       key: "vagas-sistema",
@@ -66,11 +63,11 @@ const ImportacaoDados: React.FC = () => {
       children: <VagasSistemaIngresso />,
     },
     {
-      key: "fundacao",
+      key: "HABILITADOS",
       label: "Habilitados",
       children: <Habilitados 
         onShowHistorico={handleShowHistorico}
-        onShowLayoutPadrao={() => handleShowLayoutPadrao("habilitados")}
+        onShowLayoutPadrao={() => handleShowLayoutPadrao()}
       />,
     },
     {
@@ -92,21 +89,8 @@ const ImportacaoDados: React.FC = () => {
     );
   }
 
-  // Se estiver mostrando o layout padrão, renderiza apenas o componente LayoutPadrao
-  if (showLayoutPadrao) {
-    return (
-      <BaseScreen
-        breadcrumbItems={breadcrumbItems}
-        title="Importação de dados"
-      >
-        <LayoutPadrao 
-          onVoltar={handleBackFromLayoutPadrao}
-          layoutData={layoutData as ILayoutPadrao | undefined}
-          isLoading={layoutIsLoading}
-        />
-      </BaseScreen>
-    );
-  }
+
+  
 
   return (
     <BaseScreen

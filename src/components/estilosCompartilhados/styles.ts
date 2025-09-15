@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Modal, Table, Typography, Select, Upload, Button, Card } from "antd";
+  
 
 const { Text } = Typography;
  
@@ -123,6 +124,14 @@ export const StyledTable = styled(Table)`
   }
   box-shadow: 0px 6px 18px 0px rgba(0, 0, 0, 0.06);
 `;
+
+ 
+ 
+ 
+
+ 
+
+
 
 // Container para renderização de texto com quebra de linha
 export const MultilineText = styled.div`

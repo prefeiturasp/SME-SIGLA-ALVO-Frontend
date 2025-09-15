@@ -25,6 +25,7 @@ export const useImportacaoDados = () => {
     reset,
     watch,
     setValue,
+    clearErrors,
     formState: { errors: formErrors },
   } = useForm<IImportacaoHabilitadosFiltros>({
     defaultValues,
@@ -36,7 +37,7 @@ export const useImportacaoDados = () => {
 
   // Mutation para post de importação de arquivos
   const postImportacaoArquivosMutation = useMutation({
-    mutationFn: (payload: IImportacaoHabilitadosPayload) => API.ImportacaoDados.postImportacaoArquivos(payload).response,
+    mutationFn: (payload: IImportacaoHabilitadosPayload) => API.ImportacaoDados.postImportacaoArquivosHabilitados(payload).response,
     onSuccess: () => {
       console.log("Sucesso");
       // Invalidar queries relacionadas após sucesso
@@ -78,8 +79,7 @@ export const useImportacaoDados = () => {
     queryKey: ["getImportacaoArquivosHabilitados"],
     queryFn: ({ signal }) =>
       API.ImportacaoDados.getImportacaoArquivos(
-        "habilitados",
-        { signal }
+         { signal }
       ).response,
     staleTime: 1000 * 60 * 5,
     retry: 0,
@@ -121,7 +121,10 @@ export const useImportacaoDados = () => {
   };
 
   const handleFileUpload = (file: File) => {
-    setValue("arquivo", file);
+     setValue("arquivo", file, { shouldValidate: true });
+    clearErrors("arquivo"); 
+
+
   };
 
   return {
