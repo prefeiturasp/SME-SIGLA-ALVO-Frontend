@@ -3,7 +3,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import dayjs from "dayjs";
 import { Button, Space, Typography } from "antd";
-import { SecondaryButton,StyledTable } from "../../../../../../components/estilosCompartilhados/styles";
+import { StyledTable } from "../../../../../../components/estilosCompartilhados/styles";
 import { useImportacaoDados } from "../../hooks/useImportacaoDados";
 
 
@@ -105,9 +105,18 @@ const Historico: React.FC<HistoricoProps> = ({ data, onVoltar, ...rest }) => {
       />
 
       <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
-        <SecondaryButton size="large" onClick={handleVoltar}>
+        <Button
+          type="primary"
+          ghost
+          size="large"
+          onClick={handleVoltar}
+          style={{
+            fontWeight: 700,
+            borderRadius: '0.375rem'
+          }}
+        >
           Voltar
-        </SecondaryButton>
+        </Button>
       </div>
     </>
   );

@@ -1,7 +1,7 @@
 import React from "react";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import dayjs from "dayjs";
-import { Row, Col, Select, DatePicker, Radio } from "antd";
+import { Row, Col, Select, DatePicker, Radio, Button } from "antd";
 import { Controller } from "react-hook-form";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -15,8 +15,6 @@ import {
   UploadArea,
   StyledUpload,
   ActionButtonsContainer,
-  SecondaryButton,
-  PrimaryButton,
 } from "../../../../components/estilosCompartilhados/styles";
 import { useCargos } from "../../NovaConvocacaoCandidatos/hooks/useCargos";
 import UltimasImportacoesDeVagasTable from "./components/UltimasImportacoesDeVagasTable";
@@ -293,22 +291,28 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
       {/* Botões de Ação */}
       <ActionButtonsContainer>
 
-        <SecondaryButton
+        <Button
+          type="primary"
+          ghost
           size="large"
           onClick={handleSubmit(handleEnviarForm)}
           disabled={isCreatingImportacao || !isValid}
           loading={importacoesArquivosIsLoading}
+          style={{
+            fontWeight: 700,
+            borderRadius: '0.375rem'
+          }}
         >
           Importar
-        </SecondaryButton>
+        </Button>
 
-        <PrimaryButton
+        <Button
           type="primary"
           size="large"
           onClick={onShowLayoutPadrao}
         >
           Layout padrão
-        </PrimaryButton>
+        </Button>
       </ActionButtonsContainer>
     </TabContentContainer>
   );

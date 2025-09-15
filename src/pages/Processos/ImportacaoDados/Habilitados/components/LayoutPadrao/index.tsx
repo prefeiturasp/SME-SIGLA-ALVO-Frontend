@@ -1,7 +1,6 @@
 import React from "react";
-import { Table, Typography } from "antd";
+import { Table, Typography, Button } from "antd";
 import { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from "./styles";
-import { SecondaryButton, PrimaryButton } from "../../../../../../components/estilosCompartilhados/styles";
 import type { ILayout } from "../../../../../../services/resources/importacaoDados/IImportacaoArquivos";
 
 const columns = [
@@ -82,18 +81,25 @@ const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ loading,onVoltar, dataSourc
       </LayoutContainer>
 
       <ButtonContainer>
-        <SecondaryButton
+        <Button
+          type="primary"
+          ghost
           size="large"
           onClick={onVoltar}
+          style={{
+            fontWeight: 700,
+            borderRadius: '0.375rem'
+          }}
         >
           Voltar
-        </SecondaryButton>
-        <PrimaryButton
+        </Button>
+        <Button
+          type="primary"
           size="large"
           onClick={handleSalvarArquivo}
         >
           Exportar
-        </PrimaryButton>
+        </Button>
       </ButtonContainer>
     </div>
   );

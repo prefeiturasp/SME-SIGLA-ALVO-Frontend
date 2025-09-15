@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Space, Typography, Select, Row, Col, Divider } from "antd";
+import { Card, Space, Typography, Select, Row, Col, Divider, Button } from "antd";
 import { Controller, type Control } from "react-hook-form";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
@@ -11,13 +11,11 @@ import SchoolIcon from "@mui/icons-material/School";
 import GroupIcon from "@mui/icons-material/Group";
 import { PlusOutlined } from "@ant-design/icons";
 import {
-  PrimaryButton,
   StyledCardPequeno,
   StyledCardGrande,
   CardIconContainer,
   CardContentContainer,
   ActionButton,
-  AddButton,
 } from "../styles";
 import VisualizarVagasModal from "./VisualizarVagasModal/VisualizarVagasModal";
 import SelecionarCandidatos from "./SelecionarCandidatos";
@@ -134,7 +132,7 @@ const Cargo: React.FC<CargoProps> = ({
           )}
         />
 
-        <PrimaryButton
+        <Button
           type="primary"
           size="large"
           onClick={buscarDadosDoCargo}
@@ -142,7 +140,7 @@ const Cargo: React.FC<CargoProps> = ({
           style={{ alignSelf: "flex-start" }}
         >
           Buscar
-        </PrimaryButton>
+        </Button>
 
         <Row gutter={0} justify="start" align="top">
           <Col style={{ paddingLeft: 0, paddingRight: 0 }}>
@@ -286,14 +284,16 @@ const Cargo: React.FC<CargoProps> = ({
           </ActionButton>
 
           <ActionButton
-            icon={<UploadFileIcon style={{ color: "gray" }} />}
+            type="primary"
+            size="large"
             disabled
           >
             Exportação de convocados
           </ActionButton>
 
           <ActionButton
-            icon={<UploadFileIcon style={{ color: "gray" }} />}
+            type="primary"
+            size="large"
             disabled
           >
             Exportação de vagas
@@ -336,9 +336,9 @@ const Cargo: React.FC<CargoProps> = ({
           ))}
         </Row>
 
-        <AddButton type="primary" icon={<PlusOutlined />} size="large">
+        <Button type="primary" icon={<PlusOutlined />} size="large">
           Adicionar Cargo
-        </AddButton>
+        </Button>
 
         <VisualizarVagasModal
           isOpen={openVisualizarVagasModal}
