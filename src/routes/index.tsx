@@ -9,6 +9,7 @@ import ConvocacaoCandidatos from "../pages/Processos/ConvocacaoCandidatos";
 import NovaConvocacaoCandidatos from "../pages/Processos/NovaConvocacaoCandidatos";
 import ImportacaoDados from "../pages/Processos/ImportacaoDados";
 import LayoutPadraoVagas from "../pages/Processos/ImportacaoDados/LayoutPadraoVagas";
+import HistoricoVagas from "../pages/Processos/ImportacaoDados/HistoricoVagas";
 
 //TODO ADD FEATURE FLAG
 
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
     path: "/processos/importacao-dados/layout-padrao-habilitados",
     element: <LayoutPadraoVagas tipo={'HABILITADOS'}/>,
   },
+    {
+    path: "/processos/importacao-dados/historico-vagas",
+    element: <HistoricoVagas />,
+  }, 
   
   {
     path: "/dashboard",
