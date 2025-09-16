@@ -12,7 +12,8 @@ const { Text } = Typography;
 const breadcrumbItems = [
   { title: <Link to="/"><Text strong>Home</Text></Link> },
   { title: <Link to="/processos"><Text strong>Processos</Text></Link> },
-  { title: "Importação de dados" },
+    { title: <Link to="/processos/importacao-dados"><Text strong>Importação de dados</Text></Link> },
+  { title: "Layout padrão" },
 ] as TitleItem[];
 
 
@@ -32,7 +33,7 @@ const LayoutPadraoVagas: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) => {
         },
         { signal }
       ).response,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
   });
 

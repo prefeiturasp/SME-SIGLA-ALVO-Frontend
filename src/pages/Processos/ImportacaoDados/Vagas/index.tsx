@@ -18,6 +18,7 @@ import {
 } from "../../../../components/estilosCompartilhados/styles";
 import { useCargos } from "../../NovaConvocacaoCandidatos/hooks/useCargos";
 import UltimasImportacoesDeVagasTable from "./components/UltimasImportacoesDeVagasTable";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -39,8 +40,11 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
     isValid = false,
   } = useImportacaoDadosVagas();
 
+  const navigate=useNavigate();
 
-
+ const onShowHistorico = () => {
+    navigate('/processos/importacao-dados/historico-vagas')
+   };
 
 
   // TODO Fazer somente a opção Arquivo
@@ -51,6 +55,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
   const watchedMetodoImportacao = watch("metodo_de_importacao");
  
   return (
+    
     <TabContentContainer>
       <SectionCard>
         <SectionTitle>
@@ -268,23 +273,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
 
           </Col>
         </Row>
-        <Row gutter={[0, 16]}>
-          <Col xs={24} sm={24}>
-
-            <UltimasImportacoesDeVagasTable
-              loading={importacoesArquivosIsLoading}
-              data={importacoesArquivos?.results || [{
-                uuid: '111',
-                metodo_de_importacao: 'WebService',
-                data_de_fechamento_do_modulo: dayjs().toString(),
-                cargo: '2650 - ESP.INF.TEC.CULT.DESP.-BIBLIOTECA',
-                opcoes_de_importacao: 'Ajustar',
-                data_importacao: dayjs().toString()
-              }]}
-              pagination={false}
-            />
-          </Col>
-        </Row>
+ 
 
       </SectionCard>
 
@@ -294,6 +283,13 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
         <Button
           type="primary"
           ghost
+          size="large"
+          onClick={onShowHistorico}
+        >
+          Histórico
+        </Button>
+
+        <Button
           size="large"
           onClick={handleSubmit(handleEnviarForm)}
           disabled={isCreatingImportacao || !isValid}
