@@ -25,7 +25,7 @@ export const useImportacaoDadosVagas = () => {
     watch,
     setValue,
     clearErrors,
-    formState: { errors: formErrors, isValid },
+    formState: { errors: formErrors },
   } = useForm<IImportacaoVagasForm>({
     defaultValues,
     resolver: yupResolver(importacaoVagasSchema) as Resolver<IImportacaoVagasForm>,
@@ -80,6 +80,15 @@ export const useImportacaoDadosVagas = () => {
       return
     };
 
+    if (!data.arquivo) {
+      notification.error({
+        message: "Arquivo é obrigatório",
+        description: "Por favor, selecione um arquivo antes de importar.",
+        placement: "top",
+        duration: 3.5,
+      });
+      return;
+    }
 
     const payload: IImportacaoVagasPayload = {
       arquivo: data.arquivo!,
@@ -117,7 +126,6 @@ export const useImportacaoDadosVagas = () => {
     watch,
     isCreatingImportacao: postImportacaoArquivosVagasMutation.isPending,
     createImportacaoError: postImportacaoArquivosVagasMutation.error,
-    isValid
   };
 };
 

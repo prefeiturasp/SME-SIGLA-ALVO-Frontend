@@ -17,7 +17,6 @@ import {
   ActionButtonsContainer,
 } from "../../../../components/estilosCompartilhados/styles";
 import { useCargos } from "../../NovaConvocacaoCandidatos/hooks/useCargos";
-import UltimasImportacoesDeVagasTable from "./components/UltimasImportacoesDeVagasTable";
 import { useNavigate } from "react-router-dom";
 
 
@@ -34,10 +33,8 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
     handleSubmit,
     handleEnviarForm,
     watch,
-    importacoesArquivos,
     importacoesArquivosIsLoading,
     isCreatingImportacao,
-    isValid = false,
   } = useImportacaoDadosVagas();
 
   const navigate=useNavigate();
@@ -285,14 +282,20 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
           ghost
           size="large"
           onClick={onShowHistorico}
+          style={{
+            fontWeight: 700,
+            borderRadius: '0.375rem'
+          }}
         >
           Histórico
         </Button>
 
         <Button
+          type="primary"
+          ghost
           size="large"
           onClick={handleSubmit(handleEnviarForm)}
-          disabled={isCreatingImportacao || !isValid}
+          disabled={isCreatingImportacao}
           loading={importacoesArquivosIsLoading}
           style={{
             fontWeight: 700,
