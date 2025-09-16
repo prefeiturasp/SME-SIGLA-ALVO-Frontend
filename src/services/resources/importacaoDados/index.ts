@@ -12,6 +12,7 @@ export const URL = {
   getLayout: () => `/api/v1/layouts/`,  
   getImportacaoArquivos: () => `/api/v1/importacao-arquivo/`,
   postImportacaoArquivosHabilitados: () => `/api/v1/importacao-arquivo/habilitados/`,
+  getImportacaoArquivosHabilitados: () => `/api/v1/importacao-arquivo/habilitados/`,
   getUltimasImportacoesArquivosVagas: () => `/api/v1/importacao-arquivo/vagas/`,
   postImportacaoArquivosVagas: () => `/api/v1/importacao-arquivo/vagas/`,
 };
@@ -54,8 +55,8 @@ export const postImportacaoArquivosHabilitados = (
   if(payload.cargo)formData.append('cargo', payload.cargo);
   formData.append('arquivo', payload.arquivo);
   formData.append('concurso_uuid', payload.concurso_uuid);
-  
-  
+  formData.append('concurso_nome', payload.concurso_nome);
+
   const response = appAxiosImportaArquivos
     .post<IImportacaoFundacao>(URL.postImportacaoArquivosHabilitados(), formData, {
       headers: {
@@ -73,20 +74,16 @@ export const postImportacaoArquivosHabilitados = (
 };
 
 // // TODO adicionar JWT no header Authorization
-export const getImportacaoArquivos = (
-  params: Record<string, any>,
+export const getImportacaoArquivosHabilitados = (
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
-
   const response = appAxiosImportaArquivos
-    .get<PaginatedResponse<IImportacaoFundacao>>(URL.getImportacaoArquivos(), {
-      params:queryParamsSerializer(params),
+    .get<PaginatedResponse<IImportacaoFundacao>>(URL.getImportacaoArquivosHabilitados(), {
       signal,
       ...axiosRequestConfig,
     })
     .then((response) => response.data);
-
   return {
     response,
     abort,

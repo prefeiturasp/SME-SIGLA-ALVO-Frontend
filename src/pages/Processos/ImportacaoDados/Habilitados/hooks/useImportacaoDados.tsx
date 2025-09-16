@@ -42,7 +42,6 @@ export const useImportacaoDados = () => {
       console.log("Sucesso");
       // Invalidar queries relacionadas após sucesso
       queryClient.invalidateQueries({ queryKey: ["getImportacaoArquivosHabilitados"] });
-      
       // Mostrar notificação de sucesso
       notification.success({
         message: "Importação Realizada",
@@ -62,23 +61,11 @@ export const useImportacaoDados = () => {
     },
   });
 
-  // Effect para mostrar notificação de erro
-  // useEffect(() => {
-  //   if (postImportacaoArquivosMutation.error) {
-  //     notification.error({
-  //       message: "Erro na Importação",
-  //       description: "Ocorreu um erro ao processar a importação dos dados. Tente novamente.",
-  //       placement: "top",
-  //       duration: 3.5,
-  //     });
-  //   }
-  // }, [postImportacaoArquivosMutation.error]);
-
   // Query para buscar importações com parâmetros
   const { data: importacoesArquivos, isLoading: importacoesArquivosIsLoading } = useQuery({
     queryKey: ["getImportacaoArquivosHabilitados"],
     queryFn: ({ signal }) =>
-      API.ImportacaoDados.getImportacaoArquivos(
+      API.ImportacaoDados.getImportacaoArquivosHabilitados(
          { signal }
       ).response,
     staleTime: 1000 * 60 * 5,
