@@ -287,9 +287,9 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
           onClick={onShowHistorico}
         >
           Histórico
-        </SecondaryButton>
+        </Button>
 
-        <SecondaryButton
+        <Button
           size="large"
           onClick={handleSubmit(handleEnviarForm)}
           disabled={isCreatingImportacao || !isValid}
