@@ -290,14 +290,10 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
         </Button>
 
         <Button
+          type="primary"
+          ghost
           size="large"
           onClick={handleSubmit(handleEnviarForm)}
-          disabled={isCreatingImportacao || !isValid}
-          loading={importacoesArquivosIsLoading}
-          style={{
-            fontWeight: 700,
-            borderRadius: '0.375rem'
-          }}
         >
           Importar
         </Button>

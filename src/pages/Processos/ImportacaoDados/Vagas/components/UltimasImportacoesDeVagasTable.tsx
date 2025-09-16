@@ -16,15 +16,15 @@ const UltimasImportacoesDeVagasTable: React.FC<UltimasImportacoesDeVagasTablePro
     {
       title: "Método de importação",
       dataIndex: "metodo_de_importacao",
-      key: "metodo_de_importacao",      
-      render: () => 'arquivo'      
+      key: "metodo_de_importacao",
+      render: () => 'arquivo'
     },
 
     {
       title: "Data de fechamento do módulo",
       dataIndex: "data_de_fechamento_do_modulo",
       key: "data_de_fechamento_do_modulo",
-      render: (text: string) => dayjs(text).format("DD/MM/YYYY"),
+      render: () => ''
     },
     {
       title: "Cargo",
@@ -35,18 +35,17 @@ const UltimasImportacoesDeVagasTable: React.FC<UltimasImportacoesDeVagasTablePro
       title: "Opções de importação",
       dataIndex: "opcoes_de_importacao",
       key: "opcoes_de_importacao",
-      render: () => 'Ajustar'      
+      render: () => 'Ajustar'
 
     },
     {
       title: "Data da importação",
-      dataIndex: "data_importacao",
-      key: "data_importacao",
+      dataIndex: "criado_em",
+      key: "criado_em",
       render: (text: string) => dayjs(text).format("DD/MM/YYYY"),
-    },    
-    
+    },
   ];
- 
+
   return (
     <>
 
