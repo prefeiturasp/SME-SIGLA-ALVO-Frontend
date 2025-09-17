@@ -3,13 +3,14 @@ import {Dashboard} from "../pages/Dashboard";
 import ProtectedRoute from "./protected";
 
 
-import NotFound from "../pages/NotFound";
+
 import { Home } from "../pages/Home/Home";
-import ConvocacaoCandidatos from "../pages/Processos/ConvocacaoCandidatos";
-import NovaConvocacaoCandidatos from "../pages/Processos/NovaConvocacaoCandidatos";
-import ImportacaoDados from "../pages/Processos/ImportacaoDados";
-import LayoutPadraoVagas from "../pages/Processos/ImportacaoDados/LayoutPadraoVagas";
-import HistoricoVagas from "../pages/Processos/ImportacaoDados/HistoricoVagas";
+import ConvocacaoCandidatos from "../pages/ConvocacaoCandidatos";
+import NovaConvocacaoCandidatos from "../pages/NovaConvocacaoCandidatos";
+import ImportacaoDados from "../pages/ImportacaoDados";
+import LayoutPadraoVagas from "../pages/ImportacaoDados/LayoutPadraoVagas";
+import HistoricoVagas from "../pages/ImportacaoDados/HistoricoVagas";
+import PageNotFound from "../pages/NotFound";
 
 //TODO ADD FEATURE FLAG
 
@@ -53,7 +54,7 @@ const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <NotFound />, 
+    element: <PageNotFound />, 
   },
 ]);
 

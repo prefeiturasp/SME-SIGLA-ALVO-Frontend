@@ -1,9 +1,26 @@
-export default function NotFound() {
+import { useNavigate } from "react-router-dom";
+import { Button, Result } from 'antd';
+
+
+
+
+const PageNotFound = () => {
+  const navigate = useNavigate();
   return (
-    <div style={{ textAlign: "center", padding: "2rem" }}>
-      <h1>404</h1>
-      <p>Página não encontrada</p>
-      <a href="/">Voltar para a Home</a>
-    </div>
-  );
+    <Result
+      status="404"
+      title="404"
+      subTitle="Desculpe, a página que você visitou não existe."
+      extra={
+        <Button
+          type="primary"
+          onClick={() => navigate('/')}
+          >
+          Voltar pra Home
+        </Button>
+      }
+    />
+  )
 }
+
+export default PageNotFound;
