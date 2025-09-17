@@ -14,7 +14,7 @@ import type {
 import { API } from '../../../../../services';
 
 // Mock da API
-jest.mock('../../../../../../services', () => ({
+jest.mock('../../../../../services', () => ({
   API: {
     ImportacaoDados: {
       postImportacaoArquivosHabilitados: jest.fn(),

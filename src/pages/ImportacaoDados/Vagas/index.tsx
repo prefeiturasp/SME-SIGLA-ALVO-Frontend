@@ -16,7 +16,7 @@ import {
   StyledUpload,
   ActionButtonsContainer,
 } from "../../../components/estilosCompartilhados/styles";
-import { useCargos } from "../../NovaConvocacaoCandidatos/hooks/useCargos";
+import { useCargos } from "../../../hooks/useCargos";
 import UltimasImportacoesDeVagasTable from "./components/UltimasImportacoesDeVagasTable";
 import { useNavigate } from "react-router-dom";
 

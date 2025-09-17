@@ -1,9 +1,9 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useConcursos } from '../../hooks/useConcursos';
+import { useConcursos } from '../useConcursos';
 
-jest.mock('../../../../services', () => ({
+jest.mock('../../services', () => ({
   API: {
     Concursos: {
       getConcursos: jest.fn(() => ({ response: Promise.resolve({ results: [{ value: 'c1', label: 'Concurso 1' }] }) })),

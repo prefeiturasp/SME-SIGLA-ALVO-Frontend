@@ -1,6 +1,6 @@
 // src/pages/Processos/NovaConvocacaoCandidatos/hooks/useCandidatos.tsx
 import { useQuery } from "@tanstack/react-query";
-import { API } from "../../../services";
+import { API } from "../services";
 
 export const useCandidatos = (buscarCandidatos: boolean = false) => {
   const { data: candidatosData, isLoading: candidatosIsLoading } = useQuery({

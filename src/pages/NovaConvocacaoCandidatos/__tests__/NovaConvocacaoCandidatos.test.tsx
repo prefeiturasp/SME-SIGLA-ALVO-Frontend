@@ -36,11 +36,11 @@ const mockUseConcursos = {
   concursosIsLoading: false
 };
 
-jest.mock('../hooks/useConcursos', () => ({
+jest.mock('../../../hooks/useConcursos', () => ({
   useConcursos: () => mockUseConcursos
 }));
 
-jest.mock('../../../../services', () => ({
+jest.mock('../../../services', () => ({
   API: {
     Candidatos: {
       getCandidatos: jest.fn(() => ({ response: Promise.resolve({ results: [] }) })),
@@ -372,7 +372,7 @@ describe('NovaConvocacaoCandidatos', () => {
       concursosIsLoading: false
     };
 
-    jest.doMock('../hooks/useConcursos', () => ({
+    jest.doMock('../../../hooks/useConcursos', () => ({
       useConcursos: () => mockUseConcursos
     }));
 
@@ -427,7 +427,7 @@ describe('NovaConvocacaoCandidatos', () => {
       concursosIsLoading: false
     };
 
-    jest.doMock('../hooks/useConcursos', () => ({
+    jest.doMock('../../../hooks/useConcursos', () => ({
       useConcursos: () => mockUseConcursos
     }));
 
@@ -492,7 +492,7 @@ describe('NovaConvocacaoCandidatos', () => {
       concursosIsLoading: false
     };
 
-    jest.doMock('../hooks/useConcursos', () => ({
+    jest.doMock('../../../hooks/useConcursos', () => ({
       useConcursos: () => mockUseConcursos
     }));
 
@@ -528,7 +528,7 @@ describe('NovaConvocacaoCandidatos', () => {
       concursosIsLoading: false
     };
 
-    jest.doMock('../hooks/useConcursos', () => ({
+    jest.doMock('../../../hooks/useConcursos', () => ({
       useConcursos: () => mockUseConcursosUndefined
     }));
 
@@ -569,7 +569,7 @@ describe('NovaConvocacaoCandidatos', () => {
       concursosIsLoading: false
     };
 
-    jest.doMock('../hooks/useConcursos', () => ({
+    jest.doMock('../../../hooks/useConcursos', () => ({
       useConcursos: () => mockUseConcursosSemCargos
     }));
 
@@ -585,7 +585,7 @@ describe('NovaConvocacaoCandidatos', () => {
       concursosIsLoading: false
     };
 
-    jest.doMock('../hooks/useConcursos', () => ({
+    jest.doMock('../../../hooks/useConcursos', () => ({
       useConcursos: () => mockUseConcursosVazio
     }));
 
@@ -607,7 +607,7 @@ describe('NovaConvocacaoCandidatos', () => {
       concursosIsLoading: false
     };
 
-    jest.doMock('../hooks/useConcursos', () => ({
+    jest.doMock('../../../hooks/useConcursos', () => ({
       useConcursos: () => mockUseConcursosNaoEncontra
     }));
 
@@ -634,7 +634,7 @@ describe('NovaConvocacaoCandidatos', () => {
       concursosIsLoading: false
     };
 
-    jest.doMock('../hooks/useConcursos', () => ({
+    jest.doMock('../../../hooks/useConcursos', () => ({
       useConcursos: () => mockUseConcursosCargoNaoEncontra
     }));
 

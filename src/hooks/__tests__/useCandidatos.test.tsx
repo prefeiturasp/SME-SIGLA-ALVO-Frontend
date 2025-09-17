@@ -1,9 +1,10 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useCandidatos } from '../hooks/useCandidatos';
+import { useCandidatos } from '../useCandidatos';
 
-jest.mock('../../../../services', () => ({
+
+jest.mock('../../services', () => ({
   API: {
     Candidatos: {
       getCandidatos: jest.fn(() => ({ response: Promise.resolve({ results: [] }) })),
@@ -21,12 +22,12 @@ const setupWrapper = () => {
 
 describe('useCandidatos', () => {
   beforeEach(() => {
-    const { API } = require('../../../../services');
+    const { API } = require('../../services');
     (API.Candidatos.getCandidatos as jest.Mock).mockClear();
   });
 
   it('não busca quando disabled (buscarCandidatos=false)', async () => {
-    const { API } = require('../../../../services');
+    const { API } = require('../../services');
     const { wrapper } = setupWrapper();
     const { result } = renderHook(() => useCandidatos(false), { wrapper });
 
@@ -35,7 +36,7 @@ describe('useCandidatos', () => {
   });
 
   it('busca quando enabled (buscarCandidatos=true)', async () => {
-    const { API } = require('../../../../services');
+    const { API } = require('../../services');
     const { wrapper } = setupWrapper();
     const { result } = renderHook(() => useCandidatos(true), { wrapper });
 

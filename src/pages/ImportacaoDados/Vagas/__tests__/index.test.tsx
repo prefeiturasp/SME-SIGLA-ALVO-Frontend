@@ -5,7 +5,7 @@ import Vagas from '../index';
 import { renderWithProviders } from '../../../../test-utils';
 import { useImportacaoDadosVagas } from '../hooks/useImportacaoDadosVagas';
 import { useCargos } from '../../../../hooks/useCargos';
-
+                          
 // Mocks consolidados
 jest.mock('react-hook-form', () => ({
   useForm: () => ({ control: {}, handleSubmit: jest.fn((fn) => fn), reset: jest.fn(), watch: jest.fn(), setValue: jest.fn(), clearErrors: jest.fn(), formState: { errors: {}, isValid: true } }),
@@ -22,7 +22,7 @@ jest.mock('@mui/icons-material/CalendarMonthRounded', () => () => <div data-test
 jest.mock('@mui/icons-material/UploadFile', () => () => <div data-testid="upload-icon" />);
 jest.mock('@mui/icons-material/ExpandMore', () => () => <div data-testid="expand-icon" />);
 
-jest.mock('../../../../../components/estilosCompartilhados/styles', () => ({
+jest.mock('../../../../components/estilosCompartilhados/styles', () => ({
   TabContentContainer: ({ children }: { children: React.ReactNode }) => <div data-testid="tab-content-container">{children}</div>,
   SectionCard: ({ children }: { children: React.ReactNode }) => <div data-testid="section-card">{children}</div>,
   SectionTitle: ({ children }: { children: React.ReactNode }) => <div data-testid="section-title">{children}</div>,
@@ -32,7 +32,7 @@ jest.mock('../../../../../components/estilosCompartilhados/styles', () => ({
   ActionButtonsContainer: ({ children }: { children: React.ReactNode }) => <div data-testid="action-buttons-container">{children}</div>,
 }));
 
-jest.mock('../../../../../components/formStyle/styles', () => ({
+jest.mock('../../../../components/formStyle/styles', () => ({
   CustomFormItem: ({ children, label, validateStatus, help }: any) => (
     <div data-testid="custom-form-item" data-validate-status={validateStatus}>
       {label && <label>{label}</label>}{children}{help && <span data-testid="form-help">{help}</span>}
@@ -40,7 +40,7 @@ jest.mock('../../../../../components/formStyle/styles', () => ({
   ),
 }));
 
-jest.mock('../../../../../services', () => ({ API: { ImportacaoDados: { getUltimasImportacoesArquivosVagas: jest.fn(), postImportacaoArquivosVagas: jest.fn() }, Cargos: { getCargos: jest.fn() } } }));
+jest.mock('../../../../services', () => ({ API: { ImportacaoDados: { getUltimasImportacoesArquivosVagas: jest.fn(), postImportacaoArquivosVagas: jest.fn() }, Cargos: { getCargos: jest.fn() } } }));
 jest.mock('../components/UltimasImportacoesDeVagasTable', () => ({ __esModule: true, default: ({ data }: { data: any[] }) => <div data-testid="ultimas-importacoes-table">{data?.length ? `Table with ${data.length} items` : 'Empty table'}</div> }));
 
 const mockUseImportacaoDadosVagas = useImportacaoDadosVagas as jest.MockedFunction<typeof useImportacaoDadosVagas>;
