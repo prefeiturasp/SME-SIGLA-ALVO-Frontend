@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { Tabs, Button } from 'antd';
+import { PrimaryButton as SharedPrimaryButton, SecondaryButton as SharedSecondaryButton } from '../../components/estilosCompartilhados/styles';
 
 // Estilos para as abas
 export const StyledTabs = styled(Tabs)`
@@ -31,27 +32,7 @@ export const ActionButtonsContainer = styled.div`
 `;
 
 // Botão secundário (Histórico e Importar)
-export const SecondaryButton = styled(Button)`
-  border-color: #032B68;
-  color: #032B68;
-  background-color: #fff;
-  
-  &:hover {
-    border-color: #05409a;
-    color: #05409a;
-    background-color: #fff;
-  }
-`;
+export const SecondaryButton = SharedSecondaryButton;
 
 // Botão primário (Layout padrão)
-export const PrimaryButton = styled(Button)`
-  background-color: #032B68;
-  border-color: #032B68;
-  color: #ffffff;
-  
-  &:hover {
-    background-color: #05409a;
-    border-color: #05409a;
-    color:rgb(255, 255, 255);
-  }
-`;
+export const PrimaryButton = SharedPrimaryButton;

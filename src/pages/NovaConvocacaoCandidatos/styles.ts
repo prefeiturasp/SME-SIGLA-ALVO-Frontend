@@ -1,5 +1,6 @@
 import styled, { createGlobalStyle } from 'styled-components';
-import { Button, Card, Form, Row, Col, Input, Typography, Modal as AntModal } from 'antd';
+import { Button, Card, Form, Row, Col, Input, Typography } from 'antd';
+export { CustomModal2 as CustomModal } from '../../components/estilosCompartilhados/styles';
 
 
 export const StyledCardPequeno = styled(Card)`
@@ -76,22 +77,7 @@ export const CustomFormItem = styled(Form.Item).attrs({
   }
 `;
 
-// Shared modal styles used across modals in this feature
-export const CustomModal = styled(AntModal)`
-  .ant-modal-content {
-    padding: 2rem 2rem 1.5rem 2rem;
-    border-radius: 2px;
-  }
-  .ant-modal-header {
-    padding: 0;
-  }
-  .ant-modal-footer {
-    padding: 1.5rem 0 0 0;
-    .ant-btn-primary {
-      border-radius: 2px;
-    }
-  }
-`;
+// Using shared CustomModal styles
 
 export const ModalCustomFormItem = styled(Form.Item)`
   padding-bottom: 0;
