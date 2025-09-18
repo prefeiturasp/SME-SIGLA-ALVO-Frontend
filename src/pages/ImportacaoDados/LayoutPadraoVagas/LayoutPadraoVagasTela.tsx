@@ -1,7 +1,7 @@
 import React from "react";
 import { Typography } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import BaseScreen, { type TitleItem } from "../../BaseScreen";
+import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 
 import LayoutPadrao from "../Habilitados/components/LayoutPadrao";
 import useLayout from "../../../hooks/useLayout";
@@ -33,7 +33,7 @@ const LayoutPadraoVagasTela: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) 
   };
 
   return (
-    <BaseScreen
+    <BaseTela
       breadcrumbItems={breadcrumbItems}
       title="Importação de dados"
     >
@@ -41,7 +41,7 @@ const LayoutPadraoVagasTela: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) 
         loading={layoutIsLoading}
         title={tipo === 'VAGAS' ? 'Layout: Arquivo de Vagas' : 'Layout: Arquivo de Aprovados (HABILITADOS)'}
         onVoltar={handleVoltar} dataSource={dataLayout?.results[0].estrutura || []} />
-    </BaseScreen>
+    </BaseTela>
   );
 };
 

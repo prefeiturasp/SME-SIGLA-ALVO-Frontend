@@ -3,7 +3,7 @@ import type { IProcessoConvocacao } from '../../services/resources/convocacao/IC
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import { useTheme } from "styled-components";
-import { CustomLabel } from '../../pages/BaseScreen/styles';
+import { CustomLabel } from '../../pages/Base/styles';
 
  
 

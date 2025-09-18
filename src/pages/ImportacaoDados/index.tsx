@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Typography } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import BaseScreen, { type TitleItem } from "../BaseScreen";
+import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import {
   StyledTabs,
 } from "./styles";
@@ -80,12 +80,12 @@ const ImportacaoDados: React.FC = () => {
   // Se estiver mostrando o histórico, renderiza apenas o componente Histórico
   if (showHistorico) {
     return (
-      <BaseScreen
+      <BaseTela
         breadcrumbItems={breadcrumbItems}
         title="Importação de dados"
       >
         <Historico onVoltar={handleBackFromHistorico} />
-      </BaseScreen>
+      </BaseTela>
     );
   }
 
@@ -93,7 +93,7 @@ const ImportacaoDados: React.FC = () => {
   
 
   return (
-    <BaseScreen
+    <BaseTela
       breadcrumbItems={breadcrumbItems}
       title="Importação de dados"
     >
@@ -102,7 +102,7 @@ const ImportacaoDados: React.FC = () => {
         onChange={setActiveTab}
         items={tabItems}
       />
-    </BaseScreen>
+    </BaseTela>
   );
 };
 

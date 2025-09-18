@@ -13,7 +13,7 @@ import {
  
 import UltimasImportacoesDeVagasTable from "../Vagas/components/UltimasImportacoesDeVagasTable";
 import { Link, useNavigate } from "react-router-dom";
-import BaseScreen, { type TitleItem } from "../../BaseScreen";
+import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 
 const { Text } = Typography;
 
@@ -43,7 +43,7 @@ const HistoricoVagasTela: React.FC = ({  }) => {
 
  
   return (
-     <BaseScreen
+     <BaseTela
       breadcrumbItems={breadcrumbItems}
       title="Importação de dados - Vagas"
     >
@@ -80,7 +80,7 @@ const HistoricoVagasTela: React.FC = ({  }) => {
  
       </ActionButtonsContainer>
     </TabContentContainer>
-    </BaseScreen>
+    </BaseTela>
   );
 };
 

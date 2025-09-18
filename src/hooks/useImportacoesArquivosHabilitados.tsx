@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { API } from "../services";
 
 
-const useImportacoesArquivos = () => {
+const useImportacoesArquivosHabilitados = () => {
   // Query para buscar importações com parâmetros
   const { data: importacoesArquivos, isLoading: importacoesArquivosIsLoading } = useQuery({
     queryKey: ["getImportacaoArquivosHabilitados"],
@@ -20,4 +20,4 @@ const useImportacoesArquivos = () => {
   };
 };
 
-export default useImportacoesArquivos;
+export default useImportacoesArquivosHabilitados;

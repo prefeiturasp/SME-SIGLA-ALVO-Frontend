@@ -1,16 +1,16 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import {Dashboard} from "../pages/Dashboard";
+import {DashboardTela} from "../pages/Dashboard/DashboardTela";
 import ProtectedRoute from "./protected";
 
 
 
-import { Home } from "../pages/Home/Home";
+import { HomeTela } from "../pages/Home/HomeTela";
 import ConvocacaoCandidatosTela from "../pages/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
 import NovaConvocacaoCandidatosTela from "../pages/NovaConvocacaoCandidatos/NovaConvocacaoCandidatosTela";
 import ImportacaoDadosTela from "../pages/ImportacaoDados";
 import LayoutPadraoVagasTela from "../pages/ImportacaoDados/LayoutPadraoVagas/LayoutPadraoVagasTela";
 import HistoricoVagasTela from "../pages/ImportacaoDados/HistoricoVagas/HistoricoVagasTela";
-import PageNotFound from "../pages/NotFound";
+import PageNotFoundTela from "../pages/PageNotFound/PageNotFoundTela";
 import RouteError from "./RouteError";
 
 //TODO ADD FEATURE FLAG
@@ -18,7 +18,7 @@ import RouteError from "./RouteError";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <HomeTela />,
     errorElement: <RouteError />,
   },
   {
@@ -50,20 +50,19 @@ const router = createBrowserRouter([
     path: "/processos/importacao-dados/historico-vagas",
     element: <HistoricoVagasTela />,
     errorElement: <RouteError />,
-  }, 
-  
+  },   
   {
     path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <Dashboard />
+        <DashboardTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
   },
   {
     path: "*",
-    element: <PageNotFound />, 
+    element: <PageNotFoundTela />, 
     errorElement: <RouteError />,
   },
 ]);

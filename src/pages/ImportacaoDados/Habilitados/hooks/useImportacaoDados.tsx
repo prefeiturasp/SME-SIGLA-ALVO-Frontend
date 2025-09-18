@@ -1,17 +1,18 @@
 import { useForm, type Resolver } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { App } from "antd";
-import { API } from "../../../../services";
+// import { useQueryClient } from "@tanstack/react-query";
+// import { App } from "antd";
+// import { API } from "../../../../services";
+import { usePostImportacaoArquivosHabilitados } from "../../../../hooks/usePostImportacaoArquivosHabilitados";
 import useImportacaoSchema from "./useImportacaoSchema";
 import type { IImportacaoHabilitadosFiltros, IImportacaoHabilitadosPayload } from "./types";
 import { useConcursos } from "../../../../hooks/useConcursos";
-import useImportacoesArquivos from "../../../../hooks/useImportacoesArquivos";
-// import type { IImportacaoRequest } from "../../../../../services/resources/importacaoDados/IImportacaoArquivos";
+import useImportacoesArquivosHabilitados from "../../../../hooks/useImportacoesArquivosHabilitados";
+
 
 export const useImportacaoDados = () => {
-  const queryClient = useQueryClient();
-  const { notification } = App.useApp();
+  // const queryClient = useQueryClient();
+  // const { notification } = App.useApp();
   const { concursosData } = useConcursos();
   
   const defaultValues = {
@@ -36,34 +37,11 @@ export const useImportacaoDados = () => {
     shouldFocusError: false,
   });
 
-  // Mutation para post de importação de arquivos
-  const postImportacaoArquivosMutation = useMutation({
-    mutationFn: (payload: IImportacaoHabilitadosPayload) => API.ImportacaoDados.postImportacaoArquivosHabilitados(payload).response,
-    onSuccess: () => {
-      console.log("Sucesso");
-      // Invalidar queries relacionadas após sucesso
-      queryClient.invalidateQueries({ queryKey: ["getImportacaoArquivosHabilitados"] });
-      // Mostrar notificação de sucesso
-      notification.success({
-        message: "Importação Realizada",
-        description: "A importação dos dados foi processada com sucesso!",
-        placement: "top",
-        duration: 3.5,
-      });
-    },
-    onError: (e) => {
-      console.log("Erro capturado:", e);
-      notification.error({
-        message: "Erro na Importação",
-        description: "Ocorreu um erro ao processar a importação dos dados. Tente novamente.",
-        placement: "top",
-        duration: 3.5,
-      });
-    },
-  });
+  // Mutation para post de importação de arquivos (hook centralizado)
+  const postImportacaoArquivosMutation = usePostImportacaoArquivosHabilitados();
 
   // Query para buscar importações com parâmetros
-  const { importacoesArquivos, importacoesArquivosIsLoading } = useImportacoesArquivos();
+  const { importacoesArquivos, importacoesArquivosIsLoading } = useImportacoesArquivosHabilitados();
 
   const handleEnviarForm = async (data: IImportacaoHabilitadosFiltros) => {
     if (!data.arquivo || !data.concurso) {

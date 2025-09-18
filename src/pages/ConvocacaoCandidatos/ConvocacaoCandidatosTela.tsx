@@ -2,7 +2,7 @@ import { Typography, Select, DatePicker, Row, Col, Space, Button, Card } from "a
 import { PlusOutlined } from "@ant-design/icons";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
-import BaseScreen, { type TitleItem } from "../BaseScreen";
+import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { Controller } from "react-hook-form";
 import { CustomFormItem, SeparatorCol } from "../../components/formStyle/styles";
 import ConvocacaoTable from "./components/ConvocacaoTable";
@@ -47,7 +47,7 @@ const ConvocacaoCandidatosTela: React.FC = () => {
   } = useProcessosConvocacao();
 
   return (
-    <BaseScreen
+    <BaseTela
       breadcrumbItems={breadcrumbItems}
       title="Convocação de candidatos"
     >
@@ -230,7 +230,7 @@ const ConvocacaoCandidatosTela: React.FC = () => {
           </Col>
         </Row>
       </Card>
-    </BaseScreen>
+    </BaseTela>
   );
 };
 

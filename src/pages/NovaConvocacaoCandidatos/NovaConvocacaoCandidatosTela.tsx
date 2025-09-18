@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Typography, Card } from "antd";
 
-import BaseScreen, { type TitleItem } from "../BaseScreen";
+import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useForm, useWatch } from "react-hook-form";
 import { Link } from "react-router-dom";
 
@@ -121,7 +121,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
     (cargosDisponiveis || []).find((opt) => opt.value === watchFields.cargo)?.label || "";
 
   return (
-    <BaseScreen
+    <BaseTela
       breadcrumbItems={breadcrumbItems}
       title="Processo de convocação de candidatos"
     >
@@ -150,7 +150,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
         watchFields={watchFields}
         control={control}
       />
-    </BaseScreen>
+    </BaseTela>
   );
 };
 

@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { App } from 'antd';
-import BaseScreen from '../index';
-import type { INewSampleModalProps } from '../index';
+import BaseTela from '../BaseTela';
+import type { INewSampleModalProps } from '../BaseTela';
 
 // Mocks consolidados
 jest.mock('react-router-dom', () => ({
@@ -40,7 +40,7 @@ const createWrapper = () => {
   );
 };
 
-describe('BaseScreen Component', () => {
+describe('BaseTela Component', () => {
   const defaultProps: INewSampleModalProps = {
     children: <div data-testid="test-children">Test Content</div>,
     breadcrumbItems: [{ title: 'Home' }, { title: 'Processos' }, { title: 'Convocação' }],
@@ -51,7 +51,7 @@ describe('BaseScreen Component', () => {
 
   it('deve renderizar todos os elementos principais', () => {
     const wrapper = createWrapper();
-    const { container } = render(<BaseScreen {...defaultProps} />, { wrapper });
+    const { container } = render(<BaseTela {...defaultProps} />, { wrapper });
 
     // Elementos principais
     expect(screen.getByAltText('Sistema Alvo')).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe('BaseScreen Component', () => {
 
   it('deve renderizar breadcrumb com elementos React e selecionar menu', () => {
     const wrapper = createWrapper();
-    const { container } = render(<BaseScreen {...defaultProps} />, { wrapper });
+    const { container } = render(<BaseTela {...defaultProps} />, { wrapper });
 
     // Breadcrumb
     expect(screen.getByText('Home')).toBeInTheDocument();
@@ -90,17 +90,17 @@ describe('BaseScreen Component', () => {
     const wrapper = createWrapper();
 
     // Teste com breadcrumb vazio
-    const { unmount: unmount1 } = render(<BaseScreen {...defaultProps} breadcrumbItems={[]} />, { wrapper });
+    const { unmount: unmount1 } = render(<BaseTela {...defaultProps} breadcrumbItems={[]} />, { wrapper });
     expect(screen.getByText('Test Page Title')).toBeInTheDocument();
     unmount1();
 
     // Teste com título vazio
-    const { unmount: unmount2 } = render(<BaseScreen {...defaultProps} title="" />, { wrapper });
+    const { unmount: unmount2 } = render(<BaseTela {...defaultProps} title="" />, { wrapper });
     expect(screen.getByTestId('test-children')).toBeInTheDocument();
     unmount2();
 
     // Teste com children null
-    render(<BaseScreen {...defaultProps} children={null} />, { wrapper });
+    render(<BaseTela {...defaultProps} children={null} />, { wrapper });
     expect(screen.getByText('Test Page Title')).toBeInTheDocument();
   });
 

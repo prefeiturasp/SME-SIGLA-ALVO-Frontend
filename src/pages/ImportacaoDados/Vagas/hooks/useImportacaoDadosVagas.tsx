@@ -1,14 +1,11 @@
 import { useForm, type Resolver } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { App } from "antd";
-import { API } from "../../../../services";
+import { usePostImportacaoArquivosVagas } from "../../../../hooks/usePostImportacaoArquivosVagas";
 import useImportacaoVagasSchema from "./useImportacaoVagasSchema";
 import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
 import useImportacaoArquivosVagas from "../../../../hooks/useImportacaoArquivosVagas";
 
 export const useImportacaoDadosVagas = () => {
-  const { notification } = App.useApp();
 
   const defaultValues = {
     cargo: undefined,
@@ -39,26 +36,8 @@ export const useImportacaoDadosVagas = () => {
   const { importacoesArquivosData, importacoesArquivosIsLoading, importacoesArquivosRefetch } = useImportacaoArquivosVagas();
 
   // Mutation para post de importação de arquivos
-  const postImportacaoArquivosVagasMutation = useMutation({
-    mutationFn: (payload: IImportacaoVagasPayload) => API.ImportacaoDados.postImportacaoArquivosVagas(payload).response,
-    onSuccess: () => {
-      importacoesArquivosRefetch();
-      notification.success({
-        message: "Importação Realizada",
-        description: "A importação dos dados foi processada com sucesso!",
-        placement: "top",
-        duration: 3.5,
-      });
-    },
-    onError: (e) => {
-      console.log("Erro capturado:", e);
-      notification.error({
-        message: "Erro na Importação",
-        description: "Ocorreu um erro ao processar a importação dos dados. Tente novamente.",
-        placement: "top",
-        duration: 3.5,
-      });
-    },
+  const postImportacaoArquivosVagasMutation = usePostImportacaoArquivosVagas({
+    onSuccess: () => importacoesArquivosRefetch(),
   });
 
 
