@@ -4,8 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 
 import LayoutPadrao from "../Habilitados/components/LayoutPadrao";
-import { useQuery } from "@tanstack/react-query";
-import { API } from "../../../services";
 import useLayout from "../../../hooks/useLayout";
 
 const { Text } = Typography;
@@ -23,7 +21,7 @@ interface LayoutPadraoProps {
   tipo?: string,
 }
 
-const LayoutPadraoVagas: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) => {
+const LayoutPadraoVagasTela: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) => {
 
   const { dataLayout, layoutIsLoading } = useLayout(tipo);
 
@@ -47,4 +45,4 @@ const LayoutPadraoVagas: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) => {
   );
 };
 
-export default LayoutPadraoVagas;
+export default LayoutPadraoVagasTela;

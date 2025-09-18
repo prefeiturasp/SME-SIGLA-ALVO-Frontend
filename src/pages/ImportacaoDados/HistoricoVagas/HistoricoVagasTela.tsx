@@ -18,7 +18,7 @@ import BaseScreen, { type TitleItem } from "../../BaseScreen";
 const { Text } = Typography;
 
 
-const HistoricoVagas: React.FC = ({  }) => {
+const HistoricoVagasTela: React.FC = ({  }) => {
 
   const breadcrumbItems = [
   { title: <Link to="/"><Text strong>Home</Text></Link> },
@@ -84,4 +84,4 @@ const HistoricoVagas: React.FC = ({  }) => {
   );
 };
 
-export default HistoricoVagas;
+export default HistoricoVagasTela;

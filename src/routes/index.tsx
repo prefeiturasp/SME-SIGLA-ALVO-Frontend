@@ -7,9 +7,9 @@ import ProtectedRoute from "./protected";
 import { Home } from "../pages/Home/Home";
 import ConvocacaoCandidatosTela from "../pages/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
 import NovaConvocacaoCandidatosTela from "../pages/NovaConvocacaoCandidatos/NovaConvocacaoCandidatosTela";
-import ImportacaoDadosTela from "../pages/ImportacaoDados/ImportacaoDadosTela";
-import LayoutPadraoVagas from "../pages/ImportacaoDados/LayoutPadraoVagas";
-import HistoricoVagas from "../pages/ImportacaoDados/HistoricoVagas";
+import ImportacaoDadosTela from "../pages/ImportacaoDados";
+import LayoutPadraoVagasTela from "../pages/ImportacaoDados/LayoutPadraoVagas/LayoutPadraoVagasTela";
+import HistoricoVagasTela from "../pages/ImportacaoDados/HistoricoVagas/HistoricoVagasTela";
 import PageNotFound from "../pages/NotFound";
 import RouteError from "./RouteError";
 
@@ -38,17 +38,17 @@ const router = createBrowserRouter([
   },
   {
     path: "/processos/importacao-dados/layout-padrao-vagas",
-    element: <LayoutPadraoVagas tipo={'VAGAS'}/>,
+    element: <LayoutPadraoVagasTela tipo={'VAGAS'}/>,
     errorElement: <RouteError />,
   },
     {
     path: "/processos/importacao-dados/layout-padrao-habilitados",
-    element: <LayoutPadraoVagas tipo={'HABILITADOS'}/>,
+    element: <LayoutPadraoVagasTela tipo={'HABILITADOS'}/>,
     errorElement: <RouteError />,
   },
     {
     path: "/processos/importacao-dados/historico-vagas",
-    element: <HistoricoVagas />,
+    element: <HistoricoVagasTela />,
     errorElement: <RouteError />,
   }, 
   

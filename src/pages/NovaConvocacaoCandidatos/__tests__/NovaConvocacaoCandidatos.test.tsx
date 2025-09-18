@@ -2,7 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import NovaConvocacaoCandidatos from '../index';
+import NovaConvocacaoCandidatos from '../NovaConvocacaoCandidatosTela';
 import '@testing-library/jest-dom'
 import { TextEncoder, TextDecoder } from 'util'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
