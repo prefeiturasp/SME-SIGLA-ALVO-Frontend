@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import AdicionarEscolaTable from '../components/AdicionarEscolaTable/AdicionarEscolaTable';
+import AdicionarEscolaTable from '../components/AdicionarEscolaTable';
 import { ThemeProvider as SCThemeProvider } from 'styled-components';
 import { theme as appTheme } from '../../../theme';
 

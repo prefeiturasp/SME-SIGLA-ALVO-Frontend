@@ -1,30 +1,25 @@
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import CheckIcon from "@mui/icons-material/Check";
 import React, { useState } from "react";
 import type { TableProps } from "antd";
-import {
-  Button,
-  Flex,
-  InputNumber,
-  Popconfirm,
-  Space,
-  Table,
-  Typography,
-  Tooltip,
-} from "antd";
+import { Flex, Button, Tooltip, InputNumber } from "antd";
 import type { TableColumnsType } from "antd";
+import type { IUnidadeEscolar } from "../../../services/resources/convocacao/IConvocacao";
+import { StyledTable } from "../../../components/estilosCompartilhados/styles";
+import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { Controller, useForm } from "react-hook-form";
-import { useTheme } from "styled-components";
-import type { IUnidadeEscolar } from "../../../../services/resources/convocacao/IConvocacao";
-import { StyledTable } from "../../../../components/estilosCompartilhados/styles";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+
+
+interface UnidadeEscolarTableProps extends TableProps<IUnidadeEscolar> {
+  originData: IUnidadeEscolar[];
+  loading?: boolean;
+}
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: keyof IUnidadeEscolar;
   title: any;
-  record?: IUnidadeEscolar;
-  control?: any;
+  record: IUnidadeEscolar;
+  control: any;
 }
 
 const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
@@ -40,7 +35,7 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
     <td {...restProps}>
       {editing ? (
         <Controller
-          name={`${record?.uuid}.${dataIndex}`}
+          name={`${record.uuid}.${dataIndex}`}
           control={control}
           rules={{ required: `${title} é obrigatório` }}
           render={({ field }) => (
@@ -54,34 +49,17 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
   );
 };
 
-interface AdicionarEscolaTableProps extends TableProps<IUnidadeEscolar> {}
-
-const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
+const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
+  originData,
+  loading,
   ...rest
 }) => {
-  const initialData: IUnidadeEscolar[] = [
-    {
-      uuid: "3b178725-a14a-42d7-97cc-4fb1e3837f5b",
-      eol: "480100",
-      dre: "Guaianases",
-      tipo: "UE",
-      unidade: "Escola Guaianases",
-      vagas_definitivas: 1,
-      vagas_precarias: 1,
-    },
-    {
-      uuid: "e81d73ef-5121-4237-9bcd-69d174354051",
-      eol: "480100",
-      dre: "Guaianases",
-      tipo: "UE",
-      unidade: "Escola Campo Limpo",
-      vagas_definitivas: 1,
-      vagas_precarias: 1,
-    },
-  ];
+  const [data, setData] = useState<IUnidadeEscolar[]>(originData);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [editingKey, setEditingKey] = useState<string>("");
 
   const { control, getValues } = useForm({
-    defaultValues: initialData.reduce((acc, item) => {
+    defaultValues: originData.reduce((acc, item) => {
       acc[item.uuid] = {
         vagas_definitivas: item.vagas_definitivas,
         vagas_precarias: item.vagas_precarias,
@@ -90,13 +68,7 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
     }, {} as Record<string, Partial<IUnidadeEscolar>>),
   });
 
-  const [data, setData] = useState<IUnidadeEscolar[]>(initialData);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [editingKey, setEditingKey] = useState("");
-  const theme = useTheme();
-
   const isEditing = (record: IUnidadeEscolar) => record.uuid === editingKey;
-
   const edit = (record: IUnidadeEscolar) => setEditingKey(record.uuid);
   const cancel = () => setEditingKey("");
   const save = (key: React.Key) => {
@@ -111,7 +83,7 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
     }
   };
 
-  const columns: TableColumnsType<IUnidadeEscolar> = [
+  const baseColumns: TableColumnsType<IUnidadeEscolar> = [
     { title: "Código EOL", dataIndex: "eol" },
     { title: "DRE", dataIndex: "dre" },
     { title: "Tipo de unidade", dataIndex: "tipo" },
@@ -139,7 +111,7 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
               <Button
                 type="link"
                 onClick={() => save(record.uuid)}
-                icon={<CheckOutlined style={{ color: theme.token.colorPrimary }} />}
+                icon={<CheckOutlined style={{ color: "#05409A" }} />}
               />
             </Tooltip>
             <Tooltip title="Cancelar">
@@ -157,11 +129,7 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
                 type="link"
                 disabled={editingKey !== ""}
                 onClick={() => edit(record)}
-                icon={
-                  <ModeEditOutlineOutlinedIcon
-                    style={{ color: theme.token.colorPrimary }}
-                  />
-                }
+                icon={<ModeEditOutlineOutlinedIcon style={{ color: "#05409A" }} />}
               />
             </Tooltip>
             <Button type="link" style={{ visibility: "hidden" }} icon={<CloseOutlined />} />
@@ -171,21 +139,19 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
     },
   ];
 
-  const mergedColumns: TableProps<IUnidadeEscolar>["columns"] = columns.map(
-    (col) => {
-      if (!(col as any).editable) return col as any;
-      return {
-        ...col,
-        onCell: (record: IUnidadeEscolar) => ({
-          record,
-          dataIndex: (col as any).dataIndex,
-          title: col.title,
-          control,
-          editing: isEditing(record),
-        }),
-      } as any;
-    }
-  );
+  const columns: TableProps<IUnidadeEscolar>["columns"] = baseColumns.map((col) => {
+    if (!(col as any).editable) return col;
+    return {
+      ...col,
+      onCell: (record: IUnidadeEscolar) => ({
+        record,
+        dataIndex: (col as any).dataIndex,
+        title: col.title,
+        control,
+        editing: isEditing(record),
+      }),
+    } as any;
+  });
 
   const rowSelection: any = {
     selectedRowKeys,
@@ -201,10 +167,11 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
         components={{
           body: { cell: EditableCell },
         }}
-        rowSelection={rowSelection}
         bordered
+        loading={loading}
         dataSource={data}
-        columns={mergedColumns}
+        columns={columns}
+        rowSelection={rowSelection}
         rowClassName="editable-row"
         pagination={false}
       />
@@ -212,4 +179,4 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
   );
 };
 
-export default AdicionarEscolaTable;
+export default UnidadeEscolarTable;

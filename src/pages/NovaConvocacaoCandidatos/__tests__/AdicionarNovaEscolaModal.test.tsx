@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from 'styled-components';
 import { theme as appTheme } from '../../../theme';
-import AdicionarNovaEscolaModal from '../components/AdicionarNovaEscolaModal/AdicionarNovaEscolaModal';
+import AdicionarNovaEscolaModal from '../components/AdicionarNovaEscolaModal';
 
 describe('AdicionarNovaEscolaModal', () => {
   it('renderiza e chama onCancel ao clicar em Voltar', async () => {

@@ -3,8 +3,8 @@ import { DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import dayjs from "dayjs";
 import { Button, Space, Typography } from "antd";
-import { StyledTable } from "../../../../../components/estilosCompartilhados/styles";
-import { useImportacaoDados } from "../../hooks/useImportacaoDados";
+import { StyledTable } from "../../../../components/estilosCompartilhados/styles";
+import { useImportacaoDados } from "../hooks/useImportacaoDados";
 
 
 
