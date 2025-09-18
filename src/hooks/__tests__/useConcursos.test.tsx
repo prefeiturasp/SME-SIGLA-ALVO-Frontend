@@ -17,13 +17,13 @@ const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 describe('useConcursos', () => {
-  it('retorna concursosData e concursosIsLoading', async () => {
+  it('retorna concursosData e concursosOptionsIsLoading', async () => {
     const { result } = renderHook(() => useConcursos(), { wrapper });
 
-    expect(result.current.concursosIsLoading).toBe(true);
+    expect(result.current.concursosOptionsIsLoading).toBe(true);
 
     await waitFor(() => {
-      expect(result.current.concursosIsLoading).toBe(false);
+      expect(result.current.concursosOptionsIsLoading).toBe(false);
     });
 
     expect(Array.isArray(result.current.concursosData)).toBe(false);

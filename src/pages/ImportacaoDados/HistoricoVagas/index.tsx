@@ -7,7 +7,6 @@ import { useImportacaoDadosVagas } from "../Vagas/hooks/useImportacaoDadosVagas"
 import {
   TabContentContainer,
   SectionCard,
-  SectionTitle, 
   ActionButtonsContainer,
   SecondaryButton 
 } from "../../../components/estilosCompartilhados/styles";
@@ -30,7 +29,7 @@ const HistoricoVagas: React.FC = ({  }) => {
 
 
   const {
-    importacoesArquivos,
+    importacoesArquivosData,
     importacoesArquivosIsLoading,
   
   } = useImportacaoDadosVagas();
@@ -57,7 +56,7 @@ const HistoricoVagas: React.FC = ({  }) => {
 
             <UltimasImportacoesDeVagasTable
               loading={importacoesArquivosIsLoading}
-              data={importacoesArquivos?.results || [{
+              data={importacoesArquivosData?.results || [{
                 uuid: '111',
                 metodo_de_importacao: 'WebService',
                 data_de_fechamento_do_modulo: dayjs().toString(),

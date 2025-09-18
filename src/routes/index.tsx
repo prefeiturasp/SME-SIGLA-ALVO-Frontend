@@ -5,9 +5,9 @@ import ProtectedRoute from "./protected";
 
 
 import { Home } from "../pages/Home/Home";
-import ConvocacaoCandidatos from "../pages/ConvocacaoCandidatos";
-import NovaConvocacaoCandidatos from "../pages/NovaConvocacaoCandidatos";
-import ImportacaoDados from "../pages/ImportacaoDados";
+import ConvocacaoCandidatosTela from "../pages/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
+import NovaConvocacaoCandidatosTela from "../pages/NovaConvocacaoCandidatos/NovaConvocacaoCandidatosTela";
+import ImportacaoDadosTela from "../pages/ImportacaoDados/ImportacaoDadosTela";
 import LayoutPadraoVagas from "../pages/ImportacaoDados/LayoutPadraoVagas";
 import HistoricoVagas from "../pages/ImportacaoDados/HistoricoVagas";
 import PageNotFound from "../pages/NotFound";
@@ -23,17 +23,17 @@ const router = createBrowserRouter([
   },
   {
     path: "/processos/convocacao",
-    element: <ConvocacaoCandidatos />,
+    element: <ConvocacaoCandidatosTela />,
     errorElement: <RouteError />,
   },
   {
     path: "/processos/convocacao/nova",
-    element: <NovaConvocacaoCandidatos />,
+    element: <NovaConvocacaoCandidatosTela />,
     errorElement: <RouteError />,
   },
   {
     path: "/processos/importacao-dados",
-    element: <ImportacaoDados />,
+    element: <ImportacaoDadosTela />,
     errorElement: <RouteError />,
   },
   {

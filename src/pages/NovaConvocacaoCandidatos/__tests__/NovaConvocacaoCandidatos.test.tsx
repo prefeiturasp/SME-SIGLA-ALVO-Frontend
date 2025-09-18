@@ -33,7 +33,7 @@ const mockUseConcursos = {
       ]
     }
   ],
-  concursosIsLoading: false
+  concursosOptionsIsLoading: false
 };
 
 jest.mock('../../../hooks/useConcursos', () => ({
@@ -369,7 +369,7 @@ describe('NovaConvocacaoCandidatos', () => {
   test('deve testar função buscarCargosDoConcurso com valor vazio', async () => {
     const mockUseConcursos = {
       concursosData: [],
-      concursosIsLoading: false
+      concursosOptionsIsLoading: false
     };
 
     jest.doMock('../../../hooks/useConcursos', () => ({
@@ -424,7 +424,7 @@ describe('NovaConvocacaoCandidatos', () => {
           ]
         }
       ],
-      concursosIsLoading: false
+      concursosOptionsIsLoading: false
     };
 
     jest.doMock('../../../hooks/useConcursos', () => ({
@@ -489,7 +489,7 @@ describe('NovaConvocacaoCandidatos', () => {
           cargos: []
         }
       ],
-      concursosIsLoading: false
+      concursosOptionsIsLoading: false
     };
 
     jest.doMock('../../../hooks/useConcursos', () => ({
@@ -525,7 +525,7 @@ describe('NovaConvocacaoCandidatos', () => {
   test('deve testar edge case de concursosData undefined', async () => {
     const mockUseConcursosUndefined = {
       concursosData: undefined,
-      concursosIsLoading: false
+      concursosOptionsIsLoading: false
     };
 
     jest.doMock('../../../hooks/useConcursos', () => ({
@@ -566,7 +566,7 @@ describe('NovaConvocacaoCandidatos', () => {
           cargos: undefined
         }
       ],
-      concursosIsLoading: false
+      concursosOptionsIsLoading: false
     };
 
     jest.doMock('../../../hooks/useConcursos', () => ({
@@ -582,7 +582,7 @@ describe('NovaConvocacaoCandidatos', () => {
   test('deve testar cenário de concursosData vazio para cobrir linha 73', async () => {
     const mockUseConcursosVazio = {
       concursosData: [],
-      concursosIsLoading: false
+      concursosOptionsIsLoading: false
     };
 
     jest.doMock('../../../hooks/useConcursos', () => ({
@@ -604,7 +604,7 @@ describe('NovaConvocacaoCandidatos', () => {
           cargos: []
         }
       ],
-      concursosIsLoading: false
+      concursosOptionsIsLoading: false
     };
 
     jest.doMock('../../../hooks/useConcursos', () => ({
@@ -631,7 +631,7 @@ describe('NovaConvocacaoCandidatos', () => {
           ]
         }
       ],
-      concursosIsLoading: false
+      concursosOptionsIsLoading: false
     };
 
     jest.doMock('../../../hooks/useConcursos', () => ({

@@ -7,6 +7,8 @@ import { API } from "../../../services";
 import useConvocacaoSchema from "../useConvocacaoSchema";
 import type { IFiltroProcessos } from "../../../services/resources/convocacao/IConvocacao";
 import useListRequest, { removeUndefinedFields } from "../../../hooks/useListRequest";
+import { useConcursosOptions } from "../../../hooks/useConcursosOptions";
+import useConvocacao from "../../../hooks/useConvocacao";
 
 export const useProcessosConvocacao = () => {
   const defaultValues: IFiltroProcessos = {
@@ -32,26 +34,13 @@ export const useProcessosConvocacao = () => {
       pagination: { page: 1, page_size: 10 },
     });
 
-  const { data: concursosOptions, isLoading: concursosIsLoading } = useQuery({
-    queryKey: ["getConcursosOptions"],
-    queryFn: ({ signal }) =>
-      API.Convocacao.getConcursosOptions({ signal }).response,
-    staleTime: 1000 * 60 * 5,
-    retry: 0,
-  });
-
-  
+  const { concursosOptions, concursosOptionsIsLoading } = useConcursosOptions()
+    
 
   const {
-    data: processosConvocacaoData,
-    isLoading: processosConvocacaoIsLoading,
-  } = useQuery({
-    queryKey: ["getProcessosConvocacao", listRequest],
-    queryFn: ({ signal }) =>
-      API.Convocacao.getProcessosConvocacao(listRequest, { signal }).response,
-    staleTime: 1000 * 60 * 5,
-    retry: 0,
-  });
+    processosConvocacaoData,
+    processosConvocacaoIsLoading
+  } = useConvocacao(listRequest);
 
   const handleSub = async (data: IFiltroProcessos) => {
     
@@ -72,7 +61,7 @@ export const useProcessosConvocacao = () => {
     handleSubmit,
     formErrors,
     concursosOptions,
-    concursosIsLoading,
+    concursosOptionsIsLoading,
     processosConvocacaoData,
     processosConvocacaoIsLoading,
     listRequest,

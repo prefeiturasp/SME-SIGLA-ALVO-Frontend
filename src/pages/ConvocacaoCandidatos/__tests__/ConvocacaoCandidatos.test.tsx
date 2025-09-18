@@ -37,7 +37,7 @@ jest.mock('../hooks/useProcessosConvocacao', () => {
     handleSubmit: (fn: any) => fn,
     formErrors: {},
     concursosOptions,
-    concursosIsLoading: false,
+    concursosOptionsIsLoading: false,
     processosConvocacaoData: { results: [{ id: 1 }], count: 1 },
     processosConvocacaoIsLoading: false,
     listRequest: { pagination: { page: 1 } },

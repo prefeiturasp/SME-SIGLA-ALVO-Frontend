@@ -112,7 +112,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
         { value: 'CONCURSO_001', label: 'Concurso Teste 1' },
         { value: 'CONCURSO_002', label: 'Concurso Teste 2' },
       ],
-      concursosIsLoading: false,
+      concursosOptionsIsLoading: false,
     });
   });
 

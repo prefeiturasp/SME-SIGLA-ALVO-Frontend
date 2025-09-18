@@ -35,7 +35,7 @@ type FormFields = {
 };
 
 export const NovaConvocacaoCandidatos: React.FC = () => {
-  const { concursosData, concursosIsLoading } = useConcursos();
+  const { concursosData, concursosOptionsIsLoading } = useConcursos();
 
   const { control, reset } = useForm<FormFields>({
     defaultValues: {
@@ -132,7 +132,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
         <FormPrincipal
           control={control}
           concursosData={((concursosData as unknown as ConcursoOption[]) || [])}
-          concursosIsLoading={concursosIsLoading}
+          concursosOptionsIsLoading={concursosOptionsIsLoading}
           isCargoLiberado={isCargoLiberado}
           buscarCargosDoConcurso={buscarCargosDoConcurso}
         />

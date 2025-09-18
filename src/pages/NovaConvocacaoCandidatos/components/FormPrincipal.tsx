@@ -25,7 +25,7 @@ export type FormFields = {
 interface FormPrincipalProps {
   control: Control<FormFields>;
   concursosData: ConcursoOption[];
-  concursosIsLoading: boolean;
+  concursosOptionsIsLoading: boolean;
   isCargoLiberado: string | undefined;
   buscarCargosDoConcurso: (value: string) => void;
 }
@@ -33,7 +33,7 @@ interface FormPrincipalProps {
 const FormPrincipal: React.FC<FormPrincipalProps> = ({
   control,
   concursosData,
-  concursosIsLoading,
+  concursosOptionsIsLoading,
   isCargoLiberado,
   buscarCargosDoConcurso,
 }) => {
@@ -51,7 +51,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                 placeholder="Selecione o concurso"
                 style={{ width: "100%" }}
                 options={concursosData || []}
-                loading={concursosIsLoading}
+                loading={concursosOptionsIsLoading}
                 onChange={(value) => {
                   field.onChange(value as string);
                   buscarCargosDoConcurso(value as string);

@@ -84,7 +84,7 @@ describe('Habilitados Component', () => {
       { value: '1', label: 'Concurso Teste 1' },
       { value: '2', label: 'Concurso Teste 2' },
     ],
-    concursosIsLoading: false,
+    concursosOptionsIsLoading: false,
   };
 
   beforeEach(() => {
@@ -163,7 +163,7 @@ describe('Habilitados Component', () => {
     it('deve mostrar loading no select quando concursos estão carregando', () => {
       mockUseConcursos.mockReturnValue({
         ...defaultConcursosData,
-        concursosIsLoading: true,
+        concursosOptionsIsLoading: true,
       });
 
       render(
@@ -187,7 +187,7 @@ describe('Habilitados Component', () => {
             { value: '2', label: 'Concurso com Results 2' },
           ]
         },
-        concursosIsLoading: false,
+        concursosOptionsIsLoading: false,
       });
 
       render(
@@ -731,19 +731,19 @@ describe('useConcursos Hook', () => {
     const result = mockUseConcursos();
     
     expect(result.concursosData).toBeDefined();
-    expect(result.concursosIsLoading).toBeDefined();
+    expect(result.concursosOptionsIsLoading).toBeDefined();
   });
 
   it('deve lidar com estado de loading dos concursos', () => {
     mockUseConcursos.mockReturnValue({
       concursosData: [],
-      concursosIsLoading: true,
+      concursosOptionsIsLoading: true,
     });
 
     const result = mockUseConcursos();
     
     expect(result.concursosData).toEqual([]);
-    expect(result.concursosIsLoading).toBe(true);
+    expect(result.concursosOptionsIsLoading).toBe(true);
   });
 
   it('deve retornar dados de concursos quando carregados', () => {
@@ -754,12 +754,12 @@ describe('useConcursos Hook', () => {
 
     mockUseConcursos.mockReturnValue({
       concursosData: mockConcursos,
-      concursosIsLoading: false,
+      concursosOptionsIsLoading: false,
     });
 
     const result = mockUseConcursos();
     
     expect(result.concursosData).toEqual(mockConcursos);
-    expect(result.concursosIsLoading).toBe(false);
+    expect(result.concursosOptionsIsLoading).toBe(false);
   });
 });

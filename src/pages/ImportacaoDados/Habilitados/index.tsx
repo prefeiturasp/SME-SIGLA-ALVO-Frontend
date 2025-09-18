@@ -34,7 +34,7 @@ const Habilitados: React.FC<HabilitadosProps> = ({ onShowHistorico, onShowLayout
     importacoesArquivos,
     importacoesArquivosIsLoading,
   } = useImportacaoDados();
-  const { concursosData, concursosIsLoading } = useConcursos();
+  const { concursosData, concursosOptionsIsLoading } = useConcursos();
   const watchedFile = watch("arquivo");
 
   return (
@@ -59,7 +59,7 @@ const Habilitados: React.FC<HabilitadosProps> = ({ onShowHistorico, onShowLayout
                   <StyledSelect
                     {...field}
                     placeholder="Selecione o concurso"
-                    loading={concursosIsLoading}
+                    loading={concursosOptionsIsLoading}
                     allowClear
                     suffixIcon={<ExpandMoreIcon style={{ fontSize: '1.5rem', color: '#032B68' }} />}
                   >

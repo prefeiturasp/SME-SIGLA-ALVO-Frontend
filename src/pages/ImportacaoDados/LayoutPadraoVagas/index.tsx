@@ -6,6 +6,7 @@ import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import LayoutPadrao from "../Habilitados/components/LayoutPadrao";
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../services";
+import useLayout from "../../../hooks/useLayout";
 
 const { Text } = Typography;
 
@@ -24,18 +25,7 @@ interface LayoutPadraoProps {
 
 const LayoutPadraoVagas: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) => {
 
-  const { data: dataLayout, isLoading: importacoesArquivosIsLoading } = useQuery({
-    queryKey: ["getLayout"],
-    queryFn: ({ signal }) =>
-      API.ImportacaoDados.getLayout(
-        {
-          tipo: tipo,
-        },
-        { signal }
-      ).response,
-    staleTime: 0,
-    retry: 0,
-  });
+  const { dataLayout, layoutIsLoading } = useLayout(tipo);
 
 
   const navigate = useNavigate();
@@ -50,7 +40,7 @@ const LayoutPadraoVagas: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) => {
       title="Importação de dados"
     >
       <LayoutPadrao
-        loading={importacoesArquivosIsLoading}
+        loading={layoutIsLoading}
         title={tipo === 'VAGAS' ? 'Layout: Arquivo de Vagas' : 'Layout: Arquivo de Aprovados (HABILITADOS)'}
         onVoltar={handleVoltar} dataSource={dataLayout?.results[0].estrutura || []} />
     </BaseScreen>

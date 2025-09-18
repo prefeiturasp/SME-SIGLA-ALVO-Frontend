@@ -313,7 +313,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
       // Verificar se o hook inicializa corretamente
       expect(result.current.importacoesArquivosIsLoading).toBe(true);
-      expect(result.current.importacoesArquivos).toBeUndefined();
+      expect(result.current.importacoesArquivosData).toBeUndefined();
 
       // Verificar se a API foi chamada
       expect(API.ImportacaoDados.getUltimasImportacoesArquivosVagas).toHaveBeenCalledWith(
@@ -463,7 +463,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       expect(result.current).toHaveProperty('control');
       expect(result.current).toHaveProperty('handleSubmit');
       expect(result.current).toHaveProperty('formErrors');
-      expect(result.current).toHaveProperty('importacoesArquivos');
+      expect(result.current).toHaveProperty('importacoesArquivosData');
       expect(result.current).toHaveProperty('importacoesArquivosIsLoading');
       expect(result.current).toHaveProperty('handleEnviarForm');
       expect(result.current).toHaveProperty('handleReset');

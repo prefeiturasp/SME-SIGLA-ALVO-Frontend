@@ -29,7 +29,7 @@ const breadcrumbItems = [
   { title: "Consulta de candidatos" },
 ] as TitleItem[];
 
-const ConvocacaoCandidatos: React.FC = () => {
+const ConvocacaoCandidatosTela: React.FC = () => {
   const navigate = useNavigate();
   const {
     control,
@@ -234,4 +234,6 @@ const ConvocacaoCandidatos: React.FC = () => {
   );
 };
 
-export default ConvocacaoCandidatos;
+export default ConvocacaoCandidatosTela;
+
+

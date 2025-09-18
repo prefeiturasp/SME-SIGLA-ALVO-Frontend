@@ -50,7 +50,7 @@ describe('useProcessosConvocacao', () => {
     const { result } = renderHook(() => useProcessosConvocacao(), { wrapper });
 
     await waitFor(() => {
-      expect(result.current.concursosIsLoading).toBe(false);
+      expect(result.current.concursosOptionsIsLoading).toBe(false);
       expect(result.current.processosConvocacaoIsLoading).toBe(false);
     });
 

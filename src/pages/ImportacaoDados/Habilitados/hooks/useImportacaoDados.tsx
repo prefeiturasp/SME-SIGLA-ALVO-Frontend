@@ -6,6 +6,7 @@ import { API } from "../../../../services";
 import useImportacaoSchema from "./useImportacaoSchema";
 import type { IImportacaoHabilitadosFiltros, IImportacaoHabilitadosPayload } from "./types";
 import { useConcursos } from "../../../../hooks/useConcursos";
+import useImportacoesArquivos from "../../../../hooks/useImportacoesArquivos";
 // import type { IImportacaoRequest } from "../../../../../services/resources/importacaoDados/IImportacaoArquivos";
 
 export const useImportacaoDados = () => {
@@ -62,15 +63,7 @@ export const useImportacaoDados = () => {
   });
 
   // Query para buscar importações com parâmetros
-  const { data: importacoesArquivos, isLoading: importacoesArquivosIsLoading } = useQuery({
-    queryKey: ["getImportacaoArquivosHabilitados"],
-    queryFn: ({ signal }) =>
-      API.ImportacaoDados.getImportacaoArquivosHabilitados(
-         { signal }
-      ).response,
-    staleTime: 1000 * 60 * 5,
-    retry: 0,
-  });
+  const { importacoesArquivos, importacoesArquivosIsLoading } = useImportacoesArquivos();
 
   const handleEnviarForm = async (data: IImportacaoHabilitadosFiltros) => {
     if (!data.arquivo || !data.concurso) {

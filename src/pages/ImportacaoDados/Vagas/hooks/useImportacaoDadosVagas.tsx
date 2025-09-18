@@ -5,6 +5,7 @@ import { App } from "antd";
 import { API } from "../../../../services";
 import useImportacaoVagasSchema from "./useImportacaoVagasSchema";
 import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
+import useImportacaoArquivosVagas from "../../../../hooks/useImportacaoArquivosVagas";
 
 export const useImportacaoDadosVagas = () => {
   const { notification } = App.useApp();
@@ -35,18 +36,7 @@ export const useImportacaoDadosVagas = () => {
   });
 
   // Query para buscar importações com parâmetros
-  const { data: importacoesArquivos, isLoading: importacoesArquivosIsLoading, refetch: importacoesArquivosRefetch } = useQuery({
-    queryKey: ["getImportacaoArquivosVagas"],
-    queryFn: ({ signal }) =>
-      API.ImportacaoDados.getUltimasImportacoesArquivosVagas(
-        {
-          tipo: "VAGAS",
-        },
-        { signal }
-      ).response,
-    staleTime: 1000 * 60 * 5,
-    retry: 0,
-  });
+  const { importacoesArquivosData, importacoesArquivosIsLoading, importacoesArquivosRefetch } = useImportacaoArquivosVagas();
 
   // Mutation para post de importação de arquivos
   const postImportacaoArquivosVagasMutation = useMutation({
@@ -109,7 +99,7 @@ export const useImportacaoDadosVagas = () => {
     control,
     handleSubmit,
     formErrors,
-    importacoesArquivos,
+    importacoesArquivosData,
     importacoesArquivosIsLoading,
     handleEnviarForm,
     handleReset,

@@ -34,10 +34,6 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
     handleSubmit,
     handleEnviarForm,
     watch,
-    importacoesArquivos,
-    importacoesArquivosIsLoading,
-    isCreatingImportacao,
-    isValid = false,
   } = useImportacaoDadosVagas();
 
   const navigate=useNavigate();

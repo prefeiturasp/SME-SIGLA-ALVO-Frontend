@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { API } from "../services";
 
 export const useConcursos = () => {
-  const { data: concursosData, isLoading: concursosIsLoading } = useQuery({
+  const { data: concursosData, isLoading: concursosOptionsIsLoading } = useQuery({
     queryKey: ["getConcursos"],
     queryFn: ({ signal }) =>
       API.Concursos.getConcursos({ signal }).response,
@@ -13,6 +13,6 @@ export const useConcursos = () => {
 
   return {
     concursosData: concursosData || [],
-    concursosIsLoading,
+    concursosOptionsIsLoading,
   };
 };
