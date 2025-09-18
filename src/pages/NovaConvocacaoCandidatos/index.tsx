@@ -6,7 +6,6 @@ import { useForm, useWatch } from "react-hook-form";
 import { Link } from "react-router-dom";
 
 import { useConcursos } from "../../hooks/useConcursos";
-import type { IConvocacaoFiltros } from "../../services/resources/convocacao/IConvocacao";
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
 
