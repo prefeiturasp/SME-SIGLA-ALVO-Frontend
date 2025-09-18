@@ -11,6 +11,7 @@ import ImportacaoDados from "../pages/ImportacaoDados";
 import LayoutPadraoVagas from "../pages/ImportacaoDados/LayoutPadraoVagas";
 import HistoricoVagas from "../pages/ImportacaoDados/HistoricoVagas";
 import PageNotFound from "../pages/NotFound";
+import RouteError from "./RouteError";
 
 //TODO ADD FEATURE FLAG
 
@@ -18,30 +19,37 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+    errorElement: <RouteError />,
   },
   {
     path: "/processos/convocacao",
     element: <ConvocacaoCandidatos />,
+    errorElement: <RouteError />,
   },
   {
     path: "/processos/convocacao/nova",
     element: <NovaConvocacaoCandidatos />,
+    errorElement: <RouteError />,
   },
   {
     path: "/processos/importacao-dados",
     element: <ImportacaoDados />,
+    errorElement: <RouteError />,
   },
   {
     path: "/processos/importacao-dados/layout-padrao-vagas",
     element: <LayoutPadraoVagas tipo={'VAGAS'}/>,
+    errorElement: <RouteError />,
   },
     {
     path: "/processos/importacao-dados/layout-padrao-habilitados",
     element: <LayoutPadraoVagas tipo={'HABILITADOS'}/>,
+    errorElement: <RouteError />,
   },
     {
     path: "/processos/importacao-dados/historico-vagas",
     element: <HistoricoVagas />,
+    errorElement: <RouteError />,
   }, 
   
   {
@@ -51,10 +59,12 @@ const router = createBrowserRouter([
         <Dashboard />
       </ProtectedRoute>
     ),
+    errorElement: <RouteError />,
   },
   {
     path: "*",
     element: <PageNotFound />, 
+    errorElement: <RouteError />,
   },
 ]);
 

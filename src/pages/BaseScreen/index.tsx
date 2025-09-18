@@ -1,7 +1,7 @@
-import { Breadcrumb, Typography, type MenuProps } from "antd";
+import { Breadcrumb, Button, Typography, type MenuProps } from "antd";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import type { IProcessoConvocacao } from "../../services/resources/convocacao/IConvocacao";
-import React from "react";
+import React, { Suspense, useState } from "react";
 import { Layout, Menu, theme } from "antd";
 import icon from "../../assets/alvo-img.png";
 
@@ -36,8 +36,24 @@ const BaseScreen: React.FC<INewSampleModalProps> = ({
   } = theme.useToken();
 
 
+  const [error, setError] = useState<Error | null>(null);
+
+  const handleClick = () => {
+    setError(new Error("Erro lançado intencionalmente!"));
+  };
+
+  if (error) {
+    // quando você define o estado para erro, ele vai lançar o erro em render
+    throw error;
+  }
+
+ 
+
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Erro simulado para testar a tela de erro (use ?crash=1 na URL)
+  
 
   // Função para determinar qual menu deve estar selecionado baseado na URL
   const getSelectedKeys = () => {
@@ -95,6 +111,9 @@ const menuItens: MenuProps["items"] = [
     <Layout
       style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
     >
+          <Button danger onClick={handleClick}>
+      Clique para lançar erro
+    </Button>
       <GlobalMenuWidth />
       <Header style={{ display: "flex", alignItems: "center", padding:'0 1.5rem', boxShadow: '0px 4px 20px 0px rgba(0, 0, 0, 0.1)' }}>
          <img
@@ -123,7 +142,9 @@ const menuItens: MenuProps["items"] = [
             borderRadius: borderRadiusLG,
           }}
         >
-          {children}
+          <Suspense fallback={<Typography.Text>Carregando...</Typography.Text>}>
+            {children}
+          </Suspense>
         </div>
       </Content>
       <Footer style={{ textAlign: "center" }}>Alvo</Footer>
