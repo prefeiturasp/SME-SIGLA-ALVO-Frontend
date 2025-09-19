@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Typography, Card } from "antd";
+import { Typography, Card, Row, Col, Button } from "antd";
 
 import BaseScreen, { type TitleItem } from "../../BaseScreen";
 import { useForm, useWatch } from "react-hook-form";
@@ -9,6 +9,7 @@ import { useConcursos } from "./hooks/useConcursos";
 import type { IConvocacaoFiltros } from "../../../services/resources/convocacao/IConvocacao";
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
+import Agenda from "./components/Agenda/Agenda";
 
 const { Text } = Typography;
 
@@ -150,7 +151,27 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
         selectedCargoLabel={selectedCargoLabel}
         watchFields={watchFields}
         control={control}
+        agendaComponent={
+          <Agenda 
+            cargosDisponiveis={cargosDisponiveis}
+            watchFields={watchFields}
+          />
+        }
       />
+
+
+      <Row justify="end" gutter={16} style={{ marginTop: 24 }}>
+        <Col>
+          <Button type="primary" ghost size="large">
+            Cancelar
+          </Button>
+        </Col>
+        <Col>
+          <Button type="primary" size="large">
+            Salvar
+          </Button>
+        </Col>
+      </Row>
     </BaseScreen>
   );
 };

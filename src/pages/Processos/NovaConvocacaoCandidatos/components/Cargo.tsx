@@ -6,10 +6,10 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import ApprovalIcon from "@mui/icons-material/Approval";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
 import SchoolIcon from "@mui/icons-material/School";
 import GroupIcon from "@mui/icons-material/Group";
 import { PlusOutlined } from "@ant-design/icons";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import {
   StyledCardPequeno,
   StyledCardGrande,
@@ -48,6 +48,7 @@ interface CargoProps {
   podeVisualizarVagas: boolean;
   watchFields: any;
   control: Control<FormFields>;
+  agendaComponent: React.ReactNode;
 }
 
 const Cargo: React.FC<CargoProps> = ({
@@ -62,9 +63,11 @@ const Cargo: React.FC<CargoProps> = ({
   watchFields,
   podeVisualizarVagas,
   control,
+  agendaComponent,
 }) => {
   const [popupSelecionarCandidatos, setPopupSelecionarCandidatos] =
     useState(false);
+  
   
   const handleOpenVisualizarVagasModal = () => {
     setOpenVisualizarVagasModal(true);
@@ -114,8 +117,9 @@ const Cargo: React.FC<CargoProps> = ({
   };
 
   return (
-    <Card style={{ borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
-      <Space direction="vertical" size="small" style={{ width: "100%" }}>
+    <Space direction="vertical" size="large" style={{ width: "100%" }}>
+      <Card style={{ borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+        <Space direction="vertical" size="small" style={{ width: "100%" }}>
         <Title level={3}>Cargos</Title>
         <Text strong>Cargo</Text>
         <Controller
@@ -125,9 +129,12 @@ const Cargo: React.FC<CargoProps> = ({
             <Select
               {...field}
               placeholder="Selecione o cargo"
-              style={{ width: "32%" }}
+              style={{ width: "36.875rem", height: "2.5rem" }}
               disabled={!isCargoLiberado}
               options={cargosDisponiveis}
+              suffixIcon={
+                <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
+              }
             />
           )}
         />
@@ -340,6 +347,10 @@ const Cargo: React.FC<CargoProps> = ({
           Adicionar Cargo
         </Button>
 
+        <Divider style={{ margin: "16px 0" }} />
+
+        {agendaComponent}
+
         <VisualizarVagasModal
           isOpen={openVisualizarVagasModal}
           onCancel={handleCloseVisualizarVagas}
@@ -359,8 +370,9 @@ const Cargo: React.FC<CargoProps> = ({
           onCandidatosSelecionados={onCandidatosSelecionados}
         />
 
-      </Space>
-    </Card>
+        </Space>
+      </Card>
+    </Space>
   );
 };
 

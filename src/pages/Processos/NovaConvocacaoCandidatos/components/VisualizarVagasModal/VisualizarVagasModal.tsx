@@ -1,6 +1,6 @@
 import { Button, Select, Space, Typography } from "antd";
-import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import { PlusOutlined } from "@ant-design/icons";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 
 const { Text } = Typography;
 
@@ -102,7 +102,7 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
       footer={
         <Row justify="space-between" align="middle" style={{ width: "100%" }}>
           <Col>
-            <Button type="primary" size="large" icon={<PlusOutlined />} onClick={handleOpenAdicionarEscola}>
+            <Button size="large" type="primary" icon={<PlusOutlined />} onClick={handleOpenAdicionarEscola}>
               Incluir Escola
             </Button>
           </Col>
@@ -111,17 +111,16 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
             <Space size={24}>
               <Button
                 key="atualizar"
-                type="primary"
-                ghost
                 size="large"
+                type="primary"
                 onClick={() => onCancel()}
               >
                 Cancelar
               </Button>
               <Button
                 key="salvar"
-                type="primary"
                 size="large"
+                type="primary"
                 onClick={handleSubmit(onFinish)}
               >
                 Salvar
