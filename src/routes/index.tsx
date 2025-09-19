@@ -5,11 +5,11 @@ import ProtectedRoute from "./protected";
 
 
 import { HomeTela } from "../pages/Home/HomeTela";
-import ConvocacaoCandidatosTela from "../pages/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
-import NovaConvocacaoCandidatosTela from "../pages/NovaConvocacaoCandidatos/NovaConvocacaoCandidatosTela";
-import ImportacaoDadosTela from "../pages/ImportacaoDados";
-import LayoutPadraoVagasTela from "../pages/ImportacaoDados/LayoutPadraoVagas/LayoutPadraoVagasTela";
-import HistoricoVagasTela from "../pages/ImportacaoDados/HistoricoVagas/HistoricoVagasTela";
+import ConvocacaoCandidatosTela from "../pages/Processos/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
+import NovaConvocacaoCandidatosTela from "../pages/Processos/NovaConvocacaoCandidatos/NovaConvocacaoCandidatosTela";
+import ImportacaoDadosTela from "../pages/Processos/ImportacaoDados/ImportacaoDadosTela"; 
+import LayoutPadraoVagasTela from "../pages/Processos/ImportacaoDados/LayoutPadraoVagas/LayoutPadraoVagasTela";
+import HistoricoVagasTela from "../pages/Processos/ImportacaoDados/HistoricoVagas/HistoricoVagasTela";
 import NotFoundTela from "../pages/NotFound/NotFoundTela";
 import RouteError from "./RouteError";
 
