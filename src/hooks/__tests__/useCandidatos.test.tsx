@@ -1,7 +1,7 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useCandidatos } from '../../pages/NovaConvocacaoCandidatos/components/SelecionarCandidatos/useCandidatos';
+import { useCandidatos } from '../../pages/Processos/NovaConvocacaoCandidatos/components/SelecionarCandidatos/useCandidatos';
 
 
 jest.mock('../../services', () => ({
