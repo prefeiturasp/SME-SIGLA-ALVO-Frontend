@@ -1,59 +1,69 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import {Dashboard} from "../pages/Dashboard";
+import {DashboardTela} from "../pages/Dashboard/DashboardTela";
 import ProtectedRoute from "./protected";
 
 
-import NotFound from "../pages/NotFound";
-import { Home } from "../pages/Home/Home";
-import ConvocacaoCandidatos from "../pages/Processos/ConvocacaoCandidatos";
-import NovaConvocacaoCandidatos from "../pages/Processos/NovaConvocacaoCandidatos";
-import ImportacaoDados from "../pages/Processos/ImportacaoDados";
-import LayoutPadraoVagas from "../pages/Processos/ImportacaoDados/LayoutPadraoVagas";
-import HistoricoVagas from "../pages/Processos/ImportacaoDados/HistoricoVagas";
+
+import { HomeTela } from "../pages/Home/HomeTela";
+import ConvocacaoCandidatosTela from "../pages/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
+import NovaConvocacaoCandidatosTela from "../pages/NovaConvocacaoCandidatos/NovaConvocacaoCandidatosTela";
+import ImportacaoDadosTela from "../pages/ImportacaoDados";
+import LayoutPadraoVagasTela from "../pages/ImportacaoDados/LayoutPadraoVagas/LayoutPadraoVagasTela";
+import HistoricoVagasTela from "../pages/ImportacaoDados/HistoricoVagas/HistoricoVagasTela";
+import NotFoundTela from "../pages/NotFound/NotFoundTela";
+import RouteError from "./RouteError";
 
 //TODO ADD FEATURE FLAG
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <HomeTela />,
+    errorElement: <RouteError />,
   },
   {
     path: "/processos/convocacao",
-    element: <ConvocacaoCandidatos />,
+    element: <ConvocacaoCandidatosTela />,
+    errorElement: <RouteError />,
   },
   {
     path: "/processos/convocacao/nova",
-    element: <NovaConvocacaoCandidatos />,
+    element: <NovaConvocacaoCandidatosTela />,
+    errorElement: <RouteError />,
   },
   {
     path: "/processos/importacao-dados",
-    element: <ImportacaoDados />,
+    element: <ImportacaoDadosTela />,
+    errorElement: <RouteError />,
   },
   {
     path: "/processos/importacao-dados/layout-padrao-vagas",
-    element: <LayoutPadraoVagas tipo={'VAGAS'}/>,
+    element: <LayoutPadraoVagasTela tipo={'VAGAS'}/>,
+    errorElement: <RouteError />,
   },
     {
     path: "/processos/importacao-dados/layout-padrao-habilitados",
-    element: <LayoutPadraoVagas tipo={'HABILITADOS'}/>,
+    element: <LayoutPadraoVagasTela tipo={'HABILITADOS'}/>,
+    errorElement: <RouteError />,
   },
     {
     path: "/processos/importacao-dados/historico-vagas",
-    element: <HistoricoVagas />,
-  }, 
-  
+    element: <HistoricoVagasTela />,
+    errorElement: <RouteError />,
+  },   
   {
     path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <Dashboard />
+        <DashboardTela />
       </ProtectedRoute>
     ),
+    errorElement: <RouteError />,
   },
   {
     path: "*",
-    element: <NotFound />, 
+    element: <NotFoundTela />, 
+    errorElement: <RouteError />,
   },
 ]);
 
