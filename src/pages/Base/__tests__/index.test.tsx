@@ -19,7 +19,7 @@ jest.mock('antd', () => ({
 }));
 
 jest.mock('../../../assets/alvo-img.png', () => 'mocked-image.png');
-jest.mock('../../../components/UserAvatar/UserAvatar', () => ({
+jest.mock('../../../components/UserAvatar', () => ({
   UserAvatar: () => <div data-testid="user-avatar">User Avatar</div>,
 }));
 jest.mock('@mui/icons-material/ArrowDropDown', () => ({
