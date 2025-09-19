@@ -3,7 +3,7 @@ import { screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider as SCThemeProvider } from 'styled-components';
 import { theme as appTheme } from '../../../../theme';
-import { renderWithProviders } from '../../../test-utils';
+import { renderWithProviders } from '../../../../test-utils';
 import ConvocacaoCandidatos from '../index';
 
 // Mock Controller para evitar necessidade de control real
@@ -183,6 +183,42 @@ describe('ConvocacaoCandidatos', () => {
       expect(fimInput.value).toMatch(/\d{2}\/\d{2}\/\d{4}/);
       expect(fimInput.value).not.toBe(prev);
     });
+  });
+
+  it('renderiza campos de formulário com validação', () => {
+    renderComponent();
+    
+    // Verifica se os campos estão renderizados
+    expect(screen.getByText('Concurso')).toBeInTheDocument();
+    expect(screen.getByText('Data de Convocação')).toBeInTheDocument();
+    expect(screen.getByText('Cargo')).toBeInTheDocument();
+    
+    // Verifica se os campos de data estão presentes
+    expect(screen.getByPlaceholderText('inicio')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Fim')).toBeInTheDocument();
+  });
+
+  it('renderiza botões de ação corretamente', () => {
+    renderComponent();
+    
+    // Verifica se os botões estão presentes
+    expect(screen.getByRole('button', { name: /nova convocação/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /limpar filtros/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /pesquisar/i })).toBeInTheDocument();
+  });
+
+  it('renderiza tabela com dados mockados', () => {
+    renderComponent();
+    
+    // Verifica se a tabela está renderizada com os dados mockados
+    expect(screen.getByText('ConvocacaoTable Mock - 1 itens - página 1')).toBeInTheDocument();
+  });
+
+  it('renderiza paginação com função showTotal', () => {
+    renderComponent();
+    
+    // Verifica se a função showTotal está sendo chamada
+    expect(screen.getByTestId('pagination-total')).toBeInTheDocument();
   });
 
 }); 

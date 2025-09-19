@@ -630,6 +630,37 @@ describe('useListRequest', () => {
       expect(result.current.listRequest.sort).toBeUndefined();
       expect(result.current.listRequest.order).toBeUndefined();
     });
+
+    it('deve usar prev.sort quando columnKey é undefined', () => {
+      const estadoComSort: IFullListRequest<FiltroTeste> = {
+        filters: {
+          nome: 'teste',
+          status: 'ativo',
+        },
+        sort: 'nome',
+        order: 'asc' as const,
+      };
+
+      const { result } = renderHook(() => useFullListRequest(estadoComSort));
+
+      const ordenador: SorterResult<any> = {
+        order: 'descend',
+        // columnKey é undefined
+      };
+
+      act(() => {
+        result.current.onAntTableChange(
+          {},
+          {},
+          ordenador,
+          { currentDataSource: [], action: 'sort' }
+        );
+      });
+
+      // Deve usar o prev.sort quando columnKey é undefined
+      expect(result.current.listRequest.sort).toBe('nome');
+      expect(result.current.listRequest.order).toBe('desc');
+    });
   });
 
   describe('Casos extremos e tratamento de erros', () => {

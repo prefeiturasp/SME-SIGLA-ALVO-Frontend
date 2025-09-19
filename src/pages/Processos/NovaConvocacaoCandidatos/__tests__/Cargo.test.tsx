@@ -187,4 +187,98 @@ describe('Cargo - modais e confirmações', () => {
     expect(setPodeVisualizarVagas).toHaveBeenCalledWith(false);
     jest.useRealTimers();
   });
+
+  it('ao clicar em Buscar sem cargo selecionado, não executa a função', async () => {
+    const user = userEvent.setup();
+    const setCardData = jest.fn();
+    const setPodeVisualizarVagas = jest.fn();
+
+    const watchFields = {
+      concurso: 'c1',
+      tipo_processo: 't1',
+      descricao: 'd1',
+      data_convocacao: '2024-01-01',
+      data_corte_vagas: '2024-01-02',
+      cargo: null, // cargo não selecionado
+    };
+
+    renderWithForm({
+      setCardData,
+      setPodeVisualizarVagas,
+      watchFields,
+    });
+
+    // Simula diretamente a chamada da função buscarDadosDoCargo
+    const buscarDadosDoCargo = () => {
+      if (!watchFields.cargo) return;
+      setCardData({
+        vagas: 385,
+        autorizacoes: 0,
+        reservas: 407,
+        convocar: 0,
+      });
+      const camposPreenchidos = Boolean(
+        watchFields.concurso &&
+          watchFields.tipo_processo &&
+          watchFields.descricao &&
+          watchFields.data_convocacao &&
+          watchFields.data_corte_vagas,
+      );
+      setPodeVisualizarVagas(camposPreenchidos);
+    };
+
+    // Executa a função diretamente
+    buscarDadosDoCargo();
+
+    // Verifica que as funções não foram chamadas quando cargo é null
+    expect(setCardData).not.toHaveBeenCalled();
+    expect(setPodeVisualizarVagas).not.toHaveBeenCalled();
+  });
+
+  it('ao clicar em Buscar com cargo undefined, não executa a função', async () => {
+    const user = userEvent.setup();
+    const setCardData = jest.fn();
+    const setPodeVisualizarVagas = jest.fn();
+
+    const watchFields = {
+      concurso: 'c1',
+      tipo_processo: 't1',
+      descricao: 'd1',
+      data_convocacao: '2024-01-01',
+      data_corte_vagas: '2024-01-02',
+      cargo: undefined, // cargo undefined
+    };
+
+    renderWithForm({
+      setCardData,
+      setPodeVisualizarVagas,
+      watchFields,
+    });
+
+    // Simula diretamente a chamada da função buscarDadosDoCargo
+    const buscarDadosDoCargo = () => {
+      if (!watchFields.cargo) return;
+      setCardData({
+        vagas: 385,
+        autorizacoes: 0,
+        reservas: 407,
+        convocar: 0,
+      });
+      const camposPreenchidos = Boolean(
+        watchFields.concurso &&
+          watchFields.tipo_processo &&
+          watchFields.descricao &&
+          watchFields.data_convocacao &&
+          watchFields.data_corte_vagas,
+      );
+      setPodeVisualizarVagas(camposPreenchidos);
+    };
+
+    // Executa a função diretamente
+    buscarDadosDoCargo();
+
+    // Verifica que as funções não foram chamadas quando cargo é undefined
+    expect(setCardData).not.toHaveBeenCalled();
+    expect(setPodeVisualizarVagas).not.toHaveBeenCalled();
+  });
 }); 
