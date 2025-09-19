@@ -157,9 +157,6 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
           />
         }
       />
-<<<<<<< HEAD:src/pages/NovaConvocacaoCandidatos/NovaConvocacaoCandidatosTela.tsx
-    </BaseTela>
-=======
 
 
       <Row justify="end" gutter={16} style={{ marginTop: 24 }}>
@@ -174,8 +171,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
           </Button>
         </Col>
       </Row>
-    </BaseScreen>
->>>>>>> feature/131553-criacao-funcionalidade-agenda:src/pages/Processos/NovaConvocacaoCandidatos/index.tsx
+    </BaseTela>
   );
 };
 

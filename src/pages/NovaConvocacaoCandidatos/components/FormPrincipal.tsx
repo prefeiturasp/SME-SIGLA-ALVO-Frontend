@@ -52,14 +52,10 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                 placeholder="Selecione o concurso"
                 style={{ width: "36.875rem", height: "2.5rem" }}
                 options={concursosData || []}
-<<<<<<< HEAD:src/pages/NovaConvocacaoCandidatos/components/FormPrincipal.tsx
                 loading={concursosOptionsIsLoading}
-=======
-                loading={concursosIsLoading}
                 suffixIcon={
                   <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
                 }
->>>>>>> feature/131553-criacao-funcionalidade-agenda:src/pages/Processos/NovaConvocacaoCandidatos/components/FormPrincipal.tsx
                 onChange={(value) => {
                   field.onChange(value as string);
                   buscarCargosDoConcurso(value as string);

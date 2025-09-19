@@ -1,11 +1,6 @@
 import styled from 'styled-components';
-<<<<<<< HEAD:src/pages/NovaConvocacaoCandidatos/styles.ts
-import { Button, Card, Form, Row, Col, Input, Typography } from 'antd';
- 
-=======
 import { Button, Card, Form, Row, Col, Input, Typography, Modal as AntModal, Checkbox } from 'antd';
 
->>>>>>> feature/131553-criacao-funcionalidade-agenda:src/pages/Processos/NovaConvocacaoCandidatos/styles.ts
 
 export const StyledCardPequeno = styled(Card)`
   width: 12.5rem;
