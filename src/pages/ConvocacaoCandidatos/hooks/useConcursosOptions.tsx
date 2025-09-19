@@ -1,6 +1,6 @@
 // src/pages/Processos/NovaConvocacaoCandidatos/hooks/useConcursos.tsx
 import { useQuery } from "@tanstack/react-query";
-import { API } from "../services";
+import { API } from "../../../services";
 
 export const useConcursosOptions = () => {
 

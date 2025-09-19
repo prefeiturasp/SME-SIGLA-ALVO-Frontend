@@ -1,14 +1,12 @@
 // src/pages/ProcessosConvocacao/hooks/useProcessosConvocacao.ts
 import { useForm, type Resolver } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { API } from "../../../services";
 import useConvocacaoSchema from "../useConvocacaoSchema";
 import type { IFiltroProcessos } from "../../../services/resources/convocacao/IConvocacao";
 import useListRequest, { removeUndefinedFields } from "../../../hooks/useListRequest";
-import { useConcursosOptions } from "../../../hooks/useConcursosOptions";
-import useConvocacao from "../../../hooks/useConvocacao";
+import { useConcursosOptions } from "./useConcursosOptions";
+import useConvocacao from "./useConvocacao";
 
 export const useProcessosConvocacao = () => {
   const defaultValues: IFiltroProcessos = {

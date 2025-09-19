@@ -3,11 +3,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 // import { useQueryClient } from "@tanstack/react-query";
 // import { App } from "antd";
 // import { API } from "../../../../services";
-import { usePostImportacaoArquivosHabilitados } from "../../../../hooks/usePostImportacaoArquivosHabilitados";
+import { usePostImportacaoArquivosHabilitados } from "./usePostImportacaoArquivosHabilitados";
 import useImportacaoSchema from "./useImportacaoSchema";
 import type { IImportacaoHabilitadosFiltros, IImportacaoHabilitadosPayload } from "./types";
 import { useConcursos } from "../../../../hooks/useConcursos";
-import useImportacoesArquivosHabilitados from "../../../../hooks/useImportacoesArquivosHabilitados";
+import useImportacoesArquivosHabilitados from "./useImportacoesArquivosHabilitados";
 
 
 export const useImportacaoDados = () => {

@@ -22,7 +22,7 @@ jest.mock('@mui/icons-material/CalendarMonthRounded', () => () => <div data-test
 jest.mock('@mui/icons-material/UploadFile', () => () => <div data-testid="upload-icon" />);
 jest.mock('@mui/icons-material/ExpandMore', () => () => <div data-testid="expand-icon" />);
 
-jest.mock('../../../../components/estilosCompartilhados/styles', () => ({
+jest.mock('../../../../components/EstilosCompartilhados', () => ({
   TabContentContainer: ({ children }: { children: React.ReactNode }) => <div data-testid="tab-content-container">{children}</div>,
   SectionCard: ({ children }: { children: React.ReactNode }) => <div data-testid="section-card">{children}</div>,
   SectionTitle: ({ children }: { children: React.ReactNode }) => <div data-testid="section-title">{children}</div>,
@@ -32,7 +32,7 @@ jest.mock('../../../../components/estilosCompartilhados/styles', () => ({
   ActionButtonsContainer: ({ children }: { children: React.ReactNode }) => <div data-testid="action-buttons-container">{children}</div>,
 }));
 
-jest.mock('../../../../components/formStyle/styles', () => ({
+jest.mock('../../../../components/FormStyle', () => ({
   CustomFormItem: ({ children, label, validateStatus, help }: any) => (
     <div data-testid="custom-form-item" data-validate-status={validateStatus}>
       {label && <label>{label}</label>}{children}{help && <span data-testid="form-help">{help}</span>}

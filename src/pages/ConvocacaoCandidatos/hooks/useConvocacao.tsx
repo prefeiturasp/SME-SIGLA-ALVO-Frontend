@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { API } from "../services";
-import type { IListRequest } from "../types/IListRequest";
+import { API } from "../../../services";
+import type { IListRequest } from "../../../types/IListRequest";
 
 const useConvocacao = (listRequest: IListRequest) => {
  

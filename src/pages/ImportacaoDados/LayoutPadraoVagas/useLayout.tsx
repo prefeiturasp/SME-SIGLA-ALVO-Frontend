@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { API } from "../services";
+import { API } from "../../../services";
 
 
 const useLayout = (tipo: string) => {

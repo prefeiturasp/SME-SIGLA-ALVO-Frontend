@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 
 import LayoutPadrao from "../Habilitados/components/LayoutPadrao";
-import useLayout from "../../../hooks/useLayout";
+import useLayout from "./useLayout";
 
 const { Text } = Typography;
 

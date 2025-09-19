@@ -1,9 +1,9 @@
 import { useForm, type Resolver } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { usePostImportacaoArquivosVagas } from "../../../../hooks/usePostImportacaoArquivosVagas";
+import { usePostImportacaoArquivosVagas } from "./usePostImportacaoArquivosVagas";
 import useImportacaoVagasSchema from "./useImportacaoVagasSchema";
 import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
-import useImportacaoArquivosVagas from "../../../../hooks/useImportacaoArquivosVagas";
+import useImportacaoArquivosVagas from "./useImportacaoArquivosVagas";
 
 export const useImportacaoDadosVagas = () => {
 

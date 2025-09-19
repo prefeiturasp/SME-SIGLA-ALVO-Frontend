@@ -1,23 +1,30 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { App } from "antd";
-import { API } from "../services";
-import type { IImportacaoHabilitadosPayload } from "../pages/ImportacaoDados/Habilitados/hooks/types";
+import { API } from "../../../../services";
+import type { IImportacaoVagasPayload } from "./types";
 
-export const usePostImportacaoArquivosHabilitados = () => {
+type UsePostImportacaoArquivosVagasOptions = {
+  onSuccess?: () => void;
+};
+
+export const usePostImportacaoArquivosVagas = (
+  options?: UsePostImportacaoArquivosVagasOptions
+) => {
   const queryClient = useQueryClient();
   const { notification } = App.useApp();
 
   return useMutation({
-    mutationFn: (payload: IImportacaoHabilitadosPayload) =>
-      API.ImportacaoDados.postImportacaoArquivosHabilitados(payload).response,
+    mutationFn: (payload: IImportacaoVagasPayload) =>
+      API.ImportacaoDados.postImportacaoArquivosVagas(payload).response,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getImportacaoArquivosHabilitados"] });
+      queryClient.invalidateQueries({ queryKey: ["getImportacaoArquivosVagas"] });
       notification.success({
         message: "Importação Realizada",
         description: "A importação dos dados foi processada com sucesso!",
         placement: "top",
         duration: 3.5,
       });
+      options?.onSuccess?.();
     },
     onError: () => {
       notification.error({

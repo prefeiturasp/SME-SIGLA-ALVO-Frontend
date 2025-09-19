@@ -13,7 +13,7 @@ import {
   StyledInput,
   StyledText
 } from '../../styles';
-import { useCandidatos } from '../../../../hooks/useCandidatos';
+import { useCandidatos } from './useCandidatos';
 
 const { Title, Text } = Typography;
 
