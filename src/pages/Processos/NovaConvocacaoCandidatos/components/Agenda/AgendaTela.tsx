@@ -6,12 +6,12 @@ import AgendaTabela from "./AgendaTabela";
 
 const { Title } = Typography;
 
-interface AgendaProps {
+interface AgendaTelaProps {
   cargosDisponiveis: Option[];
   watchFields: any;
 }
 
-const Agenda: React.FC<AgendaProps> = ({
+const AgendaTela: React.FC<AgendaTelaProps> = ({
   cargosDisponiveis,
   watchFields: _, // Pode ser usado futuramente para sincronização
 }) => {
@@ -51,4 +51,4 @@ const Agenda: React.FC<AgendaProps> = ({
   );
 };
 
-export default Agenda;
+export default AgendaTela;

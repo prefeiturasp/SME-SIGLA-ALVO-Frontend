@@ -9,7 +9,7 @@ import { useConcursos } from "./hooks/useConcursos";
 import type { IConvocacaoFiltros } from "../../../services/resources/convocacao/IConvocacao";
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
-import Agenda from "./components/Agenda/Agenda";
+import AgendaTela from "./components/Agenda/AgendaTela";
 
 const { Text } = Typography;
 
@@ -152,7 +152,7 @@ export const NovaConvocacaoCandidatos: React.FC = () => {
         watchFields={watchFields}
         control={control}
         agendaComponent={
-          <Agenda 
+          <AgendaTela 
             cargosDisponiveis={cargosDisponiveis}
             watchFields={watchFields}
           />
