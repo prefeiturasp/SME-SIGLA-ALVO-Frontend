@@ -1,9 +1,8 @@
-import { Avatar, Space, Typography } from 'antd';
-import type { IProcessoConvocacao } from '../../services/resources/convocacao/IConvocacao';
+import { Avatar, Space } from 'antd';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import { useTheme } from "styled-components";
-import { CustomLabel } from '../../pages/Base/styles';
+import { CustomLabel } from '../pages/Base/styles';
 
  
 

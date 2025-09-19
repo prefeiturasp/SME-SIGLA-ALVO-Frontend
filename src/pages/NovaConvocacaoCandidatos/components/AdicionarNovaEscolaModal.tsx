@@ -14,8 +14,7 @@ import type { IConvocacaoFiltros } from "../../../services/resources/convocacao/
 import { useTheme } from "styled-components";
 import {
   CustomModal,
-  TextBlue,
-} from "../../../components/estilosCompartilhados/styles";
+} from "../../../components/EstilosCompartilhados";
 import AdicionarEscolaTable from "./AdicionarEscolaTable";
 
 interface INewAdicionarNovaEscolaModalProps {

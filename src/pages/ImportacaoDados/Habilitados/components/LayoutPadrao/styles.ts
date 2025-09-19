@@ -1,1 +1,1 @@
-export { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from '../../../../../components/estilosCompartilhados/styles';
+export { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from '../../../../../components/EstilosCompartilhados';

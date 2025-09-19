@@ -6,11 +6,11 @@ const { Text } = Typography;
 
 import { Col, Divider, Input, Row } from "antd";
 import { Controller, useForm } from "react-hook-form";
-import { ModalCustomFormItem as CustomFormItem, CustomModal } from "../../styles";
+import { ModalCustomFormItem as CustomFormItem } from "../../styles";
 import { Content } from "antd/es/layout/layout";
 import type { IConvocacaoFiltros } from "../../../../services/resources/convocacao/IConvocacao";
 import UnidadeEscolarTable from "../UnidadeEscolarTable";
-import { TextBlue } from "../../../../components/estilosCompartilhados/styles";
+import { CustomModal2 as CustomModal, TextBlue } from '../../../../components/EstilosCompartilhados';
 import { useState } from "react";
 import AdicionarNovaEscolaModal from "../AdicionarNovaEscolaModal";
 

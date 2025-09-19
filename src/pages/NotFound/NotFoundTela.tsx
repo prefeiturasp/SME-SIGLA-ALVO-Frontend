@@ -4,7 +4,7 @@ import { Button, Result } from 'antd';
 
 
 
-const PageNotFoundTela = () => {
+const NotFoundTela = () => {
   const navigate = useNavigate();
   return (
     <Result
@@ -23,4 +23,4 @@ const PageNotFoundTela = () => {
   )
 }
 
-export default PageNotFoundTela;
+export default NotFoundTela;

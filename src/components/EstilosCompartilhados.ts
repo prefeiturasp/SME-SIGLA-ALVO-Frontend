@@ -210,6 +210,7 @@ export const SecondaryButton = styled(Button)`
   }
 `;
 
+
 // Botão primário personalizado
 export const PrimaryButton = styled(Button)`
   border-radius: 0.375rem !important;

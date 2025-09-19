@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { Controller } from "react-hook-form";
 import type { Control } from "react-hook-form";
-import { CustomFormItem } from "../../../components/formStyle/styles";
+import { CustomFormItem } from "../../../components/FormStyle";
 
 const { Text } = Typography;
 

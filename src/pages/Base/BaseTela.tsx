@@ -5,7 +5,7 @@ import React, { Suspense } from "react";
 import { Layout, Menu, theme } from "antd";
 import icon from "../../assets/alvo-img.png";
 
-import { UserAvatar } from "../../components/UserAvatar/UserAvatar";
+import { UserAvatar } from "../../components/UserAvatar";
 import { useNavigate, useLocation } from "react-router-dom";
 import { GlobalMenuWidth } from "./styles";
 

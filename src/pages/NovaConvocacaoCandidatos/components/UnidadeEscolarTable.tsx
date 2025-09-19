@@ -3,7 +3,7 @@ import type { TableProps } from "antd";
 import { Flex, Button, Tooltip, InputNumber } from "antd";
 import type { TableColumnsType } from "antd";
 import type { IUnidadeEscolar } from "../../../services/resources/convocacao/IConvocacao";
-import { StyledTable } from "../../../components/estilosCompartilhados/styles";
+import { StyledTable } from "../../../components/EstilosCompartilhados";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { Controller, useForm } from "react-hook-form";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";

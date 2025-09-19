@@ -16,7 +16,7 @@ import type { TableColumnsType } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { useTheme } from "styled-components";
 import type { IUnidadeEscolar } from "../../../services/resources/convocacao/IConvocacao";
-import { StyledTable } from "../../../components/estilosCompartilhados/styles";
+import { StyledTable } from "../../../components/EstilosCompartilhados";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {

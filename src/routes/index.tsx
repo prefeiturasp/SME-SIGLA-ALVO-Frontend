@@ -10,7 +10,7 @@ import NovaConvocacaoCandidatosTela from "../pages/NovaConvocacaoCandidatos/Nova
 import ImportacaoDadosTela from "../pages/ImportacaoDados";
 import LayoutPadraoVagasTela from "../pages/ImportacaoDados/LayoutPadraoVagas/LayoutPadraoVagasTela";
 import HistoricoVagasTela from "../pages/ImportacaoDados/HistoricoVagas/HistoricoVagasTela";
-import PageNotFoundTela from "../pages/PageNotFound/PageNotFoundTela";
+import NotFoundTela from "../pages/NotFound/NotFoundTela";
 import RouteError from "./RouteError";
 
 //TODO ADD FEATURE FLAG
@@ -62,7 +62,7 @@ const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <PageNotFoundTela />, 
+    element: <NotFoundTela />, 
     errorElement: <RouteError />,
   },
 ]);

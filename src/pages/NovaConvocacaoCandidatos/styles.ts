@@ -1,7 +1,6 @@
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 import { Button, Card, Form, Row, Col, Input, Typography } from 'antd';
-export { CustomModal2 as CustomModal } from '../../components/estilosCompartilhados/styles';
-
+ 
 
 export const StyledCardPequeno = styled(Card)`
   width: 12.5rem;
@@ -42,22 +41,7 @@ export const ActionButton = styled(Button)`
   margin: 0.625rem 0.5rem 0.625rem 0;
   border-radius: 0.3125rem;
 `;
-
-export const PrimaryButton = styled(Button)`
-  background-color: #05409a;
-  color: #fff;
-  border: none;
-  border-radius: 0.25rem;
-  margin: 1rem 0;
-  &:hover {
-    background-color: #38388bff !important;
-    color: #fff !important;
-  }
-`;
-
-export const AddButton = styled(PrimaryButton)`
-  margin-top: 0.75rem;
-`;
+ 
 
 export const CustomFormItem = styled(Form.Item).attrs({
   colon: false,

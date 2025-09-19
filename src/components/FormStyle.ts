@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Modal as AntModal, Col } from "antd";
+import { Col } from "antd";
 import FormItem from "antd/es/form/FormItem";
 
 export const SelectContainer = styled.div`

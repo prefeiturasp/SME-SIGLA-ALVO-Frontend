@@ -7,7 +7,7 @@ import type { IProcessoConvocacao } from "../../../services/resources/convocacao
 import { CustomTitle } from "./style";
 
 import { Button, Space } from "antd";
-import { StyledTable } from "../../../components/estilosCompartilhados/styles";
+import { StyledTable } from "../../../components/EstilosCompartilhados";
 
 interface ConvocacaoTableProps extends TableProps<IProcessoConvocacao> {
   data: IProcessoConvocacao[];

@@ -4,7 +4,7 @@ import { Controller } from "react-hook-form";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useImportacaoDados } from "./hooks/useImportacaoDados";
-import { CustomFormItem } from "../../../components/formStyle/styles";
+import { CustomFormItem } from "../../../components/FormStyle";
 import {
   TabContentContainer,
   SectionCard,
@@ -13,7 +13,7 @@ import {
   UploadArea,
   StyledUpload,
   ActionButtonsContainer,
-} from "../../../components/estilosCompartilhados/styles";
+} from "../../../components/EstilosCompartilhados";
 import { useConcursos } from "../../../hooks/useConcursos";
 
 

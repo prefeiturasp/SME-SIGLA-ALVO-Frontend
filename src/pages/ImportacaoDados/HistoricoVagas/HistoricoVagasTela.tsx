@@ -9,7 +9,7 @@ import {
   SectionCard,
   ActionButtonsContainer,
   SecondaryButton 
-} from "../../../components/estilosCompartilhados/styles";
+} from "../../../components/EstilosCompartilhados";
  
 import UltimasImportacoesDeVagasTable from "../Vagas/components/UltimasImportacoesDeVagasTable";
 import { Link, useNavigate } from "react-router-dom";

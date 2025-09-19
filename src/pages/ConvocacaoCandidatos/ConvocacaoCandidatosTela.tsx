@@ -4,7 +4,7 @@ import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { Controller } from "react-hook-form";
-import { CustomFormItem, SeparatorCol } from "../../components/formStyle/styles";
+import { CustomFormItem, SeparatorCol } from "../../components/FormStyle";
 import ConvocacaoTable from "./components/ConvocacaoTable";
 import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
 import { useNavigate } from "react-router-dom";

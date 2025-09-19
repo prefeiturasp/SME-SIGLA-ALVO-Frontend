@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import { CustomTitle } from "./style";
 
 
-import { StyledTable } from "../../../../components/estilosCompartilhados/styles";
+import { StyledTable } from "../../../../components/EstilosCompartilhados";
 import type { IUltimasImportacoesVagas } from "../../../../services/resources/importacaoDados/IImportacaoArquivos";
 
 interface UltimasImportacoesDeVagasTableProps extends TableProps<IUltimasImportacoesVagas> {

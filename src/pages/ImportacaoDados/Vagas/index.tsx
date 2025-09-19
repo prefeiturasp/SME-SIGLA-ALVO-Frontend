@@ -6,7 +6,7 @@ import { Controller } from "react-hook-form";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useImportacaoDadosVagas } from "./hooks/useImportacaoDadosVagas";
-import { CustomFormItem } from "../../../components/formStyle/styles";
+import { CustomFormItem } from "../../../components/FormStyle";
 import {
   TabContentContainer,
   SectionCard,
@@ -15,7 +15,7 @@ import {
   UploadArea,
   StyledUpload,
   ActionButtonsContainer,
-} from "../../../components/estilosCompartilhados/styles";
+} from "../../../components/EstilosCompartilhados";
 import { useCargos } from "../../../hooks/useCargos";
 import UltimasImportacoesDeVagasTable from "./components/UltimasImportacoesDeVagasTable";
 import { useNavigate } from "react-router-dom";
