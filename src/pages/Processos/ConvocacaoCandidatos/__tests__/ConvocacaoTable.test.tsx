@@ -64,4 +64,25 @@ describe('ConvocacaoTable', () => {
 
     consoleSpy.mockRestore();
   });
+
+  it('aplica classes CSS corretas para linhas pares e ímpares', () => {
+    const data = [
+      makeRow({ uuid: 'uuid-1', concurso_nome: 'Concurso 1' }),
+      makeRow({ uuid: 'uuid-2', concurso_nome: 'Concurso 2' }),
+      makeRow({ uuid: 'uuid-3', concurso_nome: 'Concurso 3' }),
+    ];
+
+    renderWithTheme(<ConvocacaoTable data={data} />);
+
+    const rows = screen.getAllByRole('row').slice(1); // Remove header row
+
+    // Primeira linha (índice 0) deve ter classe "row-white"
+    expect(rows[0]).toHaveClass('row-white');
+    
+    // Segunda linha (índice 1) deve ter classe "row-gray"
+    expect(rows[1]).toHaveClass('row-gray');
+    
+    // Terceira linha (índice 2) deve ter classe "row-white"
+    expect(rows[2]).toHaveClass('row-white');
+  });
 }); 

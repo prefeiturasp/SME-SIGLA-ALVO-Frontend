@@ -4,7 +4,7 @@ import { message } from 'antd';
 import SelecionarCandidatos from '../index';
 
 const mockUseCandidatos = jest.fn();
-jest.mock('../../../../../hooks/useCandidatos', () => ({
+jest.mock('../useCandidatos', () => ({
   useCandidatos: (shouldFetch: boolean) => mockUseCandidatos(shouldFetch),
 }));
 

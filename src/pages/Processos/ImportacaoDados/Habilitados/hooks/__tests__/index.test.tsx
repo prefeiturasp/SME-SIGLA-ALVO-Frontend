@@ -14,17 +14,17 @@ import type {
 import { API } from '../../../../../../services';
 
 // Mock da API
-jest.mock('../../../../../services', () => ({
+jest.mock('../../../../../../services', () => ({
   API: {
     ImportacaoDados: {
       postImportacaoArquivosHabilitados: jest.fn(),
-      getImportacaoArquivos: jest.fn(),
+      getImportacaoArquivosHabilitados: jest.fn(),
     },
   },
 }));
 
 // Mock do hook useConcursos
-jest.mock('../../../../../hooks/useConcursos', () => ({
+jest.mock('../../../../../../hooks/useConcursos', () => ({
   useConcursos: jest.fn(),
 }));
 
@@ -285,6 +285,40 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
         expect(error.message).toBe('Arquivo é obrigatório');
       }
     });
+
+    it('deve rejeitar quando arquivo é undefined no teste de validação', async () => {
+      const schema = useImportacaoSchema();
+      const invalidData = {
+        concurso: 'CONCURSO_001',
+        arquivo: undefined,
+      };
+
+      const isValid = await schema.isValid(invalidData);
+      expect(isValid).toBe(false);
+
+      try {
+        await schema.validate(invalidData);
+      } catch (error) {
+        expect(error.message).toBe('Arquivo é obrigatório');
+      }
+    });
+
+    it('deve rejeitar quando arquivo é string vazia no teste de validação', async () => {
+      const schema = useImportacaoSchema();
+      const invalidData = {
+        concurso: 'CONCURSO_001',
+        arquivo: '',
+      };
+
+      const isValid = await schema.isValid(invalidData);
+      expect(isValid).toBe(false);
+
+      try {
+        await schema.validate(invalidData);
+      } catch (error) {
+        expect(error.message).toBe('Apenas arquivos CSV são permitidos');
+      }
+    });
   });
 
   describe('useImportacaoDados.tsx - Hook Principal', () => {
@@ -301,7 +335,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       (API.ImportacaoDados.postImportacaoArquivosHabilitados as jest.Mock).mockResolvedValue({
         response: mockPostResponse,
       });
-      (API.ImportacaoDados.getImportacaoArquivos as jest.Mock).mockResolvedValue({
+      (API.ImportacaoDados.getImportacaoArquivosHabilitados as jest.Mock).mockResolvedValue({
         response: mockGetResponse,
       });
     });
@@ -327,7 +361,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       expect(result.current.importacoesArquivos).toBeUndefined();
 
       // Verificar se a API foi chamada
-      expect(API.ImportacaoDados.getImportacaoArquivos).toHaveBeenCalledWith(
+      expect(API.ImportacaoDados.getImportacaoArquivosHabilitados).toHaveBeenCalledWith(
         { signal: expect.any(AbortSignal) }
       );
     });
@@ -465,7 +499,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       const wrapper = createWrapper();
       renderHook(() => useImportacaoDados(), { wrapper });
 
-      expect(API.ImportacaoDados.getImportacaoArquivos).toHaveBeenCalledWith(
+      expect(API.ImportacaoDados.getImportacaoArquivosHabilitados).toHaveBeenCalledWith(
         { signal: expect.any(AbortSignal) }
       );
     });
@@ -485,6 +519,33 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       expect(result.current).toHaveProperty('watch');
       expect(result.current).toHaveProperty('isCreatingImportacao');
       expect(result.current).toHaveProperty('createImportacaoError');
+    });
+
+    it('deve cobrir linhas 86-87 - quando concurso selecionado não é encontrado', async () => {
+      const wrapper = createWrapper();
+      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+
+      // Mock para simular concurso não encontrado
+      mockUseConcursos.mockReturnValue({
+        concursosData: [
+          { value: 'CONCURSO_001', label: 'Concurso Teste 1' },
+          { value: 'CONCURSO_002', label: 'Concurso Teste 2' },
+        ],
+        concursosIsLoading: false,
+      });
+
+      const testFile = new File(['test'], 'test.csv', { type: 'text/csv' });
+      const formData = {
+        concurso: 'CONCURSO_INEXISTENTE', // Concurso que não existe na lista
+        arquivo: testFile,
+      };
+
+      await act(async () => {
+        await result.current.handleEnviarForm(formData);
+      });
+
+      // Verificar se a API não foi chamada (linha 86-87)
+      expect(API.ImportacaoDados.postImportacaoArquivosHabilitados).not.toHaveBeenCalled();
     });
   });
 });

@@ -85,4 +85,28 @@ describe('AdicionarNovaEscolaModal', () => {
 
     consoleSpy.mockRestore();
   });
+
+  it('renderiza campos de formulário com validação', () => {
+    const onCancel = jest.fn();
+    const onConfirm = jest.fn();
+
+    render(
+      <ThemeProvider theme={appTheme as any}>
+        <AdicionarNovaEscolaModal
+          isOpen={true}
+          loading={false}
+          onCancel={onCancel}
+          onConfirm={onConfirm}
+        />
+      </ThemeProvider>
+    );
+
+    // Verifica se os campos estão renderizados
+    expect(screen.getAllByText('DRE')).toHaveLength(2); // Label do campo e cabeçalho da tabela
+    expect(screen.getByText('Escola')).toBeInTheDocument();
+    expect(screen.getByText('Filtrar')).toBeInTheDocument();
+    
+    // Verifica se o select está presente
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
+  });
 }); 

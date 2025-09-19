@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useProcessosConvocacao } from '../hooks/useProcessosConvocacao';
 
 // Mock services API
-jest.mock('../../../services', () => ({
+jest.mock('../../../../services', () => ({
   API: {
     Convocacao: {
       getConcursosOptions: jest.fn(() => ({ response: Promise.resolve({ concursos: [], cargos: [] }) })),
@@ -14,7 +14,7 @@ jest.mock('../../../services', () => ({
 }));
 
 // Mock useListRequest and expose its internals for assertions
-jest.mock('../../../hooks/useListRequest', () => {
+jest.mock('../../../../hooks/useListRequest', () => {
   const setListRequest = jest.fn();
   const onAntTableChange = jest.fn();
   const listRequest = { pagination: { page: 1, page_size: 10 } };
@@ -60,7 +60,7 @@ describe('useProcessosConvocacao', () => {
 
   it('handleSub atualiza listRequest com page 1 e filters sem undefined', async () => {
     const { result } = renderHook(() => useProcessosConvocacao(), { wrapper });
-    const { __mock } = require('../../../hooks/useListRequest');
+    const { __mock } = require('../../../../hooks/useListRequest');
 
     // dados com valor definido e undefined
     const payload = { data_convocacao_inicio: '', data_convocacao_fim: '2025-03-10' } as any;
@@ -78,7 +78,7 @@ describe('useProcessosConvocacao', () => {
 
   it('handleReset reseta form e chama handleSub com valores padrões', async () => {
     const { result } = renderHook(() => useProcessosConvocacao(), { wrapper });
-    const { __mock } = require('../../../hooks/useListRequest');
+    const { __mock } = require('../../../../hooks/useListRequest');
 
     await result.current.handleReset();
 

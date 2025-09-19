@@ -12,7 +12,7 @@ import type {
 import { API } from '../../../../../../services';
 
 // Mock da API
-jest.mock('../../../../../services', () => ({
+jest.mock('../../../../../../services', () => ({
   API: {
     ImportacaoDados: {
       postImportacaoArquivosVagas: jest.fn(),
@@ -272,6 +272,42 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
         await schema.validate(invalidData);
       } catch (error) {
         expect(error.message).toBe('Arquivo é obrigatório');
+      }
+    });
+
+    it('deve rejeitar quando arquivo é undefined no teste de validação', async () => {
+      const schema = useImportacaoSchema();
+      const invalidData = {
+        cargo: 'CARGO_001',
+        arquivo: undefined,
+        metodo_de_importacao: 2,
+      };
+
+      const isValid = await schema.isValid(invalidData);
+      expect(isValid).toBe(false);
+
+      try {
+        await schema.validate(invalidData);
+      } catch (error) {
+        expect(error.message).toBe('Arquivo é obrigatório');
+      }
+    });
+
+    it('deve rejeitar quando arquivo é string vazia no teste de validação', async () => {
+      const schema = useImportacaoSchema();
+      const invalidData = {
+        cargo: 'CARGO_001',
+        arquivo: '',
+        metodo_de_importacao: 2,
+      };
+
+      const isValid = await schema.isValid(invalidData);
+      expect(isValid).toBe(false);
+
+      try {
+        await schema.validate(invalidData);
+      } catch (error) {
+        expect(error.message).toBe('Apenas arquivos CSV são permitidos');
       }
     });
   });
