@@ -1,6 +1,11 @@
 import styled from 'styled-components';
+<<<<<<< HEAD:src/pages/NovaConvocacaoCandidatos/styles.ts
 import { Button, Card, Form, Row, Col, Input, Typography } from 'antd';
  
+=======
+import { Button, Card, Form, Row, Col, Input, Typography, Modal as AntModal, Checkbox } from 'antd';
+
+>>>>>>> feature/131553-criacao-funcionalidade-agenda:src/pages/Processos/NovaConvocacaoCandidatos/styles.ts
 
 export const StyledCardPequeno = styled(Card)`
   width: 12.5rem;
@@ -389,6 +394,40 @@ export const StyledText = styled(Typography.Text)`
       color: rgba(52, 58, 64, 1);
       font-weight: 400;
     }
+  }
+`;
+
+// Estilos para checkboxes com contorno mais escuro
+export const StyledCheckbox = styled(Checkbox)`
+  .ant-checkbox-inner {
+    border: 2px solid #333 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 2px !important;
+  }
+  
+  .ant-checkbox-checked .ant-checkbox-inner {
+    border-color: #05409A !important;
+    background-color: #05409A !important;
+  }
+  
+  .ant-checkbox-checked .ant-checkbox-inner::after {
+    border-color: #fff !important;
+  }
+  
+  &:hover .ant-checkbox-inner {
+    border-color: #333 !important;
+  }
+  
+  &:hover .ant-checkbox-checked .ant-checkbox-inner {
+    border-color: #05409A !important;
+    background-color: #05409A !important;
+  }
+  
+  .ant-checkbox + span {
+    color: #000000;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 0.875rem;
   }
 `;
  

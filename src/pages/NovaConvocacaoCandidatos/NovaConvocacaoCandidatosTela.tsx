@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Typography, Card } from "antd";
+import { Typography, Card, Row, Col, Button } from "antd";
 
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useForm, useWatch } from "react-hook-form";
@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { useConcursos } from "../../hooks/useConcursos";
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
+import AgendaTela from "./components/Agenda/AgendaTela";
 
 const { Text } = Typography;
 
@@ -149,8 +150,32 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
         selectedCargoLabel={selectedCargoLabel}
         watchFields={watchFields}
         control={control}
+        agendaComponent={
+          <AgendaTela 
+            cargosDisponiveis={cargosDisponiveis}
+            watchFields={watchFields}
+          />
+        }
       />
+<<<<<<< HEAD:src/pages/NovaConvocacaoCandidatos/NovaConvocacaoCandidatosTela.tsx
     </BaseTela>
+=======
+
+
+      <Row justify="end" gutter={16} style={{ marginTop: 24 }}>
+        <Col>
+          <Button type="primary" ghost size="large">
+            Cancelar
+          </Button>
+        </Col>
+        <Col>
+          <Button type="primary" size="large">
+            Salvar
+          </Button>
+        </Col>
+      </Row>
+    </BaseScreen>
+>>>>>>> feature/131553-criacao-funcionalidade-agenda:src/pages/Processos/NovaConvocacaoCandidatos/index.tsx
   );
 };
 

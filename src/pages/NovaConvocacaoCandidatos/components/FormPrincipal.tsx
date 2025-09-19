@@ -1,5 +1,6 @@
 import React from "react";
 import { Row, Col, Select, Input, DatePicker, Typography } from "antd";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import dayjs from "dayjs";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { Controller } from "react-hook-form";
@@ -49,9 +50,16 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                 {...field}
                 data-testid="concurso-select"
                 placeholder="Selecione o concurso"
-                style={{ width: "100%" }}
+                style={{ width: "36.875rem", height: "2.5rem" }}
                 options={concursosData || []}
+<<<<<<< HEAD:src/pages/NovaConvocacaoCandidatos/components/FormPrincipal.tsx
                 loading={concursosOptionsIsLoading}
+=======
+                loading={concursosIsLoading}
+                suffixIcon={
+                  <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
+                }
+>>>>>>> feature/131553-criacao-funcionalidade-agenda:src/pages/Processos/NovaConvocacaoCandidatos/components/FormPrincipal.tsx
                 onChange={(value) => {
                   field.onChange(value as string);
                   buscarCargosDoConcurso(value as string);
@@ -76,12 +84,15 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
               <Select
                 {...field}
                 placeholder="Selecione o tipo de escolha"
-                style={{ width: "100%" }}
+                style={{ width: "36.875rem", height: "2.5rem" }}
                 options={[
                   { value: "Nova Autorização", label: "Nova Autorização" },
                   { value: "Reposição", label: "Reposição" },
                   { value: "Reconvocação", label: "Reconvocação" },
                 ]}
+                suffixIcon={
+                  <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
+                }
               />
             </CustomFormItem>
           )}
@@ -91,7 +102,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           name="descricao"
           render={({ field }) => (
             <CustomFormItem label="Descrição" labelCol={{ span: 24 }}>
-              <Input {...field} placeholder="Digite a descrição" style={{ width: "100%" }} />
+              <Input {...field} placeholder="Digite a descrição" style={{ width: "36.875rem", height: "2.5rem" }} />
             </CustomFormItem>
           )}
         />
@@ -103,7 +114,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
               <DatePicker
                 {...field}
                 placeholder="Selecione a data da convocação"
-                style={{ width: "100%" }}
+                style={{ width: "36.875rem", height: "2.5rem" }}
                 format="DD/MM/YYYY"
                 suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
                 value={field.value ? dayjs(field.value) : undefined}
@@ -120,7 +131,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
               <DatePicker
                 {...field}
                 placeholder="Selecione a data corte de vagas"
-                style={{ width: "100%" }}
+                style={{ width: "36.875rem", height: "2.5rem" }}
                 format="DD/MM/YYYY"
                 suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
                 value={field.value ? dayjs(field.value) : undefined}

@@ -1,6 +1,6 @@
 import { Button, Select, Space, Typography } from "antd";
-import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import { PlusOutlined } from "@ant-design/icons";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 
 const { Text } = Typography;
 
@@ -71,6 +71,8 @@ const AdicionarNovaEscolaModal: React.FC<INewAdicionarNovaEscolaModalProps> = ({
         <Space  size={24}>
           <Button
             key="voltar"
+            type="primary"
+            ghost
             size="large"
             onClick={() => onCancel()}
           >
