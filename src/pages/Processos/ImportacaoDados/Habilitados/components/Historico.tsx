@@ -19,6 +19,8 @@ const Historico: React.FC<HistoricoProps> = ({ data, onVoltar, ...rest }) => {
   const {
     importacoesArquivos,
     importacoesArquivosIsLoading,
+    listRequest,
+    onAntTableChange,
   } = useImportacaoDados();
 
   const handleVoltar = () => {
@@ -29,9 +31,6 @@ const Historico: React.FC<HistoricoProps> = ({ data, onVoltar, ...rest }) => {
     }
   };
 
-  const handleSalvar = () => {
-    console.log("Salvar arquivo");
-  };
 
   const handleDelete = (id: string) => {
     console.log("Delete", id);
@@ -79,28 +78,29 @@ const Historico: React.FC<HistoricoProps> = ({ data, onVoltar, ...rest }) => {
         Histórico
       </Title>
 
-      <StyledTable
+      <StyledTable<any>
         columns={columns}
         dataSource={importacoesArquivos?.results || []}
-        rowKey={(record) => `${record.id}`}
+        rowKey="id"
         bordered
-        rowClassName={(_, index) =>
+        rowClassName={(_: any, index: number) =>
           index % 2 === 0 ? "row-white" : "row-gray"
         }
         className="historico-table"
         loading={importacoesArquivosIsLoading}
         pagination={{
-          current: importacoesArquivos?.page, 
+          current: listRequest.pagination.page,
           pageSize: 10,
           defaultPageSize: 10,
           position: ["bottomLeft"],
           total: importacoesArquivos?.count,
-          showTotal: (total, range) => (
+          showTotal: (total: number, range: [number, number]) => (
             <span style={{ marginLeft: 16 }}>
-              {`Mostrando ${range[0]}-${range[1]} de ${total} registro(s)`}
+              {`Mostrando ${(range?.[0] ?? 0)}-${(range?.[1] ?? 0)} de ${(total ?? 0)} registro(s)`}
             </span>
           ),
         }}
+        onChange={onAntTableChange}
         {...rest}
       />
 

@@ -8,6 +8,7 @@ import useImportacaoSchema from "./useImportacaoSchema";
 import type { IImportacaoHabilitadosFiltros, IImportacaoHabilitadosPayload } from "./types";
 import { useConcursos } from "../../../../../hooks/useConcursos";
 import useImportacoesArquivosHabilitados from "./useImportacoesArquivosHabilitados";
+import useListRequest from "../../../../../hooks/useListRequest";
 
 
 export const useImportacaoDados = () => {
@@ -37,11 +38,16 @@ export const useImportacaoDados = () => {
     shouldFocusError: false,
   });
 
+  const { listRequest, onAntTableChange } =
+    useListRequest<IImportacaoHabilitadosFiltros>({
+      pagination: { page: 1, page_size: 10 },
+    });
+
   // Mutation para post de importação de arquivos (hook centralizado)
   const postImportacaoArquivosMutation = usePostImportacaoArquivosHabilitados();
 
   // Query para buscar importações com parâmetros
-  const { importacoesArquivos, importacoesArquivosIsLoading } = useImportacoesArquivosHabilitados();
+  const { importacoesArquivos, importacoesArquivosIsLoading } = useImportacoesArquivosHabilitados(listRequest);
 
   const handleEnviarForm = async (data: IImportacaoHabilitadosFiltros) => {
     if (!data.arquivo || !data.concurso) {
@@ -97,6 +103,8 @@ export const useImportacaoDados = () => {
     watch,
     isCreatingImportacao: postImportacaoArquivosMutation.isPending,
     createImportacaoError: postImportacaoArquivosMutation.error,
+    listRequest,
+    onAntTableChange,
   };
 };
 
