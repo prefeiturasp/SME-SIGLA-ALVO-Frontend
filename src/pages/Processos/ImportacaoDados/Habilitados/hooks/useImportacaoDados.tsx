@@ -1,5 +1,6 @@
 import { useForm, type Resolver } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useState } from "react";
 // import { useQueryClient } from "@tanstack/react-query";
 // import { App } from "antd";
 // import { API } from "../../../../services";
@@ -14,6 +15,10 @@ export const useImportacaoDados = () => {
   // const queryClient = useQueryClient();
   // const { notification } = App.useApp();
   const { concursosData } = useConcursos();
+  
+  // Estado para controlar a paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
   
   const defaultValues = {
     concurso: undefined,
@@ -41,7 +46,10 @@ export const useImportacaoDados = () => {
   const postImportacaoArquivosMutation = usePostImportacaoArquivosHabilitados();
 
   // Query para buscar importações com parâmetros
-  const { importacoesArquivos, importacoesArquivosIsLoading } = useImportacoesArquivosHabilitados();
+  const { importacoesArquivos, importacoesArquivosIsLoading } = useImportacoesArquivosHabilitados({
+    page: currentPage,
+    pageSize: pageSize,
+  });
 
   const handleEnviarForm = async (data: IImportacaoHabilitadosFiltros) => {
     if (!data.arquivo || !data.concurso) {
@@ -85,6 +93,10 @@ export const useImportacaoDados = () => {
 
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return {
     control,
     handleSubmit,
@@ -97,6 +109,9 @@ export const useImportacaoDados = () => {
     watch,
     isCreatingImportacao: postImportacaoArquivosMutation.isPending,
     createImportacaoError: postImportacaoArquivosMutation.error,
+    currentPage,
+    pageSize,
+    handlePageChange,
   };
 };
 
