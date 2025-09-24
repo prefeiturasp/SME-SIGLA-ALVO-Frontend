@@ -16,6 +16,7 @@ export interface IImportacaoHabilitadosPayload {
 }
 export interface IImportacaoVagasForm {
   cargo: string | undefined;
+  concurso: string | undefined;
   arquivo: File | null;
   data_fechamento_modulo?: string;
   metodo_de_importacao: number;
@@ -23,6 +24,8 @@ export interface IImportacaoVagasForm {
  }
 export interface IImportacaoVagasPayload {
   opcoes_de_importacao?: string;
+  concurso_nome?:string;
+  concurso_uuid?:string;
   cargo?: string;
   arquivo: File;
   tipo: string;  

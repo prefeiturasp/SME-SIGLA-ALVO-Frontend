@@ -9,6 +9,7 @@ export const useImportacaoDadosVagas = () => {
 
   const defaultValues = {
     cargo: undefined,
+    concurso: undefined,
     arquivo: null,
     tipo: "VAGAS",
     metodo_de_importacao: 1,
@@ -45,12 +46,13 @@ export const useImportacaoDadosVagas = () => {
   const handleEnviarForm = async (data: IImportacaoVagasForm) => {
 
     if (data.metodo_de_importacao === 1) {
-      console.log("A funcionalidade webservice ainda não foi impementada")
+      console.log("A funcionalidade webservice ainda não foi impementada",data)
       return
     };
 
-
     const payload: IImportacaoVagasPayload = {
+      concurso_nome: data.concurso!,
+      concurso_uuid: data.concurso!,
       arquivo: data.arquivo!,
       tipo: "VAGAS",
       opcoes_de_importacao:data.opcoes_de_importacao

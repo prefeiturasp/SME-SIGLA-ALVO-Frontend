@@ -3,8 +3,8 @@ import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import dayjs from "dayjs";
 import { Row, Col, Select, DatePicker, Radio, Button } from "antd";
 import { Controller } from "react-hook-form";
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useImportacaoDadosVagas } from "./hooks/useImportacaoDadosVagas";
 import { CustomFormItem } from "../../../../components/FormStyle";
 import {
@@ -17,10 +17,8 @@ import {
   ActionButtonsContainer,
 } from "../../../../components/EstilosCompartilhados";
 import { useCargos } from "../../../../hooks/useCargos";
-import UltimasImportacoesDeVagasTable from "./components/UltimasImportacoesDeVagasTable";
 import { useNavigate } from "react-router-dom";
-
-
+import { useConcursos } from "../../../../hooks/useConcursos";
 
 interface VagasProps {
   onShowLayoutPadrao: () => void;
@@ -36,30 +34,26 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
     watch,
   } = useImportacaoDadosVagas();
 
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
- const onShowHistorico = () => {
-    navigate('/processos/importacao-dados/historico-vagas')
-   };
-
+  const onShowHistorico = () => {
+    navigate("/processos/importacao-dados/historico-vagas");
+  };
 
   // TODO Fazer somente a opção Arquivo
 
-
   const { cargosData, cargosIsLoading } = useCargos();
+  const { concursosData, concursosOptionsIsLoading } = useConcursos();
+
   const watchedFile = watch("arquivo");
   const watchedMetodoImportacao = watch("metodo_de_importacao");
- 
+
   return (
-    
     <TabContentContainer>
       <SectionCard>
-        <SectionTitle>
-          Vagas
-        </SectionTitle>
+        <SectionTitle>Vagas</SectionTitle>
         <Row gutter={[0, 16]}>
           <Col xs={24} sm={9}>
-
             <Controller
               control={control}
               name="metodo_de_importacao"
@@ -75,39 +69,27 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
                   <Radio.Group
                     buttonStyle="outline"
                     defaultValue={1}
-
                     {...field}
                     options={[
                       {
                         value: 1,
-                        className: 'option-1',
-                        label: (
-                          <>
-                            WebService
-                          </>
-                        ),
+                        className: "option-1",
+                        label: <>WebService</>,
                       },
                       {
                         value: 2,
-                        className: 'option-2',
-                        label: (
-                          <>
-                            Arquivo
-                          </>
-                        ),
-                      }
+                        className: "option-2",
+                        label: <>Arquivo</>,
+                      },
                     ]}
                   />
                 </CustomFormItem>
               )}
             />
-
           </Col>
         </Row>
 
-
-
-        {watchedMetodoImportacao === 1 &&
+        {watchedMetodoImportacao === 1 && (
           <>
             <Row gutter={[0, 16]}>
               <Col xs={24} sm={9}>
@@ -142,7 +124,6 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
               </Col>
             </Row>
 
-
             <Row gutter={[0, 16]}>
               <Col xs={24} sm={9}>
                 <Controller
@@ -160,17 +141,29 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
                         placeholder="Selecione o cargo"
                         loading={cargosIsLoading}
                         allowClear
-                        suffixIcon={<ExpandMoreIcon style={{ fontSize: '1.5rem', color: '#032B68' }} />}
+                        suffixIcon={
+                          <ExpandMoreIcon
+                            style={{ fontSize: "1.5rem", color: "#032B68" }}
+                          />
+                        }
                       >
-                        {Array.isArray(cargosData) ? cargosData.map((cargo: any) => (
-                          <Select.Option key={cargo.value} value={cargo.value}>
-                            {cargo.label}
-                          </Select.Option>
-                        )) : cargosData?.results?.map((cargo: any) => (
-                          <Select.Option key={cargo.value} value={cargo.value}>
-                            {cargo.label}
-                          </Select.Option>
-                        ))}
+                        {Array.isArray(cargosData)
+                          ? cargosData.map((cargo: any) => (
+                              <Select.Option
+                                key={cargo.value}
+                                value={cargo.value}
+                              >
+                                {cargo.label}
+                              </Select.Option>
+                            ))
+                          : cargosData?.results?.map((cargo: any) => (
+                              <Select.Option
+                                key={cargo.value}
+                                value={cargo.value}
+                              >
+                                {cargo.label}
+                              </Select.Option>
+                            ))}
                       </StyledSelect>
                     </CustomFormItem>
                   )}
@@ -178,13 +171,56 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
               </Col>
             </Row>
           </>
-        }
+        )}
 
-
-
-        {watchedMetodoImportacao === 2 &&
+        {watchedMetodoImportacao === 2 && (
           <>
-
+            <Row gutter={[0, 16]}>
+              <Col xs={24} sm={9}>
+                <Controller
+                  control={control}
+                  name="concurso"
+                  render={({ field }) => (
+                    <CustomFormItem
+                      label="Concurso"
+                      validateStatus={formErrors.concurso ? "error" : undefined}
+                      help={formErrors.concurso?.message}
+                      labelCol={{ span: 24 }}
+                    >
+                      <StyledSelect
+                        {...field}
+                        placeholder="Selecione o concurso"
+                        loading={concursosOptionsIsLoading}
+                        allowClear
+                        suffixIcon={
+                          <ExpandMoreIcon
+                            style={{ fontSize: "1.5rem", color: "#032B68" }}
+                          />
+                        }
+                      >
+                        {Array.isArray(concursosData)
+                          ? concursosData.map((concurso: any) => (
+                              <Select.Option
+                                key={concurso.value}
+                                value={concurso.value}
+                              >
+                                {concurso.label}
+                              </Select.Option>
+                            ))
+                          : concursosData?.results?.map((concurso: any) => (
+                              <Select.Option
+                                key={concurso.value}
+                                value={concurso.value}
+                              >
+                                {concurso.label}
+                              </Select.Option>
+                            ))}
+                      </StyledSelect>
+                    </CustomFormItem>
+                  )}
+                />
+              </Col>
+            </Row>
             <Row gutter={[0, 8]}>
               <Col xs={24} sm={9}>
                 <Controller
@@ -207,10 +243,14 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
                         multiple={false}
                       >
                         <UploadArea>
-                          <span style={{ color: '#666', fontSize: '0.875rem' }}>
-                            {watchedFile ? watchedFile.name : 'Clique ou arraste os arquivos'}
+                          <span style={{ color: "#666", fontSize: "0.875rem" }}>
+                            {watchedFile
+                              ? watchedFile.name
+                              : "Clique ou arraste os arquivos"}
                           </span>
-                          <UploadFileIcon style={{ fontSize: '1.50rem', color: '#032B68' }} />
+                          <UploadFileIcon
+                            style={{ fontSize: "1.50rem", color: "#032B68" }}
+                          />
                         </UploadArea>
                       </StyledUpload>
                     </CustomFormItem>
@@ -218,13 +258,11 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
                 />
               </Col>
             </Row>
-
-             
-          </>}
+          </>
+        )}
 
         <Row gutter={[0, 16]}>
           <Col xs={24} sm={9}>
-
             <Controller
               control={control}
               name="opcoes_de_importacao"
@@ -240,48 +278,30 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
                   <Radio.Group
                     buttonStyle="outline"
                     defaultValue={1}
-
                     {...field}
                     options={[
                       {
                         value: 1,
-                        className: 'option-1',
-                        label: (
-                          <>
-                            Ajustar
-                          </>
-                        ),
+                        className: "option-1",
+                        label: <>Ajustar</>,
                       },
                       {
                         value: 2,
-                        className: 'option-2',
-                        label: (
-                          <>
-                            Substituir
-                          </>
-                        ),
-                      }
+                        className: "option-2",
+                        label: <>Substituir</>,
+                      },
                     ]}
                   />
                 </CustomFormItem>
               )}
             />
-
           </Col>
         </Row>
- 
-
       </SectionCard>
 
       {/* Botões de Ação */}
       <ActionButtonsContainer>
-
-        <Button
-          type="primary"
-          ghost
-          size="large"
-          onClick={onShowHistorico}
-        >
+        <Button type="primary" ghost size="large" onClick={onShowHistorico}>
           Histórico
         </Button>
 
@@ -294,11 +314,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
           Importar
         </Button>
 
-        <Button
-          type="primary"
-          size="large"
-          onClick={onShowLayoutPadrao}
-        >
+        <Button type="primary" size="large" onClick={onShowLayoutPadrao}>
           Layout padrão
         </Button>
       </ActionButtonsContainer>

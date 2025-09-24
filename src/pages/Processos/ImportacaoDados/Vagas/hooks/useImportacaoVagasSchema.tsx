@@ -9,10 +9,18 @@ const useImportacaoVagasSchema = () => {
       then: (schema) => schema.required("Cargo é obrigatório, selecione um cargo"),
       otherwise: (schema) => schema.notRequired(),
     }),
+    
 
     data_fechamento_modulo: yup.string().when("metodo_de_importacao", {
       is: 1,
       then: (schema) => schema.required("Data de fechamento do módulo é obrigatória"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+
+
+    concurso: yup.string().when("metodo_de_importacao", {
+      is: 2,
+      then: (schema) => schema.required("Cargo é obrigatório, selecione um cargo"),
       otherwise: (schema) => schema.notRequired(),
     }),
 
