@@ -5,7 +5,7 @@ import type {
   IImportacaoFundacao,
   IUltimasImportacoesVagas
 } from "./IImportacaoArquivos";
-import type { PaginatedResponse } from "../../../types/IListRequest";
+import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
@@ -91,16 +91,17 @@ export const getImportacaoArquivosHabilitados = (
 };
 
 
-// // TODO adicionar JWT no header Authorization
+
 export const getUltimasImportacoesArquivosVagas = (
-  params?: Record<string, any>,
+  listRequest: IListRequest<unknown>,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
+  const { pagination, ...rest } = listRequest;
   const { signal, abort } = new AbortController();
 
   const response = appAxiosImportaArquivos
     .get<PaginatedResponse<IUltimasImportacoesVagas>>(URL.getUltimasImportacoesArquivosVagas(), {
-      params,
+      params: { ...pagination, ...rest },
       paramsSerializer: queryParamsSerializer,
       signal,
       ...axiosRequestConfig,
@@ -113,6 +114,9 @@ export const getUltimasImportacoesArquivosVagas = (
   };
 };
 
+
+
+ 
 
 
 // // TODO adicionar JWT no header Authorization

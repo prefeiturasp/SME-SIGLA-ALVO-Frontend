@@ -1,6 +1,5 @@
 import React from "react";
 
-import dayjs from "dayjs";
 import { Row, Col, Typography } from "antd";
 
 import { useImportacaoDadosVagas } from "../Vagas/hooks/useImportacaoDadosVagas";
@@ -31,16 +30,13 @@ const HistoricoVagasTela: React.FC = ({  }) => {
   const {
     importacoesArquivosData,
     importacoesArquivosIsLoading,
-  
+    listRequest,
+    onAntTableChange
   } = useImportacaoDadosVagas();
 
 
   const navigate=useNavigate();
  
- const onShowHistorico = () => {
-  navigate(-1)
-   };
-
  
   return (
      <BaseTela
@@ -56,16 +52,21 @@ const HistoricoVagasTela: React.FC = ({  }) => {
 
             <UltimasImportacoesDeVagasTable
               loading={importacoesArquivosIsLoading}
-              data={importacoesArquivosData?.results || [{
-                uuid: '111',
-                metodo_de_importacao: 'WebService',
-                data_de_fechamento_do_modulo: dayjs().toString(),
-                cargo: '2650 - ESP.INF.TEC.CULT.DESP.-BIBLIOTECA',
-                opcoes_de_importacao: 'Ajustar',
-                data_importacao: dayjs().toString()
-              }]}
-              pagination={false}
-            />
+              data={importacoesArquivosData?.results || []}
+              pagination={{
+                current: listRequest.pagination.page,
+                pageSize: 10,
+                defaultPageSize: 10,
+                position: ["bottomLeft"],
+                total: importacoesArquivosData?.count,
+                showTotal: (total, range) => (
+                  <span style={{ marginLeft: 16 }}>
+                    {`Mostrando ${(range?.[0] ?? 0)}-${(range?.[1] ?? 0)} de ${(total ?? 0)} registro(s)`}
+                  </span>
+                ),
+              }}
+              onChange={onAntTableChange}
+ />
           </Col>
         </Row>
 

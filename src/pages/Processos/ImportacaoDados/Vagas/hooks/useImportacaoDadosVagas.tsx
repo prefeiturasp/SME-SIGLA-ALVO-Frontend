@@ -4,6 +4,7 @@ import { usePostImportacaoArquivosVagas } from "./usePostImportacaoArquivosVagas
 import useImportacaoVagasSchema from "./useImportacaoVagasSchema";
 import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
 import useImportacaoArquivosVagas from "./useImportacaoArquivosVagas";
+import useListRequest from "../../../../../hooks/useListRequest";
 
 export const useImportacaoDadosVagas = () => {
 
@@ -32,8 +33,15 @@ export const useImportacaoDadosVagas = () => {
     shouldFocusError: false,
   });
 
+
+
+  const { listRequest,  onAntTableChange } =
+    useListRequest({
+      pagination: { page: 1, page_size: 10 },
+    });
+
   // Query para buscar importações com parâmetros
-  const { importacoesArquivosData, importacoesArquivosIsLoading, importacoesArquivosRefetch } = useImportacaoArquivosVagas();
+  const { importacoesArquivosData, importacoesArquivosIsLoading, importacoesArquivosRefetch } = useImportacaoArquivosVagas(listRequest);
 
   // Mutation para post de importação de arquivos
   const postImportacaoArquivosVagasMutation = usePostImportacaoArquivosVagas({
@@ -86,7 +94,9 @@ export const useImportacaoDadosVagas = () => {
     watch,
     isCreatingImportacao: postImportacaoArquivosVagasMutation.isPending,
     createImportacaoError: postImportacaoArquivosVagasMutation.error,
-    isValid
+    isValid,
+    listRequest,
+    onAntTableChange
   };
 };
 
