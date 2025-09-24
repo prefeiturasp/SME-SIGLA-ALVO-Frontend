@@ -26,26 +26,32 @@ const AgendaTela: React.FC<AgendaTelaProps> = ({
     isAgendaComplete,
     handleAdicionarPeriodo,
     handleRemoverPeriodo,
+    handleUpdatePeriodo,
+    watchedFields,
   } = useAgenda(cargosDisponiveis);
 
   return (
     <div>
       <Title level={3}>Agenda</Title>
 
-      <AgendaForm
-        control={control}
-        formErrors={formErrors}
-        cargosDisponiveis={cargosDisponiveis}
-        isRetardatario={isRetardatario}
-        setIsRetardatario={setIsRetardatario}
-        getErrorMessage={getErrorMessage}
-        isAgendaComplete={isAgendaComplete}
-        handleAdicionarPeriodo={handleAdicionarPeriodo}
-      />
+      <div style={{ marginTop: 30 }}>
+        <AgendaForm
+          control={control}
+          formErrors={formErrors}
+          cargosDisponiveis={cargosDisponiveis}
+          isRetardatario={isRetardatario}
+          setIsRetardatario={setIsRetardatario}
+          getErrorMessage={getErrorMessage}
+          isAgendaComplete={isAgendaComplete}
+          handleAdicionarPeriodo={handleAdicionarPeriodo}
+          tipoEscolha={watchedFields.tipoEscolha || ""}
+        />
+      </div>
 
       <AgendaTabela
         periodosList={periodosList}
         handleRemoverPeriodo={handleRemoverPeriodo}
+        onUpdatePeriodo={handleUpdatePeriodo}
       />
     </div>
   );
