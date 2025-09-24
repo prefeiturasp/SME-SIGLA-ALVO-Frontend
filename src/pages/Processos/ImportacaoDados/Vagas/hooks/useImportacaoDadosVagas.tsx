@@ -3,6 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { usePostImportacaoArquivosVagas } from "./usePostImportacaoArquivosVagas";
 import useImportacaoVagasSchema from "./useImportacaoVagasSchema";
 import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
+import { MetodoImportacao } from "./types";
 import useImportacaoArquivosVagas from "./useImportacaoArquivosVagas";
 import useListRequest from "../../../../../hooks/useListRequest";
 
@@ -10,9 +11,11 @@ export const useImportacaoDadosVagas = () => {
 
   const defaultValues = {
     cargo: undefined,
+    concurso_uuid: undefined,
+    concurso_nome: undefined,
     arquivo: null,
-    tipo: "VAGAS",
-    metodo_de_importacao: 1,
+    metodo_de_importacao: MetodoImportacao.WebService,
+    opcoes_de_importacao:'Ajustar',
   };
 
   const importacaoVagasSchema = useImportacaoVagasSchema();
@@ -52,15 +55,15 @@ export const useImportacaoDadosVagas = () => {
 
   const handleEnviarForm = async (data: IImportacaoVagasForm) => {
 
-    if (data.metodo_de_importacao === 1) {
-      console.log("A funcionalidade webservice ainda não foi impementada")
+    if (data.metodo_de_importacao === MetodoImportacao.WebService) {
+      console.log("A funcionalidade webservice ainda não foi impementada",data)
       return
     };
-
-
+ 
     const payload: IImportacaoVagasPayload = {
+      concurso_nome: data.concurso_nome!,
+      concurso_uuid: data.concurso_uuid!,
       arquivo: data.arquivo!,
-      tipo: "VAGAS",
       opcoes_de_importacao:data.opcoes_de_importacao
     };
 
@@ -82,6 +85,12 @@ export const useImportacaoDadosVagas = () => {
     clearErrors("arquivo");
   };
 
+  const handleConcursoSelecionado = (uuid: string | undefined, nome: string | undefined) => {
+    setValue("concurso_uuid", uuid, { shouldValidate: true, shouldTouch: true });
+    setValue("concurso_nome", nome, { shouldValidate: false });
+    clearErrors("concurso_uuid");
+  };
+
   return {
     control,
     handleSubmit,
@@ -91,6 +100,7 @@ export const useImportacaoDadosVagas = () => {
     handleEnviarForm,
     handleReset,
     handleFileUpload,
+    handleConcursoSelecionado,
     watch,
     isCreatingImportacao: postImportacaoArquivosVagasMutation.isPending,
     createImportacaoError: postImportacaoArquivosVagasMutation.error,
