@@ -239,6 +239,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
         cargo: 'CARGO_001',
         arquivo: new File(['test'], 'test.csv', { type: 'application/octet-stream' }),
         metodo_de_importacao: 2,
+        concurso_uuid: 'CONCURSO_001',
       };
 
       const isValid = await schema.isValid(validData);
@@ -251,6 +252,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
         cargo: 'CARGO_001',
         arquivo: new File(['test'], 'test', { type: 'text/csv' }),
         metodo_de_importacao: 2,
+        concurso_uuid: 'CONCURSO_001',
       };
 
       const isValid = await schema.isValid(validData);
@@ -368,6 +370,8 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
         arquivo: testFile,
         metodo_de_importacao: 2,
         opcoes_de_importacao: 'opcao1',
+        concurso_uuid: 'CONCURSO_001',
+        concurso_nome: 'Concurso Teste 1',
       };
 
       await act(async () => {
@@ -376,8 +380,9 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
       // Verificar se a API foi chamada com os parâmetros corretos
       expect(API.ImportacaoDados.postImportacaoArquivosVagas).toHaveBeenCalledWith({
+        concurso_nome: 'Concurso Teste 1',
+        concurso_uuid: 'CONCURSO_001',
         arquivo: testFile,
-        tipo: 'VAGAS',
         opcoes_de_importacao: 'opcao1',
       });
     });
