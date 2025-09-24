@@ -56,14 +56,7 @@ const HistoricoVagasTela: React.FC = ({  }) => {
 
             <UltimasImportacoesDeVagasTable
               loading={importacoesArquivosIsLoading}
-              data={importacoesArquivosData?.results || [{
-                uuid: '111',
-                metodo_de_importacao: 'WebService',
-                data_de_fechamento_do_modulo: dayjs().toString(),
-                cargo: '2650 - ESP.INF.TEC.CULT.DESP.-BIBLIOTECA',
-                opcoes_de_importacao: 'Ajustar',
-                data_importacao: dayjs().toString()
-              }]}
+              data={importacoesArquivosData?.results || []}
               pagination={false}
             />
           </Col>

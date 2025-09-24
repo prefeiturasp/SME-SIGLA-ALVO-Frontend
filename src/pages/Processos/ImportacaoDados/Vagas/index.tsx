@@ -19,6 +19,7 @@ import {
 import { useCargos } from "../../../../hooks/useCargos";
 import { useNavigate } from "react-router-dom";
 import { useConcursos } from "../../../../hooks/useConcursos";
+import { MetodoImportacao } from "./hooks/types";
 
 interface VagasProps {
   onShowLayoutPadrao: () => void;
@@ -31,6 +32,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
     handleFileUpload,
     handleSubmit,
     handleEnviarForm,
+    handleConcursoSelecionado,
     watch,
   } = useImportacaoDadosVagas();
 
@@ -68,16 +70,16 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
                 >
                   <Radio.Group
                     buttonStyle="outline"
-                    defaultValue={1}
+                    defaultValue={MetodoImportacao.WebService}
                     {...field}
                     options={[
                       {
-                        value: 1,
+                        value: MetodoImportacao.WebService,
                         className: "option-1",
                         label: <>WebService</>,
                       },
                       {
-                        value: 2,
+                        value: MetodoImportacao.Arquivo,
                         className: "option-2",
                         label: <>Arquivo</>,
                       },
@@ -89,7 +91,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
           </Col>
         </Row>
 
-        {watchedMetodoImportacao === 1 && (
+        {watchedMetodoImportacao === MetodoImportacao.WebService && (
           <>
             <Row gutter={[0, 16]}>
               <Col xs={24} sm={9}>
@@ -173,22 +175,28 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
           </>
         )}
 
-        {watchedMetodoImportacao === 2 && (
+        {watchedMetodoImportacao === MetodoImportacao.Arquivo && (
           <>
             <Row gutter={[0, 16]}>
               <Col xs={24} sm={9}>
                 <Controller
                   control={control}
-                  name="concurso"
+                  name="concurso_uuid"
                   render={({ field }) => (
                     <CustomFormItem
                       label="Concurso"
-                      validateStatus={formErrors.concurso ? "error" : undefined}
-                      help={formErrors.concurso?.message}
+                      validateStatus={formErrors.concurso_uuid ? "error" : undefined}
+                      help={formErrors.concurso_uuid?.message}
                       labelCol={{ span: 24 }}
                     >
                       <StyledSelect
-                        {...field}
+                        value={field.value}
+                        onChange={(value: unknown, option: any) => {
+                          const uuid = value as string | undefined;
+                          const label = option?.label ?? option?.children;
+                          handleConcursoSelecionado(uuid, label as string | undefined);
+                          field.onChange(uuid);
+                        }}
                         placeholder="Selecione o concurso"
                         loading={concursosOptionsIsLoading}
                         allowClear
@@ -277,16 +285,16 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
                 >
                   <Radio.Group
                     buttonStyle="outline"
-                    defaultValue={1}
+                    defaultValue={'Ajustar'}
                     {...field}
                     options={[
                       {
-                        value: 1,
+                        value: 'Ajustar',
                         className: "option-1",
                         label: <>Ajustar</>,
                       },
                       {
-                        value: 2,
+                        value: 'Substituir',
                         className: "option-2",
                         label: <>Substituir</>,
                       },

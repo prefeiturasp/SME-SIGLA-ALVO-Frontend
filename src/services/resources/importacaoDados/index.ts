@@ -7,6 +7,7 @@ import type {
 } from "./IImportacaoArquivos";
 import type { PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
+import type { IImportacaoVagasPayload } from "../../../pages/Processos/ImportacaoDados/Vagas/hooks/types";
 
 export const URL = {
   getLayout: () => `/api/v1/layouts/`,  
@@ -18,16 +19,14 @@ export const URL = {
 };
 
 export const postImportacaoArquivosVagas = (
-  payload: { arquivo: File; tipo: string },
+  payload: IImportacaoVagasPayload,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
-  const formData = new FormData();
-
-  formData.append('arquivo', payload.arquivo);
-   const response = appAxiosImportaArquivos
-    .post<IImportacaoFundacao>(URL.postImportacaoArquivosVagas(), formData, {
+ 
+  const response = appAxiosImportaArquivos
+    .post<IImportacaoFundacao>(URL.postImportacaoArquivosVagas(), payload, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
