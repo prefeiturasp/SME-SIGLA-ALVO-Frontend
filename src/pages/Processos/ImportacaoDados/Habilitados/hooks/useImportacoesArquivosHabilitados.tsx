@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../../../services";
+import type { IListRequest } from "../../../../../types/IListRequest";
 
-
-const useImportacoesArquivosHabilitados = () => {
+const useImportacoesArquivosHabilitados = (listRequest: IListRequest) => {
   // Query para buscar importações com parâmetros
   const { data: importacoesArquivos, isLoading: importacoesArquivosIsLoading } = useQuery({
-    queryKey: ["getImportacaoArquivosHabilitados"],
+    queryKey: ["getImportacaoArquivosHabilitados", listRequest],
     queryFn: ({ signal }) =>
       API.ImportacaoDados.getImportacaoArquivosHabilitados(
+         listRequest,
          { signal }
       ).response,
     staleTime: 1000 * 60 * 5,

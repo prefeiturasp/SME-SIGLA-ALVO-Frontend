@@ -45,7 +45,7 @@ export const postImportacaoArquivosVagas = (
 
 // TODO adicionar JWT no header Authorization
 export const postImportacaoArquivosHabilitados = (
-  payload: { cargo?: string; arquivo: File; tipo: string, concurso_uuid:string },
+  payload: { cargo?: string; arquivo: File; tipo: string, concurso_uuid:string, concurso_nome: string },
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
@@ -75,11 +75,14 @@ export const postImportacaoArquivosHabilitados = (
 
 // // TODO adicionar JWT no header Authorization
 export const getImportacaoArquivosHabilitados = (
+  params?: Record<string, any>,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
   const response = appAxiosImportaArquivos
     .get<PaginatedResponse<IImportacaoFundacao>>(URL.getImportacaoArquivosHabilitados(), {
+      params,
+      paramsSerializer: queryParamsSerializer,
       signal,
       ...axiosRequestConfig,
     })
