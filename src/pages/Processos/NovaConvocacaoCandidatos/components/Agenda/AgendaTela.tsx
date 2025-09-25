@@ -26,8 +26,15 @@ const AgendaTela: React.FC<AgendaTelaProps> = ({
     isAgendaComplete,
     handleAdicionarPeriodo,
     handleRemoverPeriodo,
-    handleUpdatePeriodo,
     watchedFields,
+    // Funções de edição e cálculo
+    editingKey,
+    isEditing,
+    edit,
+    cancelEdit,
+    saveEdit,
+    calcularIntervaloClassificacao,
+    verificarConflitoTempoReal,
   } = useAgenda(cargosDisponiveis);
 
   return (
@@ -51,7 +58,13 @@ const AgendaTela: React.FC<AgendaTelaProps> = ({
       <AgendaTabela
         periodosList={periodosList}
         handleRemoverPeriodo={handleRemoverPeriodo}
-        onUpdatePeriodo={handleUpdatePeriodo}
+        editingKey={editingKey}
+        isEditing={isEditing}
+        edit={edit}
+        cancelEdit={cancelEdit}
+        saveEdit={saveEdit}
+        calcularIntervaloClassificacao={calcularIntervaloClassificacao}
+        verificarConflitoTempoReal={verificarConflitoTempoReal}
       />
     </div>
   );
