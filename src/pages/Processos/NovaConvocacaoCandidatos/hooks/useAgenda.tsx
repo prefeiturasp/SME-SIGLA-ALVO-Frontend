@@ -37,6 +37,7 @@ export const useAgenda = (cargosDisponiveis: Option[]) => {
   const [isRetardatario, setIsRetardatario] = useState(false);
   const [periodosList, setPeriodosList] = useState<any[]>([]);
   const [contadorSessao, setContadorSessao] = useState(1);
+  const [editingKey, setEditingKey] = useState<number | null>(null);
 
   // Observar valores dos campos
   const watchedFields = watch();
@@ -257,7 +258,6 @@ export const useAgenda = (cargosDisponiveis: Option[]) => {
       Object.keys(periodosAgrupados).forEach(cargo => {
         periodosFinais.push(...periodosAgrupados[cargo]);
       });
-      console.log("periodosFinais", periodosFinais);
       return periodosFinais;
     });
     
@@ -276,16 +276,11 @@ export const useAgenda = (cargosDisponiveis: Option[]) => {
     setPeriodosList(prev => {
       // Encontrar o período que está sendo atualizado
       const periodoAtual = prev.find(p => p.id === id);
-      console.log("1");
       if (!periodoAtual) return prev;
 
       // Se não há mudança na classificação, apenas atualizar normalmente
-      console.log("2");
-      console.log("updates", updates);
-      console.log("periodoAtual", periodoAtual);
       if (!updates.classificacao || updates.classificacao === periodoAtual.classificacao) {
         return prev.map(periodo => {
-          console.log("3");
           if (periodo.id === id) {
             return { ...periodo, ...updates };
           }
@@ -327,15 +322,12 @@ export const useAgenda = (cargosDisponiveis: Option[]) => {
       const novaClassificacaoProximo = proximoPeriodo.classificacao + diferenca;
       
       // Se a diferença for menor ou igual a 0, apenas atualizar o período atual
-      console.log("4");
       if (diferenca <= 0) {
         return prev.map(periodo => {
-          console.log("5");
           if (periodo.id === id) {
             return { ...periodo, ...updates };
           } else if (periodo.id === proximoPeriodo.id) {
-            console.log("Proximo periodo", proximoPeriodo);
-            console.log("Nova classificação do próximo:", novaClassificacaoProximo);
+
             // Atualizar o próximo período com a classificação ajustada
             return { 
               ...periodo, 
@@ -346,25 +338,12 @@ export const useAgenda = (cargosDisponiveis: Option[]) => {
         });
       }
 
-      
-
-      console.log("Ajuste automático:");
-      console.log("Período atual:", periodoAtual.cargo, "Sessão:", periodoAtual.sessao);
-      console.log("Classificação anterior:", periodoAtual.classificacao);
-      console.log("Nova classificação:", updates.classificacao);
-      console.log("Diferença:", diferenca);
-      console.log("Próximo período:", proximoPeriodo.cargo, "Sessão:", proximoPeriodo.sessao);
-      console.log("Classificação anterior do próximo:", proximoPeriodo.classificacao);
-      console.log("Nova classificação do próximo:", novaClassificacaoProximo);
-      console.log("proximoPeriodo", proximoPeriodo);
       // Atualizar ambos os períodos
       return prev.map(periodo => {
         if (periodo.id === id) {
           // Atualizar o período atual
           return { ...periodo, ...updates };
         } else if (periodo.id === proximoPeriodo.id) {
-          console.log("Proximo periodo", proximoPeriodo);
-          console.log("Nova classificação do próximo:", novaClassificacaoProximo);
           // Atualizar o próximo período com a classificação ajustada
           return { 
             ...periodo, 
@@ -464,9 +443,136 @@ export const useAgenda = (cargosDisponiveis: Option[]) => {
     reset(defaultValues);
   };
 
+  // Função para calcular o intervalo de classificação para um período específico
+  const calcularIntervaloClassificacao = (periodo: any): string => {
+    if (periodo.isRetardatario) {
+      return "-";
+    }
+    
+    // Encontrar todos os períodos do mesmo cargo que vêm antes do período atual
+    const periodosMesmoCargo = periodosList
+      .filter(p => p.cargo === periodo.cargo)
+      .sort((a, b) => {
+        // Ordenar por data e depois por horário
+        if (a.dataEscolha !== b.dataEscolha) {
+          return a.dataEscolha.localeCompare(b.dataEscolha);
+        }
+        return a.horario.localeCompare(b.horario);
+      });
+    
+    // Calcular a posição do período atual na lista ordenada
+    const indiceAtual = periodosMesmoCargo.findIndex(p => p.id === periodo.id);
+
+    // Somar as quantidades dos períodos anteriores
+    let somaAnterior = 0;
+    for (let i = 0; i < indiceAtual; i++) {
+      somaAnterior += periodosMesmoCargo[i].classificacao || 0;
+    }
+
+    const inicio = somaAnterior + 1;
+    const fim = somaAnterior + (periodo.classificacao || 0);
+
+    if (inicio === fim) {
+      return `${inicio}ª`;
+    } else {
+      return `${inicio}ª até ${fim}ª`;
+    }
+  };
+
+  // Função para verificar se o horário já existe na mesma data
+  const verificarHorarioExistente = (key: number, horaInicio: string, horaFim: string): boolean => {
+    const periodoAtual = periodosList.find(p => p.id === key);
+    if (!periodoAtual) return false;
+
+    return periodosList.some(periodo => {
+      // Não verificar contra o próprio período
+      if (periodo.id === key) return false;
+      
+      // Verificar se é a mesma data
+      if (periodo.dataEscolha !== periodoAtual.dataEscolha) return false;
+      
+      // Verificar se o horário já existe
+      const horarioExistente = periodo.horario;
+      if (horarioExistente === "Online") return false; // Online não tem conflito de horário
+      
+      // Extrair horário existente
+      const matchExistente = horarioExistente.match(/(\d{2}:\d{2})\s*às\s*(\d{2}:\d{2})/);
+      if (!matchExistente) return false;
+      
+      const [, inicioExistente, fimExistente] = matchExistente;
+      
+      // Verificar sobreposição de horários
+      const inicio1 = horaInicio;
+      const fim1 = horaFim;
+      const inicio2 = inicioExistente;
+      const fim2 = fimExistente;
+      
+      // Converte para minutos para facilitar comparação
+      const toMinutes = (time: string | number | undefined) => {
+        if (!time || typeof time !== 'string') return 0;
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
+      };
+      
+      const inicio1Min = toMinutes(inicio1);
+      const fim1Min = toMinutes(fim1);
+      const inicio2Min = toMinutes(inicio2);
+      const fim2Min = toMinutes(fim2);
+      
+      // Verifica se há sobreposição: um horário começa antes do outro terminar
+      return (inicio1Min < fim2Min && fim1Min > inicio2Min);
+    });
+  };
+
+  // Função para verificar conflito de horário em tempo real
+  const verificarConflitoTempoReal = (key: number, horaInicio: string | number | undefined, horaFim: string | number | undefined): boolean => {
+    if (!horaInicio || !horaFim || typeof horaInicio !== 'string' || typeof horaFim !== 'string') return false;
+    return verificarHorarioExistente(key, horaInicio, horaFim);
+  };
+
+  // Função para verificar se um período está sendo editado
+  const isEditing = (record: any) => record.id === editingKey;
+
+  // Função para iniciar edição
+  const edit = (record: any) => {
+    setEditingKey(record.id);
+  };
+
+  // Função para cancelar edição
+  const cancelEdit = () => {
+    setEditingKey(null);
+  };
+
+  // Função para salvar edição
+  const saveEdit = (key: number, periodoDataItem: any, values: any) => {
+    if (values.classificacao) {
+      // Se for tipo Presencial, verificar horários
+      if (periodoDataItem?.tipoEscolha === "Presencial") {
+        if (!values.horaInicio || !values.horaFim) {
+          return { success: false, message: 'Horários são obrigatórios para tipo Presencial.' };
+        }
+        
+        // Verificar se o horário já existe na mesma data
+        if (verificarHorarioExistente(key, values.horaInicio, values.horaFim)) {
+          return { success: false, message: 'Este horário já existe na mesma data. Escolha outro horário.' };
+        }
+      }
+      
+      // Atualizar o período
+      handleUpdatePeriodo(key, { 
+        horaInicio: values.horaInicio,
+        horaFim: values.horaFim,
+        classificacao: parseInt(values.classificacao)
+      });
+      
+      setEditingKey(null);
+      return { success: true };
+    }
+    return { success: false, message: 'Classificação é obrigatória.' };
+  };
+
   const handleSubmitAgenda = async (data: IAgendaFields) => {
     // Aqui você pode adicionar a lógica para processar os dados da agenda
-    console.log("Dados da agenda:", data);
     return data;
   };
 
@@ -490,5 +596,14 @@ export const useAgenda = (cargosDisponiveis: Option[]) => {
     handleAdicionarPeriodo,
     handleRemoverPeriodo,
     handleUpdatePeriodo,
+    // Funções de edição e cálculo
+    editingKey,
+    isEditing,
+    edit,
+    cancelEdit,
+    saveEdit,
+    calcularIntervaloClassificacao,
+    verificarHorarioExistente,
+    verificarConflitoTempoReal,
   };
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Table, Button, Tooltip, TimePicker, Typography, message } from "antd";
 import { DeleteOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
@@ -23,6 +23,13 @@ interface AgendaTabelaProps {
   periodosList: PeriodoItem[];
   handleRemoverPeriodo: (id: number) => void;
   onUpdatePeriodo?: (id: number, updates: Partial<PeriodoItem>) => void;
+  editingKey: number | null;
+  isEditing: (record: PeriodoItem) => boolean;
+  edit: (record: PeriodoItem) => void;
+  cancelEdit: () => void;
+  saveEdit: (key: number, periodoDataItem: PeriodoItem, values: any) => { success: boolean; message?: string };
+  calcularIntervaloClassificacao: (periodo: PeriodoItem) => string;
+  verificarConflitoTempoReal: (key: number, horaInicio: string | number | undefined, horaFim: string | number | undefined) => boolean;
 }
 
 interface FormData {
@@ -36,48 +43,15 @@ interface FormData {
 const AgendaTabela: React.FC<AgendaTabelaProps> = ({
   periodosList,
   handleRemoverPeriodo,
-  onUpdatePeriodo,
+  editingKey,
+  isEditing,
+  edit,
+  cancelEdit,
+  saveEdit,
+  calcularIntervaloClassificacao,
+  verificarConflitoTempoReal,
 }) => {
-  const [editingKey, setEditingKey] = useState<number | null>(null);
   
-  // Função para calcular o intervalo de classificação para um período específico
-  const calcularIntervaloClassificacao = (periodo: PeriodoItem): string => {
-    if (periodo.isRetardatario) {
-      return "-";
-    }
-    
-    // Encontrar todos os períodos do mesmo cargo que vêm antes do período atual
-    const periodosMesmoCargo = periodosList
-      .filter(p => p.cargo === periodo.cargo)
-      .sort((a, b) => {
-        // Ordenar por data e depois por horário
-        if (a.dataEscolha !== b.dataEscolha) {
-          return a.dataEscolha.localeCompare(b.dataEscolha);
-        }
-        return a.horario.localeCompare(b.horario);
-      });
-    
-    // Calcular a posição do período atual na lista ordenada
-    const indiceAtual = periodosMesmoCargo.findIndex(p => p.id === periodo.id);
-
-    // Somar as quantidades dos períodos anteriores
-    let somaAnterior = 0;
-    for (let i = 0; i < indiceAtual; i++) {
-      somaAnterior += periodosMesmoCargo[i].classificacao || 0;
-    }
-
-    const inicio = somaAnterior + 1;
-    const fim = somaAnterior + (periodo.classificacao || 0);
-    console.log("inicio", inicio);
-    console.log("fim", fim);
-    console.log("indiceAtual", indiceAtual);
-    console.log("somaAnterior", somaAnterior);
-    if (inicio === fim) {
-      return `${inicio}ª`;
-    } else {
-      return `${inicio}ª até ${fim}ª`;
-    }
-  };
 
   const { control, getValues, reset } = useForm<FormData>({
     defaultValues: periodosList.reduce((acc, item) => {
@@ -95,95 +69,19 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
     }, {} as FormData),
   });
 
-  const isEditing = (record: PeriodoItem) => record.id === editingKey;
-
-  const edit = (record: PeriodoItem) => {
-    setEditingKey(record.id);
-  };
-
   const cancel = () => {
-    setEditingKey(null);
+    cancelEdit();
     reset();
   };
 
-  // Função para verificar se o horário já existe na mesma data
-  const verificarHorarioExistente = (key: number, horaInicio: string, horaFim: string): boolean => {
-    const periodoAtual = periodosList.find(p => p.id === key);
-    if (!periodoAtual) return false;
 
-    return periodosList.some(periodo => {
-      // Não verificar contra o próprio período
-      if (periodo.id === key) return false;
-      
-      // Verificar se é a mesma data
-      if (periodo.dataEscolha !== periodoAtual.dataEscolha) return false;
-      
-      // Verificar se o horário já existe
-      const horarioExistente = periodo.horario;
-      if (horarioExistente === "Online") return false; // Online não tem conflito de horário
-      
-      // Extrair horário existente
-      const matchExistente = horarioExistente.match(/(\d{2}:\d{2})\s*às\s*(\d{2}:\d{2})/);
-      if (!matchExistente) return false;
-      
-      const [, inicioExistente, fimExistente] = matchExistente;
-      
-      // Verificar sobreposição de horários
-      const inicio1 = horaInicio;
-      const fim1 = horaFim;
-      const inicio2 = inicioExistente;
-      const fim2 = fimExistente;
-      
-      // Converte para minutos para facilitar comparação
-      const toMinutes = (time: string | number | undefined) => {
-        if (!time || typeof time !== 'string') return 0;
-        const [hours, minutes] = time.split(':').map(Number);
-        return hours * 60 + minutes;
-      };
-      
-      const inicio1Min = toMinutes(inicio1);
-      const fim1Min = toMinutes(fim1);
-      const inicio2Min = toMinutes(inicio2);
-      const fim2Min = toMinutes(fim2);
-      
-      // Verifica se há sobreposição: um horário começa antes do outro terminar
-      return (inicio1Min < fim2Min && fim1Min > inicio2Min);
-    });
-  };
-
-  // Função para verificar conflito de horário em tempo real
-  const verificarConflitoTempoReal = (key: number, horaInicio: string | number | undefined, horaFim: string | number | undefined): boolean => {
-    if (!horaInicio || !horaFim || typeof horaInicio !== 'string' || typeof horaFim !== 'string') return false;
-    return verificarHorarioExistente(key, horaInicio, horaFim);
-  };
-
-  const save = (key: number, periodoDataItem: PeriodoItem) => {
+  const salvarAgendaItemTabela = (key: number, periodoDataItem: PeriodoItem) => {
     const values = getValues(key.toString());
+    const result = saveEdit(key, periodoDataItem, values);
     
-    if (onUpdatePeriodo && values.classificacao) {
-      // Se for tipo Presencial, verificar horários
-      if (periodoDataItem?.tipoEscolha === "Presencial") {
-        if (!values.horaInicio || !values.horaFim) {
-          message.error('Horários são obrigatórios para tipo Presencial.');
-          return;
-        }
-        
-        // Verificar se o horário já existe na mesma data
-        if (verificarHorarioExistente(key, values.horaInicio, values.horaFim)) {
-          message.error('Este horário já existe na mesma data. Escolha outro horário.');
-          return;
-        }
-      }
-      console.log("values", values.classificacao);
-      // Salvar os valores individuais sem formatação
-      onUpdatePeriodo(key, { 
-        horaInicio: values.horaInicio,
-        horaFim: values.horaFim,
-        classificacao: parseInt(values.classificacao)
-      });
+    if (!result.success) {
+      message.error(result.message || 'Erro ao salvar período.');
     }
-    console.log("periodoList", periodosList);
-    setEditingKey(null);
   };
 
   const columns = [
@@ -338,7 +236,7 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
             <Tooltip title="Salvar">
               <Button
                 type="link"
-                onClick={() => save(record.id, record)}
+                onClick={() => salvarAgendaItemTabela(record.id, record)}
                 icon={<CheckOutlined style={{ color: "#05409A" }} />}
               />
             </Tooltip>
