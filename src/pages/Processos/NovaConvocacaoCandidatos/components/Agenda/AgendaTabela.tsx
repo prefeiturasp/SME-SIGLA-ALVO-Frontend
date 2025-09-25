@@ -75,7 +75,7 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
   };
 
 
-  const save = (key: number, periodoDataItem: PeriodoItem) => {
+  const salvarAgendaItemTabela = (key: number, periodoDataItem: PeriodoItem) => {
     const values = getValues(key.toString());
     const result = saveEdit(key, periodoDataItem, values);
     
@@ -236,7 +236,7 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
             <Tooltip title="Salvar">
               <Button
                 type="link"
-                onClick={() => save(record.id, record)}
+                onClick={() => salvarAgendaItemTabela(record.id, record)}
                 icon={<CheckOutlined style={{ color: "#05409A" }} />}
               />
             </Tooltip>
