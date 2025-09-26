@@ -10,6 +10,7 @@ import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
   getLayout: () => `/api/v1/layouts/`,  
+  getLayoutDownload: () => `/api/v1/layouts/download/`,
   getImportacaoArquivos: () => `/api/v1/importacao-arquivo/`,
   postImportacaoArquivosHabilitados: () => `/api/v1/importacao-arquivo/habilitados/`,
   getImportacaoArquivosHabilitados: () => `/api/v1/importacao-arquivo/habilitados/`,
@@ -133,6 +134,29 @@ export const getLayout = (
     .get<PaginatedResponse<IGetLayout>>(URL.getLayout(), {
       params,
       paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// Download do layout (CSV) - retorna Blob
+export const getLayoutDownload = (
+  params?: Record<string, any>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosImportaArquivos
+    .get<Blob>(URL.getLayoutDownload(), {
+      params,
+      paramsSerializer: queryParamsSerializer,
+      responseType: 'blob',
       signal,
       ...axiosRequestConfig,
     })

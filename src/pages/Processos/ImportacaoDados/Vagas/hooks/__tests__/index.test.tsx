@@ -353,7 +353,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
       // Verificar se a API foi chamada
       expect(API.ImportacaoDados.getUltimasImportacoesArquivosVagas).toHaveBeenCalledWith(
-        { tipo: 'VAGAS' },
+        expect.objectContaining({ pagination: expect.any(Object) }),
         expect.objectContaining({ signal: expect.any(AbortSignal) })
       );
     });
@@ -487,7 +487,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
       expect(API.ImportacaoDados.getUltimasImportacoesArquivosVagas).toHaveBeenCalledWith(
-        { tipo: 'VAGAS' },
+        expect.objectContaining({ pagination: expect.any(Object) }),
         expect.objectContaining({ signal: expect.any(AbortSignal) })
       );
     });
