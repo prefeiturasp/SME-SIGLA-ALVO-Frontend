@@ -1,6 +1,8 @@
 import React from "react";
 import { Table, Typography, Button } from "antd";
 import { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from "./styles";
+import { API } from "../../../../../../services";
+import { useQuery } from "@tanstack/react-query";
 import type { ILayout } from "../../../../../../services/resources/importacaoDados/IImportacaoArquivos";
 
 const columns = [
@@ -48,17 +50,32 @@ const { Title } = Typography;
 
 interface LayoutPadraoProps {
   loading:boolean;
+  tipo: string;
   onVoltar: () => void;
   dataSource: ILayout[],
   title: string,
 }
 
-const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ loading,onVoltar, dataSource, title }) => {
+const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ loading,tipo, onVoltar, dataSource, title }) => {
 
 
-  const handleSalvarArquivo = () => {
-    // Implementar lógica para salvar arquivo
-    console.log("Salvar arquivo");
+  const { refetch: refetchDownload, isFetching: isDownloading } = useQuery({
+    queryKey: ["layout-download", tipo],
+    queryFn: ({ signal }) => API.ImportacaoDados.getLayoutDownload({ tipo: tipo }, { signal }).response,
+    enabled: false,
+  });
+
+  const handleSalvarArquivo = async () => {
+    const { data } = await refetchDownload();
+    if (!data) return;
+    const url = window.URL.createObjectURL(data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'layout_'+tipo+'.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
   };
 
   return (
@@ -97,6 +114,7 @@ const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ loading,onVoltar, dataSourc
           type="primary"
           size="large"
           onClick={handleSalvarArquivo}
+          loading={isDownloading}
         >
           Exportar
         </Button>

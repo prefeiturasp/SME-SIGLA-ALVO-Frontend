@@ -39,6 +39,7 @@ const LayoutPadraoVagasTela: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) 
     >
       <LayoutPadrao
         loading={layoutIsLoading}
+        tipo={tipo}
         title={tipo === 'VAGAS' ? 'Layout: Arquivo de Vagas' : 'Layout: Arquivo de Aprovados (HABILITADOS)'}
         onVoltar={handleVoltar} dataSource={dataLayout?.results[0].estrutura || []} />
     </BaseTela>

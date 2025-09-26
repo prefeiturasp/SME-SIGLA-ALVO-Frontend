@@ -22,6 +22,9 @@ jest.mock('../../../../../services', () => ({
     ImportacaoDados: {
       postImportacaoArquivos: jest.fn(),
       getImportacaoArquivos: jest.fn(),
+      getLayoutDownload: jest.fn(() => ({
+        response: Promise.resolve(new Blob(['col1,col2\n1,2'], { type: 'text/csv' }))
+      })),
     },
     Concursos: {
       getConcursos: jest.fn(),
@@ -597,6 +600,7 @@ describe('LayoutPadrao Component', () => {
     render(
       <TestWrapper>
         <LayoutPadrao 
+        tipo='HABILITADOS'
           loading={false}
           onVoltar={mockOnVoltar} 
           dataSource={mockDataSource}
@@ -614,6 +618,7 @@ describe('LayoutPadrao Component', () => {
     render(
       <TestWrapper>
         <LayoutPadrao 
+        tipo='HABILITADOS'
           loading={false}
           onVoltar={mockOnVoltar} 
           dataSource={mockDataSource}
@@ -641,6 +646,7 @@ describe('LayoutPadrao Component', () => {
     render(
       <TestWrapper>
         <LayoutPadrao 
+        tipo='HABILITADOS'
           loading={false}
           onVoltar={mockOnVoltar} 
           dataSource={mockDataSource}
@@ -655,13 +661,29 @@ describe('LayoutPadrao Component', () => {
     expect(mockOnVoltar).toHaveBeenCalledTimes(1);
   });
 
-  it('deve chamar handleSalvarArquivo quando botão Exportar é clicado', async () => {
+  it('deve disparar download quando clicar em Exportar', async () => {
     const user = userEvent.setup();
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    const { API } = jest.requireMock('../../../../../services');
+
+    // Garantir que createObjectURL/revokeObjectURL existam no ambiente de teste
+    const mockCreate = jest.fn().mockReturnValue('blob:mock-url');
+    const mockRevoke = jest.fn();
+    const originalURL = window.URL;
+    Object.defineProperty(window, 'URL', {
+      value: {
+        ...originalURL,
+        createObjectURL: mockCreate,
+        revokeObjectURL: mockRevoke,
+      },
+      writable: true,
+    });
+
+    const clickSpy = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
 
     render(
       <TestWrapper>
         <LayoutPadrao 
+          tipo='HABILITADOS'
           loading={false}
           onVoltar={mockOnVoltar} 
           dataSource={mockDataSource}
@@ -672,16 +694,24 @@ describe('LayoutPadrao Component', () => {
 
     const exportarButton = screen.getByText('Exportar');
     await user.click(exportarButton);
-    
-    expect(consoleSpy).toHaveBeenCalledWith('Salvar arquivo');
-    
-    consoleSpy.mockRestore();
+
+    await waitFor(() => {
+      expect(API.ImportacaoDados.getLayoutDownload).toHaveBeenCalledWith({ tipo: 'HABILITADOS' }, expect.any(Object));
+      expect(mockCreate).toHaveBeenCalled();
+      expect(clickSpy).toHaveBeenCalled();
+      expect(mockRevoke).toHaveBeenCalled();
+    });
+
+    clickSpy.mockRestore();
+    // Restaurar URL original
+    Object.defineProperty(window, 'URL', { value: originalURL });
   });
 
   it('deve destacar campos obrigatórios em vermelho', () => {
     render(
       <TestWrapper>
         <LayoutPadrao 
+        tipo='HABILITADOS'
           loading={false}
           onVoltar={mockOnVoltar} 
           dataSource={mockDataSource}
@@ -713,6 +743,7 @@ describe('LayoutPadrao Component', () => {
     render(
       <TestWrapper>
         <LayoutPadrao 
+        tipo='HABILITADOS'
           loading={false}
           onVoltar={mockOnVoltar} 
           dataSource={dataSourceComCampoNaoObrigatorio}
