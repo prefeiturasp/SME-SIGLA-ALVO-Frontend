@@ -362,7 +362,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
       // Verificar se a API foi chamada
       expect(API.ImportacaoDados.getImportacaoArquivosHabilitados).toHaveBeenCalledWith(
-        expect.any(Object),
+        expect.objectContaining({ pagination: expect.any(Object) }),
         expect.objectContaining({ signal: expect.any(AbortSignal) })
       );
     });
@@ -501,7 +501,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       renderHook(() => useImportacaoDados(), { wrapper });
 
       expect(API.ImportacaoDados.getImportacaoArquivosHabilitados).toHaveBeenCalledWith(
-        expect.any(Object),
+        expect.objectContaining({ pagination: expect.any(Object) }),
         expect.objectContaining({ signal: expect.any(AbortSignal) })
       );
     });
