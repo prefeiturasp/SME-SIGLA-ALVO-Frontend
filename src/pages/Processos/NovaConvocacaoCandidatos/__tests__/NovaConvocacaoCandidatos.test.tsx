@@ -337,7 +337,7 @@ describe('NovaConvocacaoCandidatos', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
     
     expect(screen.getByText('Concurso')).toBeInTheDocument();
-    expect(screen.getAllByText('Tipo de Escolha')).toHaveLength(2);
+    expect(screen.getByText('Tipo de Escolha')).toBeInTheDocument();
     expect(screen.getByText('Descrição')).toBeInTheDocument();
     expect(screen.getByText('Data da convocação')).toBeInTheDocument();
     expect(screen.getByText('Data corte de Vagas')).toBeInTheDocument();

@@ -184,7 +184,6 @@ export const useAgenda = (cargosDisponiveis: Option[]) => {
         horaFim: watchedFields.horaFim, 
         tipoEscolha: watchedFields.tipoEscolha,
       };
-      console.log(novoPeriodo);
       novosPeriodos.push(novoPeriodo);
     }
     

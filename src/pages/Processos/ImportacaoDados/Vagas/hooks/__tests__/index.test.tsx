@@ -492,7 +492,16 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
       expect(API.ImportacaoDados.getUltimasImportacoesArquivosVagas).toHaveBeenCalledWith(
+<<<<<<< HEAD
+        expect.objectContaining({
+          pagination: expect.objectContaining({
+            page: 1,
+            page_size: 10,
+          })
+        }),
+=======
         expect.objectContaining({ pagination: expect.any(Object) }),
+>>>>>>> origin/feature/134892-Front-fazer-integracao-com-o-backend-para-o-download-do-layout-test
         expect.objectContaining({ signal: expect.any(AbortSignal) })
       );
     });
