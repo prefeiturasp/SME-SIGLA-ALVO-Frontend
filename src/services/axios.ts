@@ -6,22 +6,17 @@ const getEnv = (key: string, fallback: string) => {
 };
 
 export const appAxiosProcessoConvocacao = axios.create({
-  baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "http://127.0.0.1:8000"),
+  baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-convocacao"),
 });
 
 export const appAxiosConcursos = axios.create({
-  baseURL: getEnv("CONCURSOS_API_URL", "http://127.0.0.1:8001"),
+  baseURL: getEnv("CONCURSOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos"),
 });
 
 export const appAxiosCandidatos = axios.create({
-  baseURL: getEnv("CANDIDATOS_API_URL", "http://127.0.0.1:8002"),
+  baseURL: getEnv("CANDIDATOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos"),
 });
 
 export const appAxiosImportaArquivos = axios.create({
-  baseURL: getEnv("IMPORTACAO_ARQUIVOS_API_URL", "http://127.0.0.1:8003"),
-});
-
-
-export const appAxiosVagas = axios.create({
-  baseURL: getEnv("VAGAS_API_URL", "http://127.0.0.1:8003"),
+  baseURL: getEnv("IMPORTACAO_ARQUIVOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-importa-arquivos"),
 });
