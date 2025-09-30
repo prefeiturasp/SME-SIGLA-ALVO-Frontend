@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { Typography, Card, Row, Col, Button } from "antd";
 
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import { useForm, useWatch } from "react-hook-form";
 import { Link } from "react-router-dom";
 
-import { useConcursos } from "../../../hooks/useConcursos";
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
 import AgendaTela from "./components/Agenda/AgendaTela";
+import { useNovaConvocacaoCandidatos } from "./hooks/useNovaConvocacaoCandidatos";
 
 const { Text } = Typography;
 
@@ -20,106 +19,25 @@ const breadcrumbItems = [
   { title: "Nova Convocação" },
 ] as TitleItem[];
 
-type ConcursoOption = {
-  value: string;
-  label: string;
-  cargos?: { value: string; label: string }[];
-};
-
-type FormFields = {
-  concurso: string;
-  tipo_processo: string;
-  descricao: string;
-  cargo: string;
-  data_convocacao: string;
-  data_corte_vagas: string;
-};
-
 export const NovaConvocacaoCandidatosTela: React.FC = () => {
-  const { concursosData, concursosOptionsIsLoading } = useConcursos();
-
-  const { control, reset } = useForm<FormFields>({
-    defaultValues: {
-      concurso: undefined,
-      tipo_processo: undefined,
-      descricao: undefined,
-      cargo: "",
-      data_convocacao: "",
-      data_corte_vagas: "",
-    },
-  });
-
-  const watchFields = useWatch({ control });
-
-  const isCargoLiberado = watchFields.concurso;
-  const [cargosDisponiveis, setCargosDisponiveis] = useState<
-    { value: string; label: string }[]
-  >([]);
-  const [cardData, setCardData] = useState({
-    vagas: 0,
-    autorizacoes: 0,
-    reservas: 0,
-    convocar: 0,
-  });
-  const [cargoSelecionado, setCargoSelecionado] = useState<
-    string | undefined
-  >();
-  const [podeVisualizarVagas, setPodeVisualizarVagas] = useState(false);
-  const buscarCargosDoConcurso = (concursoValue: string) => {
-    if (!concursoValue) {
-      setCargosDisponiveis([]);
-      return;
-    }
-
-    const concursoSelecionado = ((concursosData as unknown as ConcursoOption[]) || []).find(
-      (c: ConcursoOption) => c.value === concursoValue,
-    );
-
-    if (concursoSelecionado && concursoSelecionado.cargos) {
-      setCargosDisponiveis(concursoSelecionado.cargos);
-    }
-
-    setCargoSelecionado(undefined);
-    setPodeVisualizarVagas(false);
-
-    setCardData({
-      vagas: 0,
-      autorizacoes: 0,
-      reservas: 0,
-      convocar: 0,
-    });
-  };
-
-  const handleSub = (data: FormFields) => {
-    console.log("Enviando dados para o backend:", {
-      ...data,
-      page: 1,
-      page_size: 10,
-    });
-  };
-
-  const handleReset = () => {
-    reset({
-      concurso: "",
-      tipo_processo: "",
-      descricao: "",
-      cargo: "",
-      data_convocacao: "",
-      data_corte_vagas: "",
-    });
-    setCargoSelecionado(undefined);
-    setCargosDisponiveis([]);
-    setPodeVisualizarVagas(false);
-  };
-
-  // Labels selecionados para concurso e cargo
-  const selectedConcursoLabel =
-    ((concursosData as unknown as ConcursoOption[]) || []).find(
-      (opt) => opt.value === watchFields.concurso,
-    )?.label || "";
-
-  const selectedCargoLabel =
-    (cargosDisponiveis || []).find((opt) => opt.value === watchFields.cargo)?.label || "";
+  const {
+    control,
+    handleSubmit,
+    watchFields,
+    concursosData,
+    concursosOptionsIsLoading,
+    cargosDisponiveis,
+    cardData,
+    podeVisualizarVagas,
+    isCargoLiberado,
+    selectedConcursoLabel,
+    selectedCargoLabel,
+    buscarCargosDoConcurso,
+    handleSub,
+    setCardData,
+    setPodeVisualizarVagas,
+    postProcessoConvocacaoMutation,
+  } = useNovaConvocacaoCandidatos();
 
   return (
     <BaseTela
@@ -132,7 +50,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
         </Typography.Title>
         <FormPrincipal
           control={control}
-          concursosData={((concursosData as unknown as ConcursoOption[]) || [])}
+          concursosData={concursosData}
           concursosOptionsIsLoading={concursosOptionsIsLoading}
           isCargoLiberado={isCargoLiberado}
           buscarCargosDoConcurso={buscarCargosDoConcurso}
@@ -166,7 +84,12 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
           </Button>
         </Col>
         <Col>
-          <Button type="primary" size="large">
+          <Button 
+            type="primary" 
+            size="large"
+            onClick={handleSubmit(handleSub)}
+            loading={postProcessoConvocacaoMutation.isPending}
+          >
             Salvar
           </Button>
         </Col>

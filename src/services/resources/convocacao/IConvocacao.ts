@@ -6,6 +6,16 @@ export interface IProcessoConvocacao {
 }
 
 
+export interface IPostProcessoConvocacaoPayload {
+  concurso_nome: string;
+  concurso_uuid: string;
+  tipo_escolha: string;
+  descricao: string;
+  data_convocacao: string;
+  data_corte_vagas: string;
+}
+
+
 export interface ISample extends IProcessoConvocacao {
   id : number|undefined;
 }
