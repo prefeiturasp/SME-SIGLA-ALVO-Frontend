@@ -6,7 +6,8 @@ const getEnv = (key: string, fallback: string) => {
 };
 
 export const appAxiosProcessoConvocacao = axios.create({
-  baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-convocacao"),
+  baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "http://localhost:8000"),
+  // baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-convocacao"),
 });
 
 export const appAxiosConcursos = axios.create({

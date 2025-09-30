@@ -16,7 +16,7 @@ export type ConcursoOption = {
 };
 export type FormFields = {
   concurso: string;
-  tipo_processo: string;
+  tipo_escolha: string;
   descricao: string;
   cargo: string;
   data_convocacao: string;
@@ -74,7 +74,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
         />
         <Controller
           control={control}
-          name="tipo_processo"
+          name="tipo_escolha"
           render={({ field }) => (
             <CustomFormItem label="Tipo de Escolha" labelCol={{ span: 24 }}>
               <Select
@@ -82,9 +82,9 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                 placeholder="Selecione o tipo de escolha"
                 style={{ width: "36.875rem", height: "2.5rem" }}
                 options={[
-                  { value: "Nova Autorização", label: "Nova Autorização" },
-                  { value: "Reposição", label: "Reposição" },
-                  { value: "Reconvocação", label: "Reconvocação" },
+                  { value: "NOVA_AUTORIZACAO", label: "Nova Autorização" },
+                  { value: "REPOSICAO", label: "Reposição" },
+                  { value: "RECONVOCAO", label: "Reconvocação" },
                 ]}
                 suffixIcon={
                   <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
