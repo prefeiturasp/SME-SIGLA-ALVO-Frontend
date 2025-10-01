@@ -55,7 +55,6 @@ export const useImportacaoDadosVagas = () => {
       processo_uuid: uuid,
       arquivo: data.arquivo!,
     };
-    console.log("payload", payload)
     try {
       const result = await postImportacaoArquivosVagasMutation.mutateAsync(payload);
       console.log("Importação criada com sucesso:", result);

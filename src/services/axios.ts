@@ -1,8 +1,6 @@
 import axios from "axios";
 
 const getEnv = (key: string, fallback: string) => {
-  // No Vite, as variáveis de ambiente são acessadas através de import.meta.env
-  // e devem ter o prefixo VITE_
   const viteKey = `VITE_${key}`;
   const envValue = import.meta.env[viteKey];
   return envValue || fallback;
