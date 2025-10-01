@@ -21,19 +21,11 @@ export interface IImportacaoHabilitadosPayload {
   tipo: string;
 }
 export interface IImportacaoVagasForm {
-  cargo: string | undefined;
-  concurso_uuid?: string;
-  concurso_nome?: string;
+  processo_convocacao: string;
   arquivo: File | null;
-  data_fechamento_modulo?: string;
-  metodo_de_importacao: MetodoImportacao;
-  opcoes_de_importacao?: string;
  }
 export interface IImportacaoVagasPayload {
-  opcoes_de_importacao?: string;
-  concurso_nome?:string;
-  concurso_uuid?:string;
-  cargo?: string;
+  processo_nome?:string;
+  processo_uuid?:string;
   arquivo: File;
-  tipo?: string;  
 }

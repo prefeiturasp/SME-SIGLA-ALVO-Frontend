@@ -3,19 +3,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { usePostImportacaoArquivosVagas } from "./usePostImportacaoArquivosVagas";
 import useImportacaoVagasSchema from "./useImportacaoVagasSchema";
 import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
-import { MetodoImportacao } from "./types";
 import useImportacaoArquivosVagas from "./useImportacaoArquivosVagas";
 import useListRequest from "../../../../../hooks/useListRequest";
+import { useProcessosConvocacaoOptions } from "../../../ConvocacaoCandidatos/hooks/useProcessosConvocacaoOptions";
 
 export const useImportacaoDadosVagas = () => {
 
   const defaultValues = {
-    cargo: undefined,
-    concurso_uuid: undefined,
-    concurso_nome: undefined,
+    processo_convocacao: undefined,
     arquivo: null,
-    metodo_de_importacao: MetodoImportacao.WebService,
-    opcoes_de_importacao:'Ajustar',
   };
 
   const importacaoVagasSchema = useImportacaoVagasSchema();
@@ -30,13 +26,11 @@ export const useImportacaoDadosVagas = () => {
     formState: { errors: formErrors, isValid },
   } = useForm<IImportacaoVagasForm>({
     defaultValues,
-    resolver: yupResolver(importacaoVagasSchema) as Resolver<IImportacaoVagasForm>,
+    resolver: yupResolver(importacaoVagasSchema) as unknown as Resolver<IImportacaoVagasForm>,
     reValidateMode: "onChange",
     mode: "onChange",
     shouldFocusError: false,
   });
-
-
 
   const { listRequest,  onAntTableChange } =
     useListRequest({
@@ -45,28 +39,23 @@ export const useImportacaoDadosVagas = () => {
 
   // Query para buscar importações com parâmetros
   const { importacoesArquivosData, importacoesArquivosIsLoading, importacoesArquivosRefetch } = useImportacaoArquivosVagas(listRequest);
+  const { processosConvocacaoOptions, processosConvocacaoOptionsIsLoading } = useProcessosConvocacaoOptions();
 
   // Mutation para post de importação de arquivos
   const postImportacaoArquivosVagasMutation = usePostImportacaoArquivosVagas({
     onSuccess: () => importacoesArquivosRefetch(),
   });
 
-
-
   const handleEnviarForm = async (data: IImportacaoVagasForm) => {
+    const uuid = data.processo_convocacao!;
+    const label = (processosConvocacaoOptions || []).find((o: any) => o?.value === uuid)?.label as string | undefined;
 
-    if (data.metodo_de_importacao === MetodoImportacao.WebService) {
-      console.log("A funcionalidade webservice ainda não foi impementada",data)
-      return
-    };
- 
     const payload: IImportacaoVagasPayload = {
-      concurso_nome: data.concurso_nome!,
-      concurso_uuid: data.concurso_uuid!,
+      processo_nome: label,
+      processo_uuid: uuid,
       arquivo: data.arquivo!,
-      opcoes_de_importacao:data.opcoes_de_importacao
     };
-
+    console.log("payload", payload)
     try {
       const result = await postImportacaoArquivosVagasMutation.mutateAsync(payload);
       console.log("Importação criada com sucesso:", result);
@@ -85,22 +74,17 @@ export const useImportacaoDadosVagas = () => {
     clearErrors("arquivo");
   };
 
-  const handleConcursoSelecionado = (uuid: string | undefined, nome: string | undefined) => {
-    setValue("concurso_uuid", uuid, { shouldValidate: true, shouldTouch: true });
-    setValue("concurso_nome", nome, { shouldValidate: false });
-    clearErrors("concurso_uuid");
-  };
-
   return {
     control,
     handleSubmit,
     formErrors,
     importacoesArquivosData,
     importacoesArquivosIsLoading,
+    processosConvocacaoOptions,
+    processosConvocacaoOptionsIsLoading,
     handleEnviarForm,
     handleReset,
     handleFileUpload,
-    handleConcursoSelecionado,
     watch,
     isCreatingImportacao: postImportacaoArquivosVagasMutation.isPending,
     createImportacaoError: postImportacaoArquivosVagasMutation.error,
