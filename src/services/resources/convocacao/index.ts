@@ -7,6 +7,7 @@ import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 export const URL = {
   getProcessosConvocacao: () => `/api/v1/processos-convocacao/`,
   getConcursosOptions: () => `/api/v1/processos-convocacao/filtros/`,
+  getProcessosConvocacaoOptions: () => `/api/v1/processos-convocacao/?formato=select`,
   createSample: () => `api/v1/sample/create`,
   editSample: (id:number) => `api/v1/sample/update/${id}/`,
   deleteSample: (id:number) => `api/v1/sample/delete/${id}/`,
@@ -119,6 +120,25 @@ export const getConcursosOptions = (
     response,
     abort,
   };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getProcessosConvocacaoOptions = (
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+ const response = appAxiosProcessoConvocacao
+   .get<IBackendWithSubOptions>(URL.getProcessosConvocacaoOptions(), {
+      signal,
+     ...axiosRequestConfig,
+   })
+   .then((response) => response.data);
+
+ return {
+   response,
+   abort,
+ };
 };
 
 // TODO adicionar JWT no header Authorization

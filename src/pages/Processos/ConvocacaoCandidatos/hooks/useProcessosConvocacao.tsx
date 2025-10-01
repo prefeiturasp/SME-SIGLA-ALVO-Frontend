@@ -33,7 +33,7 @@ export const useProcessosConvocacao = () => {
     });
 
   const { concursosOptions, concursosOptionsIsLoading } = useConcursosOptions()
-    
+
 
   const {
     processosConvocacaoData,
@@ -41,7 +41,7 @@ export const useProcessosConvocacao = () => {
   } = useConvocacao(listRequest);
 
   const handleSub = async (data: IFiltroProcessos) => {
-    
+
     setListRequest((prevState) => ({
       ...prevState,
       page:1,
