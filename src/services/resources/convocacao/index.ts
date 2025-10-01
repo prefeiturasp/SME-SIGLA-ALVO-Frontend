@@ -9,9 +9,6 @@ export const URL = {
   getConcursosOptions: () => `/api/v1/processos-convocacao/filtros/`,
   postProcessoConvocacao: () => `/api/v1/processos-convocacao/`,
   getProcessosConvocacaoOptions: () => `/api/v1/processos-convocacao/?formato=select`,
-  createSample: () => `api/v1/sample/create`,
-  editSample: (id:number) => `api/v1/sample/update/${id}/`,
-  deleteSample: (id:number) => `api/v1/sample/delete/${id}/`,
   getCargos: () => `/api/v1/cargos/`,
   getCargosPorConcurso: (concursoUuid: string) => `/api/v1/cargos/concurso/${concursoUuid}/`,
 };
@@ -146,7 +143,8 @@ export const getProcessosConvocacaoOptions = (
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
-
+  console.log("appAxiosProcessoConvocacao", appAxiosProcessoConvocacao)
+  console.log("appAxiosProcessoConvocacao base url", appAxiosProcessoConvocacao.defaults.baseURL)
  const response = appAxiosProcessoConvocacao
    .get<IBackendWithSubOptions>(URL.getProcessosConvocacaoOptions(), {
       signal,
