@@ -1,22 +1,25 @@
 import axios from "axios";
 
-console.log("import.meta.env.VITE_PROCESSOS_CONVOCACAO_API_URL", import.meta.env.VITE_PROCESSOS_CONVOCACAO_API_URL)
-console.log("import.meta.env.VITE_CONCURSOS_API_URL", import.meta.env.VITE_CONCURSOS_API_URL)
-console.log("import.meta.env.VITE_CANDIDATOS_API_URL", import.meta.env.VITE_CANDIDATOS_API_URL)
-console.log("import.meta.env.VITE_IMPORTACAO_ARQUIVOS_API_URL", import.meta.env.VITE_IMPORTACAO_ARQUIVOS_API_URL)
+const getEnv = (key: string, fallback: string) => {
+  // No Vite, as variáveis de ambiente são acessadas através de import.meta.env
+  // e devem ter o prefixo VITE_
+  const viteKey = `VITE_${key}`;
+  const envValue = import.meta.env[viteKey];
+  return envValue || fallback;
+};
 
 export const appAxiosProcessoConvocacao = axios.create({
-  baseURL: import.meta.env.VITE_PROCESSOS_CONVOCACAO_API_URL,
+  baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-convocacao"),
 });
 
 export const appAxiosConcursos = axios.create({
-  baseURL: import.meta.env.VITE_CONCURSOS_API_URL,
+  baseURL: getEnv("CONCURSOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos"),
 });
 
 export const appAxiosCandidatos = axios.create({
-  baseURL: import.meta.env.VITE_CANDIDATOS_API_URL,
+  baseURL: getEnv("CANDIDATOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos"),
 });
 
 export const appAxiosImportaArquivos = axios.create({
-  baseURL: import.meta.env.VITE_IMPORTACAO_ARQUIVOS_API_URL,
+  baseURL: getEnv("IMPORTACAO_ARQUIVOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-importa-arquivos"),
 });
