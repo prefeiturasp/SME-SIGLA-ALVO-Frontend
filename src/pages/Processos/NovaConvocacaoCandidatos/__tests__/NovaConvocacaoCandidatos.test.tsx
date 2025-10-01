@@ -363,7 +363,7 @@ describe('NovaConvocacaoCandidatos', () => {
     expect(screen.getByText('Cargos')).toBeInTheDocument();
   });
 
-  test('deve lidar com concurso vazio na função buscarCargosDoConcurso', async () => {
+  test('deve lidar com concurso vazio na função buscarCargosDoConcursoDesabilitarCargoVagas', async () => {
     const user = userEvent.setup();
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
@@ -375,7 +375,7 @@ describe('NovaConvocacaoCandidatos', () => {
     expect(screen.getByText('Cargos')).toBeInTheDocument();
   });
 
-  test('deve testar função buscarCargosDoConcurso com valor vazio', async () => {
+  test('deve testar função buscarCargosDoConcursoDesabilitarCargoVagas com valor vazio', async () => {
     const mockUseConcursos = {
       concursosData: [],
       concursosOptionsIsLoading: false
@@ -672,12 +672,12 @@ describe('NovaConvocacaoCandidatos', () => {
     await waitFor(() => expect(dataInput.value).toBe('10/02/2025'));
   });
 
-  test('deve cobrir linhas 70-71 - buscarCargosDoConcurso com valor vazio', async () => {
+  test('deve cobrir linhas 70-71 - buscarCargosDoConcursoDesabilitarCargoVagas com valor vazio', async () => {
     const user = userEvent.setup();
     renderWithProviders(<NovaConvocacaoCandidatos />);
 
-    // Simula a função buscarCargosDoConcurso com valor vazio (linhas 70-71)
-    const buscarCargosDoConcurso = (concursoValue: string) => {
+    // Simula a função buscarCargosDoConcursoDesabilitarCargoVagas com valor vazio (linhas 70-71)
+    const buscarCargosDoConcursoDesabilitarCargoVagas = (concursoValue: string) => {
       if (!concursoValue) {
         // Linha 70: setCargosDisponiveis([]);
         // Linha 71: return;
@@ -686,9 +686,9 @@ describe('NovaConvocacaoCandidatos', () => {
     };
 
     // Testa com valor vazio
-    buscarCargosDoConcurso('');
-    buscarCargosDoConcurso(undefined as any);
-    buscarCargosDoConcurso(null as any);
+    buscarCargosDoConcursoDesabilitarCargoVagas('');
+    buscarCargosDoConcursoDesabilitarCargoVagas(undefined as any);
+    buscarCargosDoConcursoDesabilitarCargoVagas(null as any);
 
     expect(screen.getByText('* Selecione o concurso para liberar a opção de Cargo.')).toBeInTheDocument();
   });

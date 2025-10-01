@@ -32,6 +32,11 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
+    path: "/processos/convocacao/editar",
+    element: <NovaConvocacaoCandidatosTela />,
+    errorElement: <RouteError />,
+  },
+  {
     path: "/processos/importacao-dados",
     element: <ImportacaoDadosTela />,
     errorElement: <RouteError />,

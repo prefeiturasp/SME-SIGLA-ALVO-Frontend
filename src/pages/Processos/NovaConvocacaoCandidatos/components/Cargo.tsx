@@ -21,6 +21,7 @@ import VisualizarVagasModal from "./VisualizarVagasModal/VisualizarVagasModal";
 import SelecionarCandidatos from "./SelecionarCandidatos";
 import type { IConvocacaoFiltros } from "../../../services/resources/convocacao/IConvocacao";
 import type { FormFields } from "./FormPrincipal";
+import type { IEscolhas } from "../../../../services/resources/escolhas/IEscolhas";
 
 const { Title, Text } = Typography;
 
@@ -49,6 +50,8 @@ interface CargoProps {
   watchFields: any;
   control: Control<FormFields>;
   agendaComponent: React.ReactNode;
+  dadosVagasNasEscolasPorCargo:IEscolhas[];
+  buscarVagasNasEscolasPorCargo: () => void;
 }
 
 const Cargo: React.FC<CargoProps> = ({
@@ -64,6 +67,8 @@ const Cargo: React.FC<CargoProps> = ({
   podeVisualizarVagas,
   control,
   agendaComponent,
+  dadosVagasNasEscolasPorCargo,
+  buscarVagasNasEscolasPorCargo
 }) => {
   const [popupSelecionarCandidatos, setPopupSelecionarCandidatos] =
     useState(false);
@@ -95,26 +100,7 @@ const Cargo: React.FC<CargoProps> = ({
     setPopupSelecionarCandidatos(false);
   };
 
-  const buscarDadosDoCargo = () => {
-    if (!watchFields.cargo) return;
-
-      setCardData({
-        vagas: 385,
-        autorizacoes: 0,
-        reservas: 407,
-        convocar: 0,
-      });
-      // Habilita o botão somente se todos os campos do formulário estiverem preenchidos
-      const camposPreenchidos = Boolean(
-        watchFields.concurso &&
-          watchFields.tipo_processo &&
-          watchFields.descricao &&
-          watchFields.data_convocacao &&
-          watchFields.data_corte_vagas,
-      );
-      setPodeVisualizarVagas(camposPreenchidos);
-
-  };
+ 
 
   return (
     <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -142,7 +128,7 @@ const Cargo: React.FC<CargoProps> = ({
         <Button
           type="primary"
           size="large"
-          onClick={buscarDadosDoCargo}
+          onClick={buscarVagasNasEscolasPorCargo}
           disabled={!watchFields.cargo}
           style={{ alignSelf: "flex-start" }}
         >

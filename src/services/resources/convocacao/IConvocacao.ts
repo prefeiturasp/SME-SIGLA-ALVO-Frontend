@@ -1,11 +1,19 @@
+import { number } from "yup";
+
 export interface IProcessoConvocacao {
-  concurso_nome: string;
-  data_convocacao: string;
-  status: string; 
-  uuid: string; 
+concurso_nome : string;
+concurso_uuid : string;
+criado_em : string;
+data_convocacao : string;
+data_corte_vagas : string;
+descricao : string;
+numero_convocados : number
+quantidade_cargos : number
+status : string;
+tipo_escolha : string;
+uuid : string;
 }
-
-
+ 
 export interface IPostProcessoConvocacaoPayload {
   concurso_nome: string;
   concurso_uuid: string;

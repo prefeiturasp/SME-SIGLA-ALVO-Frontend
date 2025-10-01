@@ -8,11 +8,17 @@ import { CustomTitle } from "./style";
 
 import { Button, Space } from "antd";
 import { StyledTable } from "../../../../components/EstilosCompartilhados";
+import { useNavigate } from "react-router-dom";
 
 interface ConvocacaoTableProps extends TableProps<IProcessoConvocacao> {
   data: IProcessoConvocacao[];
 }
 const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
+  const navigate = useNavigate();
+  
+  const handleEdit = (editData: IProcessoConvocacao) => {    
+    navigate(`editar`, {state:{editData}});
+  };
   const columns: ColumnsType<IProcessoConvocacao> = [
     {
       title: "Processo",
@@ -41,7 +47,7 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
           <Button
             type={"link"}
             icon={<ModeEditOutlineOutlinedIcon />}
-            onClick={() => console.log("edit")}
+            onClick={() => handleEdit(row)}
           />
 
           <Button

@@ -2,13 +2,14 @@ import React from "react";
 import { Typography, Card, Row, Col, Button } from "antd";
 
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
 import AgendaTela from "./components/Agenda/AgendaTela";
 import { useNovaConvocacaoCandidatos } from "./hooks/useNovaConvocacaoCandidatos";
-
+import type { IProcessoConvocacao } from "../../../services/resources/convocacao/IConvocacao";
+ 
 const { Text } = Typography;
 
 
@@ -20,6 +21,8 @@ const breadcrumbItems = [
 ] as TitleItem[];
 
 export const NovaConvocacaoCandidatosTela: React.FC = () => {
+
+
   const {
     control,
     handleSubmit,
@@ -32,14 +35,17 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
     isCargoLiberado,
     selectedConcursoLabel,
     selectedCargoLabel,
-    buscarCargosDoConcurso,
+    buscarCargosDoConcursoDesabilitarCargoVagas,
     handleSub,
     setCardData,
     setPodeVisualizarVagas,
     postProcessoConvocacaoMutation,
+    dadosVagasNasEscolasPorCargo,
+    buscarVagasNasEscolasPorCargo
   } = useNovaConvocacaoCandidatos();
 
-  return (
+
+ return (
     <BaseTela
       breadcrumbItems={breadcrumbItems}
       title="Processo de convocação de candidatos"
@@ -53,7 +59,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
           concursosData={concursosData}
           concursosOptionsIsLoading={concursosOptionsIsLoading}
           isCargoLiberado={isCargoLiberado}
-          buscarCargosDoConcurso={buscarCargosDoConcurso}
+          buscarCargosDoConcursoDesabilitarCargoVagas={buscarCargosDoConcursoDesabilitarCargoVagas}
         />
       </Card>
 
@@ -68,6 +74,8 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
         selectedCargoLabel={selectedCargoLabel}
         watchFields={watchFields}
         control={control}
+        dadosVagasNasEscolasPorCargo={dadosVagasNasEscolasPorCargo?.results || []}
+        buscarVagasNasEscolasPorCargo={buscarVagasNasEscolasPorCargo}
         agendaComponent={
           <AgendaTela 
             cargosDisponiveis={cargosDisponiveis}
