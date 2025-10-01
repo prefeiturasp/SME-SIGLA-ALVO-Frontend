@@ -68,6 +68,9 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
         selectedCargoLabel={selectedCargoLabel}
         watchFields={watchFields}
         control={control}
+        onCandidatosSelecionados={(quantidade, quantidadesIndividuais) => {
+          console.log('Candidatos selecionados:', quantidade, quantidadesIndividuais);
+        }}
         agendaComponent={
           <AgendaTela 
             cargosDisponiveis={cargosDisponiveis}
