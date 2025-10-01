@@ -9,7 +9,7 @@ const getEnv = (key: string, fallback: string) => {
 };
 
 export const appAxiosProcessoConvocacao = axios.create({
-  baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "http://localhost:8000"),
+  baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "http://127.0.0.1:8000"),
 });
 
 export const appAxiosConcursos = axios.create({
