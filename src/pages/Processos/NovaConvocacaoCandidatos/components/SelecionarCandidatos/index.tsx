@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Typography, Col, Button, Space, message, Table, Spin } from 'antd';
+import { Modal, Typography, Col, Button, Space, message, Spin, Alert } from 'antd';
 import { 
   ModalTitle, 
   CompetitionInfo, 
@@ -24,7 +24,7 @@ interface SelecionarCandidatosProps {
   cargo?: string;
   vagas?: number;
   autorizacoes?: number;
-  onCandidatosSelecionados?: (quantidade: number) => void;
+  onCandidatosSelecionados?: (quantidade: number, quantidadesIndividuais: { geral: number; pcd: number; nna: number }) => void;
 }
 
 const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
@@ -44,12 +44,19 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
     nna: 0
   });
   const [mostrarTabelaCandidatos, setMostrarTabelaCandidatos] = useState(false);
+  const [parametrosBusca, setParametrosBusca] = useState<{ geral: number; pcd: number; nna: number } | undefined>(undefined);
 
   // Hook para buscar candidatos - só executa quando mostrarTabelaCandidatos for true
-  const { candidatosData, candidatosIsLoading } = useCandidatos(mostrarTabelaCandidatos);
+  const { candidatosData, candidatosIsLoading } = useCandidatos(mostrarTabelaCandidatos, parametrosBusca);
   
   // Dados formatados para a tabela - só mostra quando necessário
-  const candidatos = mostrarTabelaCandidatos && candidatosData ? candidatosData : [];
+  const candidatos = mostrarTabelaCandidatos && candidatosData?.results ? candidatosData.results : [];
+
+  // Validação em tempo real
+  const totalAutorizacoes = autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
+  const isTotalValido = totalAutorizacoes === quantidade && quantidade > 0;
+  const temCamposPreenchidos = autorizacoesDigitadas.geral > 0 && autorizacoesDigitadas.def > 0 && autorizacoesDigitadas.nna > 0;
+  const mostrarErroValidacao = quantidade > 0 && temCamposPreenchidos && !isTotalValido;
 
   // Função para validar e formatar entrada numérica
   const handleNumericInput = (value: string, setter: (value: number) => void) => {
@@ -90,20 +97,38 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
   };
 
   const handleBuscarPorDigitadas = () => {
-    console.log('Buscando candidatos por autorizações digitadas');
+    // Validar se o somatório das autorizações digitadas é igual ao campo quantidade
+    const somatorio = autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
+    
+    if (somatorio !== quantidade) {
+      message.error(`O somatório dos candidatos (${somatorio}) deve ser igual ao campo "Quantidade" (${quantidade})`);
+      return;
+    }
+
+    // Se a validação passou, define os parâmetros e mostra a tabela
+    setParametrosBusca({
+      geral: autorizacoesDigitadas.geral,
+      pcd: autorizacoesDigitadas.def, // def = pcd conforme especificação
+      nna: autorizacoesDigitadas.nna
+    });
     setMostrarTabelaCandidatos(true);
   };
 
   const handleSelecionar = () => {
-    console.log('Selecionando candidatos');
-    
     // Conta a quantidade de candidatos na tabela
     // candidatosData pode ser PaginatedResponse<ICandidato> ou undefined
     const quantidadeCandidatos = candidatosData?.results?.length || 0;
     
-    // Chama o callback para informar a quantidade de candidatos selecionados
+    // Quantidades individuais baseadas nas autorizações digitadas
+    const quantidadesIndividuais = {
+      geral: autorizacoesDigitadas.geral,
+      pcd: autorizacoesDigitadas.def, // def = pcd conforme especificação
+      nna: autorizacoesDigitadas.nna
+    };
+    
+    // Chama o callback para informar a quantidade de candidatos selecionados e quantidades individuais
     if (onCandidatosSelecionados) {
-      onCandidatosSelecionados(quantidadeCandidatos);
+      onCandidatosSelecionados(quantidadeCandidatos, quantidadesIndividuais);
     }
     
     onClose();
@@ -221,7 +246,7 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
                   onKeyDown={validateNumericInput}
                   placeholder="Digite apenas números"
                 />
-                <StyledText className="text-gray">0 (Geral)</StyledText>
+                <StyledText className="text-gray">{autorizacoesDigitadas.geral} (Geral)</StyledText>
               </div>
             </TableCell>
 
@@ -251,7 +276,7 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
                   onKeyDown={validateNumericInput}
                   placeholder="Digite apenas números"
                 />
-                <StyledText className="text-gray">0 (Def.)</StyledText>
+                <StyledText className="text-gray">{autorizacoesDigitadas.def} (Def.)</StyledText>
               </div>
             </TableCell>
 
@@ -281,7 +306,7 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
                   onKeyDown={validateNumericInput}
                   placeholder="Digite apenas números"
                 />
-                <StyledText className="text-gray">0 (NNA)</StyledText>
+                <StyledText className="text-gray">{autorizacoesDigitadas.nna} (NNA)</StyledText>
               </div>
             </TableCell>
 
@@ -290,6 +315,18 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
             </TableCell>
           </TableRow>
         </TableContainer>
+
+        {/* Alert de validação */}
+        {mostrarErroValidacao && (
+          <div style={{ width: '100%', marginBottom: '1rem' }}>
+            <Alert 
+              message="A SOMA dos campos GERAL, DEF. e NNA tem que ser igual ao total inserido em QUANTIDADE." 
+              type="error" 
+              showIcon
+              style={{ width: '100%' }}
+            />
+          </div>
+        )}
 
         <ButtonContainer>
           <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%'}}>
@@ -368,10 +405,10 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
                       borderBottom: index < candidatos.length - 1 ? '1px solid #f0f0f0' : 'none'
                     }}>
                       <div style={{ width: '20%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
-                        {candidato.convocado_por}
+                        COGEP
                       </div>
                       <div style={{ width: '35%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
-                        {candidato.nome_candidato}
+                        {candidato.nome}
                       </div>
                       <div style={{ width: '15%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
                         {candidato.classificacao_geral}
@@ -417,10 +454,11 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
               <Button
                 type="primary"
                 onClick={handleSelecionar}
+                disabled={!isTotalValido}
                 style={{
-                  backgroundColor: '#05409A',
-                  borderColor: '#05409A',
-                  color: '#fff'
+                  backgroundColor: isTotalValido ? '#05409A' : '#d9d9d9',
+                  borderColor: isTotalValido ? '#05409A' : '#d9d9d9',
+                  color: isTotalValido ? '#fff' : '#999'
                 }}
               >
                 Selecionar

@@ -19,7 +19,7 @@ import {
 } from "../styles";
 import VisualizarVagasModal from "./VisualizarVagasModal/VisualizarVagasModal";
 import SelecionarCandidatos from "./SelecionarCandidatos";
-import type { IConvocacaoFiltros } from "../../../services/resources/convocacao/IConvocacao";
+import type { IConvocacaoFiltros } from "../../../../services/resources/convocacao/IConvocacao";
 import type { FormFields } from "./FormPrincipal";
 
 const { Title, Text } = Typography;
@@ -43,7 +43,7 @@ interface CargoProps {
   }) => void;
   selectedConcursoLabel: string;
   selectedCargoLabel: string;
-  onCandidatosSelecionados?: (qtd: number) => void;
+  onCandidatosSelecionados?: (qtd: number, quantidadesIndividuais?: { geral: number; pcd: number; nna: number }) => void;
   setPodeVisualizarVagas: (podeVisualizarVagas: boolean) => void;
   podeVisualizarVagas: boolean;
   watchFields: any;
@@ -67,6 +67,7 @@ const Cargo: React.FC<CargoProps> = ({
 }) => {
   const [popupSelecionarCandidatos, setPopupSelecionarCandidatos] =
     useState(false);
+  const [candidatosSelecionados, setCandidatosSelecionados] = useState(0);
   
   
   const handleOpenVisualizarVagasModal = () => {
@@ -95,19 +96,38 @@ const Cargo: React.FC<CargoProps> = ({
     setPopupSelecionarCandidatos(false);
   };
 
+  const handleCandidatosSelecionados = (quantidade: number, quantidadesIndividuais?: { geral: number; pcd: number; nna: number }) => {
+    setCandidatosSelecionados(quantidade);
+    
+    // Atualizar os cards individuais se as quantidades foram fornecidas
+    if (quantidadesIndividuais) {
+      setCardData({
+        vagas: cardData.vagas,
+        autorizacoes: quantidadesIndividuais.geral, // Ampla
+        convocar: quantidadesIndividuais.pcd,      // PcD
+        reservas: quantidadesIndividuais.nna       // NNA
+      });
+    }
+    
+    // Também chama o callback do componente pai se existir
+    if (onCandidatosSelecionados) {
+      onCandidatosSelecionados(quantidade, quantidadesIndividuais);
+    }
+  };
+
   const buscarDadosDoCargo = () => {
     if (!watchFields.cargo) return;
 
       setCardData({
         vagas: 385,
         autorizacoes: 0,
-        reservas: 407,
+        reservas: 0,
         convocar: 0,
       });
       // Habilita o botão somente se todos os campos do formulário estiverem preenchidos
       const camposPreenchidos = Boolean(
         watchFields.concurso &&
-          watchFields.tipo_processo &&
+          watchFields.tipo_escolha &&
           watchFields.descricao &&
           watchFields.data_convocacao &&
           watchFields.data_corte_vagas,
@@ -310,7 +330,7 @@ const Cargo: React.FC<CargoProps> = ({
         <Row gutter={16} justify="start">
           {[
             { title: "Escolas selecionadas", value: 0, icon: <SchoolIcon /> },
-            { title: "Candidatos selecionados", value: 0, icon: <GroupIcon /> },
+            { title: "Candidatos selecionados", value: candidatosSelecionados, icon: <GroupIcon /> },
           ].map(({ title, value, icon }) => (
             <Col key={title}>
               <StyledCardGrande styles={{ body: { padding: 0 } }}>
@@ -367,7 +387,7 @@ const Cargo: React.FC<CargoProps> = ({
           cargo={selectedCargoLabel}
           vagas={cardData.vagas}
           autorizacoes={cardData.autorizacoes}
-          onCandidatosSelecionados={onCandidatosSelecionados}
+          onCandidatosSelecionados={handleCandidatosSelecionados}
         />
 
         </Space>
