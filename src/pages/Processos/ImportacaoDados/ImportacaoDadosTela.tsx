@@ -7,7 +7,7 @@ import {
 } from "./styles";
 
 // Importar os componentes das abas
-import Vagas from "./Vagas";
+import Vagas from "./Vagas/VagasTela";
 import VagasSistemaIngresso from "./VagasSistemaIngresso";
 import Habilitados from "./Habilitados";
 import EscolhasEOL from "./EscolhasEOL";

@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosProcessoConvocacao } from "../../axios";
-import type { ISample, IProcessoConvocacao, ICreateProcessoConvocacaoPayload } from "./IConvocacao";
+import type { ISample, IProcessoConvocacao, IPostProcessoConvocacaoPayload } from "./IConvocacao";
 import type { IBackendWithSubOptions, IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
@@ -8,9 +8,7 @@ export const URL = {
   getProcessosConvocacao: () => `/api/v1/processos-convocacao/`,
   getConcursosOptions: () => `/api/v1/processos-convocacao/filtros/`,
   postProcessoConvocacao: () => `/api/v1/processos-convocacao/`,
-  createSample: () => `api/v1/sample/create`,
-  editSample: (id:number) => `api/v1/sample/update/${id}/`,
-  deleteSample: (id:number) => `api/v1/sample/delete/${id}/`,
+  getProcessosConvocacaoOptions: () => `/api/v1/processos-convocacao/?formato=select`,
   getCargos: () => `/api/v1/cargos/`,
   getCargosPorConcurso: (concursoUuid: string) => `/api/v1/cargos/concurso/${concursoUuid}/`,
 };
@@ -43,7 +41,7 @@ export const getProcessosConvocacao = (
 
 // TODO adicionar JWT no header Authorization
 export const postProcessoConvocacao = (
-  payload: ICreateProcessoConvocacaoPayload,
+  payload: IPostProcessoConvocacaoPayload,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
@@ -138,6 +136,26 @@ export const getConcursosOptions = (
     response,
     abort,
   };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getProcessosConvocacaoOptions = (
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  console.log("appAxiosProcessoConvocacao", appAxiosProcessoConvocacao)
+  console.log("appAxiosProcessoConvocacao base url", appAxiosProcessoConvocacao.defaults.baseURL)
+ const response = appAxiosProcessoConvocacao
+   .get<IBackendWithSubOptions>(URL.getProcessosConvocacaoOptions(), {
+      signal,
+     ...axiosRequestConfig,
+   })
+   .then((response) => response.data);
+
+ return {
+   response,
+   abort,
+ };
 };
 
 // TODO adicionar JWT no header Authorization
