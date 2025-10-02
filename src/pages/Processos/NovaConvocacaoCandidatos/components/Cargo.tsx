@@ -19,7 +19,7 @@ import {
 } from "../styles";
 import VisualizarVagasModal from "./VisualizarVagasModal/VisualizarVagasModal";
 import SelecionarCandidatos from "./SelecionarCandidatos";
-import type { IConvocacaoFiltros } from "../../../services/resources/convocacao/IConvocacao";
+import type { IConvocacaoFiltros, IOptions, IUnidadeEscolar } from "../../../../services/resources/convocacao/IConvocacao";
 import type { FormFields } from "./FormPrincipal";
 import type { IEscolhas } from "../../../../services/resources/escolhas/IEscolhas";
 
@@ -50,8 +50,9 @@ interface CargoProps {
   watchFields: any;
   control: Control<FormFields>;
   agendaComponent: React.ReactNode;
-  dadosVagasNasEscolasPorCargo:IEscolhas[];
+  dadosVagasNasEscolasPorCargo:IUnidadeEscolar[];
   buscarVagasNasEscolasPorCargo: () => void;
+  dres: IOptions[];
 }
 
 const Cargo: React.FC<CargoProps> = ({
@@ -68,7 +69,8 @@ const Cargo: React.FC<CargoProps> = ({
   control,
   agendaComponent,
   dadosVagasNasEscolasPorCargo,
-  buscarVagasNasEscolasPorCargo
+  buscarVagasNasEscolasPorCargo,
+  dres
 }) => {
   const [popupSelecionarCandidatos, setPopupSelecionarCandidatos] =
     useState(false);
@@ -129,7 +131,7 @@ const Cargo: React.FC<CargoProps> = ({
           type="primary"
           size="large"
           onClick={buscarVagasNasEscolasPorCargo}
-          disabled={!watchFields.cargo}
+          disabled={!watchFields.cargo||!podeVisualizarVagas}
           style={{ alignSelf: "flex-start" }}
         >
           Buscar
@@ -344,6 +346,49 @@ const Cargo: React.FC<CargoProps> = ({
           loading={false}
           concurso={selectedConcursoLabel}
           cargo={selectedCargoLabel}
+          dadosVagasNasEscolasPorCargo={[
+            {
+            uuid: "3b178725-a14a-42d7-97cc-4fb1e3837f5b",
+            codigo_eol: "480100",
+            dre: "Guaianases",
+            tipo: "UE",
+            nome_oficial: "Escola Guaianases",
+            vagas_definitivas: 1,
+            vagas_precarias: 1,
+            dres: [],
+          },
+          {
+            uuid: "e81d73ef-5121-4237-9bcd-69d174354051",
+            codigo_eol: "480100",
+            dre: "Guaianases",
+            tipo: "UE",
+            nome_oficial: "Escola Campo Limpo",
+            vagas_definitivas: 1,
+            vagas_precarias: 1,
+            dres: [],
+          },  
+          {
+            uuid: "e81d73ef-5121-4237-9bcd-69d174354053",
+            codigo_eol: "480100",
+            dre: "teste",
+            tipo: "UE",
+            nome_oficial: "Escola t",
+            vagas_definitivas: 1,
+            vagas_precarias: 1,
+            dres: [],
+          },  
+          {
+            uuid: "e81d73ef-5121-4237-9bcd-69d174354055",
+            codigo_eol: "480100",
+            dre: "segundo",
+            tipo: "UE",
+            nome_oficial: "Escola segundo",
+            vagas_definitivas: 1,
+            vagas_precarias: 1,
+            dres: [],
+          },  
+        ]}//dadosVagasNasEscolasPorCargo}
+        dres={dres}//dadosVagasNasEscolasPorCargo?.[0]?.dres || []}
         />
 
         <SelecionarCandidatos

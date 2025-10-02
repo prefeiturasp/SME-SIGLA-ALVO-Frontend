@@ -6,6 +6,8 @@ import type { IPostProcessoConvocacaoPayload, IProcessoConvocacao } from "../../
 import { useLocation } from "react-router-dom";
 import { API } from "../../../../services";
 import { useQuery } from "@tanstack/react-query";
+import useListRequest from "../../../../hooks/useListRequest";
+import type { IEscolhasFiltro } from "../../../../services/resources/escolhas/IEscolhas";
 
 type ConcursoOption = {
   value: string;
@@ -27,15 +29,16 @@ export const useNovaConvocacaoCandidatos = () => {
   const location = useLocation();
   const editData = location.state.editData as IProcessoConvocacao; 
   const isEdit = !!editData
+  console.log("editData", editData)
   
   const initialDefaults = React.useMemo(() => {
     if (!isEdit) return undefined;
     return {      
-      // concurso: 'b38ded7a-0027-416c-a54b-ce1696f14b7a',//editData.concurso_uuid, TODO REMOVER ESSE DEFAULT DE CONCURSO APOS O TEST
-      // tipo_escolha: editData.tipo_escolha,
-      // descricao: editData.descricao,
-      // data_convocacao: editData.data_convocacao || "",
-      // data_corte_vagas: editData?.data_corte_vagas || "",
+      concurso: editData.concurso_uuid,
+      tipo_escolha: editData.tipo_escolha,
+      descricao: editData.descricao,
+      data_convocacao: editData.data_convocacao || "",
+      data_corte_vagas: editData?.data_corte_vagas || "",
     };
   }, [isEdit, editData]);
 
@@ -55,7 +58,7 @@ export const useNovaConvocacaoCandidatos = () => {
     defaultValues: { ...defaultValues, ...(initialDefaults || {}) },
   });
   useEffect(() => {
-    if (initialDefaults && initialDefaults?.concurso) {
+    if (initialDefaults ) {//&& initialDefaults?.concurso
       buscarCargosDoConcurso(initialDefaults.concurso);  
      }
   }, [initialDefaults, reset]);
@@ -167,16 +170,20 @@ export const useNovaConvocacaoCandidatos = () => {
   const selectedCargoLabel =
     (cargosDisponiveis || []).find((opt) => opt.value === watchFields.cargo)?.label || "";
 
-    // processo_convocacao_uuid=<uuid>&cargo_codigo
-    const { data: dadosVagasNasEscolasPorCargo, refetch:buscarVagasNasEscolasPorCargo, isLoading } = useQuery({
-      queryKey: ["getDadosVagasNasEscolasPorCargo"],
-      queryFn: ({ signal }) =>
-        // API.Escolhas.getVagasEscolas({ signal },processo_convocacao_uuid:editData.uuid,cargo_codigo:watchFields.cargo ).response,
-      API.Escolhas.getVagasEscolas({ signal }).response,
 
-      staleTime: 1000 * 60 * 5, // 5 minutos
-      retry: 0,
+  const { listRequest, setListRequest, onAntTableChange } =
+    useListRequest<IEscolhasFiltro>({
+      pagination: { page: 1, page_size: 10 },
     });
+
+  const { data: dadosVagasNasEscolasPorCargo, refetch:buscarVagasNasEscolasPorCargo, isLoading } = useQuery({
+    queryKey: ["getDadosVagasNasEscolasPorCargo",listRequest],
+    queryFn: ({ signal }) =>
+      API.Escolhas.getVagasEscolas({ concurso_uuid:editData?.uuid,cargo_codigo:watchFields.cargo! },listRequest,{ signal }).response,
+    enabled: !!editData?.uuid && !!watchFields.cargo,
+    staleTime: 0,
+    retry: 0,
+  });
  
 
   return {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { TableProps } from "antd";
 import { Flex, Button, Tooltip, InputNumber } from "antd";
 import type { TableColumnsType } from "antd";
@@ -12,6 +12,7 @@ import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 interface UnidadeEscolarTableProps extends TableProps<IUnidadeEscolar> {
   originData: IUnidadeEscolar[];
   loading?: boolean;
+  setEditableData: React.Dispatch<React.SetStateAction<IUnidadeEscolar[]>>;
 }
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
@@ -52,11 +53,20 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
 const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
   originData,
   loading,
+  setEditableData,
   ...rest
 }) => {
+  const StyledTableAny: any = StyledTable;
   const [data, setData] = useState<IUnidadeEscolar[]>(originData);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>(
+    originData.map((item) => item.uuid)
+  );
   const [editingKey, setEditingKey] = useState<string>("");
+
+  useEffect(() => {
+    setData(originData);
+    setSelectedRowKeys(originData.map((item) => item.uuid));
+  }, [originData]);
 
   const { control, getValues } = useForm({
     defaultValues: originData.reduce((acc, item) => {
@@ -79,15 +89,20 @@ const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
       const item = newData[index];
       newData.splice(index, 1, { ...item, ...values });
       setData(newData);
+      setEditableData((prev) =>
+        prev.map((prevItem) =>
+          prevItem.uuid === key ? { ...prevItem, ...values } : prevItem
+        )
+      );
       setEditingKey("");
     }
   };
 
   const baseColumns: TableColumnsType<IUnidadeEscolar> = [
-    { title: "Código EOL", dataIndex: "eol" },
+    { title: "Código EOL", dataIndex: "codigo_eol" },
     { title: "DRE", dataIndex: "dre" },
     { title: "Tipo de unidade", dataIndex: "tipo" },
-    { title: "Unidade Escolar", dataIndex: "unidade" },
+    { title: "Unidade Escolar", dataIndex: "nome_oficial" },
     {
       title: "Vagas definitivas",
       dataIndex: "vagas_definitivas",
@@ -160,7 +175,7 @@ const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
 
   return (
     <Flex gap="middle" vertical>
-      <StyledTable<IUnidadeEscolar>
+      <StyledTableAny
         {...rest}
         rowKey="uuid"
         style={{ margin: "1.5rem 0" }}
@@ -170,7 +185,7 @@ const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
         bordered
         loading={loading}
         dataSource={data}
-        columns={columns}
+        columns={columns as any}
         rowSelection={rowSelection}
         rowClassName="editable-row"
         pagination={false}

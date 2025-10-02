@@ -10,3 +10,9 @@ export interface IEscolhas {
   concurso_nome: string;
   concurso_uuid: string;    
 }
+
+
+export interface IEscolhasFiltro {
+  concurso_uuid: string;    
+  cargo_codigo: string;
+}

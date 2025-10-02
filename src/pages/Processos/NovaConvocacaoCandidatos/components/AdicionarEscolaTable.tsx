@@ -62,21 +62,23 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
   const initialData: IUnidadeEscolar[] = [
     {
       uuid: "3b178725-a14a-42d7-97cc-4fb1e3837f5b",
-      eol: "480100",
+      codigo_eol: "480100",
       dre: "Guaianases",
       tipo: "UE",
-      unidade: "Escola Guaianases",
+      nome_oficial: "Escola Guaianases",
       vagas_definitivas: 1,
       vagas_precarias: 1,
+      dres: [],
     },
     {
       uuid: "e81d73ef-5121-4237-9bcd-69d174354051",
-      eol: "480100",
-      dre: "Guaianases",
+      codigo_eol: "480100",
+      dre: "teste",
       tipo: "UE",
-      unidade: "Escola Campo Limpo",
+      nome_oficial: "Escola Campo Limpo",
       vagas_definitivas: 1,
       vagas_precarias: 1,
+      dres: [],
     },
   ];
 
@@ -112,7 +114,7 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
   };
 
   const columns: TableColumnsType<IUnidadeEscolar> = [
-    { title: "Código EOL", dataIndex: "eol" },
+    { title: "Código EOL", dataIndex: "codigo_eol" },
     { title: "DRE", dataIndex: "dre" },
     { title: "Tipo de unidade", dataIndex: "tipo" },
     { title: "Unidade Escolar", dataIndex: "unidade" },
@@ -194,7 +196,7 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
 
   return (
     <Flex gap="middle" vertical>
-      <StyledTable<IUnidadeEscolar>
+      <StyledTable
         {...rest}
         rowKey="uuid"
         style={{ margin: "1.5rem 0" }}

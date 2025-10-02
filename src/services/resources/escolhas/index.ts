@@ -1,8 +1,9 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosEscolhas } from "../../axios";
-import type { IEscolhas } from "./IEscolhas";
-import type { PaginatedResponse } from "../../../types/IListRequest";
+import type { IEscolhas, IEscolhasFiltro } from "./IEscolhas";
+import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
+import type { IUnidadeEscolar } from "../convocacao/IConvocacao";
 
 export const URL = {
   getVagasEscolas: () => `/api/v1/vagas-escolas/`,
@@ -10,12 +11,15 @@ export const URL = {
 
 // TODO adicionar JWT no header Authorization
 export const getVagasEscolas = (
+  params: IEscolhasFiltro,
+  listRequest: IListRequest,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
-// vagas-escolas/?processo_convocacao_uuid=<uuid>&cargo_codigo=<str>&page=1&page_size=10
+  const { pagination, filters, ...rest } = listRequest;
   const response = appAxiosEscolhas    
-    .get<PaginatedResponse<IEscolhas>>(URL.getVagasEscolas(), {
+    .get<IUnidadeEscolar[]>(URL.getVagasEscolas(), {
+      params: { ...pagination, ...filters, ...rest, ...params },      
       paramsSerializer: queryParamsSerializer,
       signal,
       ...axiosRequestConfig,

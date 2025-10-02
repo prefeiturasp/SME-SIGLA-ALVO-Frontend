@@ -48,17 +48,20 @@ export interface IOptions {
  
 export interface IUnidadeEscolar {
   uuid:string;
-  eol: string;
+  codigo_eol: string;
   dre: string;
   tipo: string; 
-  unidade: string; 
+  nome_oficial: string; 
   vagas_definitivas: number; 
   vagas_precarias: number; 
   editable?:boolean;
+  dres: IOptions[];
 }
 
 
 
+
+ 
  
 
 
