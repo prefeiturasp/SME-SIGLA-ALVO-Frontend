@@ -1,0 +1,122 @@
+import styled from "styled-components";
+import { Button, Typography, Alert, Tooltip } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
+
+export const LoginContainer = styled.div`
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+`;
+
+export const LeftSide = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background-color: #ffffff;
+`;
+
+
+export const LoginCard = styled.div`
+  background: #ffffff;
+  border-radius: 0.5rem;
+  padding: 1.5rem 2rem 1rem 2rem;
+  box-shadow: 0 0.25rem 1.25rem rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 31.25rem;
+  min-width: 28.125rem;
+`;
+
+
+export const StyledForm = styled.form`
+  width: 100%;
+`;
+
+export const FormField = styled.div`
+  margin-bottom: 1.5rem;
+`;
+
+export const FieldLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.5rem;
+`;
+
+
+export const ErrorMessage = styled.div`
+  color: #ff4d4f;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+`;
+
+export const StyledButton = styled(Button)`
+  width: 100%;
+  height: 3rem;
+  background-color: #8B5CF6;
+  border-color: #8B5CF6;
+  border-radius: 0.375rem;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  
+  &:hover {
+    background-color: #7C3AED;
+    border-color: #7C3AED;
+  }
+`;
+
+export const ForgotPasswordLink = styled.a`
+  color: #05409A;
+  font-size: 0.875rem;
+  text-decoration: none;
+  margin-top: 1rem;
+  display: block;
+  text-align: center;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+export const PrefLogoContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 0.125rem;
+`;
+
+export const PrefLogoImage = styled.img`
+  height: 11rem;
+  opacity: 0.9;
+`;
+
+export const StyledTitle = styled(Typography.Title)`
+  text-align: center !important;
+  margin: 0 0 0.5rem 0 !important;
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  color: #333 !important;
+`;
+
+export const StyledText = styled(Typography.Text)`
+  display: block !important;
+  text-align: center !important;
+  color: #666 !important;
+  font-size: 0.875rem !important;
+  margin: 0 0 1rem 0 !important;
+  line-height: 1.4 !important;
+`;
+
+export const StyledAlert = styled(Alert)`
+  margin-bottom: 1rem !important;
+`;
+
+export const StyledTooltipIcon = styled(QuestionCircleOutlined)`
+  color: #666 !important;
+  cursor: help !important;
+`;

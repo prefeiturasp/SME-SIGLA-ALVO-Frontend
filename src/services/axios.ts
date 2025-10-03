@@ -21,3 +21,7 @@ export const appAxiosCandidatos = axios.create({
 export const appAxiosImportaArquivos = axios.create({
   baseURL: getEnv("IMPORTACAO_ARQUIVOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-importa-arquivos"),
 });
+
+export const appAxiosAdminUsuarios = axios.create({
+  baseURL: getEnv("ADMIN_USUARIOS_API_URL", "http://localhost:8002"),
+});

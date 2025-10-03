@@ -1,2 +1,2 @@
 export * as API from "./resources";
-export { appAxiosProcessoConvocacao, appAxiosConcursos, appAxiosCandidatos, appAxiosImportaArquivos } from "./axios";
+export { appAxiosProcessoConvocacao, appAxiosConcursos, appAxiosCandidatos, appAxiosImportaArquivos, appAxiosAdminUsuarios } from "./axios";
