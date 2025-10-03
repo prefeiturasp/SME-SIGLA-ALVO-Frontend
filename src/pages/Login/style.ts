@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Button, Typography, Alert, Tooltip } from "antd";
+import { Button, Typography, Alert, Select } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 
 export const LoginContainer = styled.div`
@@ -119,4 +119,64 @@ export const StyledAlert = styled(Alert)`
 export const StyledTooltipIcon = styled(QuestionCircleOutlined)`
   color: #666 !important;
   cursor: help !important;
+`;
+
+// Estilos específicos para Esqueci Senha
+export const StyledSelect = styled(Select)`
+  width: 100%;
+  height: 3rem;
+  
+  .ant-select-selector {
+    height: 3rem !important;
+    border-radius: 0.375rem !important;
+    border: 1px solid #d9d9d9 !important;
+    
+    &:hover {
+      border-color: #8B5CF6 !important;
+    }
+  }
+  
+  .ant-select-selection-placeholder {
+    line-height: 3rem !important;
+  }
+  
+  .ant-select-selection-item {
+    line-height: 3rem !important;
+  }
+`;
+
+export const BackToLoginButton = styled(Button)`
+  width: 100%;
+  height: 3rem;
+  background-color: #ffffff;
+  border-color: #8B5CF6;
+  color: #8B5CF6;
+  border-radius: 0.375rem;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-top: 1rem;
+  
+  &:hover {
+    background-color: #f8f7ff;
+    border-color: #7C3AED;
+    color: #7C3AED;
+  }
+`;
+
+export const ImportantNoticeContainer = styled.div`
+  background-color: #f5f5f5;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  text-align: justify;
+  line-height: 1.5;
+`;
+
+export const ImportantText = styled.span`
+  font-weight: 700;
+  color: #333;
+`;
+
+export const NoticeText = styled.span`
+  color: #333;
 `;

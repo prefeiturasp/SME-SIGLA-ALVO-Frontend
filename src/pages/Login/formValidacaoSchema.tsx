@@ -14,4 +14,13 @@ const useLoginTelaSchema = () => {
   });
 };
 
+export const useEsqueceuSenhaSchema = () => {
+  return yup.object({
+    rf: yup
+      .string()
+      .required("Campo Obrigatório")
+      .matches(/^\d+$/, "RF deve conter apenas números"),
+  });
+};
+
 export default useLoginTelaSchema;

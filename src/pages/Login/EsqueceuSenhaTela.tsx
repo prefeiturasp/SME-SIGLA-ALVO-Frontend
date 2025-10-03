@@ -1,10 +1,8 @@
 import React from "react";
 import { Input, Tooltip } from "antd";
-import { EyeInvisibleOutlined } from "@ant-design/icons";
 import { Controller } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import logoPrefSP from "../../assets/logo_PrefSP_sem fundo_horizontal_fundo claro.png";
-import { useLogin } from "./hooks/useLogin";
+import { useEsqueceuSenha } from "./hooks/useEsqueceuSenha";
 import {
   LoginContainer,
   LeftSide,
@@ -14,40 +12,39 @@ import {
   FieldLabel,
   ErrorMessage,
   StyledButton,
-  ForgotPasswordLink,
   PrefLogoContainer,
   PrefLogoImage,
   StyledTitle,
   StyledText,
   StyledAlert,
   StyledTooltipIcon,
+  BackToLoginButton,
+  ImportantNoticeContainer,
+  ImportantText,
+  NoticeText,
 } from "./style";
 
-
-const LoginTela: React.FC = () => {
-  const navigate = useNavigate();
+const EsqueceuSenhaTela: React.FC = () => {
   const {
     loading,
     alert,
     control,
     handleSubmit,
     errors,
-  } = useLogin();
-
-  const handleForgotPassword = () => {
-    navigate("/login/esqueci-minha-senha");
-  };
+    isButtonDisabled,
+    handleBackToLogin,
+  } = useEsqueceuSenha();
 
   return (
     <LoginContainer>
       <LeftSide>
         <LoginCard>
           <StyledTitle level={2}>
-            Bem-vindo ao SIGLA
+            Recuperação de senha
           </StyledTitle>
           
           <StyledText>
-            Sistema Integrado de Gestão de Lotação e Alocação
+            Informe o seu RF. Você receberá um e-mail com orientações para redefinir sua senha.
           </StyledText>
           
           {alert && (
@@ -67,56 +64,42 @@ const LoginTela: React.FC = () => {
                 </Tooltip>
               </FieldLabel>
               <Controller
-                name="usuario"
+                name="rf"
                 control={control}
                 render={({ field }) => (
                   <Input
                     {...field}
                     placeholder="12345678"
-                    status={errors.usuario ? 'error' : ''}
+                    status={errors.rf ? 'error' : ''}
                   />
                 )}
               />
-              {errors.usuario && (
+              {errors.rf && (
                 <ErrorMessage>
-                  {errors.usuario.message}
+                  {errors.rf.message}
                 </ErrorMessage>
               )}
             </FormField>
             
-            <FormField>
-              <FieldLabel>
-                Senha
-                <Tooltip title="Digite sua senha">
-                  <StyledTooltipIcon />
-                </Tooltip>
-              </FieldLabel>
-              <Controller
-                name="senha"
-                control={control}
-                render={({ field }) => (
-                  <Input.Password
-                    {...field}
-                    placeholder="********"
-                    status={errors.senha ? 'error' : ''}
-                    iconRender={(visible) => (visible ? <EyeInvisibleOutlined /> : <EyeInvisibleOutlined />)}
-                  />
-                )}
-              />
-              {errors.senha && (
-                <ErrorMessage>
-                  {errors.senha.message}
-                </ErrorMessage>
-              )}
-            </FormField>
+            <ImportantNoticeContainer>
+              <ImportantText>Importante:</ImportantText>{" "}
+              <NoticeText>
+                Ao alterar a sua senha, ela se tornará padrão e será utilizada para acessar todos os sistemas da SME aos quais você já possui acesso.
+              </NoticeText>
+            </ImportantNoticeContainer>
             
-            <StyledButton type="primary" htmlType="submit" loading={loading}>
-              Acessar
+            <StyledButton 
+              type="primary" 
+              htmlType="submit" 
+              loading={loading}
+              disabled={isButtonDisabled}
+            >
+              Continuar
             </StyledButton>
             
-            <ForgotPasswordLink onClick={handleForgotPassword}>
-              Esqueci minha senha
-            </ForgotPasswordLink>
+            <BackToLoginButton onClick={handleBackToLogin}>
+              Voltar
+            </BackToLoginButton>
             
             <PrefLogoContainer>
               <PrefLogoImage src={logoPrefSP} alt="Prefeitura de São Paulo" />
@@ -128,4 +111,4 @@ const LoginTela: React.FC = () => {
   );
 };
 
-export default LoginTela;
+export default EsqueceuSenhaTela;
