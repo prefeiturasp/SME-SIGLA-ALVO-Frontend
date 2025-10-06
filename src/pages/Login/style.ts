@@ -121,7 +121,6 @@ export const StyledTooltipIcon = styled(QuestionCircleOutlined)`
   cursor: help !important;
 `;
 
-// Estilos específicos para Esqueci Senha
 export const StyledSelect = styled(Select)`
   width: 100%;
   height: 3rem;
@@ -179,4 +178,40 @@ export const ImportantText = styled.span`
 
 export const NoticeText = styled.span`
   color: #333;
+`;
+
+export const SuccessIcon = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 4rem;
+  height: 4rem;
+  background-color: #52c41a;
+  border-radius: 50%;
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0 auto 1.5rem auto;
+`;
+
+export const SuccessMessage = styled.div`
+  text-align: center;
+  color: #333;
+  font-size: 0.875rem;
+  margin-bottom: 0;
+  line-height: 1.4;
+  padding: 0;
+`;
+
+export const EmailText = styled.span`
+  font-weight: 600;
+  color: #8B5CF6;
+`;
+
+export const InstructionsText = styled.div`
+  text-align: center;
+  color: #666;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  line-height: 1.4;
 `;

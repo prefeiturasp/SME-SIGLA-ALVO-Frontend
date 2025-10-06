@@ -19,7 +19,7 @@ export const useEsqueceuSenha = () => {
     formState: { errors },
   } = useForm<IEsqueceuSenhaRequest>({
     resolver: yupResolver(schema),
-    mode: "onChange", // Validação em tempo real
+    mode: "onChange",
     defaultValues: {
       rf: "",
     },
@@ -34,9 +34,13 @@ export const useEsqueceuSenha = () => {
     
     esqueceuSenhaMutation.mutate(values, {
       onSuccess: (data: IEsqueceuSenhaResponse) => {
-        setAlert({ 
-          type: 'success', 
-          message: data.message || 'E-mail de recuperação enviado com sucesso!' 
+        navigate('/login/esqueci-minha-senha-sucesso', {
+          state: {
+            solicitacaoId: data.solicitacao_id,
+            usuarioEmail: data.usuario?.email,
+            usuarioNome: data.usuario?.nome,
+            usuarioRf: data.usuario?.rf,
+          }
         });
       },
       onError: (error: any) => {
