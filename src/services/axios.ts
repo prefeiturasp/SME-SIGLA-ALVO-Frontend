@@ -23,5 +23,5 @@ export const appAxiosImportaArquivos = axios.create({
 });
 
 export const appAxiosAdminUsuarios = axios.create({
-  baseURL: getEnv("ADMIN_USUARIOS_API_URL", "http://localhost:8002"),
+  baseURL: getEnv("ADMIN_USUARIOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-admin-usuarios"),
 });
