@@ -1,5 +1,5 @@
 export interface ILoginRequest {
-  usuario: number;
+  usuario: string;
   senha: string;
 }
 

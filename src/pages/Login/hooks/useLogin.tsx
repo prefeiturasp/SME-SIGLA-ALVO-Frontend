@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import type { ILoginRequest } from "../../../services/resources/login";
-import useLoginTelaSchema from "../useLoginTelaSchema";
+import useLoginTelaSchema from "../formValidacaoSchema";
 import { usePostLogin } from "./usePostLogin";
 
 export const useLogin = () => {
@@ -18,6 +18,7 @@ export const useLogin = () => {
     formState: { errors },
   } = useForm<ILoginRequest>({
     resolver: yupResolver(schema),
+    mode: "onChange", // Validação em tempo real
     defaultValues: {
       usuario: "",
       senha: "",
