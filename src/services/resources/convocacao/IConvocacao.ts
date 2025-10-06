@@ -63,6 +63,39 @@ export interface IUnidadeEscolar {
 
  
  
+export interface IDre {
+  uuid: string;
+  codigo: string;
+  nome: string;
+}
+
+export interface IEscola {
+  codigo_eol: string;
+  nome_oficial: string;
+  dre: IDre;
+}
+
+export interface IVaga {
+  checked?: boolean;
+  uuid: string;
+  lote_uuid: string;
+  data_fechamento_modulo: string; // ISO date string
+  cargo_codigo: number;
+  cargo_descricao: string;
+  vagas_precarias: number;
+  vagas_definitivas: number;
+  status: string;
+  escola: IEscola;
+  criado_em: string; // ISO date string
+  atualizado_em: string; // ISO date string
+}
+
+export interface IVagasResponse {
+  vagas: IVaga[];
+  total_vagas: number;
+  dres: IDre[];
+}
+
 
 
 export interface IConvocacaoModal {

@@ -3,7 +3,7 @@ import { appAxiosEscolhas } from "../../axios";
 import type { IEscolhas, IEscolhasFiltro } from "./IEscolhas";
 import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
-import type { IUnidadeEscolar } from "../convocacao/IConvocacao";
+import type {  IVagasResponse } from "../convocacao/IConvocacao";
 
 export const URL = {
   getVagasEscolas: () => `/api/v1/vagas-escolas/`,
@@ -18,7 +18,7 @@ export const getVagasEscolas = (
   const { signal, abort } = new AbortController();
   const { pagination, filters, ...rest } = listRequest;
   const response = appAxiosEscolhas    
-    .get<IUnidadeEscolar[]>(URL.getVagasEscolas(), {
+    .get<IVagasResponse>(URL.getVagasEscolas(), {
       params: { ...pagination, ...filters, ...rest, ...params },      
       paramsSerializer: queryParamsSerializer,
       signal,

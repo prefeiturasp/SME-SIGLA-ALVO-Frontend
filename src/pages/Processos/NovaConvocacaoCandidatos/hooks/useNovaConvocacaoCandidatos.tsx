@@ -8,6 +8,7 @@ import { API } from "../../../../services";
 import { useQuery } from "@tanstack/react-query";
 import useListRequest from "../../../../hooks/useListRequest";
 import type { IEscolhasFiltro } from "../../../../services/resources/escolhas/IEscolhas";
+import type { ICardData } from "../components/Cargo";
 
 type ConcursoOption = {
   value: string;
@@ -29,8 +30,7 @@ export const useNovaConvocacaoCandidatos = () => {
   const location = useLocation();
   const editData = location.state.editData as IProcessoConvocacao; 
   const isEdit = !!editData
-  console.log("editData", editData)
-  
+   
   const initialDefaults = React.useMemo(() => {
     if (!isEdit) return undefined;
     return {      
@@ -72,12 +72,12 @@ export const useNovaConvocacaoCandidatos = () => {
   const [cargosDisponiveis, setCargosDisponiveis] = useState<
     { value: string; label: string }[]
   >([]);
-  const [cardData, setCardData] = useState({
+  const [cardData, setCardData] = useState<ICardData>({
     vagas: 0,
     autorizacoes: 0,
     reservas: 0,
     convocar: 0,
-  });
+  } );
   const [cargoSelecionado, setCargoSelecionado] = useState<
     string | undefined
   >();
@@ -99,8 +99,9 @@ export const useNovaConvocacaoCandidatos = () => {
     if (concursoSelecionado && concursoSelecionado.cargos) {
       setCargosDisponiveis(concursoSelecionado.cargos);
     }
+    
     setCardData({
-      vagas: 0,
+      vagas: dadosVagasNasEscolasPorCargo?.total_vagas || 0,
       autorizacoes: 0,
       reservas: 0,
       convocar: 0,
@@ -179,7 +180,7 @@ export const useNovaConvocacaoCandidatos = () => {
   const { data: dadosVagasNasEscolasPorCargo, refetch:buscarVagasNasEscolasPorCargo, isLoading } = useQuery({
     queryKey: ["getDadosVagasNasEscolasPorCargo",listRequest],
     queryFn: ({ signal }) =>
-      API.Escolhas.getVagasEscolas({ concurso_uuid:editData?.uuid,cargo_codigo:watchFields.cargo! },listRequest,{ signal }).response,
+      API.Escolhas.getVagasEscolas({ concurso_uuid:editData?.uuid,cargo_codigo: '2020'},listRequest,{ signal }).response, //watchFields.cargo!
     enabled: !!editData?.uuid && !!watchFields.cargo,
     staleTime: 0,
     retry: 0,

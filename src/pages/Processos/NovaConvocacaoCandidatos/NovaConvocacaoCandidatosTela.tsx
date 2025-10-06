@@ -74,11 +74,8 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
         selectedCargoLabel={selectedCargoLabel}
         watchFields={watchFields}
         control={control}
-        dadosVagasNasEscolasPorCargo={dadosVagasNasEscolasPorCargo || []}
-        dres={[{value: "1", label: "Guaianases"},
-
-          {value: "2", label: "teste"}
-        ]}//dadosVagasNasEscolasPorCargo?.[0]?.dres || []}
+        vagasNasEscolasPorCargo={dadosVagasNasEscolasPorCargo?.vagas || []}
+        dres={dadosVagasNasEscolasPorCargo?.dres||[]}// || []}
         buscarVagasNasEscolasPorCargo={buscarVagasNasEscolasPorCargo}
         agendaComponent={
           <AgendaTela 

@@ -2,24 +2,24 @@ import React, { useEffect, useState } from "react";
 import type { TableProps } from "antd";
 import { Flex, Button, Tooltip, InputNumber } from "antd";
 import type { TableColumnsType } from "antd";
-import type { IUnidadeEscolar } from "../../../../services/resources/convocacao/IConvocacao";
+import type { IVaga } from "../../../../services/resources/convocacao/IConvocacao";
 import { StyledTable } from "../../../../components/EstilosCompartilhados";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { Controller, useForm } from "react-hook-form";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 
 
-interface UnidadeEscolarTableProps extends TableProps<IUnidadeEscolar> {
-  originData: IUnidadeEscolar[];
+interface UnidadeEscolarTableProps extends TableProps<IVaga> {
+  filteredData: IVaga[];
   loading?: boolean;
-  setEditableData: React.Dispatch<React.SetStateAction<IUnidadeEscolar[]>>;
+  setEditableData: React.Dispatch<React.SetStateAction<IVaga[]>>;
 }
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
-  dataIndex: keyof IUnidadeEscolar;
+  dataIndex: keyof IVaga;
   title: any;
-  record: IUnidadeEscolar;
+  record: IVaga;
   control: any;
 }
 
@@ -51,44 +51,41 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
 };
 
 const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
-  originData,
+  filteredData,
   loading,
   setEditableData,
   ...rest
 }) => {
   const StyledTableAny: any = StyledTable;
-  const [data, setData] = useState<IUnidadeEscolar[]>(originData);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>(
-    originData.map((item) => item.uuid)
+    filteredData.filter((item) => item.checked).map((item) => item.uuid)
   );
   const [editingKey, setEditingKey] = useState<string>("");
 
   useEffect(() => {
-    setData(originData);
-    setSelectedRowKeys(originData.map((item) => item.uuid));
-  }, [originData]);
+    setSelectedRowKeys(filteredData.filter((item) => item.checked).map((item) => item.uuid));
+  }, [filteredData]);
 
   const { control, getValues } = useForm({
-    defaultValues: originData.reduce((acc, item) => {
+    defaultValues: filteredData.reduce((acc, item) => {
       acc[item.uuid] = {
         vagas_definitivas: item.vagas_definitivas,
         vagas_precarias: item.vagas_precarias,
       };
       return acc;
-    }, {} as Record<string, Partial<IUnidadeEscolar>>),
+    }, {} as Record<string, Partial<IVaga>>),
   });
 
-  const isEditing = (record: IUnidadeEscolar) => record.uuid === editingKey;
-  const edit = (record: IUnidadeEscolar) => setEditingKey(record.uuid);
+  const isEditing = (record: IVaga) => record.uuid === editingKey;
+  const edit = (record: IVaga) => setEditingKey(record.uuid);
   const cancel = () => setEditingKey("");
   const save = (key: React.Key) => {
     const values = getValues(`${key}`);
-    const newData = [...data];
+    const newData = [...filteredData];
     const index = newData.findIndex((item) => key === item.uuid);
     if (index > -1) {
       const item = newData[index];
       newData.splice(index, 1, { ...item, ...values });
-      setData(newData);
       setEditableData((prev) =>
         prev.map((prevItem) =>
           prevItem.uuid === key ? { ...prevItem, ...values } : prevItem
@@ -98,11 +95,22 @@ const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
     }
   };
 
-  const baseColumns: TableColumnsType<IUnidadeEscolar> = [
-    { title: "Código EOL", dataIndex: "codigo_eol" },
-    { title: "DRE", dataIndex: "dre" },
-    { title: "Tipo de unidade", dataIndex: "tipo" },
-    { title: "Unidade Escolar", dataIndex: "nome_oficial" },
+  const baseColumns: TableColumnsType<IVaga> = [
+    {
+      title: "Código EOL",
+      key: "codigo_eol",
+      render: (_: any, record: IVaga) => record.escola?.codigo_eol,
+    },
+    {
+      title: "DRE",
+      key: "dre_nome",
+      render: (_: any, record: IVaga) => record.escola?.dre?.nome,
+    },
+    {
+      title: "Unidade Escolar",
+      key: "nome_oficial",
+      render: (_: any, record: IVaga) => record.escola?.nome_oficial,
+    },
     {
       title: "Vagas definitivas",
       dataIndex: "vagas_definitivas",
@@ -116,9 +124,9 @@ const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
     {
       title: "Ações",
       key: "acoes",
-      width: 64,
+      width: 85,
       align: "center" as const,
-      render: (_: any, record: IUnidadeEscolar) => {
+      render: (_: any, record: IVaga) => {
         const editable = isEditing(record);
         return editable ? (
           <div style={{ width: 56, display: "flex", justifyContent: "center", gap: 2 }}>
@@ -154,11 +162,11 @@ const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
     },
   ];
 
-  const columns: TableProps<IUnidadeEscolar>["columns"] = baseColumns.map((col) => {
+  const columns: TableProps<IVaga>["columns"] = baseColumns.map((col) => {
     if (!(col as any).editable) return col;
     return {
       ...col,
-      onCell: (record: IUnidadeEscolar) => ({
+      onCell: (record: IVaga) => ({
         record,
         dataIndex: (col as any).dataIndex,
         title: col.title,
@@ -170,7 +178,18 @@ const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
 
   const rowSelection: any = {
     selectedRowKeys,
-    onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
+    preserveSelectedRowKeys: true,
+    onChange: (keys: React.Key[]) => {
+      setSelectedRowKeys(keys);
+      const visibleUuids = new Set(filteredData.map((item) => item.uuid));
+      setEditableData((prev) =>
+        prev.map((item) =>
+          visibleUuids.has(item.uuid)
+            ? { ...item, checked: keys.includes(item.uuid) }
+            : item
+        )
+      );
+    },
   };
 
   return (
@@ -184,11 +203,13 @@ const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
         }}
         bordered
         loading={loading}
-        dataSource={data}
+        dataSource={filteredData}
         columns={columns as any}
         rowSelection={rowSelection}
         rowClassName="editable-row"
         pagination={false}
+        scroll={{ x:0,y: 400 }} // ← scroll vertical
+
       />
     </Flex>
   );

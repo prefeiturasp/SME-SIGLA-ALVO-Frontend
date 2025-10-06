@@ -19,29 +19,24 @@ import {
 } from "../styles";
 import VisualizarVagasModal from "./VisualizarVagasModal/VisualizarVagasModal";
 import SelecionarCandidatos from "./SelecionarCandidatos";
-import type { IConvocacaoFiltros, IOptions, IUnidadeEscolar } from "../../../../services/resources/convocacao/IConvocacao";
+import type {  IDre, IVaga } from "../../../../services/resources/convocacao/IConvocacao";
 import type { FormFields } from "./FormPrincipal";
-import type { IEscolhas } from "../../../../services/resources/escolhas/IEscolhas";
 
 const { Title, Text } = Typography;
 
 export type Option = { value: string; label: string };
+export type ICardData = {
+  vagas: number;
+  autorizacoes: number;
+  reservas: number;
+  convocar: number;
+};
 
 interface CargoProps {
   isCargoLiberado: string | undefined;
   cargosDisponiveis: Option[];
-  cardData: {
-    vagas: number;
-    autorizacoes: number;
-    reservas: number;
-    convocar: number;
-  };
-  setCardData: (data: {
-    vagas: number;
-    autorizacoes: number;
-    reservas: number;
-    convocar: number;
-  }) => void;
+  cardData:ICardData;
+  setCardData: (data: ICardData) => void;
   selectedConcursoLabel: string;
   selectedCargoLabel: string;
   onCandidatosSelecionados?: (qtd: number) => void;
@@ -50,9 +45,9 @@ interface CargoProps {
   watchFields: any;
   control: Control<FormFields>;
   agendaComponent: React.ReactNode;
-  dadosVagasNasEscolasPorCargo:IUnidadeEscolar[];
+  vagasNasEscolasPorCargo:IVaga[];
   buscarVagasNasEscolasPorCargo: () => void;
-  dres: IOptions[];
+  dres: IDre[];
 }
 
 const Cargo: React.FC<CargoProps> = ({
@@ -68,13 +63,14 @@ const Cargo: React.FC<CargoProps> = ({
   podeVisualizarVagas,
   control,
   agendaComponent,
-  dadosVagasNasEscolasPorCargo,
+  vagasNasEscolasPorCargo,
   buscarVagasNasEscolasPorCargo,
   dres
 }) => {
+
+  const optionsDres = dres.map((dre) => ({ value: dre.uuid, label: dre.nome }));
   const [popupSelecionarCandidatos, setPopupSelecionarCandidatos] =
     useState(false);
-  
   
   const handleOpenVisualizarVagasModal = () => {
     setOpenVisualizarVagasModal(true);
@@ -89,10 +85,26 @@ const Cargo: React.FC<CargoProps> = ({
   const handleCloseVisualizarVagas = () => {
     setOpenVisualizarVagasModal(false);
   };
-
-  const confirmVisualizarVagas = async (data: IConvocacaoFiltros) => {
+  const [candidatosEEscolas, setCandidatosEEscolas] = useState({quantidadeEscolasSelecionadas:0});
+  const confirmVisualizarVagas = async (data: IVaga[]) => {
     try {
-      console.log("e", data);
+      
+      const escolasSelecionadas = data.filter((item) => item.checked);      
+
+      const quantidadeVagasSelecionados = escolasSelecionadas.reduce((acc, item) => ({
+        totalVagas: acc.totalVagas + item.vagas_definitivas + item.vagas_precarias
+      }), { totalVagas: 0 }).totalVagas;
+      setCardData((prev: ICardData) => ({
+        ...prev,
+        vagas: quantidadeVagasSelecionados,
+      } as ICardData));
+      setCandidatosEEscolas({        
+        quantidadeEscolasSelecionadas:escolasSelecionadas.length
+       });
+
+      
+      setOpenVisualizarVagasModal(false);
+
     } catch (e) {
       console.log(e);
     }
@@ -297,7 +309,7 @@ const Cargo: React.FC<CargoProps> = ({
 
         <Row gutter={16} justify="start">
           {[
-            { title: "Escolas selecionadas", value: 0, icon: <SchoolIcon /> },
+            { title: "Escolas selecionadas", value: candidatosEEscolas.quantidadeEscolasSelecionadas, icon: <SchoolIcon /> },
             { title: "Candidatos selecionados", value: 0, icon: <GroupIcon /> },
           ].map(({ title, value, icon }) => (
             <Col key={title}>
@@ -346,49 +358,8 @@ const Cargo: React.FC<CargoProps> = ({
           loading={false}
           concurso={selectedConcursoLabel}
           cargo={selectedCargoLabel}
-          dadosVagasNasEscolasPorCargo={[
-            {
-            uuid: "3b178725-a14a-42d7-97cc-4fb1e3837f5b",
-            codigo_eol: "480100",
-            dre: "Guaianases",
-            tipo: "UE",
-            nome_oficial: "Escola Guaianases",
-            vagas_definitivas: 1,
-            vagas_precarias: 1,
-            dres: [],
-          },
-          {
-            uuid: "e81d73ef-5121-4237-9bcd-69d174354051",
-            codigo_eol: "480100",
-            dre: "Guaianases",
-            tipo: "UE",
-            nome_oficial: "Escola Campo Limpo",
-            vagas_definitivas: 1,
-            vagas_precarias: 1,
-            dres: [],
-          },  
-          {
-            uuid: "e81d73ef-5121-4237-9bcd-69d174354053",
-            codigo_eol: "480100",
-            dre: "teste",
-            tipo: "UE",
-            nome_oficial: "Escola t",
-            vagas_definitivas: 1,
-            vagas_precarias: 1,
-            dres: [],
-          },  
-          {
-            uuid: "e81d73ef-5121-4237-9bcd-69d174354055",
-            codigo_eol: "480100",
-            dre: "segundo",
-            tipo: "UE",
-            nome_oficial: "Escola segundo",
-            vagas_definitivas: 1,
-            vagas_precarias: 1,
-            dres: [],
-          },  
-        ]}//dadosVagasNasEscolasPorCargo}
-        dres={dres}//dadosVagasNasEscolasPorCargo?.[0]?.dres || []}
+          vagasNasEscolasPorCargo={vagasNasEscolasPorCargo}
+          dres={optionsDres}
         />
 
         <SelecionarCandidatos

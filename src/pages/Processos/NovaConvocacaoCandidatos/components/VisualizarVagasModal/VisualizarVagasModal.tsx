@@ -8,7 +8,7 @@ import { Col, Divider, Input, Row } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { ModalCustomFormItem as CustomFormItem } from "../../styles";
 import { Content } from "antd/es/layout/layout";
-import type { IConvocacaoFiltros, IOptions, IUnidadeEscolar } from "../../../../../services/resources/convocacao/IConvocacao";
+import type { IConvocacaoFiltros, IOptions, IVaga } from "../../../../../services/resources/convocacao/IConvocacao";
 import UnidadeEscolarTable from "../UnidadeEscolarTable";
 import { CustomModal2 as CustomModal, TextBlue } from '../../../../../components/EstilosCompartilhados';
 import {  useEffect, useState } from "react";
@@ -16,12 +16,12 @@ import AdicionarNovaEscolaModal from "../AdicionarNovaEscolaModal";
  
 interface INewAdicionarNovaEscolaProps {
   isOpen: boolean;
-  onConfirm: (data: IConvocacaoFiltros) => void;
+  onConfirm: (data: IVaga[]) => void;
   onCancel: () => void;
   loading: boolean;
    concurso: string;
   cargo: string;
-  dadosVagasNasEscolasPorCargo: IUnidadeEscolar[];
+  vagasNasEscolasPorCargo: IVaga[];
   dres: IOptions[];
 }
 
@@ -32,7 +32,7 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
   loading,
   concurso,
   cargo,
-  dadosVagasNasEscolasPorCargo,
+  vagasNasEscolasPorCargo,
   dres,
 }) => {
  
@@ -50,13 +50,18 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
     mode: "all",
     shouldFocusError: false,
   });
+  console.log("vagasNasEscolasPorCargo", vagasNasEscolasPorCargo);
 
   const [openAdicionarNovaEscola, setOpenAdicionarNovaEscola] =
     useState<boolean>(false);
-  const [editableData, setEditableData] = useState<IUnidadeEscolar[]>(dadosVagasNasEscolasPorCargo || []);
-  const [filteredData, setFilteredData] = useState<IUnidadeEscolar[]>(dadosVagasNasEscolasPorCargo || []);
+  const [editableData, setEditableData] = useState<IVaga[]>(vagasNasEscolasPorCargo || []);
+  const [filteredData, setFilteredData] = useState<IVaga[]>(vagasNasEscolasPorCargo || []);
 
-  
+  //TODO remove this after testing
+  useEffect(() => {
+    setEditableData(vagasNasEscolasPorCargo || []);
+    setFilteredData(vagasNasEscolasPorCargo || []);
+  }, [vagasNasEscolasPorCargo]);
 
   useEffect(() => {
     handleFiltrar();    
@@ -82,12 +87,15 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
   
   const handleFiltrar = () => {
     const { dre, escola } = getValues();
-    const selectedDreLabel = dres.find((opt) => opt.value === dre)?.label || "";
+    const selectedDre = dres.find((opt) => opt.value === dre);
+    const selectedDreLabel = selectedDre?.label || "";
     const escolaQuery = (escola || "").toString().trim().toLowerCase();
   
     const next = editableData.filter((item) => {
-      const matchDre = dre ? item.dre === selectedDreLabel || item.dre === dre : true;
-      const matchEscola = escolaQuery ? (item.nome_oficial || "").toLowerCase().includes(escolaQuery) : true;
+      const matchDre = dre
+        ? item.escola?.dre?.uuid === dre || item.escola?.dre?.nome === selectedDreLabel
+        : true;
+      const matchEscola = escolaQuery ? (item.escola.nome_oficial || "").toLowerCase().includes(escolaQuery) : true;
       return matchDre && matchEscola;
     });
   
@@ -101,25 +109,30 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
   };
   
   const handleResetar = () => {
-    setEditableData([...(dadosVagasNasEscolasPorCargo || [])]);
-    setFilteredData([...(dadosVagasNasEscolasPorCargo || [])]);
+    setEditableData([...(vagasNasEscolasPorCargo || [])]);
+    setFilteredData([...(vagasNasEscolasPorCargo || [])]);
     reset({ dre: "", escola: "" } as any);
   };
   
 
-    const onFinish = async (data: IConvocacaoFiltros) => {
+    const onFinish = async () => {
     try {
-      await onConfirm(data);
+      await onConfirm(editableData);
     } catch (error) {
       console.log(error);
     }
   };
 
+
+  const handleOnCancel = () => {
+    handleResetar();
+    onCancel();
+  };
   return (
     <CustomModal
       title={"Vagas por Unidade Escolar"}
       onOk={handleSubmit(onFinish)}
-      onCancel={onCancel}
+      onCancel={handleOnCancel}
       closable={false}
       open={isOpen}
       centered
@@ -145,7 +158,7 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
                 key="atualizar"
                 size="large"
                 type="primary"
-                onClick={() => onCancel()}
+                onClick={() => handleOnCancel()}
               >
                 Cancelar
               </Button>
@@ -246,7 +259,7 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
 
         <UnidadeEscolarTable
           loading={false}
-          originData={filteredData}
+          filteredData={filteredData}
           setEditableData={setEditableData}
         />
       </Content>
