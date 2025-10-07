@@ -146,7 +146,7 @@ const Cargo: React.FC<CargoProps> = ({
           type="primary"
           size="large"
           onClick={buscarVagasNasEscolasPorCargo}
-          disabled={!watchFields.cargo||!podeVisualizarVagas}
+          // disabled={!watchFields.cargo||!podeVisualizarVagas}
           style={{ alignSelf: "flex-start" }}
         >
           Buscar

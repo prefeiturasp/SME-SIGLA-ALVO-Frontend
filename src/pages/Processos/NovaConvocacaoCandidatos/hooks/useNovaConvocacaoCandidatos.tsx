@@ -167,11 +167,11 @@ export const useNovaConvocacaoCandidatos = () => {
     });
 
 
-    
+  const cargoCodigo = '2073'; //watchFields.cargo;
   const { data: dadosVagasNasEscolasPorCargo, refetch:dadosVagasNasEscolasPorCargoRefetch, isLoading } = useQuery({
     queryKey: ["getDadosVagasNasEscolasPorCargo",listRequest],
     queryFn: ({ signal }) =>
-      API.Escolhas.getVagasEscolas({ concurso_uuid:editData?.uuid,cargo_codigo: '2020'},listRequest,{ signal }).response, //watchFields.cargo!
+      API.Escolhas.getVagasEscolas({ processo_uuid:editData?.uuid,cargo_codigo: cargoCodigo},listRequest,{ signal }).response, //watchFields.cargo!
     enabled: false,
     staleTime: 0,
     retry: 0,
