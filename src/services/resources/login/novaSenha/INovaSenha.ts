@@ -1,4 +1,5 @@
 export interface INovaSenhaRequest {
+  uid: string;
   token: string;
   nova_senha: string;
   confirmar_senha: string;

@@ -14,7 +14,7 @@ interface INovaSenhaFormData {
 export const useNovaSenha = () => {
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const navigate = useNavigate();
-  const { token } = useParams<{ token: string }>();
+  const { uid, token } = useParams<{ uid: string; token: string }>();
   const schema = useNovaSenhaSchema();
   const novaSenhaMutation = usePostNovaSenha();
 
@@ -58,15 +58,16 @@ export const useNovaSenha = () => {
   const onFinish = async (values: INovaSenhaFormData) => {
     setAlert(null);
     
-    if (!token) {
+    if (!uid || !token) {
       setAlert({ 
         type: 'error', 
-        message: 'Token de recuperação inválido.' 
+        message: 'Link de recuperação inválido.' 
       });
       return;
     }
 
     const payload: INovaSenhaRequest = {
+      uid: uid,
       token: token,
       nova_senha: values.nova_senha,
       confirmar_senha: values.confirmar_senha,

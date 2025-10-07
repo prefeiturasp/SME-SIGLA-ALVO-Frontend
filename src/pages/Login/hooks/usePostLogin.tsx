@@ -8,8 +8,8 @@ export const usePostLogin = () => {
     mutationFn: (payload: ILoginRequest) => postLogin(payload).response,
     onSuccess: (data) => {
       // Salvar token no localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("usuario", JSON.stringify(data.usuario));
+      localStorage.setItem("TOKEN", data.token);
+      localStorage.setItem("USUARIO", JSON.stringify(data.usuario));
       
     },
     onError: (error: any) => {
