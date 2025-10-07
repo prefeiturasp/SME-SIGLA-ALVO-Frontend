@@ -14,6 +14,7 @@ import NotFoundTela from "../pages/NotFound/NotFoundTela";
 import LoginTela from "../pages/Login/LoginTela";
 import EsqueceuSenhaTela from "../pages/Login/EsqueceuSenhaTela";
 import EsqueceuSenhaSucesso from "../pages/Login/EsqueceuSenhaSucesso";
+import NovaSenhaTela from "../pages/Login/NovaSenhaTela";
 import RouteError from "./RouteError";
 
 //TODO ADD FEATURE FLAG
@@ -30,13 +31,18 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
-    path: "/login/esqueci-minha-senha",
+    path: "/esqueci-minha-senha",
     element: <EsqueceuSenhaTela />,
     errorElement: <RouteError />,
   },
   {
-    path: "/login/esqueci-minha-senha-sucesso",
+    path: "/esqueci-minha-senha-sucesso",
     element: <EsqueceuSenhaSucesso />,
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/criar-nova-senha/:token",
+    element: <NovaSenhaTela />,
     errorElement: <RouteError />,
   },
   {
