@@ -35,7 +35,7 @@ const LoginTela: React.FC = () => {
   } = useLogin();
 
   const handleForgotPassword = () => {
-    navigate("/login/esqueci-minha-senha");
+    navigate("/esqueci-minha-senha");
   };
 
   return (

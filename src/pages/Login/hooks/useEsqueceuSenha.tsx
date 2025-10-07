@@ -34,7 +34,7 @@ export const useEsqueceuSenha = () => {
     
     esqueceuSenhaMutation.mutate(values, {
       onSuccess: (data: IEsqueceuSenhaResponse) => {
-        navigate('/login/esqueci-minha-senha-sucesso', {
+        navigate('/esqueci-minha-senha-sucesso', {
           state: {
             solicitacaoId: data.solicitacao_id,
             usuarioEmail: data.usuario?.email,

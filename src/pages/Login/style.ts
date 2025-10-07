@@ -215,3 +215,31 @@ export const InstructionsText = styled.div`
   margin-top: 0.5rem;
   line-height: 1.4;
 `;
+
+export const PasswordRequirementsList = styled.div`
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 0.375rem;
+`;
+
+export const PasswordRequirementTitle = styled.div`
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.75rem;
+`;
+
+export const RequirementItem = styled.div<{ $met: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: ${props => props.$met ? '#52c41a' : '#666'};
+  margin-bottom: 0.5rem;
+  
+  .anticon {
+    color: ${props => props.$met ? '#52c41a' : '#d9d9d9'};
+    font-size: 1rem;
+  }
+`;
