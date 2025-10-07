@@ -50,7 +50,6 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
     mode: "all",
     shouldFocusError: false,
   });
-  console.log("vagasNasEscolasPorCargo", vagasNasEscolasPorCargo);
 
   const [openAdicionarNovaEscola, setOpenAdicionarNovaEscola] =
     useState<boolean>(false);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useConcursos } from "../../../../hooks/useConcursos";
 import { usePostProcessoConvocacao } from "./usePostProcessoConvocacao";
-import type { IPostProcessoConvocacaoPayload, IProcessoConvocacao } from "../../../../services/resources/convocacao/IConvocacao";
+import type { IPostProcessoConvocacaoPayload, IProcessoConvocacao, IVagasResponse } from "../../../../services/resources/convocacao/IConvocacao";
 import { useLocation } from "react-router-dom";
 import { API } from "../../../../services";
 import { useQuery } from "@tanstack/react-query";
@@ -31,37 +31,26 @@ export const useNovaConvocacaoCandidatos = () => {
   const editData = location.state.editData as IProcessoConvocacao; 
   const isEdit = !!editData
    
-  const initialDefaults = React.useMemo(() => {
-    if (!isEdit) return undefined;
-    return {      
-      concurso: editData.concurso_uuid,
-      tipo_escolha: editData.tipo_escolha,
-      descricao: editData.descricao,
-      data_convocacao: editData.data_convocacao || "",
-      data_corte_vagas: editData?.data_corte_vagas || "",
-    };
-  }, [isEdit, editData]);
-
+  const defaultValues = {    
+      concurso: editData?.concurso_uuid||undefined,
+      tipo_escolha: editData?.tipo_escolha||undefined,
+      descricao: editData?.descricao||'',
+      data_convocacao: editData?.data_convocacao || "",
+      data_corte_vagas: editData?.data_corte_vagas || "",    
+  }
 
   const { concursosData, concursosOptionsIsLoading } = useConcursos();
 
-  const defaultValues = {
-    concurso: undefined,
-    tipo_escolha: undefined,
-    descricao: "",
-    cargo: "",
-    data_convocacao: "",
-    data_corte_vagas: "",
-  } as FormFields;
+ 
 
   const { control, reset, handleSubmit } = useForm<FormFields>({
-    defaultValues: { ...defaultValues, ...(initialDefaults || {}) },
+    defaultValues: { ...defaultValues },
   });
   useEffect(() => {
-    if (initialDefaults ) {//&& initialDefaults?.concurso
-      buscarCargosDoConcurso(initialDefaults.concurso);  
+    if (editData && editData?.concurso_uuid) {
+      buscarCargosDoConcurso(editData.concurso_uuid);  
      }
-  }, [initialDefaults, reset]);
+  }, [editData, reset]);
 
   // Mutation para post de processo de convocação (hook centralizado)
   const postProcessoConvocacaoMutation = usePostProcessoConvocacao();
@@ -101,7 +90,7 @@ export const useNovaConvocacaoCandidatos = () => {
     }
     
     setCardData({
-      vagas: dadosVagasNasEscolasPorCargo?.total_vagas || 0,
+      vagas: 0,
       autorizacoes: 0,
       reservas: 0,
       convocar: 0,
@@ -177,14 +166,36 @@ export const useNovaConvocacaoCandidatos = () => {
       pagination: { page: 1, page_size: 10 },
     });
 
-  const { data: dadosVagasNasEscolasPorCargo, refetch:buscarVagasNasEscolasPorCargo, isLoading } = useQuery({
+
+    
+  const { data: dadosVagasNasEscolasPorCargo, refetch:dadosVagasNasEscolasPorCargoRefetch, isLoading } = useQuery({
     queryKey: ["getDadosVagasNasEscolasPorCargo",listRequest],
     queryFn: ({ signal }) =>
       API.Escolhas.getVagasEscolas({ concurso_uuid:editData?.uuid,cargo_codigo: '2020'},listRequest,{ signal }).response, //watchFields.cargo!
-    enabled: !!editData?.uuid && !!watchFields.cargo,
+    enabled: false,
     staleTime: 0,
     retry: 0,
+    select: (data: IVagasResponse) => ({
+      ...data,
+      vagas: (data?.vagas || []).map((vaga) => ({
+        ...vaga,
+        checked: true,
+      })),
+    }),
   });
+
+
+  const buscarVagasNasEscolasPorCargo = () => {
+ 
+    dadosVagasNasEscolasPorCargoRefetch().then(res => {
+      const { data } = res;    
+      setCardData(prev => ({
+        ...prev,
+        vagas: data?.total_vagas || 0,
+      }));    
+     });   
+    
+  }
  
 
   return {

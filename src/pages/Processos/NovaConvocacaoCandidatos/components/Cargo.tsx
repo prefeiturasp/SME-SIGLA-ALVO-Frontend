@@ -94,10 +94,13 @@ const Cargo: React.FC<CargoProps> = ({
       const quantidadeVagasSelecionados = escolasSelecionadas.reduce((acc, item) => ({
         totalVagas: acc.totalVagas + item.vagas_definitivas + item.vagas_precarias
       }), { totalVagas: 0 }).totalVagas;
-      setCardData((prev: ICardData) => ({
+      
+      
+      setCardData((prev: ICardData)  => ({
         ...prev,
         vagas: quantidadeVagasSelecionados,
-      } as ICardData));
+      }));   
+
       setCandidatosEEscolas({        
         quantidadeEscolasSelecionadas:escolasSelecionadas.length
        });

@@ -2,25 +2,51 @@ import React from "react";
 import { Typography, Card, Row, Col, Button } from "antd";
 
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
 import AgendaTela from "./components/Agenda/AgendaTela";
 import { useNovaConvocacaoCandidatos } from "./hooks/useNovaConvocacaoCandidatos";
-import type { IProcessoConvocacao } from "../../../services/resources/convocacao/IConvocacao";
  
 const { Text } = Typography;
 
 
-const breadcrumbItems = [
-  { title: <Link to="/"><Text strong>Home</Text></Link> },
-  { title: <Link to="/processos"><Text strong>Processos</Text></Link> },
-  { title: <Link to="/processos/convocacao"><Text strong>Convocação de candidatos</Text></Link> },
-  { title: "Nova Convocação" },
-] as TitleItem[];
+
 
 export const NovaConvocacaoCandidatosTela: React.FC = () => {
+
+  const navigate = useNavigate();
+
+  const breadcrumbItems = [
+    {
+      title: (
+        <Text strong style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
+          Home
+        </Text>
+      ),
+    },
+    {
+      title: (
+        <Text strong style={{ cursor: 'pointer' }} onClick={() => navigate('/processos')}>
+          Processos
+        </Text>
+      ),
+    },
+    {
+      title: (
+        <Text strong style={{ cursor: 'pointer' }} onClick={() => navigate('/processos/convocacao')}>
+          Convocação de candidatos
+        </Text>
+      ),
+    },
+    {
+      title: "Nova Convocação",
+    },
+  ] as TitleItem[];
+
+
+
 
 
   const {
