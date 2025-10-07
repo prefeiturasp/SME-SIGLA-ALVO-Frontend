@@ -41,7 +41,7 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
-    path: "/criar-nova-senha/:token",
+    path: "/criar-nova-senha/:uid/:token",
     element: <NovaSenhaTela />,
     errorElement: <RouteError />,
   },
