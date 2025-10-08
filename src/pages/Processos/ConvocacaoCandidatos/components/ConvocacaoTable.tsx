@@ -77,10 +77,10 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
         {"Resultados"}
       </CustomTitle>
 
-      <StyledTable
+      <StyledTable<IProcessoConvocacao>
         columns={columns}
         dataSource={data}
-        rowKey={(record) => `${record.uuid}`}
+        rowKey="uuid"        
         bordered
         rowClassName={(_, index) =>
           index % 2 === 0 ? "row-white" : "row-gray"

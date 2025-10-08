@@ -16,6 +16,28 @@ const { Text } = Typography;
 
 export const NovaConvocacaoCandidatosTela: React.FC = () => {
 
+  const {
+    control,
+    handleSubmit,
+    watchFields,
+    concursosData,
+    concursosOptionsIsLoading,
+    cargosDisponiveis,
+    cardData,
+    podeVisualizarVagas,
+    isCargoLiberado,
+    selectedConcursoLabel,
+    selectedCargoLabel,
+    popularSelectDeCargos,
+    handleSub,
+    setCardData,
+    setPodeVisualizarVagas,
+    postProcessoConvocacaoMutation,
+    dadosVagasNasEscolasPorCargo,
+    buscarVagasNasEscolasPorCargo,
+    isEdit
+  } = useNovaConvocacaoCandidatos();
+
   const navigate = useNavigate();
 
   const breadcrumbItems = [
@@ -41,34 +63,13 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
       ),
     },
     {
-      title: "Nova Convocação",
+      title: isEdit ? "Editar Convocação" : "Nova Convocação",
     },
   ] as TitleItem[];
 
 
 
 
-
-  const {
-    control,
-    handleSubmit,
-    watchFields,
-    concursosData,
-    concursosOptionsIsLoading,
-    cargosDisponiveis,
-    cardData,
-    podeVisualizarVagas,
-    isCargoLiberado,
-    selectedConcursoLabel,
-    selectedCargoLabel,
-    buscarCargosDoConcursoDesabilitarCargoVagas,
-    handleSub,
-    setCardData,
-    setPodeVisualizarVagas,
-    postProcessoConvocacaoMutation,
-    dadosVagasNasEscolasPorCargo,
-    buscarVagasNasEscolasPorCargo
-  } = useNovaConvocacaoCandidatos();
 
 
  return (
@@ -85,7 +86,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
           concursosData={concursosData}
           concursosOptionsIsLoading={concursosOptionsIsLoading}
           isCargoLiberado={isCargoLiberado}
-          buscarCargosDoConcursoDesabilitarCargoVagas={buscarCargosDoConcursoDesabilitarCargoVagas}
+          popularSelectDeCargos={popularSelectDeCargos}
         />
       </Card>
 

@@ -25,5 +25,5 @@ export const appAxiosImportaArquivos = axios.create({
 });
 
 export const appAxiosEscolhas = axios.create({
-  baseURL: getEnv("ESCOLHAS_API_URL", "http://localhost:8003"),
+  baseURL: getEnv("ESCOLHAS_API_URL", "http://localhost:8004"),
 });
