@@ -56,17 +56,17 @@ const addAuthInterceptor = (axiosInstance: AxiosInstance) => {
 };
 
 export const appAxiosProcessoConvocacao = axios.create({
-  baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "http://localhost:8000"),
+  baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-convocacao"),
 });
 addAuthInterceptor(appAxiosProcessoConvocacao);
 
 export const appAxiosConcursos = axios.create({
-  baseURL: getEnv("CONCURSOS_API_URL", "http://localhost:8001"),
+  baseURL: getEnv("CONCURSOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos"),
 });
 addAuthInterceptor(appAxiosConcursos);
 
 export const appAxiosCandidatos = axios.create({
-  baseURL: getEnv("CANDIDATOS_API_URL", "http://localhost:8002"),
+  baseURL: getEnv("CANDIDATOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos"),
 });
 addAuthInterceptor(appAxiosCandidatos);
 
