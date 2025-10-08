@@ -215,7 +215,7 @@ const ConvocacaoCandidatos: React.FC = () => {
               data={processosConvocacaoData?.results || []}
               pagination={{
                 current: listRequest.pagination.page,
-                pageSize: 10,
+                pageSize: listRequest.pagination.page_size,
                 defaultPageSize: 10,
                 position: ["bottomLeft"],
                 total: processosConvocacaoData?.count,

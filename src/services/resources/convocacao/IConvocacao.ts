@@ -1,11 +1,19 @@
+import { number } from "yup";
+
 export interface IProcessoConvocacao {
-  concurso_nome: string;
-  data_convocacao: string;
-  status: string; 
-  uuid: string; 
+concurso_nome : string;
+concurso_uuid : string;
+criado_em : string;
+data_convocacao : string;
+data_corte_vagas : string;
+descricao : string;
+numero_convocados : number
+quantidade_cargos : number
+status : string;
+tipo_escolha : string;
+uuid : string;
 }
-
-
+ 
 export interface IPostProcessoConvocacaoPayload {
   concurso_nome: string;
   concurso_uuid: string;
@@ -40,18 +48,54 @@ export interface IOptions {
  
 export interface IUnidadeEscolar {
   uuid:string;
-  eol: string;
+  codigo_eol: string;
   dre: string;
   tipo: string; 
-  unidade: string; 
+  nome_oficial: string; 
   vagas_definitivas: number; 
   vagas_precarias: number; 
   editable?:boolean;
+  dres: IOptions[];
 }
 
 
 
+
  
+ 
+export interface IDre {
+  uuid: string;
+  codigo: string;
+  nome: string;
+}
+
+export interface IEscola {
+  codigo_eol: string;
+  nome_oficial: string;
+  dre: IDre;
+}
+
+export interface IVaga {
+  checked?: boolean;
+  uuid: string;
+  lote_uuid: string;
+  data_fechamento_modulo: string; // ISO date string
+  cargo_codigo: number;
+  cargo_descricao: string;
+  vagas_precarias: number;
+  vagas_definitivas: number;
+  status: string;
+  escola: IEscola;
+  criado_em: string; // ISO date string
+  atualizado_em: string; // ISO date string
+}
+
+export interface IVagasResponse {
+  vagas: IVaga[];
+  total_vagas: number;
+  dres: IDre[];
+}
+
 
 
 export interface IConvocacaoModal {

@@ -57,7 +57,7 @@ describe('VisualizarVagasModal', () => {
     expect(await screen.findByText('Vagas por Unidade Escolar')).toBeInTheDocument();
   });
 
-  it('aciona botões de ação (Atualizar vagas e Filtrar)', async () => {
+  it('aciona botões de ação (Resetar e Filtrar)', async () => {
     const user = userEvent.setup();
     const onCancel = jest.fn();
     const onConfirm = jest.fn();
@@ -70,7 +70,7 @@ describe('VisualizarVagasModal', () => {
       </SCThemeProvider>
     );
 
-    const atualizarBtn = await screen.findByRole('button', { name: /atualizar vagas/i });
+    const atualizarBtn = await screen.findByRole('button', { name: /Resetar/i });
     await user.click(atualizarBtn);
 
     const filtrarBtn = await screen.findByRole('button', { name: /filtrar/i });
