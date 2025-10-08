@@ -19,28 +19,24 @@ import {
 } from "../styles";
 import VisualizarVagasModal from "./VisualizarVagasModal/VisualizarVagasModal";
 import SelecionarCandidatos from "./SelecionarCandidatos";
-import type { IConvocacaoFiltros } from "../../../../services/resources/convocacao/IConvocacao";
+import type {  IDre, IVaga } from "../../../../services/resources/convocacao/IConvocacao";
 import type { FormFields } from "./FormPrincipal";
 
 const { Title, Text } = Typography;
 
 export type Option = { value: string; label: string };
+export type ICardData = {
+  vagas: number;
+  autorizacoes: number;
+  reservas: number;
+  convocar: number;
+};
 
 interface CargoProps {
   isCargoLiberado: string | undefined;
   cargosDisponiveis: Option[];
-  cardData: {
-    vagas: number;
-    autorizacoes: number;
-    reservas: number;
-    convocar: number;
-  };
-  setCardData: (data: {
-    vagas: number;
-    autorizacoes: number;
-    reservas: number;
-    convocar: number;
-  }) => void;
+  cardData:ICardData;
+  setCardData: (data: ICardData) => void;
   selectedConcursoLabel: string;
   selectedCargoLabel: string;
   onCandidatosSelecionados?: (qtd: number, quantidadesIndividuais?: { geral: number; pcd: number; nna: number }) => void;
@@ -49,6 +45,9 @@ interface CargoProps {
   watchFields: any;
   control: Control<FormFields>;
   agendaComponent: React.ReactNode;
+  vagasNasEscolasPorCargo:IVaga[];
+  buscarVagasNasEscolasPorCargo: () => void;
+  dres: IDre[];
 }
 
 const Cargo: React.FC<CargoProps> = ({
@@ -64,11 +63,15 @@ const Cargo: React.FC<CargoProps> = ({
   podeVisualizarVagas,
   control,
   agendaComponent,
+  vagasNasEscolasPorCargo,
+  buscarVagasNasEscolasPorCargo,
+  dres
 }) => {
+
+  const optionsDres = dres.map((dre) => ({ value: dre.uuid, label: dre.nome }));
   const [popupSelecionarCandidatos, setPopupSelecionarCandidatos] =
     useState(false);
   const [candidatosSelecionados, setCandidatosSelecionados] = useState(0);
-  
   
   const handleOpenVisualizarVagasModal = () => {
     setOpenVisualizarVagasModal(true);
@@ -83,10 +86,29 @@ const Cargo: React.FC<CargoProps> = ({
   const handleCloseVisualizarVagas = () => {
     setOpenVisualizarVagasModal(false);
   };
-
-  const confirmVisualizarVagas = async (data: IConvocacaoFiltros) => {
+  const [candidatosEEscolas, setCandidatosEEscolas] = useState({quantidadeEscolasSelecionadas:0});
+  const confirmVisualizarVagas = async (data: IVaga[]) => {
     try {
-      console.log("e", data);
+      
+      const escolasSelecionadas = data.filter((item) => item.checked);      
+
+      const quantidadeVagasSelecionados = escolasSelecionadas.reduce((acc, item) => ({
+        totalVagas: acc.totalVagas + item.vagas_definitivas + item.vagas_precarias
+      }), { totalVagas: 0 }).totalVagas;
+      
+      
+      setCardData((prev: ICardData)  => ({
+        ...prev,
+        vagas: quantidadeVagasSelecionados,
+      }));   
+
+      setCandidatosEEscolas({        
+        quantidadeEscolasSelecionadas:escolasSelecionadas.length
+       });
+
+      
+      setOpenVisualizarVagasModal(false);
+
     } catch (e) {
       console.log(e);
     }
@@ -162,8 +184,8 @@ const Cargo: React.FC<CargoProps> = ({
         <Button
           type="primary"
           size="large"
-          onClick={buscarDadosDoCargo}
-          disabled={!watchFields.cargo}
+          onClick={buscarVagasNasEscolasPorCargo}
+          disabled={!watchFields.cargo && !podeVisualizarVagas}
           style={{ alignSelf: "flex-start" }}
         >
           Buscar
@@ -329,8 +351,8 @@ const Cargo: React.FC<CargoProps> = ({
 
         <Row gutter={16} justify="start">
           {[
-            { title: "Escolas selecionadas", value: 0, icon: <SchoolIcon /> },
-            { title: "Candidatos selecionados", value: candidatosSelecionados, icon: <GroupIcon /> },
+            { title: "Escolas selecionadas", value: candidatosEEscolas.quantidadeEscolasSelecionadas, icon: <SchoolIcon /> },
+            { title: "Candidatos selecionados", value: 0, icon: <GroupIcon /> },
           ].map(({ title, value, icon }) => (
             <Col key={title}>
               <StyledCardGrande styles={{ body: { padding: 0 } }}>
@@ -378,6 +400,8 @@ const Cargo: React.FC<CargoProps> = ({
           loading={false}
           concurso={selectedConcursoLabel}
           cargo={selectedCargoLabel}
+          vagasNasEscolasPorCargo={vagasNasEscolasPorCargo}
+          dres={optionsDres}
         />
 
         <SelecionarCandidatos

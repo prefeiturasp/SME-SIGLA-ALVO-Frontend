@@ -2,6 +2,8 @@ import axios from "axios";
 import type { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 
 const getEnv = (key: string, fallback: string) => {
+  // No Vite, as variáveis de ambiente são acessadas através de import.meta.env
+  // e devem ter o prefixo VITE_
   const viteKey = `VITE_${key}`;
   const envValue = import.meta.env[viteKey];
   return envValue || fallback;
@@ -77,3 +79,8 @@ export const appAxiosAdminUsuarios = axios.create({
   baseURL: getEnv("ADMIN_USUARIOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-admin-usuarios"),
 });
 addAuthInterceptor(appAxiosAdminUsuarios);
+
+export const appAxiosEscolhas = axios.create({
+  baseURL: getEnv("ESCOLHAS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-escolha"),
+});
+addAuthInterceptor(appAxiosEscolhas);

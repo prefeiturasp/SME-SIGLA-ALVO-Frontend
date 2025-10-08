@@ -2,24 +2,20 @@ import React from "react";
 import { Typography, Card, Row, Col, Button } from "antd";
 
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
 import AgendaTela from "./components/Agenda/AgendaTela";
 import { useNovaConvocacaoCandidatos } from "./hooks/useNovaConvocacaoCandidatos";
-
+ 
 const { Text } = Typography;
 
 
-const breadcrumbItems = [
-  { title: <Link to="/"><Text strong>Home</Text></Link> },
-  { title: <Link to="/processos"><Text strong>Processos</Text></Link> },
-  { title: <Link to="/processos/convocacao"><Text strong>Convocação de candidatos</Text></Link> },
-  { title: "Nova Convocação" },
-] as TitleItem[];
+
 
 export const NovaConvocacaoCandidatosTela: React.FC = () => {
+
   const {
     control,
     handleSubmit,
@@ -32,14 +28,48 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
     isCargoLiberado,
     selectedConcursoLabel,
     selectedCargoLabel,
-    buscarCargosDoConcurso,
+    popularSelectDeCargos,
     handleSub,
     setCardData,
     setPodeVisualizarVagas,
     postProcessoConvocacaoMutation,
+    dadosVagasNasEscolasPorCargo,
+    buscarVagasNasEscolasPorCargo,
+    isEdit
   } = useNovaConvocacaoCandidatos();
 
-  return (
+  const navigate = useNavigate();
+
+  const breadcrumbItems = [
+    {
+      title: (
+        <Text strong style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
+          Home
+        </Text>
+      ),
+    },
+    {
+      title: (
+        <Text strong style={{ cursor: 'pointer' }} onClick={() => navigate('/processos')}>
+          Processos
+        </Text>
+      ),
+    },
+    {
+      title: (
+        <Text strong style={{ cursor: 'pointer' }} onClick={() => navigate('/processos/convocacao')}>
+          Convocação de candidatos
+        </Text>
+      ),
+    },
+    {
+      title: isEdit ? "Editar Convocação" : "Nova Convocação",
+    },
+  ] as TitleItem[];
+
+
+
+ return (
     <BaseTela
       breadcrumbItems={breadcrumbItems}
       title="Processo de convocação de candidatos"
@@ -53,7 +83,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
           concursosData={concursosData}
           concursosOptionsIsLoading={concursosOptionsIsLoading}
           isCargoLiberado={isCargoLiberado}
-          buscarCargosDoConcurso={buscarCargosDoConcurso}
+          popularSelectDeCargos={popularSelectDeCargos}
         />
       </Card>
 
@@ -71,6 +101,9 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
         onCandidatosSelecionados={(quantidade, quantidadesIndividuais) => {
           console.log('Candidatos selecionados:', quantidade, quantidadesIndividuais);
         }}
+        vagasNasEscolasPorCargo={dadosVagasNasEscolasPorCargo?.vagas || []}
+        dres={dadosVagasNasEscolasPorCargo?.dres||[]}// || []}
+        buscarVagasNasEscolasPorCargo={buscarVagasNasEscolasPorCargo}
         agendaComponent={
           <AgendaTela 
             cargosDisponiveis={cargosDisponiveis}

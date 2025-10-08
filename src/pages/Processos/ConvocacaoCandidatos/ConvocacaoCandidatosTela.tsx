@@ -11,26 +11,30 @@ import { useNavigate } from "react-router-dom";
 
 const { Text } = Typography;
 
-const breadcrumbItems = [
-  {
-    title: (
-      <a href="/">
-        <Text strong>Home</Text>
-      </a>
-    ),
-  },
-  {
-    title: (
-      <a href="/processos">
-        <Text strong>Processos</Text>
-      </a>
-    ),
-  },
-  { title: "Consulta de candidatos" },
-] as TitleItem[];
+
 
 const ConvocacaoCandidatosTela: React.FC = () => {
   const navigate = useNavigate();
+
+
+  const breadcrumbItems = [
+    {
+      title: (
+        <Text strong style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
+          Home
+        </Text>
+      ),
+    },
+    {
+      title: (
+        <Text strong style={{ cursor: 'pointer' }} onClick={() => navigate('/processos')}>
+          Processos
+        </Text>
+      ),
+    },
+    { title: "Consulta de candidatos" },
+  ] as TitleItem[];
+
   const {
     control,
     handleSubmit,

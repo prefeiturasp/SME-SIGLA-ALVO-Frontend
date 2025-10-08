@@ -1,39 +1,64 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useConcursos } from "../../../../hooks/useConcursos";
 import { usePostProcessoConvocacao } from "./usePostProcessoConvocacao";
-import type { IPostProcessoConvocacaoPayload } from "../../../../services/resources/convocacao/IConvocacao";
+import type {
+  IPostProcessoConvocacaoPayload,
+  IProcessoConvocacao,
+  IVagasResponse,
+} from "../../../../services/resources/convocacao/IConvocacao";
+import { useLocation } from "react-router-dom";
+import { API } from "../../../../services";
+import { useQuery } from "@tanstack/react-query";
+import useListRequest from "../../../../hooks/useListRequest";
+import type { IEscolhasFiltro } from "../../../../services/resources/escolhas/IEscolhas";
+import type { ICardData } from "../components/Cargo";
+
+export type CargosDisponiveisOption = {
+  value: string;
+  label: string;
+  codigo: string;
+};
 
 type ConcursoOption = {
   value: string;
   label: string;
-  cargos?: { value: string; label: string }[];
+  cargos?: CargosDisponiveisOption[];
 };
 
 type FormFields = {
-  concurso: string;
-  tipo_escolha: string;
+  concurso: string | undefined;
+  tipo_escolha: string | undefined;
   descricao: string;
-  cargo: string;
+  cargo: string | undefined;
   data_convocacao: string;
   data_corte_vagas: string;
 };
 
 export const useNovaConvocacaoCandidatos = () => {
-  const { concursosData, concursosOptionsIsLoading } = useConcursos();
+  const location = useLocation();
+  const editData = location.state.editData as IProcessoConvocacao;
+  const isEdit = !!editData;
 
   const defaultValues = {
-    concurso: undefined,
-    tipo_escolha: undefined,
-    descricao: undefined,
-    cargo: "",
-    data_convocacao: "",
-    data_corte_vagas: "",
+    concurso: editData?.concurso_uuid || undefined,
+    tipo_escolha: editData?.tipo_escolha || undefined,
+    descricao: editData?.descricao || "",
+    data_convocacao: editData?.data_convocacao || "",
+    data_corte_vagas: editData?.data_corte_vagas || "",
   };
 
+  const { concursosData, concursosOptionsIsLoading } = useConcursos();
+
   const { control, reset, handleSubmit } = useForm<FormFields>({
-    defaultValues,
+    defaultValues: { ...defaultValues },
   });
+  
+  useEffect(() => {
+    if (editData?.concurso_uuid && concursosData) {
+         popularSelectDeCargos(editData.concurso_uuid);      
+    }
+  }, [editData,concursosData]);
 
   // Mutation para post de processo de convocação (hook centralizado)
   const postProcessoConvocacaoMutation = usePostProcessoConvocacao();
@@ -42,9 +67,9 @@ export const useNovaConvocacaoCandidatos = () => {
 
   const isCargoLiberado = watchFields.concurso;
   const [cargosDisponiveis, setCargosDisponiveis] = useState<
-    { value: string; label: string }[]
+    CargosDisponiveisOption[]
   >([]);
-  const [cardData, setCardData] = useState({
+  const [cardData, setCardData] = useState<ICardData>({
     vagas: 0,
     autorizacoes: 0,
     reservas: 0,
@@ -53,24 +78,17 @@ export const useNovaConvocacaoCandidatos = () => {
   const [cargoSelecionado, setCargoSelecionado] = useState<
     string | undefined
   >();
-  const [podeVisualizarVagas, setPodeVisualizarVagas] = useState(false);
+  const [podeVisualizarVagas, setPodeVisualizarVagas] = useState(isEdit);
 
-  const buscarCargosDoConcurso = (concursoValue: string) => {
-    if (!concursoValue) {
-      setCargosDisponiveis([]);
-      return;
-    }
+  const popularSelectDeCargos = (concursoValue: string) => {
 
-    const concursoSelecionado = ((concursosData as unknown as ConcursoOption[]) || []).find(
-      (c: ConcursoOption) => c.value === concursoValue,
-    );
+    const concursoSelecionado = (
+      (concursosData as unknown as ConcursoOption[]) || []
+    ).find((c: ConcursoOption) => c.value === concursoValue);
 
     if (concursoSelecionado && concursoSelecionado.cargos) {
       setCargosDisponiveis(concursoSelecionado.cargos);
     }
-
-    setCargoSelecionado(undefined);
-    setPodeVisualizarVagas(false);
 
     setCardData({
       vagas: 0,
@@ -78,17 +96,30 @@ export const useNovaConvocacaoCandidatos = () => {
       reservas: 0,
       convocar: 0,
     });
+ 
+    setCargoSelecionado(undefined);
+    setPodeVisualizarVagas(false);
   };
 
   const handleSub = async (data: FormFields) => {
-    if (!data.concurso || !data.tipo_escolha || !data.descricao || !data.data_convocacao || !data.data_corte_vagas) {
+    if (
+      !data.concurso ||
+      !data.tipo_escolha ||
+      !data.descricao ||
+      !data.data_convocacao ||
+      !data.data_corte_vagas
+    ) {
       console.error("Todos os campos são obrigatórios");
       return;
     }
 
     // Buscar dados do concurso selecionado
-    const concursosArray = Array.isArray(concursosData) ? concursosData : concursosData?.results || [];
-    const concursoSelecionado = concursosArray.find((concurso: any) => concurso.value === data.concurso);
+    const concursosArray = Array.isArray(concursosData)
+      ? concursosData
+      : concursosData?.results || [];
+    const concursoSelecionado = concursosArray.find(
+      (concurso: any) => concurso.value === data.concurso
+    );
 
     if (!concursoSelecionado) {
       console.error("Concurso selecionado não encontrado");
@@ -130,11 +161,56 @@ export const useNovaConvocacaoCandidatos = () => {
   // Labels selecionados para concurso e cargo
   const selectedConcursoLabel =
     ((concursosData as unknown as ConcursoOption[]) || []).find(
-      (opt) => opt.value === watchFields.concurso,
+      (opt) => opt.value === watchFields.concurso
     )?.label || "";
 
   const selectedCargoLabel =
-    (cargosDisponiveis || []).find((opt) => opt.value === watchFields.cargo)?.label || "";
+    (cargosDisponiveis || []).find((opt) => opt.value === watchFields.cargo)
+      ?.label || "";
+
+  const selectedCargoCodigo =
+    (cargosDisponiveis || []).find((opt) => opt.value === watchFields.cargo)
+      ?.codigo || "";
+
+  const { listRequest, setListRequest, onAntTableChange } =
+    useListRequest<IEscolhasFiltro>({
+      pagination: { page: 1, page_size: 10 },
+    });
+
+  const {
+    data: dadosVagasNasEscolasPorCargo,
+    refetch: dadosVagasNasEscolasPorCargoRefetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ["getDadosVagasNasEscolasPorCargo", listRequest],
+    queryFn: ({ signal }) =>
+      API.Escolhas.getVagasEscolas(
+        { processo_uuid: editData?.uuid, cargo_codigo: selectedCargoCodigo },
+        listRequest,
+        { signal }
+      ).response, //watchFields.cargo!
+    enabled: false,
+    staleTime: 0,
+    retry: 0,
+    select: (data: IVagasResponse) => ({
+      ...data,
+      vagas: (data?.vagas || []).map((vaga) => ({
+        ...vaga,
+        checked: true,
+      })),
+    }),
+  });
+
+  const buscarVagasNasEscolasPorCargo = () => {
+    dadosVagasNasEscolasPorCargoRefetch().then((res) => {
+      const { data } = res;
+      setCardData((prev) => ({
+        ...prev,
+        vagas: data?.total_vagas || 0,
+      }));
+      setPodeVisualizarVagas((data?.total_vagas || 0) > 0);
+    });
+  };
 
   return {
     // Form controls
@@ -142,7 +218,7 @@ export const useNovaConvocacaoCandidatos = () => {
     reset,
     handleSubmit,
     watchFields,
-    
+
     // Data
     concursosData: (concursosData as unknown as ConcursoOption[]) || [],
     concursosOptionsIsLoading,
@@ -150,21 +226,24 @@ export const useNovaConvocacaoCandidatos = () => {
     cardData,
     cargoSelecionado,
     podeVisualizarVagas,
-    
+
     // Computed values
     isCargoLiberado,
     selectedConcursoLabel,
     selectedCargoLabel,
-    
+
     // Actions
-    buscarCargosDoConcurso,
+    popularSelectDeCargos,
     handleSub,
     handleReset,
     setCardData,
     setCargoSelecionado,
     setPodeVisualizarVagas,
-    
-    // Mutation state
+
+    // Mutation editData
     postProcessoConvocacaoMutation,
+    dadosVagasNasEscolasPorCargo,
+    buscarVagasNasEscolasPorCargo,
+    isEdit,
   };
 };

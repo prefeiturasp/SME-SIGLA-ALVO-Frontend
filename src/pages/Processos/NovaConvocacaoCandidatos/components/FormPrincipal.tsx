@@ -28,7 +28,7 @@ interface FormPrincipalProps {
   concursosData: ConcursoOption[];
   concursosOptionsIsLoading: boolean;
   isCargoLiberado: string | undefined;
-  buscarCargosDoConcurso: (value: string) => void;
+  popularSelectDeCargos: (value: string) => void;
 }
 
 const FormPrincipal: React.FC<FormPrincipalProps> = ({
@@ -36,7 +36,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
   concursosData,
   concursosOptionsIsLoading,
   isCargoLiberado,
-  buscarCargosDoConcurso,
+  popularSelectDeCargos,
 }) => {
   return (
     <Row gutter={16}>
@@ -58,7 +58,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                 }
                 onChange={(value) => {
                   field.onChange(value as string);
-                  buscarCargosDoConcurso(value as string);
+                  popularSelectDeCargos(value as string);
                 }}
               />
               {!isCargoLiberado && (
