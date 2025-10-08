@@ -1,13 +1,37 @@
-import { Breadcrumb, Typography, type MenuProps } from "antd";
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Breadcrumb, Typography } from "antd";
 import type { IProcessoConvocacao } from "../../services/resources/convocacao/IConvocacao";
-import React, { Suspense } from "react";
-import { Layout, Menu, theme } from "antd";
-import icon from "../../assets/alvo-img.png";
+import React, { Suspense, useState } from "react";
+import { Layout, theme } from "antd";
+import alvoIcon from "../../assets/alvo-fundo-branco.png";
+import prefSPLogo from "../../assets/logo_PrefSP_sem fundo_horizontal_fundo claro.png";
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 import { UserAvatar } from "../../components/UserAvatar";
 import { useNavigate, useLocation } from "react-router-dom";
-import { GlobalMenuWidth } from "./styles";
+import { 
+  GlobalMenuWidth, 
+  StyledLayout, 
+  StyledHeader, 
+  StyledSider, 
+  SidebarHeader,
+  SidebarFooter,
+  AlvoLogo, 
+  PrefSPLogo, 
+  CustomMenu,
+  CustomMenuItem,
+  StyledContent, 
+  StyledFooter,
+  SidePanel,
+  SidePanelHeader,
+  SidePanelContent,
+  SidePanelItem,
+  ProcessosIcon,
+  RelatoriosIcon,
+  GerenciarIcon,
+  SidePanelTitle,
+  PageTitle,
+  PageContentContainer
+} from "./styles";
 
 export interface INewSampleModalData extends IProcessoConvocacao {
   description: string;
@@ -15,7 +39,6 @@ export interface INewSampleModalData extends IProcessoConvocacao {
 
 export type TitleItem = { title: string } | { title: React.ReactElement };
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { CustomLabel } from "./styles";
 
 interface INewSampleModalProps {
   children: React.ReactNode;
@@ -23,7 +46,6 @@ interface INewSampleModalProps {
   title: string;
 }
 
-const { Header, Content, Footer } = Layout;
 
 
 const BaseTela: React.FC<INewSampleModalProps> = ({
@@ -35,105 +57,174 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-
-
   const navigate = useNavigate();
   const location = useLocation();
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
+  const [selectedMenuTitle, setSelectedMenuTitle] = useState("");
+  const [selectedMenuKey, setSelectedMenuKey] = useState("");
+
+  const processedBreadcrumbItems = breadcrumbItems
+    .map((item, index) => {
+      if (index === 0 && location.pathname === '/') {
+        return null;
+      }
+      
+      if (typeof item.title === 'string' && item.title.toLowerCase() === 'home') {
+        return {
+          ...item,
+          onClick: () => navigate('/')
+        } as TitleItem & { onClick: () => void };
+      }
+      
+      return item;
+    })
+    .filter((item): item is TitleItem => item !== null);
 
    
 
-  // Função para determinar qual menu deve estar selecionado baseado na URL
   const getSelectedKeys = () => {
     const path = location.pathname;
     
     if (path.startsWith('/processos')) {
-      return ['sub2']; // Processos
+      return ['processos'];
     } else if (path.startsWith('/administracao') || path.startsWith('/admin')) {
-      return ['sub1']; // Administração
+      return ['gerenciar'];
     } else if (path.startsWith('/relatorios') || path.startsWith('/relatorio')) {
-      return ['sub3']; // Relatórios
+      return ['relatorios'];
     }
     
-    return []; // Nenhum selecionado se não corresponder a nenhuma seção
+    return [];
   };
 
-const menuItens: MenuProps["items"] = [
+
+const handleMenuClick = (key: string, title: string) => {
+  if (isSidePanelOpen && selectedMenuKey === key) {
+    setIsSidePanelOpen(false);
+    setSelectedMenuKey("");
+    setSelectedMenuTitle("");
+  } else {
+    setSelectedMenuTitle(title);
+    setSelectedMenuKey(key);
+    setIsSidePanelOpen(true);
+  }
+};
+
+const menuItems = [
   {
-    key: "sub1",
-    label: 
-    <CustomLabel>
-      Administração <ArrowDropDownIcon />
-    </CustomLabel>,
-    children: [
-      { key: 1, label: "Concursos" },
-      { key: 2, label: "Escolas" },
-    ],
+    key: "processos",
+    icon: <ProcessosIcon />,
+    label: "Processos",
+    onClick: () => handleMenuClick("processos", "Processos")
   },
   {
-    key: "sub2",
-    label: 
-    <CustomLabel>
-      Processos <ArrowDropDownIcon />
-    </CustomLabel>,
-    children: [
-      { key: 3, label: "Convocação de candidatos", onClick: () => navigate("/processos/convocacao") }, 
-      { key: 4, label: "Escolha de candidatos" },
-      { key: 5, label: "Importação de dados", onClick: () => navigate("/processos/importacao-dados") },
-    ]
+    key: "relatorios",
+    icon: <RelatoriosIcon />,
+    label: "Relatórios",
+    onClick: () => handleMenuClick("relatorios", "Relatórios")
   },
   {
-    key: "sub3",
-    label: 
-        <CustomLabel>
-      Relatórios <ArrowDropDownIcon />
-    </CustomLabel>,
-     children: [
-      { key: 5, label: "Relatório ABCD" },
-      { key: 6, label: "Relatório EFGH" },
-    ],
+    key: "gerenciar",
+    icon: <GerenciarIcon />,
+    label: "Gerenciar",
+    onClick: () => handleMenuClick("gerenciar", "Gerenciar")
   },
 ];
 
-  return (
-    <Layout
-      style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
-    >
-       
-      <GlobalMenuWidth />
-      <Header style={{ display: "flex", alignItems: "center", padding:'0 1.5rem', boxShadow: '0px 4px 20px 0px rgba(0, 0, 0, 0.1)' }}>
-         <img
-          src={icon}
-          alt="Sistema Alvo"
-        />
-        <Menu
-          theme="light"
-          mode="horizontal"
-          selectedKeys={getSelectedKeys()}
-          items={menuItens}
-          style={{ flex: 1, marginLeft: "1.5rem" }}
-        />
-        <UserAvatar />
-      </Header>
+const getSubmenuItems = (menuKey: string) => {
+  switch (menuKey) {
+    case "processos":
+      return [
+        { key: "convocacao", label: "Convocação de Candidatos", onClick: () => navigate("/processos/convocacao") }, 
+        { key: "escolha", label: "Escolha de Candidatos" },
+        { key: "importacao", label: "Importação de Dados", onClick: () => navigate("/processos/importacao-dados") },
+      ];
+    case "relatorios":
+      return [
+        { key: "relatorio1", label: "Relatório A" },
+        { key: "relatorio2", label: "Relatório B" },
+        { key: "relatorio3", label: "Relatório C" },
+      ];
+    case "gerenciar":
+      return [
+        { key: "concursos", label: "Concursos" },
+        { key: "escolas", label: "Escolas" },
+        { key: "usuarios", label: "Usuários" },
+        { key: "configuracoes", label: "Configurações" },
+      ];
+    default:
+      return [];
+  }
+};
 
-      <Content style={{ padding: "1.5rem"}}>
-        <Breadcrumb separator={<KeyboardArrowRightIcon  />}  items={breadcrumbItems} />
-        <Typography.Title level={2} style={{ margin:"1rem 0" ,fontWeight: 700 }} >
-          {title}
-        </Typography.Title>
-        <div
-          style={{
-            background: colorBgContainer,
-            minHeight: "30vh",
-            borderRadius: borderRadiusLG,
-          }}
-        >
-          <Suspense fallback={<Typography.Text>Carregando...</Typography.Text>}>
-            {children}
-          </Suspense>
-        </div>
-      </Content>
-      <Footer style={{ textAlign: "center" }}>Alvo</Footer>
-    </Layout>
+  return (
+    <StyledLayout>
+      <GlobalMenuWidth />
+      
+      <StyledHeader>
+        <PrefSPLogo src={prefSPLogo} alt="Prefeitura de São Paulo" />
+        <Breadcrumb separator={<KeyboardArrowRightIcon />} items={processedBreadcrumbItems} />
+        <UserAvatar />
+      </StyledHeader>
+
+      <Layout>
+        <StyledSider width={106}>
+          <SidebarHeader>
+            <AlvoLogo src={alvoIcon} alt="ALVO" />
+          </SidebarHeader>
+          <CustomMenu>
+            {menuItems.map((item) => (
+              <CustomMenuItem
+                key={item.key}
+                onClick={item.onClick}
+                $isSelected={getSelectedKeys().includes(item.key)}
+                $isOpen={isSidePanelOpen && selectedMenuKey === item.key}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </CustomMenuItem>
+            ))}
+          </CustomMenu>
+          <SidebarFooter>
+            <ExitToAppIcon />
+          </SidebarFooter>
+        </StyledSider>
+
+        {isSidePanelOpen && (
+          <SidePanel>
+            <SidePanelHeader>
+              <SidePanelTitle level={3}>
+                {selectedMenuTitle}
+              </SidePanelTitle>
+            </SidePanelHeader>
+            <SidePanelContent>
+              {getSubmenuItems(selectedMenuKey).map((item) => (
+                <SidePanelItem
+                  key={item.key}
+                  onClick={item.onClick}
+                >
+                  {item.label}
+                </SidePanelItem>
+              ))}
+            </SidePanelContent>
+          </SidePanel>
+        )}
+        
+        <StyledContent style={{ marginLeft: isSidePanelOpen ? '23.4375rem' : '6.625rem' }}>
+          <PageTitle level={2}>
+            {title}
+          </PageTitle>
+          <PageContentContainer $bgColor={colorBgContainer} $borderRadius={borderRadiusLG}>
+            <Suspense fallback={<Typography.Text>Carregando...</Typography.Text>}>
+              {children}
+            </Suspense>
+          </PageContentContainer>
+        </StyledContent>
+      </Layout>
+      
+      <StyledFooter style={{ marginLeft: isSidePanelOpen ? '23.4375rem' : '6.625rem' }}>
+        Sistema Alvo - Versão: 1.0.33.01 - Todos os direitos reservados
+      </StyledFooter>
+    </StyledLayout>
   );
 };
 
