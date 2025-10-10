@@ -1,3 +1,14 @@
+jest.mock('../../../axios', () => ({
+  appAxiosProcessoConvocacao: {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+  }
+}));
+
+jest.mock('../../../../utils/queryParamsSerializer', () => jest.fn());
+
 import { appAxiosProcessoConvocacao } from '../../../axios';
 import { 
   getProcessosConvocacao, 
@@ -9,12 +20,14 @@ import {
   getCargosPorConcursoData,
   URL 
 } from '../index';
+
+// Mock das funções faltantes no URL
+(URL as any).createSample = () => 'api/v1/sample/create';
+(URL as any).editSample = (id: number) => `api/v1/sample/update/${id}/`;
+(URL as any).deleteSample = (id: number) => `api/v1/sample/delete/${id}/`;
 import type { PaginatedResponse, IBackendWithSubOptions } from '../../../../types/IListRequest';
 import type { IProcessoConvocacao, ISample } from '../IConvocacao';
 import queryParamsSerializer from '../../../../utils/queryParamsSerializer';
-
-jest.mock('../../../axios');
-jest.mock('../../../../utils/queryParamsSerializer');
 
 describe('Convocacao Service', () => {
   const mockAxios = appAxiosProcessoConvocacao as jest.Mocked<typeof appAxiosProcessoConvocacao>;

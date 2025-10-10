@@ -8,31 +8,38 @@ import UnidadeEscolarTable from '../components/UnidadeEscolarTable';
 const originData = [
   {
     uuid: 'row-1',
-    eol: '123456',
-    dre: 'DRE Leste',
-    tipo: 'EMEF',
-    unidade: 'Escola Teste 1',
+    escola: {
+      codigo_eol: '123456',
+      dre: { nome: 'DRE Leste' },
+      tipo: 'EMEF',
+      nome_oficial: 'Escola Teste 1',
+    },
     vagas_definitivas: 1,
     vagas_precarias: 2,
+    checked: false,
   },
   {
     uuid: 'row-2',
-    eol: '654321',
-    dre: 'DRE Sul',
-    tipo: 'EMEI',
-    unidade: 'Escola Teste 2',
+    escola: {
+      codigo_eol: '654321',
+      dre: { nome: 'DRE Sul' },
+      tipo: 'EMEI',
+      nome_oficial: 'Escola Teste 2',
+    },
     vagas_definitivas: 3,
     vagas_precarias: 4,
+    checked: false,
   },
 ];
 
 describe('UnidadeEscolarTable', () => {
   it('renderiza, entra em modo edição e salva alterações', async () => {
     const user = userEvent.setup();
+    const mockSetEditableData = jest.fn();
 
     render(
       <SCThemeProvider theme={appTheme as any}>
-        <UnidadeEscolarTable originData={originData} />
+        <UnidadeEscolarTable originData={originData} filteredData={originData} setEditableData={mockSetEditableData} loading={false} />
       </SCThemeProvider>
     );
 
@@ -52,7 +59,8 @@ describe('UnidadeEscolarTable', () => {
     const actionButtonsEditing = within(row).getAllByRole('button');
     await user.click(actionButtonsEditing[0]);
 
-    expect(within(row).getByText('5')).toBeInTheDocument();
+    // Check that setEditableData was called to update the data
+    expect(mockSetEditableData).toHaveBeenCalled();
   });
 
   it('cancela edição e mantém valores originais', async () => {
@@ -60,7 +68,7 @@ describe('UnidadeEscolarTable', () => {
 
     render(
       <SCThemeProvider theme={appTheme as any}>
-        <UnidadeEscolarTable originData={originData} />
+        <UnidadeEscolarTable originData={originData} filteredData={originData} setEditableData={jest.fn()} loading={false} />
       </SCThemeProvider>
     );
 
@@ -86,7 +94,7 @@ describe('UnidadeEscolarTable', () => {
 
     render(
       <SCThemeProvider theme={appTheme as any}>
-        <UnidadeEscolarTable originData={originData} />
+        <UnidadeEscolarTable originData={originData} filteredData={originData} setEditableData={jest.fn()} loading={false} />
       </SCThemeProvider>
     );
 

@@ -15,7 +15,7 @@ describe('AdicionarEscolaTable', () => {
     );
 
     // Garante que a primeira linha renderizou
-    const rowText = await screen.findByText('Escola Guaianases');
+    const rowText = await screen.findByText('Guaianases');
     const row = rowText.closest('tr') as HTMLElement;
     expect(row).toBeInTheDocument();
 

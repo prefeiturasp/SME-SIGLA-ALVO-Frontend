@@ -1,21 +1,37 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider as SCThemeProvider } from 'styled-components';
 import { theme as appTheme } from '../../../../theme';
 import ConvocacaoTable from '../components/ConvocacaoTable';
 
 const makeRow = (over: Partial<any> = {}) => ({
   uuid: 'uuid-1',
-  concurso_nome: 'Concurso X',
+  descricao: 'Concurso X',
   data_convocacao: '2025-03-10',
   status: 'Ativo',
   ...over,
 });
 
+// Mock useNavigate
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
+}));
+
 describe('ConvocacaoTable', () => {
+  beforeEach(() => {
+    mockNavigate.mockClear();
+  });
+
   const renderWithTheme = (ui: React.ReactElement) =>
-    render(<SCThemeProvider theme={appTheme as any}>{ui}</SCThemeProvider>);
+    render(
+      <BrowserRouter>
+        <SCThemeProvider theme={appTheme as any}>{ui}</SCThemeProvider>
+      </BrowserRouter>
+    );
 
   it('renderiza título e dados com data formatada', () => {
     renderWithTheme(<ConvocacaoTable data={[makeRow()]} />);
@@ -46,30 +62,28 @@ describe('ConvocacaoTable', () => {
 
   it('não dispara onClick do Editar quando desabilitado', async () => {
     const user = userEvent.setup();
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     renderWithTheme(<ConvocacaoTable data={[makeRow()]} />);
 
     const row = screen.getByText('Concurso X').closest('tr') as HTMLElement;
     const buttons = within(row).getAllByRole('button');
 
-    const candidate = buttons.find((b: any) =>
-      b.getAttribute('aria-disabled') === 'true' || (typeof (b as HTMLButtonElement).disabled !== 'undefined' && (b as HTMLButtonElement).disabled === true)
-    );
-    const editButton = candidate || buttons[0];
+    // Find the edit button (first button)
+    const editButton = buttons[0];
 
     await user.click(editButton as HTMLElement);
 
-    expect(consoleSpy).toHaveBeenCalledWith('edit');
-
-    consoleSpy.mockRestore();
+    // Check if navigate was called with the correct path
+    expect(mockNavigate).toHaveBeenCalledWith('editar', expect.objectContaining({
+      state: expect.objectContaining({ editData: expect.any(Object) })
+    }));
   });
 
   it('aplica classes CSS corretas para linhas pares e ímpares', () => {
     const data = [
-      makeRow({ uuid: 'uuid-1', concurso_nome: 'Concurso 1' }),
-      makeRow({ uuid: 'uuid-2', concurso_nome: 'Concurso 2' }),
-      makeRow({ uuid: 'uuid-3', concurso_nome: 'Concurso 3' }),
+      makeRow({ uuid: 'uuid-1', descricao: 'Concurso 1' }),
+      makeRow({ uuid: 'uuid-2', descricao: 'Concurso 2' }),
+      makeRow({ uuid: 'uuid-3', descricao: 'Concurso 3' }),
     ];
 
     renderWithTheme(<ConvocacaoTable data={data} />);

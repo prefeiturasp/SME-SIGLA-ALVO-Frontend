@@ -67,23 +67,29 @@ describe('SelecionarCandidatos', () => {
   });
 
   describe('Testes de digitação nos inputs', () => {
-    it('deve permitir apenas números no input de Classificação inicial', async () => {
+    it('deve permitir apenas números no input de Quantidade inicial', async () => {
       const user = userEvent.setup();
       render(<SelecionarCandidatos {...defaultProps} />);
 
-      const classificacaoInput = screen.getByDisplayValue('1');
+      const allInputs = screen.getAllByRole('textbox');
+      const numericInputs = allInputs.filter(input => 
+        input.getAttribute('type') === 'text' || 
+        input.getAttribute('type') === 'number' ||
+        input.getAttribute('inputmode') === 'numeric'
+      );
+      const quantidadeInput = numericInputs[0]; // Primeiro input numérico é o de Quantidade
       
       await act(async () => {
-        await user.clear(classificacaoInput);
-        await user.type(classificacaoInput, '123');
+        await user.clear(quantidadeInput);
+        await user.type(quantidadeInput, '123');
       });
-      expect(classificacaoInput).toHaveValue('123');
+      expect(quantidadeInput).toHaveValue('123');
 
       await act(async () => {
-        await user.clear(classificacaoInput);
-        await user.type(classificacaoInput, 'abc123def');
+        await user.clear(quantidadeInput);
+        await user.type(quantidadeInput, 'abc123def');
       });
-      expect(classificacaoInput).toHaveValue('123');
+      expect(quantidadeInput).toHaveValue('123');
     });
 
     it('deve permitir apenas números no input de Quantidade', async () => {
@@ -157,10 +163,16 @@ describe('SelecionarCandidatos', () => {
     it('deve mostrar mensagem de aviso ao tentar digitar caracteres não numéricos', async () => {
       render(<SelecionarCandidatos {...defaultProps} />);
 
-      const classificacaoInput = screen.getByDisplayValue('1');
+      const allInputs = screen.getAllByRole('textbox');
+      const numericInputs = allInputs.filter(input => 
+        input.getAttribute('type') === 'text' || 
+        input.getAttribute('type') === 'number' ||
+        input.getAttribute('inputmode') === 'numeric'
+      );
+      const quantidadeInput = numericInputs[0]; // Primeiro input numérico é o de Quantidade
       
       await act(async () => {
-        fireEvent.keyDown(classificacaoInput, { key: 'a' });
+        fireEvent.keyDown(quantidadeInput, { key: 'a' });
       });
       
       expect(message.warning).toHaveBeenCalledWith('Digite apenas números');
@@ -242,6 +254,29 @@ describe('SelecionarCandidatos', () => {
         />
       );
 
+      const allInputs = screen.getAllByRole('textbox');
+      const numericInputs = allInputs.filter(input => 
+        input.getAttribute('type') === 'text' || 
+        input.getAttribute('type') === 'number' ||
+        input.getAttribute('inputmode') === 'numeric'
+      );
+      
+      const quantidadeInput = numericInputs[0];
+      const geralInput = numericInputs[1];
+      const defInput = numericInputs[2];
+      const nnaInput = numericInputs[3];
+
+      await act(async () => {
+        await user.clear(quantidadeInput);
+        await user.type(quantidadeInput, '2');
+        await user.clear(geralInput);
+        await user.type(geralInput, '1');
+        await user.clear(defInput);
+        await user.type(defInput, '1');
+        await user.clear(nnaInput);
+        await user.type(nnaInput, '0');
+      });
+
       const buscarButton = screen.getByText('Buscar candidatos por autorizações digitadas');
       await act(async () => {
         await user.click(buscarButton);
@@ -256,7 +291,11 @@ describe('SelecionarCandidatos', () => {
         await user.click(selecionarButton);
       });
 
-      expect(mockOnCandidatosSelecionados).toHaveBeenCalledWith(2);
+      expect(mockOnCandidatosSelecionados).toHaveBeenCalledWith(2, {
+        geral: 1,
+        pcd: 1,
+        nna: 0
+      });
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
@@ -264,6 +303,19 @@ describe('SelecionarCandidatos', () => {
       const user = userEvent.setup();
       const mockOnClose = jest.fn();
       const mockOnCandidatosSelecionados = jest.fn();
+      
+      mockUseCandidatos.mockImplementation((shouldFetch) => {
+        if (shouldFetch) {
+          return {
+            candidatosData: { results: [] },
+            candidatosIsLoading: false
+          };
+        }
+        return {
+          candidatosData: null,
+          candidatosIsLoading: false
+        };
+      });
       
       render(
         <SelecionarCandidatos 
@@ -273,12 +325,48 @@ describe('SelecionarCandidatos', () => {
         />
       );
 
+      const allInputs = screen.getAllByRole('textbox');
+      const numericInputs = allInputs.filter(input => 
+        input.getAttribute('type') === 'text' || 
+        input.getAttribute('type') === 'number' ||
+        input.getAttribute('inputmode') === 'numeric'
+      );
+      
+      const quantidadeInput = numericInputs[0];
+      const geralInput = numericInputs[1];
+      const defInput = numericInputs[2];
+      const nnaInput = numericInputs[3];
+
+      await act(async () => {
+        await user.clear(quantidadeInput);
+        await user.type(quantidadeInput, '2');
+        await user.clear(geralInput);
+        await user.type(geralInput, '1');
+        await user.clear(defInput);
+        await user.type(defInput, '1');
+        await user.clear(nnaInput);
+        await user.type(nnaInput, '0');
+      });
+
+      const buscarButton = screen.getByText('Buscar candidatos por autorizações digitadas');
+      await act(async () => {
+        await user.click(buscarButton);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('Convocados por autorizações digitadas')).toBeInTheDocument();
+      });
+
       const selecionarButton = screen.getByText('Selecionar');
       await act(async () => {
         await user.click(selecionarButton);
       });
 
-      expect(mockOnCandidatosSelecionados).toHaveBeenCalledWith(0);
+      expect(mockOnCandidatosSelecionados).toHaveBeenCalledWith(0, {
+        geral: 1,
+        pcd: 1,
+        nna: 0
+      });
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
   });
@@ -303,7 +391,16 @@ describe('SelecionarCandidatos', () => {
     it('deve inicializar com valores padrão nos inputs', () => {
       render(<SelecionarCandidatos {...defaultProps} />);
 
-      expect(screen.getByDisplayValue('1')).toBeInTheDocument();
+      const allInputs = screen.getAllByRole('textbox');
+      const numericInputs = allInputs.filter(input => 
+        input.getAttribute('type') === 'text' || 
+        input.getAttribute('type') === 'number' ||
+        input.getAttribute('inputmode') === 'numeric'
+      );
+      
+      // Verifica se o input de Quantidade está inicializado com valor vazio (0)
+      const quantidadeInput = numericInputs[0];
+      expect(quantidadeInput).toHaveValue('');
 
       const autorizacaoInputs = screen.getAllByPlaceholderText('Digite apenas números');
       autorizacaoInputs.forEach(input => {
