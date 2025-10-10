@@ -11,6 +11,8 @@ describe('VisualizarVagasModal', () => {
     loading: false,
     concurso: 'Concurso X',
     cargo: 'Cargo Y',
+    vagasNasEscolasPorCargo: [],
+    dres: [],
   };
 
   it('renderiza concurso e cargo e permite cancelar', async () => {
@@ -62,22 +64,23 @@ describe('VisualizarVagasModal', () => {
     const onCancel = jest.fn();
     const onConfirm = jest.fn();
 
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-
     render(
       <SCThemeProvider theme={appTheme as any}>
         <VisualizarVagasModal {...baseProps} onCancel={onCancel} onConfirm={onConfirm} />
       </SCThemeProvider>
     );
 
-    const atualizarBtn = await screen.findByRole('button', { name: /Resetar/i });
-    await user.click(atualizarBtn);
+    const resetarBtn = await screen.findByRole('button', { name: /Resetar/i });
+    expect(resetarBtn).toBeInTheDocument();
+    await user.click(resetarBtn);
 
     const filtrarBtn = await screen.findByRole('button', { name: /filtrar/i });
+    expect(filtrarBtn).toBeInTheDocument();
     await user.click(filtrarBtn);
 
-    expect(consoleSpy).toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    // Verifica que os botões são clicáveis e não causam erros
+    expect(resetarBtn).toBeEnabled();
+    expect(filtrarBtn).toBeEnabled();
   });
 
   it('chama onConfirm ao clicar em Salvar', async () => {

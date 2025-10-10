@@ -1,11 +1,19 @@
+jest.mock('../../../axios', () => ({
+  appAxiosCandidatos: {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+  }
+}));
+
+jest.mock('../../../../utils/queryParamsSerializer', () => jest.fn());
+
 import { appAxiosCandidatos } from '../../../axios';
 import { getCandidatos, URL } from '../index';
 import type { PaginatedResponse } from '../../../../types/IListRequest';
 import type { ICandidato } from '../ICandidatos';
 import queryParamsSerializer from '../../../../utils/queryParamsSerializer';
-
-jest.mock('../../../axios');
-jest.mock('../../../../utils/queryParamsSerializer');
 
 describe('Candidatos Service', () => {
   const mockAxios = appAxiosCandidatos as jest.Mocked<typeof appAxiosCandidatos>;

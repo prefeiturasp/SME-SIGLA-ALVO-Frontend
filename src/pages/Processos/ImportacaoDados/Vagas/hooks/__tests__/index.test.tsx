@@ -152,22 +152,18 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     it('deve validar dados corretos', async () => {
       const schema = useImportacaoSchema();
       const validData = {
-        cargo: 'CARGO_001',
+        processo_convocacao: 'PROCESSO_001',
         arquivo: new File(['test'], 'test.csv', { type: 'text/csv' }),
-        metodo_de_importacao: 1,
-        data_fechamento_modulo: '2024-01-01',
       };
 
       const isValid = await schema.isValid(validData);
       expect(isValid).toBe(true);
     });
 
-    it('deve rejeitar quando cargo está ausente', async () => {
+    it('deve rejeitar quando processo_convocacao está ausente', async () => {
       const schema = useImportacaoSchema();
       const invalidData = {
         arquivo: new File(['test'], 'test.csv', { type: 'text/csv' }),
-        metodo_de_importacao: 1,
-        data_fechamento_modulo: '2024-01-01',
       };
 
       const isValid = await schema.isValid(invalidData);
@@ -175,16 +171,15 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
       try {
         await schema.validate(invalidData);
-      } catch (error) {
-        expect(error.message).toBe('Cargo é obrigatório, selecione um cargo');
+      } catch (error: any) {
+        expect(error.message).toBe('Processo de convocação é obrigatório');
       }
     });
 
     it('deve rejeitar quando arquivo está ausente', async () => {
       const schema = useImportacaoSchema();
       const invalidData = {
-        cargo: 'CARGO_001',
-        metodo_de_importacao: 2,
+        processo_convocacao: 'PROCESSO_001',
       };
 
       const isValid = await schema.isValid(invalidData);
@@ -236,10 +231,8 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     it('deve aceitar arquivo CSV por extensão mesmo sem tipo MIME correto', async () => {
       const schema = useImportacaoSchema();
       const validData = {
-        cargo: 'CARGO_001',
+        processo_convocacao: 'PROCESSO_001',
         arquivo: new File(['test'], 'test.csv', { type: 'application/octet-stream' }),
-        metodo_de_importacao: 2,
-        concurso_uuid: 'CONCURSO_001',
       };
 
       const isValid = await schema.isValid(validData);
@@ -249,10 +242,8 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     it('deve aceitar arquivo CSV por tipo MIME mesmo sem extensão .csv', async () => {
       const schema = useImportacaoSchema();
       const validData = {
-        cargo: 'CARGO_001',
+        processo_convocacao: 'PROCESSO_001',
         arquivo: new File(['test'], 'test', { type: 'text/csv' }),
-        metodo_de_importacao: 2,
-        concurso_uuid: 'CONCURSO_001',
       };
 
       const isValid = await schema.isValid(validData);
@@ -365,13 +356,9 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       const { result } = renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
       const testFile = new File(['test'], 'test.csv', { type: 'text/csv' });
-      const formData = {
-        cargo: 'CARGO_001',
+      const formData: IImportacaoVagasForm = {
+        processo_convocacao: 'PROCESSO_001',
         arquivo: testFile,
-        metodo_de_importacao: 2,
-        opcoes_de_importacao: 'opcao1',
-        concurso_uuid: 'CONCURSO_001',
-        concurso_nome: 'Concurso Teste 1',
       };
 
       await act(async () => {
@@ -380,10 +367,9 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
       // Verificar se a API foi chamada com os parâmetros corretos
       expect(API.ImportacaoDados.postImportacaoArquivosVagas).toHaveBeenCalledWith({
-        concurso_nome: 'Concurso Teste 1',
-        concurso_uuid: 'CONCURSO_001',
+        processo_nome: undefined,
+        processo_uuid: 'PROCESSO_001',
         arquivo: testFile,
-        opcoes_de_importacao: 'opcao1',
       });
     });
 
@@ -392,17 +378,17 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       const wrapper = createWrapper();
       const { result } = renderHook(() => useImportacaoDadosVagas(), { wrapper });
 
-      const formDataComMetodo1 = {
-        cargo: 'CARGO_001',
-        arquivo: new File(['test'], 'test.csv', { type: 'text/csv' }),
-        metodo_de_importacao: 1,
+      const testFile = new File(['test'], 'test.csv', { type: 'text/csv' });
+      const formData: IImportacaoVagasForm = {
+        processo_convocacao: 'PROCESSO_001',
+        arquivo: testFile,
       };
 
       await act(async () => {
-        await result.current.handleEnviarForm(formDataComMetodo1);
+        await result.current.handleEnviarForm(formData);
       });
 
-      expect(API.ImportacaoDados.postImportacaoArquivosVagas).not.toHaveBeenCalled();
+      expect(API.ImportacaoDados.postImportacaoArquivosVagas).toHaveBeenCalled();
     });
 
     it('deve executar handleReset corretamente', () => {
@@ -439,11 +425,9 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       expect(result.current.isCreatingImportacao).toBe(false);
 
       const testFile = new File(['test'], 'test.csv', { type: 'text/csv' });
-      const formData = {
-        cargo: 'CARGO_001',
+      const formData: IImportacaoVagasForm = {
+        processo_convocacao: 'PROCESSO_001',
         arquivo: testFile,
-        metodo_de_importacao: 2,
-        opcoes_de_importacao: 'opcao1',
       };
 
       // Executar função para testar cobertura
@@ -468,11 +452,9 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       });
 
       const testFile = new File(['test'], 'test.csv', { type: 'text/csv' });
-      const formData = {
-        cargo: 'CARGO_001',
+      const formData: IImportacaoVagasForm = {
+        processo_convocacao: 'PROCESSO_001',
         arquivo: testFile,
-        metodo_de_importacao: 2,
-        opcoes_de_importacao: 'opcao1',
       };
 
       await act(async () => {

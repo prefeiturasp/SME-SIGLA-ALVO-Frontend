@@ -1,17 +1,25 @@
-import { appAxiosCandidatos } from '../../../axios';
-import { getCandidatos, URL } from '../index';
+jest.mock('../../../axios', () => ({
+  appAxiosEscolhas: {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+  }
+}));
+
+jest.mock('../../../../utils/queryParamsSerializer', () => jest.fn());
+
+import { appAxiosEscolhas } from '../../../axios';
+import { getVagasEscolas, URL } from '../index';
 import type { PaginatedResponse } from '../../../../types/IListRequest';
-import type { ICandidato } from '../IEscolhas';
+import type { IVagasResponse } from '../../../resources/convocacao/IConvocacao';
 import queryParamsSerializer from '../../../../utils/queryParamsSerializer';
 
-jest.mock('../../../axios');
-jest.mock('../../../../utils/queryParamsSerializer');
-
-describe('Candidatos Service', () => {
-  const mockAxios = appAxiosCandidatos as jest.Mocked<typeof appAxiosCandidatos>;
+describe('Escolhas Service', () => {
+  const mockAxios = appAxiosEscolhas as jest.Mocked<typeof appAxiosEscolhas>;
   const mockParamsSerializer = queryParamsSerializer as jest.MockedFunction<typeof queryParamsSerializer>;
 
-  const mockCandidatosData: PaginatedResponse<ICandidato> = {
+  const mockVagasData: IVagasResponse = {
     count: 3,
     next: null,
     previous: null,
@@ -48,19 +56,21 @@ describe('Candidatos Service', () => {
 
   describe('URL', () => {
     it('retorna a URL correta', () => {
-      expect(URL.getCandidatos()).toBe('/api/v1/candidatos/');
+      expect(URL.getVagasEscolas()).toBe('/api/v1/vagas-escolas/');
     });
   });
 
-  describe('getCandidatos', () => {
+  describe('getVagasEscolas', () => {
     it('faz GET e retorna os dados', async () => {
-      mockAxios.get.mockResolvedValueOnce({ data: mockCandidatosData });
+      mockAxios.get.mockResolvedValueOnce({ data: mockVagasData });
+      const params = { cargo: 'cargo1', concurso: 'conc1' };
+      const listRequest = { pagination: { page: 1, page_size: 10 }, filters: {} };
 
-      const { response } = getCandidatos();
+      const { response } = getVagasEscolas(params, listRequest);
 
-      await expect(response).resolves.toEqual(mockCandidatosData);
+      await expect(response).resolves.toEqual(mockVagasData);
       expect(mockAxios.get).toHaveBeenCalledWith(
-        '/api/v1/candidatos/',
+        '/api/v1/vagas-escolas/',
         expect.objectContaining({
           paramsSerializer: queryParamsSerializer,
           signal: expect.any(AbortSignal),
@@ -69,14 +79,16 @@ describe('Candidatos Service', () => {
     });
 
     it('mescla configurações adicionais do axios', async () => {
-      mockAxios.get.mockResolvedValueOnce({ data: mockCandidatosData });
+      mockAxios.get.mockResolvedValueOnce({ data: mockVagasData });
+      const params = { cargo: 'cargo1', concurso: 'conc1' };
+      const listRequest = { pagination: { page: 1, page_size: 10 }, filters: {} };
       const config = { timeout: 5000, headers: { 'X-Test': '1' } };
 
-      const { response } = getCandidatos(config);
+      const { response } = getVagasEscolas(params, listRequest, config);
       await response;
 
       expect(mockAxios.get).toHaveBeenCalledWith(
-        '/api/v1/candidatos/',
+        '/api/v1/vagas-escolas/',
         expect.objectContaining({
           timeout: 5000,
           headers: { 'X-Test': '1' },
@@ -87,18 +99,22 @@ describe('Candidatos Service', () => {
 
     it('propaga erros da requisição', async () => {
       const error = new Error('Network error');
+      const params = { cargo: 'cargo1', concurso: 'conc1' };
+      const listRequest = { pagination: { page: 1, page_size: 10 }, filters: {} };
       mockAxios.get.mockRejectedValueOnce(error);
 
-      const { response } = getCandidatos();
+      const { response } = getVagasEscolas(params, listRequest);
       await expect(response).rejects.toThrow('Network error');
     });
   });
 
   describe('AbortController', () => {
     it('expõe uma função abort', () => {
-      mockAxios.get.mockResolvedValueOnce({ data: mockCandidatosData });
+      mockAxios.get.mockResolvedValueOnce({ data: mockVagasData });
+      const params = { cargo: 'cargo1', concurso: 'conc1' };
+      const listRequest = { pagination: { page: 1, page_size: 10 }, filters: {} };
       
-      const { abort } = getCandidatos();
+      const { abort } = getVagasEscolas(params, listRequest);
       expect(typeof abort).toBe('function');
       expect(() => {
         if (typeof abort === 'function') return true;
