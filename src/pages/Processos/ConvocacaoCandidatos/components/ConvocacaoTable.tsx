@@ -22,8 +22,8 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
   const columns: ColumnsType<IProcessoConvocacao> = [
     {
       title: "Processo",
-      dataIndex: "concurso_nome",
-      key: "concurso_nome",
+      dataIndex: "descricao",
+      key: "descricao",
     },
 
     {

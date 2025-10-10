@@ -27,6 +27,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
     podeVisualizarVagas,
     isCargoLiberado,
     selectedConcursoLabel,
+    selectedConcursoValue,
     selectedCargoLabel,
     popularSelectDeCargos,
     handleSub,
@@ -95,6 +96,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
         podeVisualizarVagas={podeVisualizarVagas}
         setPodeVisualizarVagas={setPodeVisualizarVagas}
         selectedConcursoLabel={selectedConcursoLabel}
+        selectedConcursoValue={selectedConcursoValue}
         selectedCargoLabel={selectedCargoLabel}
         watchFields={watchFields}
         control={control}

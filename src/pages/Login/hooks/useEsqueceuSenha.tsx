@@ -36,10 +36,8 @@ export const useEsqueceuSenha = () => {
       onSuccess: (data: IEsqueceuSenhaResponse) => {
         navigate('/esqueci-minha-senha-sucesso', {
           state: {
-            solicitacaoId: data.solicitacao_id,
-            usuarioEmail: data.usuario?.email,
-            usuarioNome: data.usuario?.nome,
-            usuarioRf: data.usuario?.rf,
+            usuarioEmail: data?.email,
+            usuarioRf: data?.usuario,
           }
         });
       },

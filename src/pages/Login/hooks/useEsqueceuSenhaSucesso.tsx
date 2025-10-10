@@ -5,31 +5,15 @@ export const useEsqueceuSenhaSucesso = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const solicitacaoId = location.state?.solicitacaoId;
   const usuarioEmail = location.state?.usuarioEmail;
-  
-  const [maskedEmail, setMaskedEmail] = useState<string>("");
-
-  const maskEmail = (email: string): string => {
-    if (!email || email.length <= 3) return email;
-    
-    const [localPart, domain] = email.split('@');
-    if (!domain) return email;
-    
-    const maskedLocal = localPart.substring(0, 3) + '*'.repeat(Math.max(0, localPart.length - 3));
-    return `${maskedLocal}@${domain}`;
-  };
+  const usuarioRf = location.state?.usuarioRf;
 
   useEffect(() => {
-    if (!solicitacaoId && !usuarioEmail) {
+    if (!usuarioRf && !usuarioEmail) {
       navigate('/login');
       return;
     }
-
-    if (usuarioEmail) {
-      setMaskedEmail(maskEmail(usuarioEmail));
-    }
-  }, [solicitacaoId, usuarioEmail, navigate]);
+  }, [usuarioRf, usuarioEmail, navigate]);
 
   const handleBackToLogin = () => {
     navigate("/login");
@@ -37,7 +21,8 @@ export const useEsqueceuSenhaSucesso = () => {
 
   return {
     loading: false,
-    maskedEmail,
+    usuarioEmail,
+    usuarioRf,
     handleBackToLogin,
   };
 };

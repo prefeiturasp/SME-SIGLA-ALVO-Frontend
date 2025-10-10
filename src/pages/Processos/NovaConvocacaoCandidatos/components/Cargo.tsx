@@ -38,6 +38,7 @@ interface CargoProps {
   cardData:ICardData;
   setCardData: (data: ICardData) => void;
   selectedConcursoLabel: string;
+  selectedConcursoValue: string;
   selectedCargoLabel: string;
   onCandidatosSelecionados?: (qtd: number, quantidadesIndividuais?: { geral: number; pcd: number; nna: number }) => void;
   setPodeVisualizarVagas: (podeVisualizarVagas: boolean) => void;
@@ -53,6 +54,7 @@ interface CargoProps {
 const Cargo: React.FC<CargoProps> = ({
   isCargoLiberado,
   selectedConcursoLabel,
+  selectedConcursoValue,
   selectedCargoLabel,
   onCandidatosSelecionados,
   setPodeVisualizarVagas,
@@ -408,6 +410,7 @@ const Cargo: React.FC<CargoProps> = ({
           visible={popupSelecionarCandidatos}
           onClose={handleCloseSelecionarCandidatos}
           concurso={selectedConcursoLabel}
+          concursoValue={selectedConcursoValue}
           cargo={selectedCargoLabel}
           vagas={cardData.vagas}
           autorizacoes={cardData.autorizacoes}

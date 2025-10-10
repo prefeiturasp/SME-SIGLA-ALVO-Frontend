@@ -21,6 +21,7 @@ interface SelecionarCandidatosProps {
   visible: boolean;
   onClose: () => void;
   concurso?: string;
+  concursoValue?: string;
   cargo?: string;
   vagas?: number;
   autorizacoes?: number;
@@ -31,12 +32,12 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
   visible,
   onClose,
   concurso,
+  concursoValue,
   cargo,
   vagas = 9,
   autorizacoes = 0,
   onCandidatosSelecionados
 }) => {
-  const [classificacaoInicial, setClassificacaoInicial] = useState(1);
   const [quantidade, setQuantidade] = useState(0);
   const [autorizacoesDigitadas, setAutorizacoesDigitadas] = useState({
     geral: 0,
@@ -44,13 +45,13 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
     nna: 0
   });
   const [mostrarTabelaCandidatos, setMostrarTabelaCandidatos] = useState(false);
-  const [parametrosBusca, setParametrosBusca] = useState<{ geral: number; pcd: number; nna: number } | undefined>(undefined);
+  const [parametrosBusca, setParametrosBusca] = useState<{ geral: number; pcd: number; nna: number; concurso_uuid: string } | undefined>(undefined);
 
   // Hook para buscar candidatos - só executa quando mostrarTabelaCandidatos for true
   const { candidatosData, candidatosIsLoading } = useCandidatos(mostrarTabelaCandidatos, parametrosBusca);
   
   // Dados formatados para a tabela - só mostra quando necessário
-  const candidatos = mostrarTabelaCandidatos && candidatosData?.results ? candidatosData.results : [];
+  const candidatos = mostrarTabelaCandidatos && candidatosData ? candidatosData : [];
 
   // Validação em tempo real
   const totalAutorizacoes = autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
@@ -109,8 +110,10 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
     setParametrosBusca({
       geral: autorizacoesDigitadas.geral,
       pcd: autorizacoesDigitadas.def, // def = pcd conforme especificação
-      nna: autorizacoesDigitadas.nna
+      nna: autorizacoesDigitadas.nna,
+      concurso_uuid: concursoValue
     });
+    console.log("concursoValue", concursoValue);
     setMostrarTabelaCandidatos(true);
   };
 
@@ -186,18 +189,6 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
 
         <InputGroup>
           <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
-            <div style={{ width: '40%' }}>
-              <StyledText strong>Classificação inicial:</StyledText>
-              <StyledInput
-                type="text"
-                inputMode="numeric"
-                value={classificacaoInicial || ''}
-                onChange={(e) => handleNumericInput(e.target.value, setClassificacaoInicial)}
-                onKeyDown={validateNumericInput}
-                placeholder="0"
-                style={{ marginTop: '0rem' }}
-              />
-            </div>
             <div style={{ width: '40%' }}>
               <StyledText strong>Quantidade:</StyledText>
               <StyledInput
@@ -408,13 +399,13 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
                         COGEP
                       </div>
                       <div style={{ width: '35%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
-                        {candidato.nome}
+                        {candidato.candidato.nome}
                       </div>
                       <div style={{ width: '15%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
-                        {candidato.classificacao_geral}
+                        {candidato.classificacao}
                       </div>
                       <div style={{ width: '15%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
-                        {candidato.classificacao_especial}
+                        {candidato.classificacao_pcd}
                       </div>
                       <div style={{ width: '15%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
                         {candidato.classificacao_nna}
