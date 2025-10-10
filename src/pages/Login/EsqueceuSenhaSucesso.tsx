@@ -21,7 +21,8 @@ import {
 const EsqueceuSenhaSucesso: React.FC = () => {
   const {
     loading,
-    maskedEmail,
+    usuarioEmail,
+    usuarioRf,
     handleBackToLogin,
   } = useEsqueceuSenhaSucesso();
 
@@ -37,7 +38,7 @@ const EsqueceuSenhaSucesso: React.FC = () => {
             message={
               <SuccessMessage>
                 Seu link de recuperação de senha foi enviado para{" "}
-                <EmailText>{maskedEmail}</EmailText>
+                <EmailText>{usuarioEmail}</EmailText>
               </SuccessMessage>
             }
             type="success"

@@ -164,6 +164,11 @@ export const useNovaConvocacaoCandidatos = () => {
       (opt) => opt.value === watchFields.concurso
     )?.label || "";
 
+  const selectedConcursoValue =
+    ((concursosData as unknown as ConcursoOption[]) || []).find(
+      (opt) => opt.value === watchFields.concurso
+    )?.value || "";
+
   const selectedCargoLabel =
     (cargosDisponiveis || []).find((opt) => opt.value === watchFields.cargo)
       ?.label || "";
@@ -230,6 +235,7 @@ export const useNovaConvocacaoCandidatos = () => {
     // Computed values
     isCargoLiberado,
     selectedConcursoLabel,
+    selectedConcursoValue,
     selectedCargoLabel,
 
     // Actions
