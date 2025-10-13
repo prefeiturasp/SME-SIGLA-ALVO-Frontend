@@ -354,7 +354,7 @@ const Cargo: React.FC<CargoProps> = ({
         <Row gutter={16} justify="start">
           {[
             { title: "Escolas selecionadas", value: candidatosEEscolas.quantidadeEscolasSelecionadas, icon: <SchoolIcon /> },
-            { title: "Candidatos selecionados", value: 0, icon: <GroupIcon /> },
+            { title: "Candidatos selecionados", value: candidatosSelecionados, icon: <GroupIcon /> },
           ].map(({ title, value, icon }) => (
             <Col key={title}>
               <StyledCardGrande styles={{ body: { padding: 0 } }}>
