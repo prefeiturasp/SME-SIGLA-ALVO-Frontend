@@ -4,8 +4,8 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const isAuthenticated = Boolean(localStorage.getItem("token"));
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {  
+  const isAuthenticated = Boolean(localStorage.getItem("TOKEN"));
 
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
