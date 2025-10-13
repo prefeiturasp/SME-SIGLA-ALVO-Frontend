@@ -118,9 +118,8 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
   };
 
   const handleSelecionar = () => {
-    // Conta a quantidade de candidatos na tabela
-    // candidatosData pode ser PaginatedResponse<ICandidato> ou undefined
-    const quantidadeCandidatos = candidatosData?.results?.length || 0;
+    // Calcula a quantidade total de candidatos com base nas autorizações digitadas
+    const quantidadeCandidatos = autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
     
     // Quantidades individuais baseadas nas autorizações digitadas
     const quantidadesIndividuais = {
