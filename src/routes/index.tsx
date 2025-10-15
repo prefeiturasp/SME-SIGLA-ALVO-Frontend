@@ -16,6 +16,7 @@ import EsqueceuSenhaTela from "../pages/Login/EsqueceuSenhaTela";
 import EsqueceuSenhaSucesso from "../pages/Login/EsqueceuSenhaSucesso";
 import NovaSenhaTela from "../pages/Login/NovaSenhaTela";
 import RouteError from "./RouteError";
+import Step01 from "../pages/CriarEditarConvocacao/Step-01";
 
 //TODO ADD FEATURE FLAG
 
@@ -50,6 +51,12 @@ const router = createBrowserRouter([
     element: <ConvocacaoCandidatosTela />,
     errorElement: <RouteError />,
   },
+
+  {
+    path: "/processos/convocacao/nova/steps-01",
+    element: <Step01 />,
+    errorElement: <RouteError />,
+  },  
   {
     path: "/processos/convocacao/nova",
     element: <NovaConvocacaoCandidatosTela />,

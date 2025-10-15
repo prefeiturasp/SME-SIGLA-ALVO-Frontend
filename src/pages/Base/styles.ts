@@ -130,7 +130,7 @@ export const GlobalMenuWidth = createGlobalStyle`
 
 export const StyledLayout = styled(Layout)`
   height: 100vh;
-  background: #ffffff;
+  
   overflow: hidden;
   overflow-x: hidden;
 `;
@@ -140,7 +140,7 @@ export const StyledHeader = styled(Layout.Header)`
   align-items: center;
   justify-content: space-between;
   padding: 0 1.5rem;
-  background: #ffffff;
+  
   border-bottom: 0.0625rem solid #f0f0f0;
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
   height: 4.5rem;
@@ -219,20 +219,17 @@ export const SidebarFooter = styled.div`
 `;
 
 export const StyledContent = styled(Layout.Content)`
-  margin-left: 6.625rem;
-  padding: 1.5rem;
-  background: #ffffff;
+  
+  margin:1.5625rem 2.5rem 1.5625rem 8.625rem;
   height: calc(100vh - 4.5rem - 3.75rem);
   overflow-y: auto;
 `;
 
 export const StyledFooter = styled(Layout.Footer)`
-  margin-left: 6.625rem;
-  text-align: center;
-  background: #ffffff;
+  text-align: end;
   color: #6c757d;
   font-size: 0.75rem;
-  padding: 1rem 1.5rem;
+  padding: 1rem 0rem;
   height: 3.75rem;
   line-height: 1.75rem;
 `;
@@ -361,7 +358,7 @@ export const PageTitle = styled(Typography.Title)`
 `;
 
 export const PageContentContainer = styled.div<{ $bgColor?: string; $borderRadius?: number }>`
-  background: ${({ $bgColor }) => $bgColor || '#ffffff'};
+  background: ${({ $bgColor }) => $bgColor || '#FAFAFA'};
   min-height: 30vh;
-  border-radius: ${({ $borderRadius }) => $borderRadius || 0}px;
+  border-radius: ${({ $borderRadius }) => $borderRadius || 0}px;]
 `;
