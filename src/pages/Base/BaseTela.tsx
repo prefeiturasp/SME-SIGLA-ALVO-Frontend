@@ -43,7 +43,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 interface INewSampleModalProps {
   children: React.ReactNode;
   breadcrumbItems: TitleItem[];
-  title: string;
+  title: string | React.ReactElement;
 }
 
 

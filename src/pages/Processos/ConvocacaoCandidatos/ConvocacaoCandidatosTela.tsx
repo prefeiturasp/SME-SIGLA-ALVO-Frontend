@@ -1,21 +1,28 @@
-import { Typography, Select, DatePicker, Row, Col, Space, Button, Card } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
-import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import { Typography, Row, Col } from "antd";
+import { UsergroupAddOutlined, UserSwitchOutlined } from "@ant-design/icons";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import { Controller } from "react-hook-form";
-import { CustomFormItem, SeparatorCol } from "../../../components/FormStyle";
 import ConvocacaoTable from "./components/ConvocacaoTable";
+import ConvocacaoFiltros from "./components/ConvocacaoFiltros";
 import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
 import { useNavigate } from "react-router-dom";
+import {
+  PageContainer,
+  HeaderContainer,
+  TitleContainer,
+  OrangeAccentBar,
+  PageTitle,
+  ActionButton,
+  NovaConvocacaoButton,
+  ConteudoPagina,
+  TituloPagina,
+  TableContainer,
+  ButtonGroup
+} from "./style";
 
 const { Text } = Typography;
 
-
-
 const ConvocacaoCandidatosTela: React.FC = () => {
   const navigate = useNavigate();
-
 
   const breadcrumbItems = [
     {
@@ -32,7 +39,7 @@ const ConvocacaoCandidatosTela: React.FC = () => {
         </Text>
       ),
     },
-    { title: "Consulta de candidatos" },
+    { title: "Lista de Convocações" },
   ] as TitleItem[];
 
   const {
@@ -51,169 +58,58 @@ const ConvocacaoCandidatosTela: React.FC = () => {
   } = useProcessosConvocacao();
 
   return (
-    <BaseTela
-      breadcrumbItems={breadcrumbItems}
-      title="Convocação de candidatos"
-    >
-      <Card style={{ borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", marginBottom: 24 }}>
-        <Row align="top" justify="space-between">
-          <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>
-            Busca processos
-          </Typography.Title>
-          <Button
-            type="primary"
-            size="large"
-            icon={<PlusOutlined />}
-            disabled={!concursosOptions}
-            onClick={() => navigate("/processos/convocacao/nova",{state:concursosOptions})}
-          >
-            Nova convocação
-          </Button>
-        </Row>
+    <PageContainer>
+      <BaseTela
+        breadcrumbItems={breadcrumbItems}
+        title={
+          <HeaderContainer>
+            <TitleContainer>
+              <OrangeAccentBar />
+              <PageTitle>Lista de Convocações</PageTitle>
+            </TitleContainer>
+            <ButtonGroup>
+              <ActionButton
+                type="primary"
+                size="large"
+                ghost={true}
+                icon={<UserSwitchOutlined />}
+                onClick={() => navigate("/processos/gerenciamento-vagas")}
+              >
+                Gerenciamento de vagas
+              </ActionButton>
+              <NovaConvocacaoButton
+                type="primary"
+                size="large"
+                icon={<UsergroupAddOutlined />}
+                disabled={!concursosOptions}
+                onClick={() => navigate("/processos/convocacao/nova",{state:concursosOptions})}
+              >
+                Nova convocação
+              </NovaConvocacaoButton>
+            </ButtonGroup>
+          </HeaderContainer>
+        }
+      >
+        <ConteudoPagina>
+        <TituloPagina level={4}>
+          Busca processos
+        </TituloPagina>
+
+        <ConvocacaoFiltros
+          control={control}
+          formErrors={formErrors}
+          concursosOptions={concursosOptions}
+          concursosOptionsIsLoading={concursosOptionsIsLoading}
+          handleSubmit={handleSubmit}
+          handleSub={handleSub as any}
+          handleReset={handleReset}
+          dayjs={dayjs}
+        />
+        </ConteudoPagina>
 
         <Row>
-          <Col xs={24} md={12}>
-            <Controller
-              control={control}
-              name="concurso_uuid"
-              render={({ field }) => (
-                <CustomFormItem
-                  label="Concurso"
-                  validateStatus={
-                    formErrors.concurso_uuid ? "error" : undefined
-                  }
-                  help={formErrors.concurso_uuid?.message}
-                  labelCol={{ span: 24 }}
-                >
-                  <Select
-                    {...field}
-                    options={concursosOptions?.concursos || []}
-                    placeholder="Selecione o concurso"
-                    loading={concursosOptionsIsLoading}
-                    suffixIcon={
-                      <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
-                    }
-                  />
-                </CustomFormItem>
-              )}
-            />
-
-            <Row gutter={16} align="middle">
-              <Col xs={24} sm={11}>
-                <Controller
-                  control={control}
-                  name="data_convocacao_inicio"
-                  render={({ field }) => (
-                    <CustomFormItem
-                      label="Data de Convocação"
-                      validateStatus={
-                        formErrors.data_convocacao_inicio ? "error" : undefined
-                      }
-                      help={formErrors.data_convocacao_inicio?.message}
-                      labelCol={{ span: 24 }}
-                    >
-                      <DatePicker
-                        
-                        value={field.value ? dayjs(field.value) : undefined}
-                        onChange={(date) =>
-                          field.onChange(
-                            date ? dayjs(date).format("YYYY-MM-DD") : ""
-                          )
-                        }
-                        placeholder="inicio"
-                        format="DD/MM/YYYY"
-                        suffixIcon={
-                          <CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />
-                        }
-                      />
-                    </CustomFormItem>
-                  )}
-                />
-              </Col>
-
-              <SeparatorCol xs={24} sm={2}>
-                <Text strong>até</Text>
-              </SeparatorCol>
-
-              <Col xs={24} sm={11}>
-                <Controller
-                  control={control}
-                  name="data_convocacao_fim"
-                  render={({ field }) => (
-                    <CustomFormItem
-                      label=" "
-                      validateStatus={
-                        formErrors.data_convocacao_fim ? "error" : undefined
-                      }
-                      help={formErrors.data_convocacao_fim?.message}
-                      labelCol={{ span: 24 }}
-                    >
-                      <DatePicker
-                        value={field.value ? dayjs(field.value) : undefined}
-                        onChange={(date) =>
-                          field.onChange(
-                            date ? dayjs(date).format("YYYY-MM-DD") : ""
-                          )
-                        }
-                        placeholder="Fim"
-                        format="DD/MM/YYYY"
-                        suffixIcon={
-                          <CalendarMonthRoundedIcon sx={{ color: "#032B68" }} />
-                        }
-                      />
-                    </CustomFormItem>
-                  )}
-                />
-              </Col>
-            </Row>
-
-            <Row>
-              <Col xs={24}>
-                <Controller
-                  control={control}
-                  name="cargo_uuid"
-                  render={({ field }) => (
-                    <CustomFormItem
-                      label="Cargo"
-                      validateStatus={formErrors.cargo_uuid ? "error" : undefined}
-                      help={formErrors.cargo_uuid?.message}
-                      labelCol={{ span: 24 }}
-                    >
-                      <Select
-                        {...field}
-                        options={
-                          concursosOptions ? concursosOptions.cargos : []
-                        }
-                        placeholder="Selecione o cargo"
-                        suffixIcon={
-                          <KeyboardArrowDownRoundedIcon
-                            sx={{ color: "#032B68" }}
-                          />
-                        }
-                      />
-                    </CustomFormItem>
-                  )}
-                />
-              </Col>
-
-              <Space style={{ margin: "1.5rem 0" }}>
-                <Button type="primary" ghost size="large" onClick={handleReset}>
-                  Limpar filtros
-                </Button>
-                <Button
-                  size="large"
-                  type="primary"
-                  onClick={handleSubmit(handleSub)}
-                >
-                  Pesquisar
-                </Button>
-              </Space>
-            </Row>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col xs={24}>
+        <Col xs={24}>
+          <TableContainer>
             <ConvocacaoTable
               loading={processosConvocacaoIsLoading}
               data={processosConvocacaoData?.results || []}
@@ -231,13 +127,12 @@ const ConvocacaoCandidatosTela: React.FC = () => {
               }}
               onChange={onAntTableChange}
             />
-          </Col>
+          </TableContainer>
+        </Col>
         </Row>
-      </Card>
-    </BaseTela>
+      </BaseTela>
+    </PageContainer>
   );
 };
 
 export default ConvocacaoCandidatosTela;
-
-

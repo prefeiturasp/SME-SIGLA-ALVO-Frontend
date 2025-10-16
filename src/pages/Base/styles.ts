@@ -37,8 +37,10 @@ export const UserLabel = styled.span`
   align-items: center;
   gap: 0.25rem;
   font-family: 'Open Sans', sans-serif;
-  font-size: 1.25rem;
   font-weight: 700;
+  font-size: 20px;
+  line-height: 100%;
+  letter-spacing: 0px;
 `;
 
 export const StyledUserAvatar = styled(Avatar)`
@@ -73,7 +75,12 @@ export const GlobalMenuWidth = createGlobalStyle`
         
         a, span {
           color: #71717A !important;
-          font-size: 1rem !important;
+          font-family: 'Open Sans', sans-serif !important;
+          font-weight: 600 !important;
+          font-size: 16px !important;
+          line-height: 24px !important;
+          letter-spacing: 0% !important;
+          text-align: center !important;
           text-decoration: none !important;
           background: transparent !important;
           border: none !important;

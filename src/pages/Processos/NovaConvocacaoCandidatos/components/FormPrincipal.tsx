@@ -29,6 +29,7 @@ interface FormPrincipalProps {
   concursosOptionsIsLoading: boolean;
   isCargoLiberado: string | undefined;
   popularSelectDeCargos: (value: string) => void;
+  isViewMode?: boolean;
 }
 
 const FormPrincipal: React.FC<FormPrincipalProps> = ({
@@ -37,6 +38,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
   concursosOptionsIsLoading,
   isCargoLiberado,
   popularSelectDeCargos,
+  isViewMode = false,
 }) => {
   return (
     <Row gutter={16}>
@@ -53,6 +55,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                 style={{ width: "36.875rem", height: "2.5rem" }}
                 options={concursosData || []}
                 loading={concursosOptionsIsLoading}
+                disabled={isViewMode}
                 suffixIcon={
                   <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
                 }
@@ -86,6 +89,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                   { value: "REPOSICAO", label: "Reposição" },
                   { value: "RECONVOCAO", label: "Reconvocação" },
                 ]}
+                disabled={isViewMode}
                 suffixIcon={
                   <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
                 }
@@ -98,7 +102,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           name="descricao"
           render={({ field }) => (
             <CustomFormItem label="Descrição" labelCol={{ span: 24 }}>
-              <Input {...field} placeholder="Digite a descrição" style={{ width: "36.875rem", height: "2.5rem" }} />
+              <Input {...field} placeholder="Digite a descrição" style={{ width: "36.875rem", height: "2.5rem" }} disabled={isViewMode} />
             </CustomFormItem>
           )}
         />
@@ -112,6 +116,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                 placeholder="Selecione a data da convocação"
                 style={{ width: "36.875rem", height: "2.5rem" }}
                 format="DD/MM/YYYY"
+                disabled={isViewMode}
                 suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
                 value={field.value ? dayjs(field.value) : undefined}
                 onChange={(date) => field.onChange(date ? date.toISOString() : "")}
@@ -129,6 +134,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                 placeholder="Selecione a data corte de vagas"
                 style={{ width: "36.875rem", height: "2.5rem" }}
                 format="DD/MM/YYYY"
+                disabled={isViewMode}
                 suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
                 value={field.value ? dayjs(field.value) : undefined}
                 onChange={(date) => field.onChange(date ? date.toISOString() : "")}

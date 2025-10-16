@@ -2,12 +2,22 @@ import React from "react";
 import { Typography, Card, Row, Col, Button } from "antd";
 
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
 import AgendaTela from "./components/Agenda/AgendaTela";
 import { useNovaConvocacaoCandidatos } from "./hooks/useNovaConvocacaoCandidatos";
+import {
+  breadcrumbItemStyle,
+  mainCardStyle,
+  buscaProcessosTitleStyle,
+  buttonsRowStyle,
+  viewModeButtonsContainerStyle,
+  voltarButtonStyle,
+  voltarButtonHoverStyle,
+  voltarButtonLeaveStyle
+} from "./styles";
  
 const { Text } = Typography;
 
@@ -36,7 +46,8 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
     postProcessoConvocacaoMutation,
     dadosVagasNasEscolasPorCargo,
     buscarVagasNasEscolasPorCargo,
-    isEdit
+    isEdit,
+    isViewMode
   } = useNovaConvocacaoCandidatos();
 
   const navigate = useNavigate();
@@ -44,27 +55,27 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
   const breadcrumbItems = [
     {
       title: (
-        <Text strong style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
+        <Text strong style={breadcrumbItemStyle} onClick={() => navigate('/')}>
           Home
         </Text>
       ),
     },
     {
       title: (
-        <Text strong style={{ cursor: 'pointer' }} onClick={() => navigate('/processos')}>
+        <Text strong style={breadcrumbItemStyle} onClick={() => navigate('/processos')}>
           Processos
         </Text>
       ),
     },
     {
       title: (
-        <Text strong style={{ cursor: 'pointer' }} onClick={() => navigate('/processos/convocacao')}>
+        <Text strong style={breadcrumbItemStyle} onClick={() => navigate('/processos/convocacao')}>
           Convocação de candidatos
         </Text>
       ),
     },
     {
-      title: isEdit ? "Editar Convocação" : "Nova Convocação",
+      title: isViewMode ? "Visualizar Convocação" : isEdit ? "Editar Convocação" : "Nova Convocação",
     },
   ] as TitleItem[];
 
@@ -75,8 +86,8 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
       breadcrumbItems={breadcrumbItems}
       title="Processo de convocação de candidatos"
     >
-      <Card style={{ borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", marginBottom: 24 }}>
-        <Typography.Title level={4} style={{ margin: "0 0 1rem 0" }}>
+      <Card style={mainCardStyle}>
+        <Typography.Title level={4} style={buscaProcessosTitleStyle}>
           Busca Processos
         </Typography.Title>
         <FormPrincipal
@@ -85,6 +96,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
           concursosOptionsIsLoading={concursosOptionsIsLoading}
           isCargoLiberado={isCargoLiberado}
           popularSelectDeCargos={popularSelectDeCargos}
+          isViewMode={isViewMode}
         />
       </Card>
 
@@ -115,23 +127,48 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
       />
 
 
-      <Row justify="end" gutter={16} style={{ marginTop: 24 }}>
-        <Col>
-          <Button type="primary" ghost size="large">
-            Cancelar
-          </Button>
-        </Col>
-        <Col>
-          <Button 
-            type="primary" 
+      {!isViewMode && (
+        <Row justify="end" gutter={16} style={buttonsRowStyle}>
+          <Col>
+            <Button 
+              type="primary" 
+              ghost 
+              size="large"
+              onClick={() => navigate('/processos/convocacao')}
+            >
+              Cancelar
+            </Button>
+          </Col>
+          <Col>
+            <Button 
+              type="primary" 
+              size="large"
+              onClick={handleSubmit(handleSub)}
+              loading={postProcessoConvocacaoMutation.isPending}
+            >
+              Salvar
+            </Button>
+          </Col>
+        </Row>
+      )}
+
+      {isViewMode && (
+        <div style={viewModeButtonsContainerStyle}>
+          <Button
             size="large"
-            onClick={handleSubmit(handleSub)}
-            loading={postProcessoConvocacaoMutation.isPending}
+            onClick={() => navigate(-1)}
+            style={voltarButtonStyle}
+            onMouseEnter={(e) => {
+              Object.assign(e.currentTarget.style, voltarButtonHoverStyle);
+            }}
+            onMouseLeave={(e) => {
+              Object.assign(e.currentTarget.style, voltarButtonLeaveStyle);
+            }}
           >
-            Salvar
+            Voltar
           </Button>
-        </Col>
-      </Row>
+        </div>
+      )}
     </BaseTela>
   );
 };

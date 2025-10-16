@@ -10,7 +10,7 @@ import useConvocacao from "./useConvocacao";
 
 export const useProcessosConvocacao = () => {
   const defaultValues: IFiltroProcessos = {
- 
+    status: "todos"
   };
 
   const {
@@ -41,11 +41,36 @@ export const useProcessosConvocacao = () => {
   } = useConvocacao(listRequest);
 
   const handleSub = async (data: IFiltroProcessos) => {
+    const processedFilters: IFiltroProcessos = {};
+
+    if (data.status && data.status !== "todos") {
+      const statusMapping: { [key: string]: string } = {
+        'andamento': 'EM_ANDAMENTO',
+        'finalizado': 'FINALIZADO'
+      };
+      processedFilters.status = statusMapping[data.status] || data.status;
+      console.log('Status mapeado:', data.status, '->', processedFilters.status);
+    }
+
+    if (data.concurso_uuid) {
+      processedFilters.concurso_uuid = data.concurso_uuid;
+    }
+    if (data.cargo_uuid) {
+      processedFilters.cargo_uuid = data.cargo_uuid;
+    }
+    if (data.data_convocacao_inicio) {
+      processedFilters.data_convocacao_inicio = data.data_convocacao_inicio;
+    }
+    if (data.data_convocacao_fim) {
+      processedFilters.data_convocacao_fim = data.data_convocacao_fim;
+    }
+
+    console.log('Filtros processados:', processedFilters);
 
     setListRequest((prevState) => ({
       ...prevState,
-      page:1,
-    filters: removeUndefinedFields(data),
+      page: 1,
+      filters: removeUndefinedFields(processedFilters),
     }));
   };
 
