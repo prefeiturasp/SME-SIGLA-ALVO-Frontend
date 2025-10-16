@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Button, Card, Form, Row, Col, Input, Typography, Modal as AntModal, Checkbox } from 'antd';
+import { Button, Card, Form, Row, Col, Input, Typography, Checkbox } from 'antd';
 
 
 export const StyledCardPequeno = styled(Card)`
@@ -425,4 +425,70 @@ export const StyledCheckbox = styled(Checkbox)`
     font-size: 0.875rem;
   }
 `;
+
+// Estilos para o NovaConvocacaoCandidatosTela.tsx
+// Estilo para breadcrumb items clicáveis
+export const breadcrumbItemStyle = {
+  cursor: 'pointer'
+};
+
+// Estilo do Card principal
+export const mainCardStyle = {
+  borderRadius: 8,
+  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  marginBottom: 24
+};
+
+// Estilo do título "Busca Processos"
+export const buscaProcessosTitleStyle = {
+  margin: "0 0 1rem 0"
+};
+
+// Estilo da Row dos botões
+export const buttonsRowStyle = {
+  marginTop: 24
+};
+
+// Estilo do container dos botões no modo visualização
+export const viewModeButtonsContainerStyle = {
+  marginTop: "1rem",
+  display: "flex",
+  justifyContent: "flex-end",
+  gap: "1rem"
+};
+
+// Estilo do botão "Voltar"
+export const voltarButtonStyle = {
+  width: '111px',
+  height: '40px',
+  gap: '8px',
+  opacity: 1,
+  borderRadius: '8px',
+  borderWidth: '1px',
+  paddingRight: '16px',
+  paddingLeft: '16px',
+  border: '1px solid #0F59C8',
+  backgroundColor: '#FFFFFF',
+  fontFamily: 'Open Sans',
+  fontWeight: 600,
+  fontSize: '16px',
+  lineHeight: '24px',
+  letterSpacing: '0%',
+  verticalAlign: 'middle' as const,
+  color: '#0F59C8',
+  boxShadow: 'none'
+};
+
+// Estilos de hover e leave para o botão "Voltar"
+export const voltarButtonHoverStyle = {
+  backgroundColor: '#0F59C8',
+  borderColor: '#0F59C8',
+  color: '#FFFFFF'
+};
+
+export const voltarButtonLeaveStyle = {
+  backgroundColor: '#FFFFFF',
+  borderColor: '#0F59C8',
+  color: '#0F59C8'
+};
  

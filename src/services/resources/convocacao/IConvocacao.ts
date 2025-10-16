@@ -34,6 +34,7 @@ export interface IFiltroProcessos {
   cargo_uuid?: string;
   data_convocacao_inicio?: string;
   data_convocacao_fim?: string;
+  status?: string;
 }
 
   

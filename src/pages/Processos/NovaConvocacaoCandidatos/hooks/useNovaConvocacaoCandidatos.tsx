@@ -38,6 +38,7 @@ type FormFields = {
 export const useNovaConvocacaoCandidatos = () => {
   const location = useLocation();
   const editData = location.state.editData as IProcessoConvocacao;
+  const isViewMode = location.state.isViewMode as boolean;
   const isEdit = !!editData;
 
   const defaultValues = {
@@ -251,5 +252,6 @@ export const useNovaConvocacaoCandidatos = () => {
     dadosVagasNasEscolasPorCargo,
     buscarVagasNasEscolasPorCargo,
     isEdit,
+    isViewMode,
   };
 };
