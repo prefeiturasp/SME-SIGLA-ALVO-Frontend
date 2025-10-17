@@ -14,12 +14,16 @@ export const StyledTabs = styled(Tabs)`
   
   .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
     color: #032B68 !important;
-    font-weight: bold !important;
+    font-weight: 600 !important;
   }
   
   .ant-tabs-tab:not(.ant-tabs-tab-active) .ant-tabs-tab-btn {
     color: #666 !important;
-    font-weight: bold !important;
+    font-weight: 400 !important;
+  }
+
+  .ant-tabs-tab.ant-tabs-tab-disabled .ant-tabs-tab-btn {
+    font-weight: 400 !important;
   }
 `;
 
