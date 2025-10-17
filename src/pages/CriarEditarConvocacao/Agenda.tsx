@@ -65,12 +65,12 @@ const Agenda: React.FC = () => {
 
   const current=2;
   const next = () => {
-    navigate('/processos/convocacao/nova/step'+(current+2))
+    navigate('/processos/convocacao/nova/resumo')
     
   };
 
   const prev = () => {
-    navigate('/processos/convocacao/nova/step'+(current))    
+    navigate('/processos/convocacao/nova/selecao-cargos')    
   };
   
 

@@ -66,12 +66,12 @@ const DadosDoProcesso: React.FC = () => {
   const current=0;
 
   const next = () => {
-    navigate('/processos/convocacao/nova/step'+(current+2))
+    navigate('/processos/convocacao/nova/selecao-cargos')
     
   };
 
   const prev = () => {
-    navigate('/processos/convocacao/nova/step'+(current))    
+    console.log('voltar')
   };
 
   

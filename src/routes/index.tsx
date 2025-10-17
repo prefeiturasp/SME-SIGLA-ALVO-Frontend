@@ -56,22 +56,22 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/processos/convocacao/nova/step1",
+    path: "/processos/convocacao/nova/dados-processo",
     element: <DadosDoProcesso />,
     errorElement: <RouteError />,
   },  
   {
-    path: "/processos/convocacao/nova/step2",
+    path: "/processos/convocacao/nova/selecao-cargos",
     element: <SelecaoCargos />,
     errorElement: <RouteError />,
   },  
   {
-    path: "/processos/convocacao/nova/step3",
+    path: "/processos/convocacao/nova/agenda",
     element: <Agenda />,
     errorElement: <RouteError />,
   },  
   {
-    path: "/processos/convocacao/nova/step4",
+    path: "/processos/convocacao/nova/resumo",
     element: <Resumo />,
     errorElement: <RouteError />,
   },  

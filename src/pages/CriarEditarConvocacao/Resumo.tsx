@@ -65,12 +65,11 @@ const Resumo: React.FC = () => {
 
   const current=3;
   const next = () => {
-    navigate('/processos/convocacao/nova/step'+(current+2))
-    
+    console.log('next')
   };
 
   const prev = () => {
-    navigate('/processos/convocacao/nova/step'+(current))    
+    navigate('/processos/convocacao/nova/agenda')    
   };
 
   

@@ -65,12 +65,12 @@ const SelecaoCargos: React.FC = () => {
 
   const current=1;
   const next = () => {
-    navigate('/processos/convocacao/nova/step'+(current+2))
+    navigate('/processos/convocacao/nova/agenda')
     
   };
 
   const prev = () => {
-    navigate('/processos/convocacao/nova/step'+(current))    
+    navigate('/processos/convocacao/nova/dados-processo')    
   };
 
   
