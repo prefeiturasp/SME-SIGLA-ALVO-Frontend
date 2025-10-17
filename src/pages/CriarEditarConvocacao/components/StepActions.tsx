@@ -1,6 +1,7 @@
 import React from "react";
 import { Row, Col, Button, message } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { PrimaryButton, SecondaryButton } from "../../../components/EstilosCompartilhados";
 
 interface StepActionsProps {
   current: number;
@@ -22,28 +23,28 @@ export const StepActions: React.FC<StepActionsProps> = ({
       <Row align="middle" justify="space-between">
         {/* Botão Cancelar à esquerda */}
         <Col>
-          <Button
+          <SecondaryButton
             style={{ margin: "0 8px" }}
             onClick={onCancel ?? (() => console.log("cancelar"))}
           >
             Cancelar
-          </Button>
+          </SecondaryButton>
         </Col>
 
         {/* Ações à direita */}
         <Col>
           {current > 0 && (
-            <Button
+            <SecondaryButton
               icon={<LeftOutlined />}
               style={{ margin: "0 8px" }}
               onClick={prev}
             >
               Voltar
-            </Button>
+            </SecondaryButton>
           )}
 
           {current < steps.length - 1 && (
-            <Button
+            <PrimaryButton
               iconPosition="end"
               icon={<RightOutlined />}
               type="primary"
@@ -51,17 +52,17 @@ export const StepActions: React.FC<StepActionsProps> = ({
               onClick={next}
             >
               Salvar e avançar
-            </Button>
+            </PrimaryButton>
           )}
 
           {current === steps.length - 1 && (
-            <Button
+            <PrimaryButton
               type="primary"
               style={{ margin: "0 8px" }}
               onClick={() => message.success("Processo concluído!")}
             >
               Finalizar
-            </Button>
+            </PrimaryButton>
           )}
         </Col>
       </Row>

@@ -17,7 +17,7 @@ import { items, steps } from "./components/StepsNames";
 
 const { Text } = Typography;
 
-const Step01: React.FC = () => {
+const DadosDoProcesso: React.FC = () => {
   const { token } = theme.useToken();
 
   const navigate = useNavigate();
@@ -63,20 +63,21 @@ const Step01: React.FC = () => {
 
   //ESCOLHE O STEP DEPENDENDO DO QUE JÁ FOI PREENCHIDO EM   EditData
 
-  const [current, setCurrent] = useState(0);
+  const current=0;
 
   const next = () => {
-    setCurrent(current + 1);
+    navigate('/processos/convocacao/nova/step'+(current+2))
+    
   };
 
   const prev = () => {
-    setCurrent(current - 1);
+    navigate('/processos/convocacao/nova/step'+(current))    
   };
 
   
 
   const contentStyle: React.CSSProperties = {
-    lineHeight: "400px",
+    lineHeight: "300px",
     textAlign: "center",
 
     borderRadius: token.borderRadiusLG,
@@ -91,7 +92,7 @@ const Step01: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
         buttons={
-          <Button icon={<UserSwitchOutlined />}>Gerenciamento de vagas</Button>
+          <Button style={{fontWeight:'400'}} color="primary" variant="outlined" icon={<UserSwitchOutlined />}>Gerenciamento de vagas</Button>
         }
       >
         <Card title="Processo de convocação de candidatos" variant="borderless">
@@ -118,4 +119,4 @@ const Step01: React.FC = () => {
   );
 };
 
-export default Step01;
+export default DadosDoProcesso;

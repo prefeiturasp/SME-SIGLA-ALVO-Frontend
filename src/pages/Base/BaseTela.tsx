@@ -221,9 +221,9 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
         <StyledContent
           style={{ marginLeft: isSidePanelOpen ? "23.4375rem" : "8.625rem" }}
         >
-          <Row align={"middle"} justify={"space-between"}>
+          <Row align={"middle"} justify={"space-between"} style={{margin: '0 0 2rem 0'}}>
             <Col>
-              <PageTitle level={2}>{title}</PageTitle>
+              <PageTitle>{title}</PageTitle>
             </Col>
             <Col>{buttons}</Col>
           </Row>

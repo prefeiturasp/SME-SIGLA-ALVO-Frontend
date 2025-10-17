@@ -16,7 +16,10 @@ import EsqueceuSenhaTela from "../pages/Login/EsqueceuSenhaTela";
 import EsqueceuSenhaSucesso from "../pages/Login/EsqueceuSenhaSucesso";
 import NovaSenhaTela from "../pages/Login/NovaSenhaTela";
 import RouteError from "./RouteError";
-import Step01 from "../pages/CriarEditarConvocacao/Step-01";
+import DadosDoProcesso from "../pages/CriarEditarConvocacao/DadosDoProcesso";
+import SelecaoCargos from "../pages/CriarEditarConvocacao/SelecaoCargos";
+import Agenda from "../pages/CriarEditarConvocacao/Agenda";
+import Resumo from "../pages/CriarEditarConvocacao/Resumo";
 
 //TODO ADD FEATURE FLAG
 
@@ -53,8 +56,23 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/processos/convocacao/nova/steps-01",
-    element: <Step01 />,
+    path: "/processos/convocacao/nova/step1",
+    element: <DadosDoProcesso />,
+    errorElement: <RouteError />,
+  },  
+  {
+    path: "/processos/convocacao/nova/step2",
+    element: <SelecaoCargos />,
+    errorElement: <RouteError />,
+  },  
+  {
+    path: "/processos/convocacao/nova/step3",
+    element: <Agenda />,
+    errorElement: <RouteError />,
+  },  
+  {
+    path: "/processos/convocacao/nova/step4",
+    element: <Resumo />,
     errorElement: <RouteError />,
   },  
   {

@@ -141,7 +141,7 @@ export const StyledHeader = styled(Layout.Header)`
   justify-content: space-between;
   padding: 0 1.5rem;
   
-  border-bottom: 0.0625rem solid #f0f0f0;
+  border-bottom: 0.0625rem solid #FAFAFA;
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
   height: 4.5rem;
   line-height: 4.5rem;
@@ -241,7 +241,7 @@ export const SidePanel = styled.div`
   width: 16.8125rem;
   height: calc(100vh - 4.5rem);
   background: #ffffff;
-  border-right: 0.0625rem solid #f0f0f0;
+  border-right: 0.0625rem solid #FAFAFA;
   box-shadow: 0.125rem 0 0.5rem rgba(0, 0, 0, 0.1);
   z-index: 998;
   display: flex;
@@ -272,7 +272,7 @@ export const SidePanelItem = styled.div`
   padding-bottom: 1.25rem;
   padding-left: 1.5rem;
   gap: 0.625rem;
-  border-bottom: 0.0625rem solid #f0f0f0;
+  border-bottom: 0.0625rem solid #FAFAFA;
   cursor: pointer;
   font-size: 0.875rem;
   color: #515151;
@@ -352,9 +352,21 @@ export const SidePanelTitle = styled(Typography.Title)`
   color: #212529 !important;
 `;
 
-export const PageTitle = styled(Typography.Title)`
-  margin: 1rem 0 !important;
-  font-weight: 700 !important;
+export const PageTitle = styled(Typography.Text)`
+
+  
+  
+  border-left: 3px solid #FF8048;
+color: #1C1D22;
+
+font-size: 24px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+
+  padding-left:15px;
+
+  
 `;
 
 export const PageContentContainer = styled.div<{ $bgColor?: string; $borderRadius?: number }>`

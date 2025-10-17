@@ -1,12 +1,14 @@
+import type Stepper from "@mui/material/Stepper";
+
  
  
  
 
 export const theme = {
   token: {
-    colorPrimary: "#05409A",
+    colorPrimary: "#002C8C",
     fontFamily: "Roboto, sans-serif",
-    borderRadius: 5,          
+    borderRadius: 8, // substitui o borderRadius customizado
     colorBgContainer: "#FFFFFF",
     colorBgBase: "#FAFAFA",
     colorTextLightSolid: "#ffffff",
@@ -14,13 +16,13 @@ export const theme = {
     // colorBgLayout: "#FAFAFA",
     colorTextDescription: "#161718",
     fontSize: 16,
-    fontWeightStrong: 700,
-    fontWeight: 700,
+    fontWeightStrong: 600,
+    fontWeight: 400,
     controlHeight: 44,
   },
   components: {
     Typography: {
-      fontWeight: 700,
+      fontWeight: 400,
     },
     Layout: {
       headerBg: "#FFFFFF",
@@ -33,13 +35,45 @@ export const theme = {
     },
     Pagination: {
       colorPrimary: "#ffffff",
-      itemActiveBg: "#05409A",
+      itemActiveBg: "#002C8C",
     },
     Button: {
-      controlHeight: 44,
+      // Tokens específicos de botão
+      controlHeight: 45, // altura
+      borderRadius: 8, // borda arredondada
+      colorBorder: "#B1B2B7", // cor da borda padrão
+      defaultBorderColor: "#B1B2B7",
+      defaultColor: "#161718", // cor do texto no botão padrão
+      defaultBg: "#FFFFFF",
+      paddingInline: 16, // padding horizontal
+      paddingBlock: 0, // padding vertical
       fontWeight: 700,
-      borderRadius: 5,   
+      colorPrimaryHover: "#0650C0", // hover do botão primário
+      colorPrimaryActive: "#04357A", // active do botão primário
+      colorText: "#838383", // texto padrão
+      
+    },
+    Card: {
+      fontWeight: 400,           // peso do texto do conteúdo
+      headerFontSize: 18,        // tamanho do título
+          // peso do título
+      headerColor: "#515151",    // cor do título
+      colorText: "#515151",      // cor do texto do conteúdo
+      headerLineHeight: 1.2,     // linha do título para melhor leitura
     },
     
+      Steps: {      
+      colorPrimary: "#1890FF",      
+      
+      colorTextDescription: "#00000073", // cor da descrição
+      colorText: "#515151", // cor do texto normal
+      
+       controlItemBgHover: "#F0F7FF", // fundo no hover
+
+       controlItemTextColor: "#00000073",  // 🔹 número do Step inativo
+       controlItemBgActive: "transparent", // fundo de etapas ativas transparente
+
+
+    },
   },
 };
