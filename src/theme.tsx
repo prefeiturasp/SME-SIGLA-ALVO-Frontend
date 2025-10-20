@@ -21,6 +21,10 @@ export const theme = {
     controlHeight: 44,
   },
   components: {
+    Form: {
+      labelRequiredMarkColor: "#515151",
+
+    },
     Typography: {
       fontWeight: 400,
     },
@@ -60,6 +64,8 @@ export const theme = {
       headerColor: "#515151",    // cor do título
       colorText: "#515151",      // cor do texto do conteúdo
       headerLineHeight: 1.2,     // linha do título para melhor leitura
+      headerBorderWidth: 0, // remove a borda inferior do header
+
     },
     
       Steps: {      

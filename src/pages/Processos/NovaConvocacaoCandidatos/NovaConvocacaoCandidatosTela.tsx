@@ -28,6 +28,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
 
   const {
     control,
+    formErrors,
     handleSubmit,
     watchFields,
     concursosData,
@@ -97,6 +98,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
           isCargoLiberado={isCargoLiberado}
           popularSelectDeCargos={popularSelectDeCargos}
           isViewMode={isViewMode}
+          formErrors={formErrors}
         />
       </Card>
 

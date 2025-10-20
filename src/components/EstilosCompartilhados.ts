@@ -292,3 +292,10 @@ export const ButtonContainer = styled.div`
   gap: 12px;
   margin-top: 2rem;
 `;
+
+
+export const StyledCardWithoutBorder = styled(Card)`
+.ant-card-head {
+  border-bottom: none;
+}
+`;
