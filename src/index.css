@@ -20,6 +20,9 @@ ul, ol {
   list-style: none;
 }
 
+
+ 
+
 /* Steps number color to red and weights for current/disabled, as fallback to tokens */
 .ant-steps .ant-steps-item-wait .ant-steps-item-icon >.ant-steps-icon {
   color: #00000040;

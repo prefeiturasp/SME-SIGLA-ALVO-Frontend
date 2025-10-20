@@ -1,27 +1,34 @@
-import React, { useState } from "react";
-import {
-  Button,
-  Card,
-  Steps,
-  theme,
-  Typography,
-} from "antd";
+import React from "react";
+import { Button, Steps, Typography } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
 
-import {
-  UserSwitchOutlined,
-} from "@ant-design/icons";
+import { UserSwitchOutlined } from "@ant-design/icons";
 import { StepActions } from "./components/StepActions";
 import { items, steps } from "./components/StepsNames";
+import { StyledCardWithoutBorder } from "../../components/EstilosCompartilhados";
+import FormPrincipal from "../Processos/NovaConvocacaoCandidatos/components/FormPrincipal";
+import { useNovaConvocacaoCandidatos } from "../Processos/NovaConvocacaoCandidatos/hooks/useNovaConvocacaoCandidatos";
 
 const { Text } = Typography;
 
 const DadosDoProcesso: React.FC = () => {
-  const { token } = theme.useToken();
+  
 
   const navigate = useNavigate();
-  const isEdit = false;
+
+  const {
+    control,
+    handleSubmit,    
+    concursosData,
+    concursosOptionsIsLoading,    
+    isCargoLiberado,    
+    popularSelectDeCargos,
+    handleSub,        
+    isEdit,
+    isViewMode,
+    formErrors    
+    } = useNovaConvocacaoCandidatos();
   const breadcrumbItems = [
     {
       title: (
@@ -61,28 +68,27 @@ const DadosDoProcesso: React.FC = () => {
     },
   ] as TitleItem[];
 
-  //ESCOLHE O STEP DEPENDENDO DO QUE JÁ FOI PREENCHIDO EM   EditData
+  const current = 0;
 
-  const current=0;
-
-  const next = () => {
-    navigate('/processos/convocacao/nova/selecao-cargos')
+  const next = async () => {
     
+    await handleSubmit(async (formData) => {
+      const ok = await handleSub(formData);
+      
+      if (ok) {
+         navigate("/processos/convocacao/nova/selecao-cargos", {state:{editData: {...formData, concurso_uuid:formData.concurso}, isViewMode: false}});
+      }
+    })();
   };
 
   const prev = () => {
-    console.log('voltar')
+    console.log("voltar");
   };
 
-  
-
   const contentStyle: React.CSSProperties = {
-    lineHeight: "300px",
-    textAlign: "center",
-
-    borderRadius: token.borderRadiusLG,
-
-    marginTop: 20,
+    minHeight: "40vh",
+    
+    
   };
 
   // editData
@@ -92,28 +98,49 @@ const DadosDoProcesso: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
         buttons={
-          <Button style={{fontWeight:'400'}} color="primary" variant="outlined" icon={<UserSwitchOutlined />}>Gerenciamento de vagas</Button>
+          <Button
+            style={{ fontWeight: "400" }}
+            color="primary"
+            variant="outlined"
+            icon={<UserSwitchOutlined />}
+          >
+            Gerenciamento de vagas
+          </Button>
         }
       >
-        <Card title="Processo de convocação de candidatos" variant="borderless">
+        <StyledCardWithoutBorder
+          title="Processo de convocação de candidatos"
+          variant="outlined"
+        >
           <Steps current={current} items={items} />
-        </Card>
+        </StyledCardWithoutBorder>
 
-        <Card
+        <StyledCardWithoutBorder
           style={{ marginTop: "1.25rem" }}
           title={steps[current].title}
           variant="borderless"
         >
-          <div style={contentStyle}>{"escreva seu componente aqui"}</div>
+          <div style={contentStyle}>
+            <FormPrincipal
+              control={control}
+              concursosData={concursosData}
+              concursosOptionsIsLoading={concursosOptionsIsLoading}
+              isCargoLiberado={isCargoLiberado}
+              popularSelectDeCargos={popularSelectDeCargos}
+              isViewMode={isViewMode} 
+              formErrors={formErrors}
+            />
+          </div>
 
           <StepActions
             current={current}
             steps={steps}
             next={next}
             prev={prev}
-            onCancel={() => console.log("cancelado!")}
+            loading={false}
+
           />
-        </Card>
+        </StyledCardWithoutBorder>
       </BaseTela>
     </>
   );

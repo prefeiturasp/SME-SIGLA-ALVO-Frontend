@@ -6,9 +6,10 @@ import { PrimaryButton, SecondaryButton } from "../../../components/EstilosCompa
 interface StepActionsProps {
   current: number;
   steps: { title: string }[];
-  next: () => void;
+  next: () => void | Promise<void>;
   prev: () => void;
-  onCancel?: () => void;
+  onCancel?: () => void;  
+  loading?: boolean;
 }
 
 export const StepActions: React.FC<StepActionsProps> = ({
@@ -17,18 +18,21 @@ export const StepActions: React.FC<StepActionsProps> = ({
   next,
   prev,
   onCancel,
+  loading,
 }) => {
   return (
     <div style={{ marginTop: 24 }}>
       <Row align="middle" justify="space-between">
         {/* Botão Cancelar à esquerda */}
         <Col>
+        {onCancel && (
           <SecondaryButton
             style={{ margin: "0 8px" }}
-            onClick={onCancel ?? (() => console.log("cancelar"))}
+            onClick={onCancel}
           >
             Cancelar
-          </SecondaryButton>
+            </SecondaryButton>
+          )}
         </Col>
 
         {/* Ações à direita */}
@@ -49,7 +53,8 @@ export const StepActions: React.FC<StepActionsProps> = ({
               icon={<RightOutlined />}
               type="primary"
               style={{ margin: "0 8px" }}
-              onClick={next}
+              onClick={next} 
+              loading={loading}            
             >
               Salvar e avançar
             </PrimaryButton>

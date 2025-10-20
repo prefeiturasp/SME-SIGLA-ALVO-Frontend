@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Button,
-  Card,
   Steps,
   theme,
   Typography,
@@ -14,6 +13,7 @@ import {
 } from "@ant-design/icons";
 import { StepActions } from "./components/StepActions";
 import { items, steps } from "./components/StepsNames";
+import { StyledCardWithoutBorder } from "../../components/EstilosCompartilhados";
 
 const { Text } = Typography;
 
@@ -95,11 +95,11 @@ const Resumo: React.FC = () => {
           <Button style={{fontWeight:'400'}} color="primary" variant="outlined" icon={<UserSwitchOutlined />}>Gerenciamento de vagas</Button>
         }
       >
-        <Card title="Processo de convocação de candidatos" variant="borderless">
+        <StyledCardWithoutBorder title="Processo de convocação de candidatos" variant="borderless">
           <Steps current={current} items={items} />
-        </Card>
+        </StyledCardWithoutBorder>
 
-        <Card
+        <StyledCardWithoutBorder
           style={{ marginTop: "1.25rem" }}
           title={steps[current].title}
           variant="borderless"
@@ -113,7 +113,7 @@ const Resumo: React.FC = () => {
             prev={prev}
             onCancel={() => console.log("cancelado!")}
           />
-        </Card>
+        </StyledCardWithoutBorder>
       </BaseTela>
     </>
   );
