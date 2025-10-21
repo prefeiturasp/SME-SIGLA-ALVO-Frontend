@@ -73,10 +73,10 @@ const DadosDoProcesso: React.FC = () => {
   const next = async () => {
     
     await handleSubmit(async (formData) => {
-      const ok = await handleSub(formData);
+      const result = await handleSub(formData);
       
-      if (ok) {
-         navigate("/processos/convocacao/nova/selecao-cargos", {state:{editData: {...formData, concurso_uuid:formData.concurso}, isViewMode: false}});
+      if (result) {
+         navigate(`/processos/convocacao/nova/${result.uuid}/selecao-cargos`, {state:{editData: {...formData, concurso_uuid:formData.concurso}, isViewMode: false}});
       }
     })();
   };
