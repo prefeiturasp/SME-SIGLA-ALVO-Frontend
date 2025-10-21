@@ -75,7 +75,6 @@ const DadosDoProcesso: React.FC = () => {
     
     await handleSubmit(async (formData) => {
       const result = await handleSub(formData);
-      console.log("resultaaa",result)
       if (result && typeof result === 'object' && 'uuid' in result) {
         navigate(`/processos/convocacao/editar/${result.uuid}/selecao-cargos`, {state:{editData: result, isViewMode: false}});         
       }

@@ -7,15 +7,9 @@ const { Text } = Typography;
 
 import { StyledTable } from "../../../components/EstilosCompartilhados";
 import { Button, Row, Typography } from "antd";
+import type { ICandidatosClassificados } from "../../../services/resources/agenda/IAgenda";
 
-export interface ICandidatosClassificados {
-  uuid: string;
-  qtd_candidatos: number;
-  classificacao: string;
-  data_escolha: string;  
-  sessao: string;  
-  horario: string;
-}
+
 interface ResumoCandidatosTableProps extends TableProps<ICandidatosClassificados> {
   data: ICandidatosClassificados[];
 }

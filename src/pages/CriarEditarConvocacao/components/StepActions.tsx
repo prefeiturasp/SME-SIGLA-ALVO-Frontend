@@ -64,7 +64,7 @@ export const StepActions: React.FC<StepActionsProps> = ({
             <PrimaryButton
               type="primary"
               style={{ margin: "0 8px" }}
-              onClick={() => message.success("Processo concluído!")}
+              onClick={next}
             >
               Finalizar
             </PrimaryButton>

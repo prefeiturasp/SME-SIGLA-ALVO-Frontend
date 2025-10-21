@@ -1,56 +1,55 @@
 import React from "react";
-import { Row, Col, Select, Input, DatePicker, Typography, Form } from "antd";
-import type { Control, FieldErrors } from "react-hook-form";
+import { Row, Col, Spin } from "antd";
+import dayjs from "dayjs";
+
 import { TextSubHeading, TextSubTituloCinza, TextTituloCinza } from "../../../components/EstilosCompartilhados";
-import type { FormFields } from "../../Processos/NovaConvocacaoCandidatos/hooks/useNovaConvocacaoCandidatos";
 
-const { Text } = Typography;
-const { Paragraph } = Typography;
+import type { IProcessoConvocacaoResumo } from "../../../services/resources/convocacao/IConvocacao";
 
-export type ConcursoOption = {
-  value: string;
-  label: string;
-  cargos?: { value: string; label: string }[];
-};
 
-interface ResumoDoProcessoProps {
-  
-  formErrors?: FieldErrors<FormFields>;
+
+interface ResumoDoProcessoProps {  
+  data: IProcessoConvocacaoResumo;
+  isLoading: boolean;
 }
 
 const ResumoDoProcesso: React.FC<ResumoDoProcessoProps> = ({
-  
+  data,
+  isLoading
 }) => {
-  return (
-    <Row gutter={30}>
+   return (
+    <Spin spinning={isLoading} tip="Carregando dados do processo..." size="large">
+      
+    <Row gutter={30} >  
       <Col xs={24} md={24} style={{marginBottom: '1rem'}}>
       <TextSubHeading>Dados do processo</TextSubHeading>
       </Col>
 
       <Col xs={24} md={8}>
         <TextTituloCinza >Concurso</TextTituloCinza>
-        <TextSubTituloCinza>10ª CONV COORDENADOR PEDAGÓGICO</TextSubTituloCinza>        
+        <TextSubTituloCinza>{data.concurso_nome}</TextSubTituloCinza>        
         <TextTituloCinza >Número da convocação</TextTituloCinza>
-        <TextSubTituloCinza >00057869-12</TextSubTituloCinza>
+        <TextSubTituloCinza >{data.numero_convocacao}</TextSubTituloCinza>
       </Col>
 
       <Col xs={24} md={8}>
       <TextTituloCinza >Tipo de processo</TextTituloCinza>
         
-        <TextSubTituloCinza>Escolha</TextSubTituloCinza>
+        <TextSubTituloCinza>{data.tipo_escolha}</TextSubTituloCinza>
         <TextTituloCinza >Data da convocação</TextTituloCinza>        
-        <TextSubTituloCinza>12/06/2025</TextSubTituloCinza>
+        <TextSubTituloCinza>{data.data_convocacao ? dayjs(data.data_convocacao).format('DD/MM/YYYY') : ''}</TextSubTituloCinza>
       </Col>
 
       <Col xs={24} md={8}>
       <TextTituloCinza >Título</TextTituloCinza>        
         
-        <TextSubTituloCinza>Descrição do título</TextSubTituloCinza>
-        
-        <TextTituloCinza  >Data da publicação</TextTituloCinza>        
-        <TextSubTituloCinza >26/09/2025</TextSubTituloCinza>
+        <TextSubTituloCinza>{data.descricao}</TextSubTituloCinza>
+
+        <TextTituloCinza>Data da publicação</TextTituloCinza>        
+        <TextSubTituloCinza >{data.data_corte_vagas ? dayjs(data.data_corte_vagas).format('DD/MM/YYYY') : ''}</TextSubTituloCinza>
       </Col>
     </Row>
+    </Spin>
   );
 };
 
