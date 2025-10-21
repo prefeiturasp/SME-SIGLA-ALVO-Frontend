@@ -56,33 +56,28 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/processos/convocacao/nova/dados-processo",
+    path: "/processos/convocacao/dados-processo/criar",
     element: <DadosDoProcesso />,
     errorElement: <RouteError />,
   },  
-  {
-    path: "/processos/convocacao/nova/selecao-cargos",
+  {    
+    path: "/processos/convocacao/editar/:uuid/selecao-cargos",
     element: <SelecaoCargos />,
     errorElement: <RouteError />,
   },  
   {
-    path: "/processos/convocacao/nova/agenda",
+    path: "/processos/convocacao/editar/:uuid/agenda",    
     element: <Agenda />,
     errorElement: <RouteError />,
   },  
   {
-    path: "/processos/convocacao/nova/resumo",
+    path: "/processos/convocacao/editar/:uuid/resumo",    
     element: <Resumo />,
     errorElement: <RouteError />,
-  },  
+  },        
   {
-    path: "/processos/convocacao/nova",
-    element: <NovaConvocacaoCandidatosTela />,
-    errorElement: <RouteError />,
-  },
-  {
-    path: "/processos/convocacao/editar",
-    element: <NovaConvocacaoCandidatosTela />,
+    path: "/processos/convocacao/editar/:uuid/dados-processo",
+    element: <DadosDoProcesso />,
     errorElement: <RouteError />,
   },
   {

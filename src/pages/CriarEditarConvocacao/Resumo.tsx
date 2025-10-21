@@ -6,7 +6,7 @@ import {
   Typography,
 } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import {
   UserSwitchOutlined,
@@ -14,12 +14,14 @@ import {
 import { StepActions } from "./components/StepActions";
 import { items, steps } from "./components/StepsNames";
 import { StyledCardWithoutBorder } from "../../components/EstilosCompartilhados";
+import ResumoDoProcesso from "./components/ResumoDoProcesso";
+import ResumoCandidatosTable from "./components/ResumoCandidatosTable";
 
 const { Text } = Typography;
 
 const Resumo: React.FC = () => {
   const { token } = theme.useToken();
-
+const { uuid } = useParams<{ uuid: string;}>();
   const navigate = useNavigate();
   const isEdit = false;
   const breadcrumbItems = [
@@ -69,7 +71,7 @@ const Resumo: React.FC = () => {
   };
 
   const prev = () => {
-    navigate('/processos/convocacao/nova/agenda')    
+    navigate(`/processos/convocacao/editar/${uuid}/agenda`);    
   };
 
   
@@ -95,7 +97,7 @@ const Resumo: React.FC = () => {
           <Button style={{fontWeight:'400'}} color="primary" variant="outlined" icon={<UserSwitchOutlined />}>Gerenciamento de vagas</Button>
         }
       >
-        <StyledCardWithoutBorder title="Processo de convocação de candidatos" variant="borderless">
+        <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
           <Steps current={current} items={items} />
         </StyledCardWithoutBorder>
 
@@ -104,7 +106,29 @@ const Resumo: React.FC = () => {
           title={steps[current].title}
           variant="borderless"
         >
-          <div style={contentStyle}>{"escreva seu componente aqui"}</div>
+          <ResumoDoProcesso />                  
+        </StyledCardWithoutBorder>
+
+        <StyledCardWithoutBorder
+          style={{ marginTop: "1.25rem" }}          
+          variant="borderless"
+        >
+          <ResumoCandidatosTable data={[{
+            uuid: "1",
+            qtd_candidatos: 2,
+            classificacao: "1",
+            data_escolha: "2025-01-01",
+            sessao: "1",
+            horario: "10:00"
+          },
+          {
+            uuid: "1",
+            qtd_candidatos: 1,
+            classificacao: "1",
+            data_escolha: "2025-01-01",
+            sessao: "1",
+            horario: "10:00"
+          }]}  />
 
           <StepActions
             current={current}

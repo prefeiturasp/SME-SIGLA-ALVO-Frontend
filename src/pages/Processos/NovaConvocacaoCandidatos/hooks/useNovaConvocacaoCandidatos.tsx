@@ -7,7 +7,7 @@ import type {
   IProcessoConvocacao,
   IVagasResponse,
 } from "../../../../services/resources/convocacao/IConvocacao";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { API } from "../../../../services";
 import { useQuery } from "@tanstack/react-query";
 import useListRequest from "../../../../hooks/useListRequest";
@@ -41,6 +41,8 @@ export const useNovaConvocacaoCandidatos = () => {
   const editData = location.state?.editData as IProcessoConvocacao;
   const isViewMode = !!location.state?.isViewMode as boolean;
   const isEdit = !!editData;
+
+  const { uuid } = useParams<{ uuid: string;}>();
 
   const defaultValues = {
     concurso: editData?.concurso_uuid || undefined,
@@ -107,7 +109,7 @@ export const useNovaConvocacaoCandidatos = () => {
     setPodeVisualizarVagas(false);
   };
 
-  const handleSub = async (data: FormFields): Promise<boolean> => {
+  const handleSub = async (data: FormFields): Promise<IProcessoConvocacao|boolean> => {
     console.log("Processo de convocação ssss");
 
     if (
@@ -147,7 +149,8 @@ export const useNovaConvocacaoCandidatos = () => {
       const result = await postProcessoConvocacaoMutation.mutateAsync(payload);
       console.log("Processo de convocação criado com sucesso:", result);
       reset(defaultValues);
-      return true;
+      console.log("result", result);
+      return result;
     } catch (error) {
       console.error("Erro ao criar processo de convocação:", error);
       return false;
@@ -263,6 +266,7 @@ export const useNovaConvocacaoCandidatos = () => {
     isEdit,
     isViewMode,
     formErrors,
-    editData
+    editData,
+    uuid
   };
 };

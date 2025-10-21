@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Modal, Table, Typography, Select, Upload, Button, Card } from "antd";
+import Paragraph from "antd/es/typography/Paragraph";
 
 const { Text } = Typography;
 
@@ -295,7 +296,41 @@ export const ButtonContainer = styled.div`
 
 
 export const StyledCardWithoutBorder = styled(Card)`
+
 .ant-card-head {
   border-bottom: none;
+  padding: 1.25rem ;
 }
+.ant-card-body {
+    padding: 0rem 1.25rem 1.25rem 1.25rem;
+  }
+`;
+
+
+
+export const TextSubHeading = styled(Text)`
+color: #515151;
+font-size: 18px;
+font-weight: 600;
+`;
+
+
+export const TextTituloCinza = styled(Text)`
+color: rgba(81, 81, 81, 0.80);
+font-size: 14px;
+font-weight: 600;
+line-height: 22px; 
+
+`;
+export const TextSubTituloCinza = styled(Paragraph)`
+color: #838383;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 22px;
+`;
+
+
+export const CustomTitle = styled(Typography.Title).attrs({ level: 4 })`
+  margin: 2.375rem 0 1rem 0;
 `;

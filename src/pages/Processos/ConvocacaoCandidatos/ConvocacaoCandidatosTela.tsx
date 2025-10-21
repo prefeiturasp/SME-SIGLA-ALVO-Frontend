@@ -82,7 +82,7 @@ const ConvocacaoCandidatosTela: React.FC = () => {
                 size="large"
                 icon={<UsergroupAddOutlined />}
                 disabled={!concursosOptions}
-                onClick={() => navigate("/processos/convocacao/nova",{state:concursosOptions})}
+                onClick={() => navigate("/processos/convocacao/dados-processo/criar",{state:concursosOptions})}
               >
                 Nova convocação
               </NovaConvocacaoButton>
