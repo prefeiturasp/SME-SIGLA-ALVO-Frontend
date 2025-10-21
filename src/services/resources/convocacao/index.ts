@@ -45,8 +45,6 @@ export const getProcessoConvocacaoPorUUID = (
   uuid: string,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
-  console.log('uuid', uuid);
-  console.log('URL.getProcessoConvocacaoPorUUID(uuid)', URL.getProcessoConvocacaoPorUUID(uuid));
   const { signal, abort } = new AbortController();
 
   const response = appAxiosProcessoConvocacao
@@ -166,9 +164,7 @@ export const getProcessosConvocacaoOptions = (
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
-  console.log("appAxiosProcessoConvocacao", appAxiosProcessoConvocacao)
-  console.log("appAxiosProcessoConvocacao base url", appAxiosProcessoConvocacao.defaults.baseURL)
- const response = appAxiosProcessoConvocacao
+  const response = appAxiosProcessoConvocacao
    .get<IBackendWithSubOptions>(URL.getProcessosConvocacaoOptions(), {
       signal,
      ...axiosRequestConfig,

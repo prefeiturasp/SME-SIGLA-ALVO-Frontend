@@ -6,109 +6,13 @@ import {
   ModalTitle, 
   ButtonContainer
 } from '../../Processos/NovaConvocacaoCandidatos/styles';
+import { modalStyles, modalInlineStyles, GlobalStyles } from './styles';
 import { Table } from 'antd';
 import { useCandidatos } from './hooks/useCandidatos';
 import { useGetVagasPorProcessoECargo } from './hooks/useGetVagasPorProcessoECargo';
 
 const { Title, Text } = Typography;
 
-// Estilos reutilizáveis
-const modalStyles = {
-  // Estilos dos cabeçalhos da tabela
-  tableHeader: {
-    fontFamily: 'Open Sans',
-    fontWeight: 700,
-    fontStyle: 'normal',
-    fontSize: '14px',
-    lineHeight: '22px',
-    letterSpacing: '0%',
-    verticalAlign: 'middle' as const,
-    color: '#515151E0',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center' as const
-  },
-  // Estilos dos inputs de autorização
-  inputField: {
-    width: '60px',
-    height: '32px',
-    border: '1px solid #d9d9d9',
-    borderRadius: '4px',
-    padding: '0 8px',
-    fontSize: '14px',
-    textAlign: 'center' as const,
-    backgroundColor: '#fff'
-  },
-  inputLabel: {
-    color: '#333',
-    fontSize: '14px'
-  },
-  // Estilos das seções de informação
-  infoSectionLabel: {
-    fontWeight: 'bold',
-    color: '#333',
-    fontSize: '14px',
-    marginBottom: '0.25rem'
-  },
-  infoSectionValue: {
-    color: '#666',
-    fontSize: '14px'
-  },
-  // Estilos dos botões de ação
-  actionButtonContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem'
-  },
-  // Estilos do total de vagas
-  totalVagasStyle: {
-    color: '#0F59C8',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    padding: '4px 8px',
-    backgroundColor: '#E6F7FF',
-    borderRadius: '4px',
-    border: '1px solid #91D5FF'
-  },
-  // Estilos do loading
-  loadingContainer: {
-    textAlign: 'center' as const,
-    padding: '2rem'
-  },
-  loadingText: {
-    marginTop: '1rem'
-  },
-  // Estilos de texto da lista
-  listTitle: {
-    fontFamily: "Open Sans",
-    fontWeight: 700,
-    fontStyle: "normal",
-    fontSize: "14px",
-    lineHeight: "22px",
-    letterSpacing: "0%",
-    color: "#515151",
-    marginBottom: '0.5rem',
-    display: 'block'
-  },
-  // Estilos de estado vazio
-  emptyState: {
-    textAlign: 'center' as const,
-    padding: '2rem',
-    color: '#666',
-    backgroundColor: '#f5f5f5',
-    border: '1px solid #d9d9d9',
-    borderRadius: '6px'
-  },
-  // Estilos de mensagem de erro
-  errorMessage: {
-    color: '#ff4d4f',
-    fontSize: '12px',
-    marginTop: '4px',
-    fontFamily: 'Open Sans',
-    fontWeight: 400
-  }
-};
 
 interface BuscarCandidatosModalProps {
   visible: boolean;
@@ -311,7 +215,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       nna: autorizacoesDigitadas.nna,
       concurso_uuid: concursoValue || ""
     });
-    console.log("concursoValue", concursoValue);
     setMostrarTabelaCandidatos(true);
   };
 
@@ -338,187 +241,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
 
   return (
     <>
-      <style>{`
-        /* Tamanho padrão dos botões do modal */
-        .modal-action-btn {
-          width: 111px !important;
-          height: 40px !important;
-          gap: 8px !important;
-          opacity: 1 !important;
-          border-radius: 8px !important; /* borderRadiusLG */
-          border-width: 1px !important;
-          padding-right: 16px !important; /* padding */
-          padding-left: 16px !important;  /* padding */
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          min-width: 111px !important;
-        }
-
-        /* Botão Buscar do modal - igual ao Buscar da Lista de Convocações */
-        .modal-buscar-btn {
-          box-sizing: border-box;
-          border: 1px solid #0F59C8;
-          background-color: #FFFFFF;
-          font-family: 'Open Sans';
-          font-weight: 600;
-          font-size: 1rem;
-          line-height: 1.5rem;
-          letter-spacing: 0%;
-          vertical-align: middle;
-          color: #0F59C8;
-          box-shadow: none;
-        }
-
-        .modal-buscar-btn .anticon {
-          color: #0F59C8;
-        }
-
-        .modal-buscar-btn:hover,
-        .modal-buscar-btn:focus {
-          background-color: #0F59C8 !important;
-          border-color: #0F59C8 !important;
-          color: #FFFFFF !important;
-        }
-
-        .modal-buscar-btn:hover .anticon,
-        .modal-buscar-btn:focus .anticon {
-          color: #FFFFFF !important;
-        }
-
-        .modal-buscar-btn.ant-btn-disabled,
-        .modal-buscar-btn[disabled] {
-          background-color: #f5f5f5 !important;
-          border-color: #d9d9d9 !important;
-          color: rgba(0, 0, 0, 0.25) !important;
-        }
-
-        .modal-buscar-btn.ant-btn-disabled .anticon,
-        .modal-buscar-btn[disabled] .anticon {
-          color: rgba(0, 0, 0, 0.25) !important;
-        }
-
-        /* Hover do Cancel igual ao Buscar */
-        .modal-cancel-btn:hover,
-        .modal-cancel-btn:focus {
-          background-color: #0F59C8 !important;
-          border-color: #0F59C8 !important;
-          color: #FFFFFF !important;
-        }
-
-        /* Tamanho específico do botão Cancelar */
-        .modal-cancel-btn {
-          width: 77px !important;
-          height: 45px !important;
-          min-width: 77px !important; /* sobrescreve .ant-btn-lg */
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          padding-left: 16px !important;
-          padding-right: 16px !important;
-        }
-
-        /* Label do botão Cancelar */
-        .modal-cancel-label {
-          width: 45px;
-          height: 22px;
-          opacity: 1;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          font-family: 'Open Sans';
-          font-weight: 600;
-          font-style: normal;
-          font-size: 14px;
-          line-height: 22px;
-          letter-spacing: 0%;
-          text-align: center;
-        }
-
-        /* Botão Adicionar ao cargo - medidas e cores específicas */
-        .modal-adicionar-btn {
-          width: 158px !important;
-          height: 45px !important;
-          opacity: 0.8 !important;
-          border-radius: 8px !important;
-          border-width: 1px !important;
-          padding: 4px 15px !important; /* top/bottom 4, left/right 15 */
-          gap: 8px !important;
-          background: var(--Primary-colorPrimaryText, #002C8C) !important;
-          border: 1px solid var(--colorLinkActive, #0958D9) !important;
-          color: #FFFFFF !important;
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-        }
-        .modal-adicionar-btn .anticon {
-          color: #FFFFFF !important;
-        }
-
-        /* Estado desabilitado do botão Adicionar ao cargo: todo cinza */
-        .modal-adicionar-btn.ant-btn-disabled,
-        .modal-adicionar-btn[disabled],
-        .modal-adicionar-btn.ant-btn-disabled:hover,
-        .modal-adicionar-btn.ant-btn-disabled:focus {
-          background-color: #f5f5f5 !important;
-          border-color: #d9d9d9 !important;
-          color: rgba(0, 0, 0, 0.25) !important;
-          opacity: 1 !important;
-        }
-        .modal-adicionar-btn.ant-btn-disabled .anticon,
-        .modal-adicionar-btn[disabled] .anticon {
-          color: rgba(0, 0, 0, 0.25) !important;
-        }
-        .modal-adicionar-btn.ant-btn-disabled .modal-adicionar-label,
-        .modal-adicionar-btn[disabled] .modal-adicionar-label {
-          color: rgba(0, 0, 0, 0.25) !important;
-        }
-
-        /* Label do botão Adicionar ao cargo */
-        .modal-adicionar-label {
-          width: 126px;
-          height: 22px;
-          opacity: 1;
-          display: inline-block;
-          font-family: 'Open Sans';
-          font-weight: 600;
-          font-style: normal;
-          font-size: 14px;
-          line-height: 22px;
-          letter-spacing: 0%;
-          text-align: center;
-          color: #FFFF; /* garante contraste sobre background branco */
-        }
-
-        /* Labels dos radios Calculada e Digitadas */
-        .modal-radio-label {
-          width: 61px;
-          height: 22px;
-          opacity: 1;
-          font-family: 'Open Sans';
-          font-weight: 400;
-          font-style: normal;
-          font-size: 14px;
-          line-height: 22px;
-          letter-spacing: 0%;
-          color: var(--Text-neutral-color-text, #000000E0);
-        }
-
-        /* Labels Autorizações Digitadas e Candidatos Convocados */
-        .modal-section-label {
-          width: 166px;
-          height: 22px;
-          opacity: 1;
-          font-family: 'Inter';
-          font-weight: 600;
-          font-style: normal;
-          font-size: 14px;
-          line-height: 22px;
-          letter-spacing: 0%;
-          vertical-align: middle;
-          color: #515151;
-        }
-      `}</style>
+      <GlobalStyles />
       <Modal
         open={visible}
         onCancel={onClose}
@@ -526,26 +249,18 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
         width={900}
         centered
         destroyOnHidden
-        style={{ 
-          maxWidth: '100vw',
-          maxHeight: '100vh'
-        }}
+        style={modalInlineStyles.modalMaxSize}
       >
-        <div style={{ padding: '1rem 0.5rem 0.5rem 0.5rem', width: '100%', height: 'auto', minHeight: '500px', display: 'flex', flexDirection: 'column' }}>
+        <div style={modalInlineStyles.mainContainer}>
         <ModalTitle>
-          <Title level={3} style={{ marginTop: '-0.1rem', textAlign: 'left' }}>
+          <Title level={3} style={modalInlineStyles.titleStyle}>
             Buscar candidatos
           </Title>
         </ModalTitle>
 
-        <div style={{ 
-          backgroundColor: '#f5f5f5', 
-          padding: '1rem', 
-          borderRadius: '6px',
-          marginBottom: '1.5rem'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-            <div style={{ flex: 1 }}>
+        <div style={modalInlineStyles.infoSection}>
+          <div style={modalInlineStyles.infoContainer}>
+            <div style={modalInlineStyles.infoItem}>
               <div style={modalStyles.infoSectionLabel}>
                 Concurso
               </div>
@@ -553,7 +268,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
                 {concurso}
               </div>
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={modalInlineStyles.infoItem}>
               <div style={modalStyles.infoSectionLabel}>
                 Cargo
               </div>
@@ -561,7 +276,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
                 {cargo}
               </div>
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={modalInlineStyles.infoItem}>
               <div style={modalStyles.infoSectionLabel}>
                 Vagas
               </div>
@@ -572,8 +287,8 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
           </div>
         </div>
 
-        <div style={{ marginTop: '0.5rem', marginBottom: '1.5rem' }}>
-          <Text strong style={{ display: 'block', marginBottom: '0.5rem', fontSize: '14px' }}>
+        <div style={modalInlineStyles.convocacaoSection}>
+          <Text strong style={modalInlineStyles.convocacaoLabel}>
             Tipo de convocação
           </Text>
           <Radio.Group 
@@ -585,28 +300,13 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
           </Radio.Group>
         </div>
 
-        <div style={{ 
-          backgroundColor: '#f5f5f5', 
-          padding: '1rem', 
-          borderRadius: '6px',
-          marginBottom: '1.5rem'
-        }}>
+        <div style={modalInlineStyles.infoSection}>
           {/* Primeira linha - Autorizações Digitadas */}
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            marginBottom: '1rem'
-          }}>
-            <div style={{ 
-              fontWeight: 'bold', 
-              color: '#333', 
-              fontSize: '14px',
-              marginRight: '2rem',
-              minWidth: '150px'
-            }}>
+          <div style={modalInlineStyles.inputsRow}>
+            <div style={modalInlineStyles.inputsLabel}>
               <span className="modal-section-label">Autorizações Digitadas:</span>
             </div>
-            <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+            <div style={modalInlineStyles.inputsContainer}>
               <div style={modalStyles.actionButtonContainer}>
                 <input
                   type="text"
@@ -662,20 +362,11 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
           </div>
 
           {/* Segunda linha - Vagas utilizadas */}
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center'
-          }}>
-            <div style={{ 
-              fontWeight: 'bold', 
-              color: '#333', 
-              fontSize: '14px',
-              marginRight: '2rem',
-              minWidth: '150px'
-            }}>
+          <div style={modalInlineStyles.vagasRow}>
+            <div style={modalInlineStyles.inputsLabel}>
               <span className="modal-section-label">Vagas utilizadas:</span>
             </div>
-            <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+            <div style={modalInlineStyles.inputsContainer}>
               <span style={modalStyles.totalVagasStyle}>
                 {totalAutorizacoes} de {vagasIsLoading ? '...' : totalVagas} vagas
               </span>
@@ -684,7 +375,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
           
           {/* Mensagem de erro se total exceder vagas disponíveis */}
           {isTotalExcedido && (
-            <div style={{ marginTop: '8px', marginLeft: '150px' }}>
+            <div style={modalInlineStyles.errorContainer}>
               <span style={modalStyles.errorMessage}>
                 Total de vagas excedido.
               </span>
@@ -694,7 +385,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
 
 
         <ButtonContainer>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', marginBottom: '1rem'}}>
+          <div style={modalInlineStyles.buttonsContainer}>
             <Button
               className="modal-buscar-btn modal-action-btn"
               size="large"
@@ -706,7 +397,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
           </div>
 
           {mostrarTabelaCandidatos && (
-            <div style={{ marginTop: '0rem', marginBottom: '1rem', width: '100%' }}>
+            <div style={modalInlineStyles.tableContainer}>
               <Text strong style={modalStyles.listTitle}>
                 Lista de Convocados por autorizações {tipoConvocacao === 'calculada' ? 'calculadas' : 'digitadas'}
               </Text>
@@ -733,8 +424,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
                       cell: (props: any) => (
                         <th {...props} style={{ 
                           ...props.style, 
-                          height: '38px',
-                          padding: '8px 16px'
+                          ...modalInlineStyles.tableHeaderCell
                         }} />
                       ),
                     },
@@ -750,7 +440,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
                   }}
                   locale={{
                     emptyText: (
-                      <div style={{ ...modalStyles.emptyState, color: '#8C8C8C' }}>
+                      <div style={{ ...modalStyles.emptyState, ...modalInlineStyles.emptyStateCustom }}>
                         Nenhum candidato encontrado
                       </div>
                     )
@@ -766,24 +456,14 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
             </div>
           )}
           
-          <Divider style={{ 
-            margin: "75px 0 0px 0",
-            width: "100%",
-            height: "0px",
-            opacity: 1,
-            borderWidth: "1px",
-            border: "1px solid #F0F0F0"
-          }} />
+          <Divider style={modalInlineStyles.finalDivider} />
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1rem', width: '100%', marginTop: '0.5rem' }}>
+          <div style={modalInlineStyles.finalButtonsContainer}>
             <Button
               onClick={onClose}
               size="large"
               className="modal-action-btn modal-cancel-btn"
-              style={{
-                borderColor: '#05409A',
-                color: '#05409A'
-              }}
+              style={modalInlineStyles.cancelButton}
             >
               <span className="modal-cancel-label">Cancelar</span>
             </Button>

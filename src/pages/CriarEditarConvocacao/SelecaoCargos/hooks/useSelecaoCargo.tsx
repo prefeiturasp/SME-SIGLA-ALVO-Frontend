@@ -28,7 +28,6 @@ export type VagasInfo = {
 export const useSelecaoCargo = () => {
   const { uuid } = useParams<{ uuid: string }>();
   
-  console.log('uuid', uuid);
   const [cargoSelecionado, setCargoSelecionado] = useState<string | undefined>();
   const [cargosDisponiveis, setCargosDisponiveis] = useState<CargosDisponiveisOption[]>([]);
   const [modalSelecionarCandidatosVisible, setModalSelecionarCandidatosVisible] = useState(false);
@@ -44,9 +43,7 @@ export const useSelecaoCargo = () => {
 
   // Popular select de cargos quando os dados forem carregados
   useEffect(() => {
-    console.log('concursoData', concursoData);
     if (concursoData?.cargos) {
-      console.log('concursoData.cargos', concursoData.cargos);
       setCargosDisponiveis(concursoData.cargos.map((cargo: any) => ({
         value: cargo.uuid,
         label: cargo.nome,

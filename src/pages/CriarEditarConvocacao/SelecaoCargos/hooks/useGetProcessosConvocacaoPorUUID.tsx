@@ -3,7 +3,6 @@ import { API } from "../../../../services";
 import type { AxiosRequestConfig } from "axios";
 
 const useGetProcessosConvocacaoPorUUID = (uuid: string, axiosRequestConfig?: AxiosRequestConfig) => {
-  console.log('uuid', uuid);
   const { data: processoConvocacaoData, isLoading: processoConvocacaoIsLoading } = useQuery({
     queryKey: ["getProcessoConvocacaoPorUUID", uuid],
     queryFn: ({ signal }) =>
@@ -16,7 +15,6 @@ const useGetProcessosConvocacaoPorUUID = (uuid: string, axiosRequestConfig?: Axi
     enabled: !!uuid, // Só executa se uuid não for vazio/undefined
   });
 
-  console.log('processoConvocacaoData', processoConvocacaoData);
   return {
     processoConvocacaoData,
     processoConvocacaoIsLoading,

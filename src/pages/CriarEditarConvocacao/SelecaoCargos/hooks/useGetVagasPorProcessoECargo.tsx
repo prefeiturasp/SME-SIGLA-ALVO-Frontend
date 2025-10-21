@@ -30,7 +30,7 @@ export const useGetVagasPorProcessoECargo = (
       vagasRefetch();
     }
   };
-  console.log("Dota 2")
+  
   return {
     vagasData,
     vagasIsLoading,
