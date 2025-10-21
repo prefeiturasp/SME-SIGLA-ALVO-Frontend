@@ -74,7 +74,7 @@ describe('ConvocacaoTable', () => {
     await user.click(editButton as HTMLElement);
 
     // Check if navigate was called with the correct path
-    expect(mockNavigate).toHaveBeenCalledWith('editar', expect.objectContaining({
+    expect(mockNavigate).toHaveBeenCalledWith('/processos/convocacao/nova/uuid-1/selecao-cargos', expect.objectContaining({
       state: expect.objectContaining({ editData: expect.any(Object) })
     }));
   });
