@@ -6,6 +6,7 @@ import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
   getProcessosConvocacao: () => `/api/v1/processos-convocacao/`,
+  getProcessoConvocacaoPorUUID: (uuid: string) => `/api/v1/processos-convocacao/${uuid}/`,
   getConcursosOptions: () => `/api/v1/processos-convocacao/filtros/`,
   postProcessoConvocacao: () => `/api/v1/processos-convocacao/`,
   getProcessosConvocacaoOptions: () => `/api/v1/processos-convocacao/?formato=select`,
@@ -28,6 +29,28 @@ export const getProcessosConvocacao = (
     .get<PaginatedResponse<IProcessoConvocacao>>(URL.getProcessosConvocacao(), {
       params: { ...pagination, ...filters, ...rest },
       paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getProcessoConvocacaoPorUUID = (
+  uuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  console.log('uuid', uuid);
+  console.log('URL.getProcessoConvocacaoPorUUID(uuid)', URL.getProcessoConvocacaoPorUUID(uuid));
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .get<IProcessoConvocacao>(URL.getProcessoConvocacaoPorUUID(uuid), {
       signal,
       ...axiosRequestConfig,
     })

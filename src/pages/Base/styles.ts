@@ -360,20 +360,15 @@ export const SidePanelTitle = styled(Typography.Title)`
 `;
 
 export const PageTitle = styled(Typography.Text)`
-
-  
-  
   border-left: 3px solid #FF8048;
-color: #1C1D22;
-
-font-size: 24px;
-font-style: normal;
-font-weight: 600;
-line-height: normal;
-
-  padding-left:15px;
-
-  
+  color: #515151;
+  font-family: 'Open Sans';
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: 0%;
+  padding-left: 15px;
 `;
 
 export const PageContentContainer = styled.div<{ $bgColor?: string; $borderRadius?: number }>`

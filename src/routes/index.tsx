@@ -17,7 +17,7 @@ import EsqueceuSenhaSucesso from "../pages/Login/EsqueceuSenhaSucesso";
 import NovaSenhaTela from "../pages/Login/NovaSenhaTela";
 import RouteError from "./RouteError";
 import DadosDoProcesso from "../pages/CriarEditarConvocacao/DadosDoProcesso";
-import SelecaoCargos from "../pages/CriarEditarConvocacao/SelecaoCargos";
+import SelecaoCargosTela from "../pages/CriarEditarConvocacao/SelecaoCargos/SelecaoCargosTela";
 import Agenda from "../pages/CriarEditarConvocacao/Agenda";
 import Resumo from "../pages/CriarEditarConvocacao/Resumo";
 
@@ -61,8 +61,8 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },  
   {
-    path: "/processos/convocacao/nova/selecao-cargos",
-    element: <SelecaoCargos />,
+    path: "/processos/convocacao/nova/:uuid/selecao-cargos",
+    element: <SelecaoCargosTela />,
     errorElement: <RouteError />,
   },  
   {

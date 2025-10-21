@@ -147,7 +147,7 @@ export const useNovaConvocacaoCandidatos = () => {
       const result = await postProcessoConvocacaoMutation.mutateAsync(payload);
       console.log("Processo de convocação criado com sucesso:", result);
       reset(defaultValues);
-      return true;
+      return result;
     } catch (error) {
       console.error("Erro ao criar processo de convocação:", error);
       return false;

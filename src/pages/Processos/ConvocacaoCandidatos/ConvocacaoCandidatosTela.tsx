@@ -7,10 +7,6 @@ import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
 import { useNavigate } from "react-router-dom";
 import {
   PageContainer,
-  HeaderContainer,
-  TitleContainer,
-  OrangeAccentBar,
-  PageTitle,
   ActionButton,
   NovaConvocacaoButton,
   ConteudoPagina,
@@ -61,33 +57,28 @@ const ConvocacaoCandidatosTela: React.FC = () => {
     <PageContainer>
       <BaseTela
         breadcrumbItems={breadcrumbItems}
-        title={
-          <HeaderContainer>
-            <TitleContainer>
-              <OrangeAccentBar />
-              <PageTitle>Lista de Convocações</PageTitle>
-            </TitleContainer>
-            <ButtonGroup>
-              <ActionButton
-                type="primary"
-                size="large"
-                ghost={true}
-                icon={<UserSwitchOutlined />}
-                onClick={() => navigate("/processos/gerenciamento-vagas")}
-              >
-                Gerenciamento de vagas
-              </ActionButton>
-              <NovaConvocacaoButton
-                type="primary"
-                size="large"
-                icon={<UsergroupAddOutlined />}
-                disabled={!concursosOptions}
-                onClick={() => navigate("/processos/convocacao/nova",{state:concursosOptions})}
-              >
-                Nova convocação
-              </NovaConvocacaoButton>
-            </ButtonGroup>
-          </HeaderContainer>
+        title="Lista de Convocações"
+        buttons={
+          <ButtonGroup>
+            <ActionButton
+              type="primary"
+              size="large"
+              ghost={true}
+              icon={<UserSwitchOutlined />}
+              onClick={() => navigate("/processos/gerenciamento-vagas")}
+            >
+              Gerenciamento de vagas
+            </ActionButton>
+            <NovaConvocacaoButton
+              type="primary"
+              size="large"
+              icon={<UsergroupAddOutlined />}
+              disabled={!concursosOptions}
+              onClick={() => navigate("/processos/convocacao/nova/dados-processo",{state:concursosOptions})}
+            >
+              Nova convocação
+            </NovaConvocacaoButton>
+          </ButtonGroup>
         }
       >
         <ConteudoPagina>

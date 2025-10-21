@@ -218,7 +218,8 @@ export const OrangeAccentBar = styled.div`
 export const PageTitle = styled.span`
   font-family: 'Open Sans';
   font-weight: 600;
-  font-size: 1.5rem;
+  font-style: normal;
+  font-size: 24px;
   line-height: 100%;
   letter-spacing: 0%;
   color: #515151;
@@ -291,6 +292,7 @@ export const ButtonGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  margin-left: auto;
 `;
 
 // Card de busca
