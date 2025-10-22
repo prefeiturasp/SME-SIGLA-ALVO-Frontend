@@ -1,27 +1,34 @@
 import React from "react";
-import {
-  Button,
-  Steps,
-  theme,
-  Typography,
-} from "antd";
+import { Button, Collapse, Steps, theme, Typography } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-import {
-  UserSwitchOutlined,
-} from "@ant-design/icons";
+import { UserSwitchOutlined } from "@ant-design/icons";
 import { StepActions } from "./components/StepActions";
 import { items, steps } from "./components/StepsNames";
 import { StyledCardWithoutBorder } from "../../components/EstilosCompartilhados";
+import ResumoDoProcesso from "./components/ResumoDoProcesso";
+import ResumoCandidatosTable from "./components/ResumoCandidatosTable";
+import { useAgenda } from "../../hooks/useAgenda";
+import useConvocacaoById from "../Processos/ConvocacaoCandidatos/hooks/useConvocacaoById";
+import { usePatchProcessoConvocacao } from "../Processos/NovaConvocacaoCandidatos/hooks/usePatchProcessoConvocacao";
+import type { IAgenda, ICandidatosClassificados } from "../../services/resources/agenda/IAgenda";
 
 const { Text } = Typography;
 
 const Resumo: React.FC = () => {
   const { token } = theme.useToken();
 
+  const { uuid } = useParams<{ uuid: string }>();
   const navigate = useNavigate();
-  const isEdit = false;
+
+  const { agendaData, agendaIsLoading } = useAgenda(uuid as string);
+
+  const { processoConvocacaoData, processoConvocacaoIsLoading } =
+    useConvocacaoById(uuid as string);
+  // de onde vem o cargo tem que ser varias tabelas ? rodar no wire mock
+  const patchProcessoConvocacaoMutation = usePatchProcessoConvocacao();
+
   const breadcrumbItems = [
     {
       title: (
@@ -57,45 +64,53 @@ const Resumo: React.FC = () => {
       ),
     },
     {
-      title: isEdit ? "Editar Convocação" : "Nova Convocação",
+      title: "Editar Convocação",
     },
   ] as TitleItem[];
 
-  //ESCOLHE O STEP DEPENDENDO DO QUE JÁ FOI PREENCHIDO EM   EditData
+  const current = 3;
 
-  const current=3;
-  const next = () => {
-    console.log('next')
+  const next = async () => {
+    patchProcessoConvocacaoMutation.mutate(
+      { uuid: uuid as string, payload: { status: "EM_ANDAMENTO" } },
+      {
+        onSuccess: () => {
+          navigate(`/processos/convocacao/`);
+        },
+      }
+    );
   };
 
   const prev = () => {
-    navigate('/processos/convocacao/nova/agenda')    
+    navigate(`/processos/convocacao/editar/${uuid}/agenda`);
   };
 
-  
-
-  
-
-  const contentStyle: React.CSSProperties = {
-    lineHeight: "300px",
-    textAlign: "center",
-
-    borderRadius: token.borderRadiusLG,
-
-    marginTop: 20,
-  };
-
-  // editData
   return (
     <>
       <BaseTela
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
         buttons={
-          <Button style={{fontWeight:'400'}} color="primary" variant="outlined" icon={<UserSwitchOutlined />}>Gerenciamento de vagas</Button>
+          <Button
+            style={{ fontWeight: "400" }}
+            color="primary"
+            variant="outlined"
+            icon={<UserSwitchOutlined />}
+          >
+            Gerenciamento de vagas
+          </Button>
         }
       >
-        <StyledCardWithoutBorder title="Processo de convocação de candidatos" variant="borderless">
+        <StyledCardWithoutBorder
+          title={
+            <Text
+              style={{ fontWeight: "400", color: token.colorTextSecondary }}
+            >
+              Processo de convocação de candidatos
+            </Text>
+          }
+          variant="borderless"
+        >
           <Steps current={current} items={items} />
         </StyledCardWithoutBorder>
 
@@ -104,7 +119,36 @@ const Resumo: React.FC = () => {
           title={steps[current].title}
           variant="borderless"
         >
-          <div style={contentStyle}>{"escreva seu componente aqui"}</div>
+          {processoConvocacaoData && (
+            <ResumoDoProcesso
+              data={processoConvocacaoData}
+              isLoading={processoConvocacaoIsLoading}
+            />
+          )}
+        </StyledCardWithoutBorder>
+
+        <StyledCardWithoutBorder
+          style={{ marginTop: "1.25rem" }}
+          variant="borderless"
+        >
+            <Collapse
+              size="large"
+              defaultActiveKey={['0']}
+              items={agendaData.map((agenda, index: number) => (
+                 {
+                  key: index,
+                  label: agenda.cargo_nome,
+                  children: (
+                    <ResumoCandidatosTable
+                      title={agenda.cargo_nome}
+                      loading={agendaIsLoading}
+                      data={agenda?.candidatos_classificados || []}
+                    />
+                  )
+                }
+              )) || []}
+            />
+          
 
           <StepActions
             current={current}

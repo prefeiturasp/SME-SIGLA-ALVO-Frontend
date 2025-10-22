@@ -33,11 +33,11 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
   const navigate = useNavigate();
   
   const handleEdit = (editData: IProcessoConvocacao) => {    
-    navigate(`editar`, {state:{editData}});
+    navigate(`editar/${editData.uuid}/dados-processo`, {state:{editData}});
   };
 
   const handleView = (viewData: IProcessoConvocacao) => {    
-    navigate(`editar`, {state:{editData: viewData, isViewMode: true}});
+    navigate(`editar/${viewData.uuid}/dados-processo`, {state:{editData: viewData, isViewMode: true}});
   };
 
   const isProcessoFinalizado = (status: string | undefined) => {

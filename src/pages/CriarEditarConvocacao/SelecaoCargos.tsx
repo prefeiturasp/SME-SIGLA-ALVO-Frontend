@@ -27,7 +27,8 @@ const SelecaoCargos: React.FC = () => {
   const {    
     isEdit,    
     editData,
-    } = useNovaConvocacaoCandidatos();
+    uuid,
+    } = useNovaConvocacaoCandidatos();  
   const breadcrumbItems = [
     {
       title: (
@@ -71,12 +72,12 @@ const SelecaoCargos: React.FC = () => {
 
   const current=1;
   const next = () => {
-    navigate('/processos/convocacao/nova/agenda')
+    navigate(`/processos/convocacao/editar/${uuid}/agenda`)
     
   };
 
   const prev = () => {
-    navigate('/processos/convocacao/nova/dados-processo', {state:{editData: editData, isViewMode: false}});
+    navigate(`/processos/convocacao/editar/${uuid}/dados-processo`, {state:{editData: editData, isViewMode: false}});
   };
 
   
@@ -102,7 +103,7 @@ const SelecaoCargos: React.FC = () => {
           <Button style={{fontWeight:'400'}} color="primary" variant="outlined" icon={<UserSwitchOutlined />}>Gerenciamento de vagas</Button>
         }
       >
-        <StyledCardWithoutBorder title="Processo de convocação de candidatos" variant="borderless">
+        <StyledCardWithoutBorder title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
           <Steps current={current} items={items} />
         </StyledCardWithoutBorder>
 

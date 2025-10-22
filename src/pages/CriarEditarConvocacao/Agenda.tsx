@@ -7,7 +7,7 @@ import {
   Typography,
 } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import {
   UserSwitchOutlined,
@@ -20,7 +20,7 @@ const { Text } = Typography;
 
 const Agenda: React.FC = () => {
   const { token } = theme.useToken();
-
+  const { uuid } = useParams<{ uuid: string;}>();
   const navigate = useNavigate();
   const isEdit = false;
   const breadcrumbItems = [
@@ -66,12 +66,13 @@ const Agenda: React.FC = () => {
 
   const current=2;
   const next = () => {
-    navigate('/processos/convocacao/nova/resumo')
-    
+
+    navigate(`/processos/convocacao/editar/${uuid}/resumo`)
+
   };
 
   const prev = () => {
-    navigate('/processos/convocacao/nova/selecao-cargos')    
+    navigate(`/processos/convocacao/editar/${uuid}/selecao-cargos`)    
   };
   
 
@@ -96,7 +97,7 @@ const Agenda: React.FC = () => {
           <Button style={{fontWeight:'400'}} color="primary" variant="outlined" icon={<UserSwitchOutlined />}>Gerenciamento de vagas</Button>
         }
       >
-        <StyledCardWithoutBorder title="Processo de convocação de candidatos" variant="borderless">
+        <StyledCardWithoutBorder title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
           <Steps current={current} items={items} />
         </StyledCardWithoutBorder>
 

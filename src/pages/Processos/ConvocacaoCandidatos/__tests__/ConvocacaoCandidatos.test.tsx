@@ -106,10 +106,10 @@ describe('ConvocacaoCandidatos', () => {
 
     renderComponent();
 
-    const novaBtn = screen.getByRole('button', { name: /nova convocação/i });
+    const novaBtn = screen.getByRole('button', { name: /criar convocação/i });
     await user.click(novaBtn);
 
-    expect(mockNavigate).toHaveBeenCalledWith('/processos/convocacao/nova', { state: concursosOptions });
+    expect(mockNavigate).toHaveBeenCalledWith('/processos/convocacao/criar', { state: concursosOptions });
   });
 
   it('chama handleSub ao clicar em Pesquisar', async () => {
@@ -202,7 +202,7 @@ describe('ConvocacaoCandidatos', () => {
     renderComponent();
     
     // Verifica se os botões estão presentes
-    expect(screen.getByRole('button', { name: /nova convocação/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /criar convocação/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /limpar filtros/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /pesquisar/i })).toBeInTheDocument();
   });

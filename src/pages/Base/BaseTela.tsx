@@ -221,7 +221,11 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
         <StyledContent
           style={{ marginLeft: isSidePanelOpen ? "23.4375rem" : "8.625rem" }}
         >
-          <Row align={"middle"} justify={"space-between"} style={{margin: '0 0 2rem 0'}}>
+          <Row
+            align={"middle"}
+            justify={"space-between"}
+            style={{ margin: "0 0 2rem 0" }}
+          >
             <Col>
               <PageTitle>{title}</PageTitle>
             </Col>
@@ -238,14 +242,12 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
               {children}
             </Suspense>
           </PageContentContainer>
-
         </StyledContent>
       </Layout>
 
-
-      <StyledFooter style={{marginRight:'2.5rem'}}  >
-            Sistema Alvo - Versão: 1.0.33.01 - Todos os direitos reservados
-          </StyledFooter>
+      <StyledFooter style={{ marginRight: "2.5rem" }}>
+        Sistema Alvo - Versão: 1.0.33.01 - Todos os direitos reservados
+      </StyledFooter>
     </StyledLayout>
   );
 };

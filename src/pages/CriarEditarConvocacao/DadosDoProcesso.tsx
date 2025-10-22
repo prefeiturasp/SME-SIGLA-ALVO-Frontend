@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Steps, Typography } from "antd";
+import { Button, Steps, theme, Typography } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
 
@@ -14,6 +14,7 @@ const { Text } = Typography;
 
 const DadosDoProcesso: React.FC = () => {
   
+  const { token } = theme.useToken();
 
   const navigate = useNavigate();
 
@@ -27,7 +28,7 @@ const DadosDoProcesso: React.FC = () => {
     handleSub,        
     isEdit,
     isViewMode,
-    formErrors    
+    formErrors,  
     } = useNovaConvocacaoCandidatos();
   const breadcrumbItems = [
     {
@@ -74,9 +75,8 @@ const DadosDoProcesso: React.FC = () => {
     
     await handleSubmit(async (formData) => {
       const result = await handleSub(formData);
-      
-      if (result) {
-         navigate(`/processos/convocacao/nova/${result.uuid}/selecao-cargos`, {state:{editData: {...formData, concurso_uuid:formData.concurso}, isViewMode: false}});
+      if (result && typeof result === 'object' && 'uuid' in result) {
+        navigate(`/processos/convocacao/editar/${result.uuid}/selecao-cargos`, {state:{editData: result, isViewMode: false}});         
       }
     })();
   };
@@ -108,10 +108,7 @@ const DadosDoProcesso: React.FC = () => {
           </Button>
         }
       >
-        <StyledCardWithoutBorder
-          title="Processo de convocação de candidatos"
-          variant="outlined"
-        >
+        <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
           <Steps current={current} items={items} />
         </StyledCardWithoutBorder>
 

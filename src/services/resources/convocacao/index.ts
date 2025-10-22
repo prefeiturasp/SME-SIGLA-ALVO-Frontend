@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosProcessoConvocacao } from "../../axios";
-import type { ISample, IProcessoConvocacao, IPostProcessoConvocacaoPayload } from "./IConvocacao";
+import type { ISample, IProcessoConvocacao, IPostProcessoConvocacaoPayload, IProcessoConvocacaoResumo } from "./IConvocacao";
 import type { IBackendWithSubOptions, IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
@@ -9,6 +9,8 @@ export const URL = {
   getProcessoConvocacaoPorUUID: (uuid: string) => `/api/v1/processos-convocacao/${uuid}/`,
   getConcursosOptions: () => `/api/v1/processos-convocacao/filtros/`,
   postProcessoConvocacao: () => `/api/v1/processos-convocacao/`,
+  patchProcessoConvocacao: (uuid: string) => `/api/v1/processos-convocacao/${uuid}/`,
+  getProcessoConvocacaoById:(uuid: string) => `/api/v1/processos-convocacao/${uuid}/`,
   getProcessosConvocacaoOptions: () => `/api/v1/processos-convocacao/?formato=select`,
   getCargos: () => `/api/v1/cargos/`,
   getCargosPorConcurso: (concursoUuid: string) => `/api/v1/cargos/concurso/${concursoUuid}/`,
@@ -69,6 +71,46 @@ export const postProcessoConvocacao = (
 
   const response = appAxiosProcessoConvocacao
     .post<IProcessoConvocacao>(URL.postProcessoConvocacao(), payload, {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+export const patchProcessoConvocacao = (
+  uuid: string,
+  payload: Partial<IPostProcessoConvocacaoPayload>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .patch<IProcessoConvocacao>(URL.patchProcessoConvocacao(uuid), payload, {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getProcessoConvocacaoById = (
+  uuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .get<IProcessoConvocacaoResumo>(URL.getProcessoConvocacaoById(uuid), {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })

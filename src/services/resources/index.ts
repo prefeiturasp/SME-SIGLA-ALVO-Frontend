@@ -4,4 +4,4 @@ export * as Concursos from "./concursos";
 export * as Candidatos from "./candidatos";
 export * as ImportacaoDados from "./importacaoDados";   
 export * as Escolhas from "./escolhas";
- 
+export * as Agenda from "./agenda";

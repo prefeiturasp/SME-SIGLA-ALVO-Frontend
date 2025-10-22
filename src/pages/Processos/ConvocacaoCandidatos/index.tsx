@@ -51,7 +51,7 @@ const ConvocacaoCandidatos: React.FC = () => {
             size="large"
             icon={<PlusOutlined />}
             disabled={!concursosOptions}
-            onClick={() => navigate("/processos/convocacao/nova",{state:concursosOptions})}
+            onClick={() => navigate("/processos/convocacao/criar",{state:concursosOptions})}
           >
             Nova convocação
           </Button>
