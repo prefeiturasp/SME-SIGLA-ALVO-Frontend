@@ -66,7 +66,7 @@ export const appAxiosConcursos = axios.create({
 addAuthInterceptor(appAxiosConcursos);
 
 export const appAxiosCandidatos = axios.create({
-  baseURL: getEnv("CANDIDATOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos"),
+  baseURL: getEnv("CANDIDATOS_API_URL","https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos"),
 });
 addAuthInterceptor(appAxiosCandidatos);
 
@@ -84,3 +84,8 @@ export const appAxiosEscolhas = axios.create({
   baseURL: getEnv("ESCOLHAS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-escolha"),
 });
 addAuthInterceptor(appAxiosEscolhas);
+
+export const appAxiosAgenda = axios.create({
+  baseURL: getEnv("AGENDA_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-agenda"),
+});
+addAuthInterceptor(appAxiosAgenda);

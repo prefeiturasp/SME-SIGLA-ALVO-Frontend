@@ -172,5 +172,6 @@ export const useSelecaoCargo = () => {
     vagasInfo,
     handleEditarCargo,
     handleExcluirCargo,
+    uuid
   };
 };

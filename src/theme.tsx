@@ -14,7 +14,9 @@ export const theme = {
     colorTextLightSolid: "#ffffff",
     colorError: "#DB001B",
     // colorBgLayout: "#FAFAFA",
-    colorTextDescription: "#161718",
+    colorText: "#1C1D22",
+    colorTextSecondary: "#515151",
+    colorTextDescription: "rgba(81, 81, 81, 0.80);",
     fontSize: 16,
     fontWeightStrong: 600,
     fontWeight: 400,
@@ -36,6 +38,7 @@ export const theme = {
       headerSplitColor: "transparent",
       rowBg: "#FFFFFF",
       rowSelectedBg: "#F6F6F6",
+      // footerTextColor:  "#1C1D22",
     },
     Pagination: {
       colorPrimary: "#ffffff",

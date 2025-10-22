@@ -61,6 +61,7 @@ const SelecaoCargos: React.FC = () => {
     vagasInfo,
     handleEditarCargo,
     handleExcluirCargo,
+    uuid,
   } = useSelecaoCargo();
 
 
@@ -105,14 +106,19 @@ const SelecaoCargos: React.FC = () => {
   ] as TitleItem[];
 
   const current=1;
+ 
   const next = () => {
-    navigate('/processos/convocacao/nova/agenda')
-    
+
+    navigate(`/processos/convocacao/editar/${uuid}/agenda`)
+
   };
 
   const prev = () => {
-    navigate('/processos/convocacao/nova/dados-processo')    
+    navigate(`/processos/convocacao/editar/${uuid}/dados-processo`)    
   };
+  
+
+
 
   const formatDate = (value?: string) => {
     if (!value) return '—';

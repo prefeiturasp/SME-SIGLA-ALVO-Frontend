@@ -12,7 +12,11 @@ import {
   ConteudoPagina,
   TituloPagina,
   TableContainer,
-  ButtonGroup
+  ButtonGroup,
+  HeaderContainer,
+  TitleContainer,
+  OrangeAccentBar,
+  PageTitle
 } from "./style";
 
 const { Text } = Typography;
@@ -57,28 +61,33 @@ const ConvocacaoCandidatosTela: React.FC = () => {
     <PageContainer>
       <BaseTela
         breadcrumbItems={breadcrumbItems}
-        title="Lista de Convocações"
-        buttons={
-          <ButtonGroup>
-            <ActionButton
-              type="primary"
-              size="large"
-              ghost={true}
-              icon={<UserSwitchOutlined />}
-              onClick={() => navigate("/processos/gerenciamento-vagas")}
-            >
-              Gerenciamento de vagas
-            </ActionButton>
-            <NovaConvocacaoButton
-              type="primary"
-              size="large"
-              icon={<UsergroupAddOutlined />}
-              disabled={!concursosOptions}
-              onClick={() => navigate("/processos/convocacao/nova/dados-processo",{state:concursosOptions})}
-            >
-              Nova convocação
-            </NovaConvocacaoButton>
-          </ButtonGroup>
+        title={
+          <HeaderContainer>
+            <TitleContainer>
+              <OrangeAccentBar />
+              <PageTitle>Lista de Convocações</PageTitle>
+            </TitleContainer>
+            <ButtonGroup>
+              <ActionButton
+                type="primary"
+                size="large"
+                ghost={true}
+                icon={<UserSwitchOutlined />}
+                onClick={() => navigate("/processos/gerenciamento-vagas")}
+              >
+                Gerenciamento de vagas
+              </ActionButton>
+              <NovaConvocacaoButton
+                type="primary"
+                size="large"
+                icon={<UsergroupAddOutlined />}
+                disabled={!concursosOptions}
+                onClick={() => navigate("/processos/convocacao/dados-processo/criar",{state:concursosOptions})}
+              >
+                Nova convocação
+              </NovaConvocacaoButton>
+            </ButtonGroup>
+          </HeaderContainer>
         }
       >
         <ConteudoPagina>
