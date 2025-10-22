@@ -10,10 +10,11 @@ import { Button, Row, Typography } from "antd";
 import type { ICandidatosClassificados } from "../../../services/resources/agenda/IAgenda";
 
 
-interface ResumoCandidatosTableProps extends TableProps<ICandidatosClassificados> {
+interface ResumoCandidatosTableProps extends TableProps {
   data: ICandidatosClassificados[];
+  title: string;
 }
-const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, ...rest }) => {
+const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, title, ...rest }) => {
   
   
 
@@ -53,7 +54,7 @@ const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, ...
     <>
 
       <CustomTitle level={4} style={{ margin: "1rem 0 1rem 1rem " }}>
-        {"Cargo: PROF. FUND. II E MÉDIO - BIOLOGIA"}
+        {title}
       </CustomTitle>
 
 

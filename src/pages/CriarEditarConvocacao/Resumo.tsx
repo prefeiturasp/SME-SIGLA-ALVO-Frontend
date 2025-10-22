@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Steps, theme, Typography } from "antd";
+import { Button, Collapse, Steps, theme, Typography } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -12,6 +12,7 @@ import ResumoCandidatosTable from "./components/ResumoCandidatosTable";
 import { useAgenda } from "../../hooks/useAgenda";
 import useConvocacaoById from "../Processos/ConvocacaoCandidatos/hooks/useConvocacaoById";
 import { usePatchProcessoConvocacao } from "../Processos/NovaConvocacaoCandidatos/hooks/usePatchProcessoConvocacao";
+import type { IAgenda, ICandidatosClassificados } from "../../services/resources/agenda/IAgenda";
 
 const { Text } = Typography;
 
@@ -25,7 +26,7 @@ const Resumo: React.FC = () => {
 
   const { processoConvocacaoData, processoConvocacaoIsLoading } =
     useConvocacaoById(uuid as string);
-
+  // de onde vem o cargo tem que ser varias tabelas ? rodar no wire mock
   const patchProcessoConvocacaoMutation = usePatchProcessoConvocacao();
 
   const breadcrumbItems = [
@@ -69,20 +70,20 @@ const Resumo: React.FC = () => {
 
   const current = 3;
 
-  const next = async () => {    
-      patchProcessoConvocacaoMutation.mutate(
-        { uuid: uuid as string, payload: { status: "EM_ANDAMENTO" } },
-        {
-          onSuccess: () => {
-            navigate(`/processos/convocacao/`);
-          },
-        }
-      );    
+  const next = async () => {
+    patchProcessoConvocacaoMutation.mutate(
+      { uuid: uuid as string, payload: { status: "EM_ANDAMENTO" } },
+      {
+        onSuccess: () => {
+          navigate(`/processos/convocacao/`);
+        },
+      }
+    );
   };
 
   const prev = () => {
-    navigate(`/processos/convocacao/editar/${uuid}/agenda`)    
-  };  
+    navigate(`/processos/convocacao/editar/${uuid}/agenda`);
+  };
 
   return (
     <>
@@ -130,10 +131,24 @@ const Resumo: React.FC = () => {
           style={{ marginTop: "1.25rem" }}
           variant="borderless"
         >
-          <ResumoCandidatosTable
-            loading={agendaIsLoading}
-            data={agendaData || []}
-          />
+            <Collapse
+              size="large"
+              defaultActiveKey={['0']}
+              items={agendaData.map((agenda, index: number) => (
+                 {
+                  key: index,
+                  label: agenda.cargo_nome,
+                  children: (
+                    <ResumoCandidatosTable
+                      title={agenda.cargo_nome}
+                      loading={agendaIsLoading}
+                      data={agenda?.candidatos_classificados || []}
+                    />
+                  )
+                }
+              )) || []}
+            />
+          
 
           <StepActions
             current={current}

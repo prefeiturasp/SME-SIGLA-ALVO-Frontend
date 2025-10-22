@@ -13,3 +13,9 @@
     processo_uuid: string;
   }
  
+  export interface IAgenda {
+    
+    cargo_nome: string;
+    candidatos_classificados: ICandidatosClassificados[];
+  }
+ 

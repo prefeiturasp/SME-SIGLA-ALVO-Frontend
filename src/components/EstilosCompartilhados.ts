@@ -302,7 +302,7 @@ export const StyledCardWithoutBorder = styled(Card)`
   padding: 1.25rem ;
 }
 .ant-card-body {
-    padding: 0rem 1.25rem 1.25rem 1.25rem;
+    padding: 1.25rem;
   }
 `;
 

@@ -28,16 +28,16 @@ const ResumoDoProcesso: React.FC<ResumoDoProcessoProps> = ({
       <Col xs={24} md={8}>
         <TextTituloCinza >Concurso</TextTituloCinza>
         <TextSubTituloCinza>{data.concurso_nome}</TextSubTituloCinza>        
-        <TextTituloCinza >Número da convocação</TextTituloCinza>
-        <TextSubTituloCinza >{data.numero_convocacao}</TextSubTituloCinza>
+        <TextTituloCinza >Data da convocação</TextTituloCinza>        
+        <TextSubTituloCinza>{data.data_convocacao ? dayjs(data.data_convocacao).format('DD/MM/YYYY') : ''}</TextSubTituloCinza>
       </Col>
 
       <Col xs={24} md={8}>
       <TextTituloCinza >Tipo de processo</TextTituloCinza>
         
         <TextSubTituloCinza>{data.tipo_escolha}</TextSubTituloCinza>
-        <TextTituloCinza >Data da convocação</TextTituloCinza>        
-        <TextSubTituloCinza>{data.data_convocacao ? dayjs(data.data_convocacao).format('DD/MM/YYYY') : ''}</TextSubTituloCinza>
+        <TextTituloCinza>Data da publicação</TextTituloCinza>        
+        <TextSubTituloCinza >{data.data_corte_vagas ? dayjs(data.data_corte_vagas).format('DD/MM/YYYY') : ''}</TextSubTituloCinza>
       </Col>
 
       <Col xs={24} md={8}>
@@ -45,8 +45,7 @@ const ResumoDoProcesso: React.FC<ResumoDoProcessoProps> = ({
         
         <TextSubTituloCinza>{data.descricao}</TextSubTituloCinza>
 
-        <TextTituloCinza>Data da publicação</TextTituloCinza>        
-        <TextSubTituloCinza >{data.data_corte_vagas ? dayjs(data.data_corte_vagas).format('DD/MM/YYYY') : ''}</TextSubTituloCinza>
+        
       </Col>
     </Row>
     </Spin>
