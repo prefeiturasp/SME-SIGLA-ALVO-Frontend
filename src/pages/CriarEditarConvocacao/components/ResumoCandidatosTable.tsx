@@ -10,9 +10,8 @@ import { Button, Row, Typography } from "antd";
 import type { ICandidatosClassificados } from "../../../services/resources/agenda/IAgenda";
 
 
-interface ResumoCandidatosTableProps extends TableProps {
+interface ResumoCandidatosTableProps extends TableProps<ICandidatosClassificados> {
   data: ICandidatosClassificados[];
-  title: string;
 }
 const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, title, ...rest }) => {
   
@@ -48,21 +47,15 @@ const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, tit
     },
   ];
 
-  const totalCandidatos = data.reduce((acc, curr) => acc + curr.qtd_candidatos, 0);
 
   return (
     <>
 
-      <CustomTitle level={4} style={{ margin: "1rem 0 1rem 1rem " }}>
-        {title}
-      </CustomTitle>
-
-
+ 
       <StyledTable
         columns={columns}
         dataSource={data}
-        rowKey={(record) => `${record.uuid}`}        
-        footer={() => <Row justify="start"><Text style={{ fontWeight: '600' }}>Total de {totalCandidatos} candidatos adicionados</Text></Row>}
+        rowKey={(record) => `${record.uuid}`}                
         pagination={false}        
         {...rest}
       />

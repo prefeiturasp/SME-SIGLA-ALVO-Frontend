@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Collapse, Steps, theme, Typography } from "antd";
+import { Button, Collapse, Space, Steps, theme, Typography } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -23,7 +23,11 @@ const Resumo: React.FC = () => {
   const navigate = useNavigate();
 
   const { agendaData, agendaIsLoading } = useAgenda(uuid as string);
-
+  const totalPorAgenda = agendaData?.map((agenda) => {
+    return agenda.candidatos_classificados.reduce((acc, candidato) => acc + candidato.qtd_candidatos, 0);
+  }) || [];
+  
+  
   const { processoConvocacaoData, processoConvocacaoIsLoading } =
     useConvocacaoById(uuid as string);
   // de onde vem o cargo tem que ser varias tabelas ? rodar no wire mock
@@ -84,7 +88,8 @@ const Resumo: React.FC = () => {
   const prev = () => {
     navigate(`/processos/convocacao/editar/${uuid}/agenda`);
   };
-
+  
+  
   return (
     <>
       <BaseTela
@@ -137,10 +142,9 @@ const Resumo: React.FC = () => {
               items={agendaData.map((agenda, index: number) => (
                  {
                   key: index,
-                  label: agenda.cargo_nome,
+                  label: <>{agenda.cargo_nome}   -   {totalPorAgenda[index] } Vagas no total</>,
                   children: (
                     <ResumoCandidatosTable
-                      title={agenda.cargo_nome}
                       loading={agendaIsLoading}
                       data={agenda?.candidatos_classificados || []}
                     />
