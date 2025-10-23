@@ -1,4 +1,4 @@
-import { Breadcrumb, Col, Row, Typography } from "antd";
+import { Breadcrumb, Col, Row, Tooltip, Typography } from "antd";
 import type { IProcessoConvocacao } from "../../services/resources/convocacao/IConvocacao";
 import React, { Suspense, useState } from "react";
 import { Layout, theme } from "antd";
@@ -167,6 +167,12 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("TOKEN");
+    localStorage.removeItem("USUARIO");
+    navigate("/login");
+  };
+
   return (
     <StyledLayout>
       <GlobalMenuWidth />
@@ -199,7 +205,9 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
             ))}
           </CustomMenu>
           <SidebarFooter>
-            <ExitToAppIcon />
+            <Tooltip title="Sair">
+              <ExitToAppIcon onClick={handleLogout} />
+            </Tooltip>
           </SidebarFooter>
         </StyledSider>
 

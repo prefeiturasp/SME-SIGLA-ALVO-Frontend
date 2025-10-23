@@ -264,8 +264,8 @@ export const ActionButton = styled(Button)`
 `;
 
 export const NovaConvocacaoButton = styled(Button)`
-  width: 12.0625rem;
-  height: 2.8125rem;
+  
+  
   gap: 0.5rem;
   opacity: 1;
   border-radius: 0.5rem;
