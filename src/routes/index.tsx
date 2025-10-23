@@ -16,6 +16,8 @@ import EsqueceuSenhaTela from "../pages/Login/EsqueceuSenhaTela";
 import EsqueceuSenhaSucesso from "../pages/Login/EsqueceuSenhaSucesso";
 import NovaSenhaTela from "../pages/Login/NovaSenhaTela";
 import RouteError from "./RouteError";
+import GerenciamentoVagasTela from "../pages/GerenciamentoVagas/GerenciamentoVagasTela";
+
 
 //TODO ADD FEATURE FLAG
 
@@ -23,6 +25,11 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <HomeTela />,
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/processos/gerenciamento-vagas",
+    element: <GerenciamentoVagasTela />,
     errorElement: <RouteError />,
   },
   {
@@ -43,6 +50,11 @@ const router = createBrowserRouter([
   {
     path: "/criar-nova-senha/:uid/:token",
     element: <NovaSenhaTela />,
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/processos/gerenciamento-vagas",
+    element: <GerenciamentoVagasTela />,
     errorElement: <RouteError />,
   },
   {

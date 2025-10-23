@@ -13,6 +13,6 @@ export interface IEscolhas {
 
 
 export interface IEscolhasFiltro {
-  processo_uuid: string;    
+  processo_uuid: string;
   cargo_codigo: string;
 }

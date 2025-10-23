@@ -56,31 +56,37 @@ const addAuthInterceptor = (axiosInstance: AxiosInstance) => {
 };
 
 export const appAxiosProcessoConvocacao = axios.create({
-  baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-convocacao"),
+  // baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-convocacao"),
+  baseURL: "http://localhost:8000",
 });
-addAuthInterceptor(appAxiosProcessoConvocacao);
+// addAuthInterceptor(appAxiosProcessoConvocacao);
 
 export const appAxiosConcursos = axios.create({
-  baseURL: getEnv("CONCURSOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos"),
+  // baseURL: getEnv("CONCURSOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos"),
+  baseURL: "http://localhost:8001",
 });
-addAuthInterceptor(appAxiosConcursos);
+// addAuthInterceptor(appAxiosConcursos);
 
 export const appAxiosCandidatos = axios.create({
-  baseURL: getEnv("CANDIDATOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos"),
+  // baseURL: getEnv("CANDIDATOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos"),
+  baseURL: "http://localhost:8002",
 });
-addAuthInterceptor(appAxiosCandidatos);
+// addAuthInterceptor(appAxiosCandidatos);
 
 export const appAxiosImportaArquivos = axios.create({
-  baseURL: getEnv("IMPORTACAO_ARQUIVOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-importa-arquivos"),
+  // baseURL: getEnv("IMPORTACAO_ARQUIVOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-importa-arquivos"),
+  baseURL: "http://localhost:8003",
 });
-addAuthInterceptor(appAxiosImportaArquivos);
+// addAuthInterceptor(appAxiosImportaArquivos);
 
 export const appAxiosAdminUsuarios = axios.create({
-  baseURL: getEnv("ADMIN_USUARIOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-admin-usuarios"),
+  // baseURL: getEnv("ADMIN_USUARIOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-admin-usuarios"),
+  baseURL: "http://localhost:8005",
 });
-addAuthInterceptor(appAxiosAdminUsuarios);
+// addAuthInterceptor(appAxiosAdminUsuarios);
 
 export const appAxiosEscolhas = axios.create({
-  baseURL: getEnv("ESCOLHAS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-escolha"),
+  // baseURL: getEnv("ESCOLHAS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-escolha"),
+  baseURL: "http://localhost:8004",
 });
-addAuthInterceptor(appAxiosEscolhas);
+// addAuthInterceptor(appAxiosEscolhas);

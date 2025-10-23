@@ -6,7 +6,7 @@ export const theme = {
     fontFamily: "Open Sans, sans-serif",
     borderRadius: 8, // substitui o borderRadius customizado
     colorBgContainer: "#FFFFFF",
-    colorBgBase: "#FFFFFF",
+    colorBgBase: "#FAFAFA",
     colorTextLightSolid: "#ffffff",
     colorError: "#DB001B",  
     colorText: "#1C1D22",
@@ -17,8 +17,12 @@ export const theme = {
     fontWeight: 400,
    },
   components: {
+    Form: {
+      labelRequiredMarkColor: "#515151",
+
+    },
     Typography: {
-      fontWeight: 700,
+      fontWeight: 400,
     },
     Layout: {
       headerBg: "#FFFFFF",
@@ -28,10 +32,11 @@ export const theme = {
       headerSplitColor: "transparent",
       rowBg: "#FFFFFF",
       rowSelectedBg: "#F6F6F6",
+      // footerTextColor:  "#1C1D22",
     },
     Pagination: {
       colorPrimary: "#ffffff",
-      itemActiveBg: "#05409A",
+      itemActiveBg: "#002C8C",
     },
     Button: {
     
@@ -74,5 +79,18 @@ export const theme = {
 
     },
     
+      Steps: {      
+      colorPrimary: "#1890FF",      
+      
+      colorTextDescription: "#00000073", // cor da descrição
+      colorText: "#515151", // cor do texto normal
+      
+       controlItemBgHover: "#F0F7FF", // fundo no hover
+
+       controlItemTextColor: "#00000073",  // 🔹 número do Step inativo
+       controlItemBgActive: "transparent", // fundo de etapas ativas transparente
+
+
+    },
   },
 };

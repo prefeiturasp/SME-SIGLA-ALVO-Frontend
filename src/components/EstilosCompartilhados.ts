@@ -201,29 +201,31 @@ export const SecondaryButton = styled(Button)`
   padding: 0 1.5rem;
   border-color: #032B68;
   color: #032B68;
-  background-color: #fff;
+  background-color: #ffffff;
   
   &:hover {
     border-color: #05409a;
     color: #05409a;
-    background-color: #fff;
+    background-color: #ffffff;
+  }
+
+  &:hover {
+    border-color: #05409a;
+    color: #05409a;
+    background-color: #ffffff;
   }
 `;
 
 
 // Botão primário personalizado
 export const PrimaryButton = styled(Button)`
-  border-radius: 0.375rem !important;
-  font-weight: 700 !important;
-  height: 2.5rem !important;
-  padding: 0 1.5rem !important;
   background-color: #032B68 !important;
   border-color: #032B68 !important;
   color: #ffffff !important;
   
   &:hover {
-    background-color: #87CEEB !important;
-    border-color: #87CEEB !important;
+    background-color: #ffffff !important;
+    border-color: #032B68 !important;
     color: #032B68 !important;
   }
   

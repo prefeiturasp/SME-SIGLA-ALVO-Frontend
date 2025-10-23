@@ -6,6 +6,7 @@ import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
   getConcursos: () => `/api/v1/concursos/?formato=select`,
+  getConcursoByUuid: (uuid: string) => `/api/v1/concursos/${uuid}/`,
 };
 
 
@@ -25,6 +26,25 @@ export const getConcursos = (
     })
     .then((response) => response.data);
 
+  return {
+    response,
+    abort,
+  };
+};
+
+export const getConcursoByUuid = (
+  uuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosConcursos
+    .get<IConcurso>(URL.getConcursoByUuid(uuid), {
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+    console.log("response", response);
   return {
     response,
     abort,

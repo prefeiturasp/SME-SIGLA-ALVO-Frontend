@@ -218,7 +218,8 @@ export const OrangeAccentBar = styled.div`
 export const PageTitle = styled.span`
   font-family: 'Open Sans';
   font-weight: 600;
-  font-size: 1.5rem;
+  font-style: normal;
+  font-size: 24px;
   line-height: 100%;
   letter-spacing: 0%;
   color: #515151;
@@ -262,39 +263,14 @@ export const ActionButton = styled(Button)`
   }
 `;
 
-<<<<<<< HEAD
-export const NovaConvocacaoButton = styled(Button)`
-  width: 12.0625rem;
-  height: 2.8125rem;
-  gap: 0.5rem;
-  opacity: 1;
-  border-radius: 0.5rem;
-  padding-right: 1rem;
-  padding-left: 1rem;
-  background-color: #002C8C;
-  border-color: #002C8C;
-  font-family: 'Open Sans';
-  font-weight: 600;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  letter-spacing: 0%;
-  vertical-align: middle;
-
-  .anticon {
-    width: 0.974375rem;
-    height: 1.034375rem;
-    opacity: 1;
-  }
-`;
-=======
  
->>>>>>> 783a655 (fetaure: 136894 adicionando melhoria de css na tela de processo de convocação)
 
 // Container para agrupar os botões
 export const ButtonGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  margin-left: auto;
 `;
 
 // Card de busca

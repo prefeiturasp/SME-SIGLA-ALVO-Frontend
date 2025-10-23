@@ -130,31 +130,43 @@ const menuItems = [
   },
 ];
 
-const getSubmenuItems = (menuKey: string) => {
-  switch (menuKey) {
-    case "processos":
-      return [
-        { key: "convocacao", label: "Convocação de Candidatos", onClick: () => navigate("/processos/convocacao") }, 
-        { key: "escolha", label: "Escolha de Candidatos" },
-        { key: "importacao", label: "Importação de Dados", onClick: () => navigate("/processos/importacao-dados") },
-      ];
-    case "relatorios":
-      return [
-        { key: "relatorio1", label: "Relatório A" },
-        { key: "relatorio2", label: "Relatório B" },
-        { key: "relatorio3", label: "Relatório C" },
-      ];
-    case "gerenciar":
-      return [
-        { key: "concursos", label: "Concursos" },
-        { key: "escolas", label: "Escolas" },
-        { key: "usuarios", label: "Usuários" },
-        { key: "configuracoes", label: "Configurações" },
-      ];
-    default:
-      return [];
-  }
-};
+  const getSubmenuItems = (menuKey: string) => {
+    switch (menuKey) {
+      case "processos":
+        return [
+          {
+            key: "convocacao",
+            label: "Convocação de Candidatos",
+            onClick: () => navigate("/processos/convocacao"),
+          },
+          { 
+            key: "gerenciamento-vagas", 
+            label: "Gerenciamento de Vagas",
+            onClick: () => navigate("/processos/gerenciamento-vagas"),
+          },
+          {
+            key: "importacao",
+            label: "Importação de Dados",
+            onClick: () => navigate("/processos/importacao-dados"),
+          },
+        ];
+      case "relatorios":
+        return [
+          { key: "relatorio1", label: "Relatório A" },
+          { key: "relatorio2", label: "Relatório B" },
+          { key: "relatorio3", label: "Relatório C" },
+        ];
+      case "gerenciar":
+        return [
+          { key: "concursos", label: "Concursos" },
+          { key: "escolas", label: "Escolas" },
+          { key: "usuarios", label: "Usuários" },
+          { key: "configuracoes", label: "Configurações" },
+        ];
+      default:
+        return [];
+    }
+  };
 
   return (
     <StyledLayout>

@@ -37,7 +37,6 @@ export const useImportacaoDadosVagas = () => {
       pagination: { page: 1, page_size: 10 },
     });
 
-  // Query para buscar importações com parâmetros
   const { importacoesArquivosData, importacoesArquivosIsLoading, importacoesArquivosRefetch } = useImportacaoArquivosVagas(listRequest);
   const { processosConvocacaoOptions, processosConvocacaoOptionsIsLoading } = useProcessosConvocacaoOptions();
 
