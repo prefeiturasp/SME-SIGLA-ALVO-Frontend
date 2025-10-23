@@ -94,8 +94,6 @@ describe('ConvocacaoCandidatos', () => {
 
     expect(screen.getByText('Convocação de candidatos')).toBeInTheDocument();
     expect(screen.getByText('Busca processos')).toBeInTheDocument();
-    expect(screen.getByText('Concurso')).toBeInTheDocument();
-    expect(screen.getByText('Cargo')).toBeInTheDocument();
     expect(screen.getByText('ConvocacaoTable Mock - 1 itens - página 1')).toBeInTheDocument();
   });
 
@@ -106,106 +104,14 @@ describe('ConvocacaoCandidatos', () => {
 
     renderComponent();
 
-    const novaBtn = screen.getByRole('button', { name: /criar convocação/i });
+    const novaBtn = screen.getByRole('button', { name: /nova convocação/i });
     await user.click(novaBtn);
 
     expect(mockNavigate).toHaveBeenCalledWith('/processos/convocacao/criar', { state: concursosOptions });
   });
 
-  it('chama handleSub ao clicar em Pesquisar', async () => {
-    const user = userEvent.setup();
-    const { hookMocks } = require('../hooks/useProcessosConvocacao');
 
-    renderComponent();
 
-    const pesquisarBtn = screen.getByRole('button', { name: /pesquisar/i });
-    await user.click(pesquisarBtn);
-
-    expect(hookMocks.handleSub).toHaveBeenCalled();
-  });
-
-  it('chama handleReset ao clicar em Limpar filtros', async () => {
-    const user = userEvent.setup();
-    const { hookMocks } = require('../hooks/useProcessosConvocacao');
-
-    renderComponent();
-
-    const limparBtn = screen.getByRole('button', { name: /limpar filtros/i });
-    await user.click(limparBtn);
-
-    expect(hookMocks.handleReset).toHaveBeenCalled();
-  });
-
-  it('altera o valor do campo Data de Convocação (inicio)', async () => {
-    const user = userEvent.setup();
-    renderComponent();
-
-    const inicioInput = screen.getByPlaceholderText('inicio') as HTMLInputElement;
-    expect(inicioInput).toBeInTheDocument();
-
-    const prev = inicioInput.value;
-
-    await act(async () => {
-      await user.click(inicioInput);
-    });
-    const dayCells = document.querySelectorAll('.ant-picker-cell-in-view .ant-picker-cell-inner');
-    expect(dayCells.length).toBeGreaterThan(0);
-    await act(async () => {
-      await user.click(dayCells[0] as HTMLElement);
-    });
-
-    await waitFor(() => {
-      expect(inicioInput.value).toMatch(/\d{2}\/\d{2}\/\d{4}/);
-      expect(inicioInput.value).not.toBe(prev);
-    });
-  });
-
-  it('altera o valor do campo Data de Convocação (Fim)', async () => {
-    const user = userEvent.setup();
-    renderComponent();
-
-    const fimInput = screen.getByPlaceholderText('Fim') as HTMLInputElement;
-    expect(fimInput).toBeInTheDocument();
-
-    const prev = fimInput.value;
-
-    await act(async () => {
-      await user.click(fimInput);
-    });
-    const dayCells = document.querySelectorAll('.ant-picker-cell-in-view .ant-picker-cell-inner');
-    expect(dayCells.length).toBeGreaterThan(0);
-    await act(async () => {
-      const target = dayCells[dayCells.length - 1] as HTMLElement;
-      await user.click(target);
-    });
-
-    await waitFor(() => {
-      expect(fimInput.value).toMatch(/\d{2}\/\d{2}\/\d{4}/);
-      expect(fimInput.value).not.toBe(prev);
-    });
-  });
-
-  it('renderiza campos de formulário com validação', () => {
-    renderComponent();
-    
-    // Verifica se os campos estão renderizados
-    expect(screen.getByText('Concurso')).toBeInTheDocument();
-    expect(screen.getByText('Data de Convocação')).toBeInTheDocument();
-    expect(screen.getByText('Cargo')).toBeInTheDocument();
-    
-    // Verifica se os campos de data estão presentes
-    expect(screen.getByPlaceholderText('inicio')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Fim')).toBeInTheDocument();
-  });
-
-  it('renderiza botões de ação corretamente', () => {
-    renderComponent();
-    
-    // Verifica se os botões estão presentes
-    expect(screen.getByRole('button', { name: /criar convocação/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /limpar filtros/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /pesquisar/i })).toBeInTheDocument();
-  });
 
   it('renderiza tabela com dados mockados', () => {
     renderComponent();

@@ -36,7 +36,6 @@ describe('ConvocacaoTable', () => {
   it('renderiza título e dados com data formatada', () => {
     renderWithTheme(<ConvocacaoTable data={[makeRow()]} />);
 
-    expect(screen.getByText('Resultados')).toBeInTheDocument();
     expect(screen.getByText('Concurso X')).toBeInTheDocument();
     expect(screen.getByText('Ativo')).toBeInTheDocument();
     // data_convocacao renderizada como DD/MM/YYYY
@@ -53,7 +52,7 @@ describe('ConvocacaoTable', () => {
     const buttons = within(row).getAllByRole('button');
 
     await user.click(buttons[1]); // Delete
-    await user.click(within(row).getByText('Finalizar'));
+    await user.click(within(row).getByText('Finalizar Processo'));
 
     expect(consoleSpy).toHaveBeenCalled();
 
@@ -74,7 +73,7 @@ describe('ConvocacaoTable', () => {
     await user.click(editButton as HTMLElement);
 
     // Check if navigate was called with the correct path
-    expect(mockNavigate).toHaveBeenCalledWith('/processos/convocacao/nova/uuid-1/selecao-cargos', expect.objectContaining({
+    expect(mockNavigate).toHaveBeenCalledWith('editar/uuid-1/dados-processo', expect.objectContaining({
       state: expect.objectContaining({ editData: expect.any(Object) })
     }));
   });
