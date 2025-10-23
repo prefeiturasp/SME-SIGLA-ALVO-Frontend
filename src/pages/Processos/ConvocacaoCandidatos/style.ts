@@ -262,6 +262,7 @@ export const ActionButton = styled(Button)`
   }
 `;
 
+<<<<<<< HEAD
 export const NovaConvocacaoButton = styled(Button)`
   width: 12.0625rem;
   height: 2.8125rem;
@@ -285,6 +286,9 @@ export const NovaConvocacaoButton = styled(Button)`
     opacity: 1;
   }
 `;
+=======
+ 
+>>>>>>> 783a655 (fetaure: 136894 adicionando melhoria de css na tela de processo de convocação)
 
 // Container para agrupar os botões
 export const ButtonGroup = styled.div`

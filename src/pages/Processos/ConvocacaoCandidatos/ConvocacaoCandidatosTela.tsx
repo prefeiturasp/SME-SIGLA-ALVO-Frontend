@@ -1,4 +1,4 @@
-import { Typography, Row, Col } from "antd";
+import { Typography, Row, Col, Button } from "antd";
 import { UsergroupAddOutlined, UserSwitchOutlined } from "@ant-design/icons";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import ConvocacaoTable from "./components/ConvocacaoTable";
@@ -12,7 +12,6 @@ import {
   OrangeAccentBar,
   PageTitle,
   ActionButton,
-  NovaConvocacaoButton,
   ConteudoPagina,
   TituloPagina,
   TableContainer,
@@ -61,12 +60,8 @@ const ConvocacaoCandidatosTela: React.FC = () => {
     <PageContainer>
       <BaseTela
         breadcrumbItems={breadcrumbItems}
-        title={
-          <HeaderContainer>
-            <TitleContainer>
-              <OrangeAccentBar />
-              <PageTitle>Lista de Convocações</PageTitle>
-            </TitleContainer>
+        title="Lista de Convocações"
+        buttons={
             <ButtonGroup>
               <ActionButton
                 type="primary"
@@ -77,7 +72,8 @@ const ConvocacaoCandidatosTela: React.FC = () => {
               >
                 Gerenciamento de vagas
               </ActionButton>
-              <NovaConvocacaoButton
+              
+              <Button
                 type="primary"
                 size="large"
                 icon={<UsergroupAddOutlined />}
@@ -85,9 +81,8 @@ const ConvocacaoCandidatosTela: React.FC = () => {
                 onClick={() => navigate("/processos/convocacao/nova",{state:concursosOptions})}
               >
                 Nova convocação
-              </NovaConvocacaoButton>
-            </ButtonGroup>
-          </HeaderContainer>
+              </Button>
+            </ButtonGroup>          
         }
       >
         <ConteudoPagina>
