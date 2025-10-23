@@ -263,29 +263,7 @@ export const ActionButton = styled(Button)`
   }
 `;
 
-export const NovaConvocacaoButton = styled(Button)`
-  
-  
-  gap: 0.5rem;
-  opacity: 1;
-  border-radius: 0.5rem;
-  padding-right: 1rem;
-  padding-left: 1rem;
-  background-color: #002C8C;
-  border-color: #002C8C;
-  font-family: 'Open Sans';
-  font-weight: 600;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  letter-spacing: 0%;
-  vertical-align: middle;
-
-  .anticon {
-    width: 0.974375rem;
-    height: 1.034375rem;
-    opacity: 1;
-  }
-`;
+ 
 
 // Container para agrupar os botões
 export const ButtonGroup = styled.div`
