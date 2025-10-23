@@ -77,6 +77,7 @@ const ConvocacaoCandidatosTela: React.FC = () => {
               >
                 Gerenciamento de vagas
               </ActionButton>
+              
               <NovaConvocacaoButton
                 type="primary"
                 size="large"

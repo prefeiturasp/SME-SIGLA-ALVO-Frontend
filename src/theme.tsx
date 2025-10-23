@@ -13,6 +13,8 @@ export const theme = {
     colorBgBase: "#FAFAFA",
     colorTextLightSolid: "#ffffff",
     colorError: "#DB001B",
+    // buttonSize: 44,
+    
     // colorBgLayout: "#FAFAFA",
     colorText: "#1C1D22",
     colorTextSecondary: "#515151",
@@ -20,7 +22,7 @@ export const theme = {
     fontSize: 16,
     fontWeightStrong: 600,
     fontWeight: 400,
-    controlHeight: 44,
+    // controlHeight: 44,
   },
   components: {
     Form: {
@@ -45,8 +47,15 @@ export const theme = {
       itemActiveBg: "#002C8C",
     },
     Button: {
-      // Tokens específicos de botão
-      controlHeight: 45, // altura
+    
+      // // Tokens específicos de botão
+      
+      
+      controlHeightLG: 45,
+      controlHeightMD: 40,
+      controlHeightSM: 35,
+      controlHeight: 40,
+
       borderRadius: 8, // borda arredondada
       colorBorder: "#B1B2B7", // cor da borda padrão
       defaultBorderColor: "#B1B2B7",
