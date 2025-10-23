@@ -1,29 +1,21 @@
-import type Stepper from "@mui/material/Stepper";
-
- 
- 
- 
-
 export const theme = {
   token: {
+    colorBgLayout:'#FAFAFA',
+    
     colorPrimary: "#002C8C",
-    fontFamily: "Roboto, sans-serif",
+    fontFamily: "Open Sans, sans-serif",
     borderRadius: 8, // substitui o borderRadius customizado
     colorBgContainer: "#FFFFFF",
     colorBgBase: "#FAFAFA",
     colorTextLightSolid: "#ffffff",
-    colorError: "#DB001B",
-    // buttonSize: 44,
-    
-    // colorBgLayout: "#FAFAFA",
+    colorError: "#DB001B",  
     colorText: "#1C1D22",
     colorTextSecondary: "#515151",
     colorTextDescription: "rgba(81, 81, 81, 0.80);",
     fontSize: 16,
     fontWeightStrong: 600,
     fontWeight: 400,
-    // controlHeight: 44,
-  },
+   },
   components: {
     Form: {
       labelRequiredMarkColor: "#515151",
@@ -56,6 +48,13 @@ export const theme = {
       controlHeightSM: 35,
       controlHeight: 40,
 
+
+      fontSizeLG: 16,
+      fontSizeSM: 14,
+      fontSize: 16,
+
+      
+
       borderRadius: 8, // borda arredondada
       colorBorder: "#B1B2B7", // cor da borda padrão
       defaultBorderColor: "#B1B2B7",
@@ -63,7 +62,7 @@ export const theme = {
       defaultBg: "#FFFFFF",
       paddingInline: 16, // padding horizontal
       paddingBlock: 0, // padding vertical
-      fontWeight: 700,
+      fontWeight: 600,
       colorPrimaryHover: "#0650C0", // hover do botão primário
       colorPrimaryActive: "#04357A", // active do botão primário
       colorText: "#838383", // texto padrão
