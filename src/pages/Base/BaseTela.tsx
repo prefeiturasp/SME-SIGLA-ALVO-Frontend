@@ -142,7 +142,11 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
             label: "Convocação de Candidatos",
             onClick: () => navigate("/processos/convocacao"),
           },
-          { key: "escolha", label: "Escolha de Candidatos" },
+          { 
+            key: "gerenciamento-vagas", 
+            label: "Gerenciamento de Vagas",
+            onClick: () => navigate("/processos/gerenciamento-vagas"),
+          },
           {
             key: "importacao",
             label: "Importação de Dados",

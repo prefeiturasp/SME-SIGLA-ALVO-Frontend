@@ -188,8 +188,6 @@ export const ActionButtonsContainer = styled.div`
 // Botão secundário personalizado
 export const SecondaryButton = styled(Button)`
   min-width: 124px;
-  height: 2.88rem
-
   gap: 17px;
   flex-shrink: 0;
 
@@ -201,7 +199,13 @@ export const SecondaryButton = styled(Button)`
   &:hover {
     border-color: #05409a;
     color: #05409a;
-    background-color: #fff;
+    background-color: #ffffff;
+  }
+
+  &:hover {
+    border-color: #05409a;
+    color: #05409a;
+    background-color: #ffffff;
   }
 `;
 
@@ -209,8 +213,6 @@ export const SecondaryButton = styled(Button)`
 export const PrimaryButton = styled(Button)`
   padding:0 1rem;
   border-radius: 0.375rem !important;
- 
-  height: 2.88rem !important;
   
   background-color: #002c8c !important;
   border-color: #002c8c !important;

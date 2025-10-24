@@ -45,7 +45,6 @@ export const getConcursoByUuid = (
       ...axiosRequestConfig,
     })
     .then((response) => response.data);
-
   return {
     response,
     abort,

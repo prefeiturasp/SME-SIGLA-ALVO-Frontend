@@ -1,7 +1,6 @@
 export const theme = {
   token: {
     colorBgLayout:'#FAFAFA',
-    
     colorPrimary: "#002C8C",
     fontFamily: "Open Sans, sans-serif",
     borderRadius: 8, // substitui o borderRadius customizado
@@ -39,22 +38,12 @@ export const theme = {
       itemActiveBg: "#002C8C",
     },
     Button: {
-    
-      // // Tokens específicos de botão
-      
-      
       controlHeightLG: 45,
-      controlHeightMD: 40,
       controlHeightSM: 35,
       controlHeight: 40,
-
-
-      fontSizeLG: 16,
+      fontSizeLG: 18,
       fontSizeSM: 14,
       fontSize: 16,
-
-      
-
       borderRadius: 8, // borda arredondada
       colorBorder: "#B1B2B7", // cor da borda padrão
       defaultBorderColor: "#B1B2B7",
@@ -65,8 +54,19 @@ export const theme = {
       fontWeight: 600,
       colorPrimaryHover: "#0650C0", // hover do botão primário
       colorPrimaryActive: "#04357A", // active do botão primário
+
+      // Secondary Button
+      colorSecondaryHover: "#0650C0", // hover do botão secundário
+      colorSecondaryActive: "#04357A", // active do botão secundário
+      colorSecondary: "#838383", // texto do botão secundário
+      colorSecondaryBg: "#FFFFFF", // fundo do botão secundário
+      colorSecondaryBorder: "#B1B2B7", // borda do botão secundário
+      colorSecondaryText: "#838383", // texto do botão secundário
+      colorSecondaryBgHover: "#F0F0F0", // fundo do botão secundário no hover
+      colorSecondaryBgActive: "#E0E0E0", // fundo do botão secundário no active
+      colorSecondaryBgDisabled: "#F0F0F0", // fundo do botão secundário no disabled
+      colorSecondaryBgLoading: "#F0F0F0", // fundo do botão secundário no loading
       colorText: "#838383", // texto padrão
-      
     },
     Card: {
       fontWeight: 400,           // peso do texto do conteúdo
