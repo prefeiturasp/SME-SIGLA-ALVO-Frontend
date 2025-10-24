@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   Row,
@@ -25,6 +25,7 @@ import { CustomFormItem } from "../../components/FormStyle";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import VagasEscolasTabela from "./components/VagasEscolasTabela";
+import IncluirEscolasModal from "./components/IncluirEscolasModal";
 import styled from "styled-components";
 
 import { useGerenciamentoVagas } from "./hooks/useGerenciamentoVagas";
@@ -40,6 +41,25 @@ const ResponsiveSelect = styled(StyledSelect)`
 const GerenciamentoVagasTela: React.FC = () => {
   const { token } = theme.useToken();
   const { Dragger } = Upload;
+  
+  // Estado para controlar o modal de incluir escolas
+  const [modalIncluirEscolasVisible, setModalIncluirEscolasVisible] = useState(false);
+  
+  // Funções para controlar o modal
+  const handleAbrirModalIncluirEscolas = () => {
+    setModalIncluirEscolasVisible(true);
+  };
+  
+  const handleFecharModalIncluirEscolas = () => {
+    setModalIncluirEscolasVisible(false);
+  };
+  
+  const handleEscolasSelecionadas = (escolas: any[]) => {
+    // Aqui será implementada a lógica para processar as escolas selecionadas
+    console.log('Escolas selecionadas:', escolas);
+    message.success(`${escolas.length} escolas adicionadas com sucesso!`);
+  };
+  
   const draggerProps: UploadProps = {
     name: 'file',
     multiple: false,
@@ -255,9 +275,18 @@ const GerenciamentoVagasTela: React.FC = () => {
               </Col>
               <Col span={8} style={{ display: "flex", alignItems: "flex-start", justifyContent: "flex-end", marginTop: -7 }}>
                 <ActionButtonsContainer style={{ justifyContent: "flex-end" }}>
+<<<<<<< Updated upstream
                   <Button onClick={handleLimparFiltros}>Limpar filtros</Button>
                   <Button icon={<SearchOutlined />} onClick={handleFiltrar}>Buscar</Button>
                   <Button type="primary">Incluir escola</Button>
+=======
+                  <SecondaryButton onClick={handleLimparFiltros}>Limpar filtros</SecondaryButton>
+                  <SecondaryButton icon={<SearchOutlined />} onClick={handleFiltrar}>Buscar</SecondaryButton>
+                  <PrimaryButton onClick={handleAbrirModalIncluirEscolas}>Incluir escola</PrimaryButton>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
                 </ActionButtonsContainer>
               </Col>
             </Row>
@@ -322,6 +351,16 @@ const GerenciamentoVagasTela: React.FC = () => {
         </Card>
         )}
       </BaseTela>
+      
+      {/* Modal de Incluir Escolas */}
+      <IncluirEscolasModal
+        visible={modalIncluirEscolasVisible}
+        onClose={handleFecharModalIncluirEscolas}
+        processo={processosConvocacaoData?.results?.find((p: any) => p.uuid === control._formValues?.processo_convocacao)?.descricao || "Carregando..."}
+        cargo={(concursoData?.cargos as any)?.find((c: any) => c.uuid === cargoSelecionado)?.nome || "Cargo"}
+        dadosVagasImportadas={dadosVagasNasEscolas}
+        onEscolasSelecionadas={handleEscolasSelecionadas}
+      />
     </>
   );
 };
