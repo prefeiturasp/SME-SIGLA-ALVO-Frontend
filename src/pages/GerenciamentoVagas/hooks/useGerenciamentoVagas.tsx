@@ -121,7 +121,7 @@ export const useGerenciamentoVagas = () => {
     setVagasEscolasData(dadosVagasNasEscolas?.vagas || []);
   };
 
-  const handleSalvar = () => {
+  const handleSalvar = async () => {
     const currentById = new Map<string, IVaga>(
       vagasEscolasData.map((item) => [item.uuid, item]) as any
     );
@@ -149,7 +149,12 @@ export const useGerenciamentoVagas = () => {
         foi_utilizada: false,
       };
     });
-    patchVagasEscolasUtilizadasMutation.mutate(vagasUtilizadas);
+    try {
+      await patchVagasEscolasUtilizadasMutation.mutateAsync(vagasUtilizadas as any);
+      window.location.reload();
+    } catch (err) {
+      // erro já notificado pelo onError do mutation
+    }
   };
 
   // Form com os filtros da tabela

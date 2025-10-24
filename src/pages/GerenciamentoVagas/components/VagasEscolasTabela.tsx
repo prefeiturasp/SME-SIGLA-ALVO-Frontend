@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { TableProps } from "antd";
-import { Flex, Button, Tooltip, InputNumber, Input } from "antd";
+import { Flex, Button, Tooltip, InputNumber, Input, Table as AntTable } from "antd";
 import type { TableColumnsType } from "antd";
 import type { IVaga } from "../../../services/resources/convocacao/IConvocacao";
 import { StyledTable } from "../../../components/EstilosCompartilhados";
@@ -267,8 +267,13 @@ const VagasEscolasTabela: React.FC<VagasEscolasTabelaProps> = ({
         rowClassName="editable-row"
         size="small"
         pagination={{ 
-            pageSize: paginationState.pageSize, current: paginationState.current, onChange: (page: number, pageSize?: number) => setPaginationState({ current: page, pageSize: pageSize || 10 }),
+            pageSize: paginationState.pageSize,
+            current: paginationState.current,
+            onChange: (page: number, pageSize?: number) => setPaginationState({ current: page, pageSize: pageSize || 10 }),
             total: filteredData?.length,
+            defaultPageSize: 10,
+            defaultCurrent: 1,
+            showSizeChanger: true,
             showTotal: (total: number, range: [number, number]) => (
                 <span style={{ marginLeft: 16 }}>
                 {`Mostrando ${(range?.[0] ?? 0)}-${(range?.[1] ?? 0)} de ${(total ?? 0)} registro(s)`}
