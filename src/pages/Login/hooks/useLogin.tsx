@@ -7,10 +7,19 @@ import useLoginTelaSchema from "../formValidacaoSchema";
 import { usePostLogin } from "./usePostLogin";
 
 export const useLogin = () => {
-  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [alert, setAlert] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
   const navigate = useNavigate();
   const schema = useLoginTelaSchema();
   const loginMutation = usePostLogin();
+
+  const token = localStorage.getItem("TOKEN");
+
+  if (token) {
+    navigate("/");
+  }
 
   const {
     control,
@@ -27,13 +36,13 @@ export const useLogin = () => {
 
   const onFinish = async (values: ILoginRequest) => {
     setAlert(null);
-    
+
     loginMutation.mutate(values, {
       onSuccess: () => {
         navigate("/");
       },
       onError: () => {
-        setAlert({ type: 'error', message: 'Usuário ou senha inválidos.' });
+        setAlert({ type: "error", message: "Usuário ou senha inválidos." });
       },
     });
   };
@@ -42,7 +51,7 @@ export const useLogin = () => {
     // Estados
     loading: loginMutation.isPending,
     alert,
-    
+
     // Form handling
     control,
     handleSubmit: handleSubmit(onFinish),

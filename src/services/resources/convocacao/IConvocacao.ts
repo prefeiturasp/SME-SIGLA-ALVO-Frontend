@@ -13,8 +13,22 @@ status : string;
 tipo_escolha : string;
 uuid : string;
 }
- 
+export interface IProcessoConvocacaoResumo {
+
+  uuid: string;
+  concurso_uuid: string;
+  concurso_nome: string;
+  descricao: string;
+  tipo_escolha: string;
+  status: string;
+  data_convocacao: string;
+  data_corte_vagas: string;
+  criado_em: string;
+  atualizado_em: string;
+  numero_convocacao: string;
+}
 export interface IPostProcessoConvocacaoPayload {
+  status?: string;
   concurso_nome: string;
   concurso_uuid: string;
   tipo_escolha: string;

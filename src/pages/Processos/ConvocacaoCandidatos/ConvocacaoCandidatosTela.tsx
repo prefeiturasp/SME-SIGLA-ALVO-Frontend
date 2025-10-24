@@ -7,15 +7,15 @@ import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
 import { useNavigate } from "react-router-dom";
 import {
   PageContainer,
-  HeaderContainer,
-  TitleContainer,
-  OrangeAccentBar,
-  PageTitle,
   ActionButton,
   ConteudoPagina,
   TituloPagina,
   TableContainer,
-  ButtonGroup
+  ButtonGroup,
+  HeaderContainer,
+  TitleContainer,
+  OrangeAccentBar,
+  PageTitle
 } from "./style";
 
 const { Text } = Typography;
@@ -72,16 +72,17 @@ const ConvocacaoCandidatosTela: React.FC = () => {
               >
                 Gerenciamento de vagas
               </ActionButton>
+              
               <Button
                 type="primary"
                 size="large"
                 icon={<UsergroupAddOutlined />}
                 disabled={!concursosOptions}
-                onClick={() => navigate("/processos/convocacao/nova",{state:concursosOptions})}
+                onClick={() => navigate("/processos/convocacao/dados-processo/criar",{state:concursosOptions})}
               >
                 Nova convocação
               </Button>
-            </ButtonGroup>
+            </ButtonGroup>          
         }
       >
         <ConteudoPagina>

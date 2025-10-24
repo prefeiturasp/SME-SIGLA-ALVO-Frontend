@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import { Modal, Table, Typography, Select, Upload, Button, Card } from "antd";
-  
+import Paragraph from "antd/es/typography/Paragraph";
 
 const { Text } = Typography;
- 
+
 export const TextBlue = styled(Text)`
-   color: #05409A;
-   font-weight: 700;
+  color: #05409a;
+  font-weight: 700;
 `;
 
 export const CustomModal = styled(Modal)`
@@ -14,7 +14,7 @@ export const CustomModal = styled(Modal)`
     font-weight: 700;
     font-size: 20px;
     line-height: 1.4;
-   }
+  }
 `;
 
 export const CustomModal2 = styled(Modal)`
@@ -38,7 +38,7 @@ export const CustomModal2 = styled(Modal)`
 // Container para conteúdo das abas
 export const TabContentContainer = styled.div`
   padding: 0.5rem 0 1.5rem 0;
-  
+
   /* Remove qualquer outline ou border de debug */
   .ant-row,
   .ant-col {
@@ -51,7 +51,7 @@ export const TabContentContainer = styled.div`
 export const SectionCard = styled(Card)`
   margin-bottom: 1.5rem;
   border-radius: 0.5rem;
-  box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
 `;
 
 // Títulos das seções
@@ -63,13 +63,13 @@ export const SectionTitle = styled(Typography.Title).attrs({ level: 4 })`
 // Estilos para o select de concurso
 export const StyledSelect = styled(Select)`
   width: 100%;
-  
+
   .ant-select-selector {
     border-radius: 0.375rem;
   }
-  
+
   .ant-select-suffix {
-    color: #032B68;
+    color: #032b68;
   }
 `;
 
@@ -81,57 +81,49 @@ export const StyledCheckbox = styled.div`
 // Estilos para a tabela (consolidado dos dois arquivos)
 export const StyledTable = styled(Table)`
   background-color: #fff;
-  
+
   .ant-table-thead > tr > th {
-    background-color: #f0f0f0;
+    background-color: #FAFAFA;
     border-bottom: 1px solid #d9d9d9;
     font-weight: 600;
-    border: none !important; 
+    border: none !important;
   }
-  
+
   .ant-table-tbody > tr:nth-child(even) > td {
     background-color: #f8f8f8;
   }
-  
+
   .ant-table-tbody > tr:nth-child(odd) > td {
     background-color: #ffffff;
   }
-  
+
   .ant-table-tbody > tr > td {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #FAFAFA;
     border: none !important;
   }
-  
+
   .ant-table-tbody > tr:hover > td {
     background-color: #f0f8ff !important;
   }
 
   .ant-table-tbody > tr:nth-child(even) {
-    background-color: #F6F6F6;
+    background-color: #f6f6f6;
   }
 
   .ant-table-pagination {
     display: flex;
     justify-content: flex-end;
-    .ant-pagination-item{
-    border-radius:5px
-    } 
+    .ant-pagination-item {
+      border-radius: 5px;
+    }
   }
 
-   .ant-pagination-total-text {
-    margin-right: auto; 
+  .ant-pagination-total-text {
+    margin-right: auto;
     color: #727679;
   }
   box-shadow: 0px 6px 18px 0px rgba(0, 0, 0, 0.06);
 ` as unknown as typeof Table;
-
- 
- 
- 
-
- 
-
-
 
 // Container para renderização de texto com quebra de linha
 export const MultilineText = styled.div`
@@ -155,7 +147,7 @@ export const UploadArea = styled.div`
 
 // Divider entre seções
 export const SectionDivider = styled.div`
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #FAFAFA;
   margin: 1.5rem 0;
   width: 100%;
 `;
@@ -163,22 +155,22 @@ export const SectionDivider = styled.div`
 // Upload personalizado do Ant Design
 export const StyledUpload = styled(Upload)`
   width: 100%;
-  
+
   .ant-upload {
     width: 100%;
   }
-  
+
   .ant-upload-drag {
     border: none !important;
     background: transparent !important;
     border-radius: 0 !important;
     padding: 0 !important;
   }
-  
+
   .ant-upload-drag:hover {
     border: none !important;
   }
-  
+
   .ant-upload-drag-hover {
     border: none !important;
   }
@@ -195,14 +187,15 @@ export const ActionButtonsContainer = styled.div`
 
 // Botão secundário personalizado
 export const SecondaryButton = styled(Button)`
-  border-radius: 0.375rem;
-  font-weight: 700;
-  height: 2.5rem;
-  padding: 0 1.5rem;
-  border-color: #032B68;
-  color: #032B68;
-  background-color: #ffffff;
-  
+  min-width: 124px;
+  gap: 17px;
+  flex-shrink: 0;
+
+  border-radius: var(--BorderRadius-borderRadiusLG, 8px);
+  border: 1px solid #b1b2b7;
+  color: #838383;
+  padding:0 1rem;
+
   &:hover {
     border-color: #05409a;
     color: #05409a;
@@ -216,22 +209,24 @@ export const SecondaryButton = styled(Button)`
   }
 `;
 
-
 // Botão primário personalizado
 export const PrimaryButton = styled(Button)`
-  background-color: #032B68 !important;
-  border-color: #032B68 !important;
+  padding:0 1rem;
+  border-radius: 0.375rem !important;
+  
+  background-color: #002c8c !important;
+  border-color: #002c8c !important;
   color: #ffffff !important;
-  
+
   &:hover {
-    background-color: #ffffff !important;
-    border-color: #032B68 !important;
-    color: #032B68 !important;
+    background-color: #87ceeb !important;
+    border-color: #87ceeb !important;
+    color: #002c8c !important;
   }
-  
+
   &:focus {
-    background-color: #032B68 !important;
-    border-color: #032B68 !important;
+    background-color: #002c8c !important;
+    border-color: #002c8c !important;
     color: #ffffff !important;
   }
 `;
@@ -247,7 +242,7 @@ export const LayoutContainer = styled.div`
 // Seção do cabeçalho do layout padrão
 export const HeaderSection = styled.div`
   margin-bottom: 2.5rem;
-  
+
   h3 {
     margin: 0;
     color: #262626;
@@ -259,13 +254,13 @@ export const HeaderSection = styled.div`
 // Container da tabela do layout padrão
 export const TableContainer = styled.div`
   margin-bottom: 2rem;
-  
+
   .ant-table {
     border-radius: 6px;
     overflow: hidden;
     box-shadow: 0px 6px 18px 0px rgba(0, 0, 0, 0.06);
   }
-  
+
   .ant-table-thead > tr > th {
     background-color: #f5f5f5;
     font-weight: 600;
@@ -273,21 +268,21 @@ export const TableContainer = styled.div`
     border: none !important;
     padding: 16px 20px;
   }
-  
+
   .ant-table-tbody > tr > td {
     vertical-align: top;
     padding: 16px 20px;
     border: none !important;
   }
-  
+
   .ant-table-tbody > tr:nth-child(even) {
-    background-color: #F6F6F6;
+    background-color: #f6f6f6;
   }
-  
+
   .ant-table-tbody > tr:hover > td {
     background-color: #fafafa;
   }
-  
+
   .ant-table-tbody > tr:last-child > td {
     border-bottom: none;
   }
@@ -299,4 +294,45 @@ export const ButtonContainer = styled.div`
   justify-content: flex-end;
   gap: 12px;
   margin-top: 2rem;
+`;
+
+
+export const StyledCardWithoutBorder = styled(Card)`
+
+.ant-card-head {
+  border-bottom: none;
+  padding: 1.25rem ;
+}
+.ant-card-body {
+    padding: 1.25rem;
+  }
+`;
+
+
+
+export const TextSubHeading = styled(Text)`
+color: #515151;
+font-size: 18px;
+font-weight: 600;
+`;
+
+
+export const TextTituloCinza = styled(Text)`
+color: rgba(81, 81, 81, 0.80);
+font-size: 14px;
+font-weight: 600;
+line-height: 22px; 
+
+`;
+export const TextSubTituloCinza = styled(Paragraph)`
+color: #838383;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 22px;
+`;
+
+
+export const CustomTitle = styled(Typography.Title).attrs({ level: 4 })`
+  margin: 2.375rem 0 1rem 0;
 `;

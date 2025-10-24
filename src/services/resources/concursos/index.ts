@@ -32,6 +32,7 @@ export const getConcursos = (
   };
 };
 
+// TODO adicionar JWT no header Authorization
 export const getConcursoByUuid = (
   uuid: string,
   axiosRequestConfig?: AxiosRequestConfig
@@ -44,7 +45,6 @@ export const getConcursoByUuid = (
       ...axiosRequestConfig,
     })
     .then((response) => response.data);
-    console.log("response", response);
   return {
     response,
     abort,

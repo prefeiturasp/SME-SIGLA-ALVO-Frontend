@@ -1,13 +1,11 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import {DashboardTela} from "../pages/Dashboard/DashboardTela";
+import { DashboardTela } from "../pages/Dashboard/DashboardTela";
 import ProtectedRoute from "./protected";
-
-
 
 import { HomeTela } from "../pages/Home/HomeTela";
 import ConvocacaoCandidatosTela from "../pages/Processos/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
 import NovaConvocacaoCandidatosTela from "../pages/Processos/NovaConvocacaoCandidatos/NovaConvocacaoCandidatosTela";
-import ImportacaoDadosTela from "../pages/Processos/ImportacaoDados/ImportacaoDadosTela"; 
+import ImportacaoDadosTela from "../pages/Processos/ImportacaoDados/ImportacaoDadosTela";
 import LayoutPadraoVagasTela from "../pages/Processos/ImportacaoDados/LayoutPadraoVagas/LayoutPadraoVagasTela";
 import HistoricoVagasTela from "../pages/Processos/ImportacaoDados/HistoricoVagas/HistoricoVagasTela";
 import NotFoundTela from "../pages/NotFound/NotFoundTela";
@@ -18,13 +16,21 @@ import NovaSenhaTela from "../pages/Login/NovaSenhaTela";
 import RouteError from "./RouteError";
 import GerenciamentoVagasTela from "../pages/GerenciamentoVagas/GerenciamentoVagasTela";
 
+import DadosDoProcesso from "../pages/CriarEditarConvocacao/DadosDoProcesso";
+import SelecaoCargosTela from "../pages/CriarEditarConvocacao/SelecaoCargos/SelecaoCargosTela";
+import Agenda from "../pages/CriarEditarConvocacao/Agenda";
+import Resumo from "../pages/CriarEditarConvocacao/Resumo";
 
 //TODO ADD FEATURE FLAG
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomeTela />,
+    element: (
+      <ProtectedRoute>
+        <HomeTela />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
   {
@@ -59,39 +65,103 @@ const router = createBrowserRouter([
   },
   {
     path: "/processos/convocacao",
-    element: <ConvocacaoCandidatosTela />,
+    element: (
+      <ProtectedRoute>
+        <ConvocacaoCandidatosTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+
+  {
+    path: "/processos/convocacao/dados-processo/criar",
+    element: (
+      <ProtectedRoute>
+        <DadosDoProcesso />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
   {
-    path: "/processos/convocacao/nova",
-    element: <NovaConvocacaoCandidatosTela />,
+    path: "/processos/convocacao/nova/:uuid/selecao-cargos",
+    element: (
+      <ProtectedRoute>
+        <SelecaoCargosTela />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/processos/convocacao/editar/:uuid/selecao-cargos",
+    element: (
+      <ProtectedRoute>
+        <SelecaoCargosTela />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
   {
-    path: "/processos/convocacao/editar",
-    element: <NovaConvocacaoCandidatosTela />,
+    path: "/processos/convocacao/editar/:uuid/agenda",
+    element: (
+      <ProtectedRoute>
+        <Agenda />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/processos/convocacao/editar/:uuid/resumo",
+    element: (
+      <ProtectedRoute>
+        <Resumo />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/processos/convocacao/editar/:uuid/dados-processo",
+    element: (
+      <ProtectedRoute>
+        <DadosDoProcesso />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
   {
     path: "/processos/importacao-dados",
-    element: <ImportacaoDadosTela />,
+    element: (
+      <ProtectedRoute>
+        <ImportacaoDadosTela />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
   {
     path: "/processos/importacao-dados/layout-padrao-vagas",
-    element: <LayoutPadraoVagasTela tipo={'VAGAS'}/>,
+    element: (
+      <ProtectedRoute>
+        <LayoutPadraoVagasTela tipo={"VAGAS"} />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
-    {
+  {
     path: "/processos/importacao-dados/layout-padrao-habilitados",
-    element: <LayoutPadraoVagasTela tipo={'HABILITADOS'}/>,
+    element: (
+      <ProtectedRoute>
+        <LayoutPadraoVagasTela tipo={"HABILITADOS"} />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
-    {
+  {
     path: "/processos/importacao-dados/historico-vagas",
-    element: <HistoricoVagasTela />,
+    element: (
+      <ProtectedRoute>
+        <HistoricoVagasTela />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
-  },   
+  },
   {
     path: "/dashboard",
     element: (
@@ -103,7 +173,7 @@ const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <NotFoundTela />, 
+    element: <NotFoundTela />,
     errorElement: <RouteError />,
   },
 ]);

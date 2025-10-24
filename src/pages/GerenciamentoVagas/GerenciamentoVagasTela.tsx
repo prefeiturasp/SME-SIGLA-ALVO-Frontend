@@ -11,6 +11,7 @@ import {
   message,
 } from "antd";
 import type { UploadProps } from "antd";
+import { Button } from "antd";
 import { CloudUploadOutlined, SearchOutlined } from '@ant-design/icons';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
@@ -24,11 +25,17 @@ import { CustomFormItem } from "../../components/FormStyle";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import VagasEscolasTabela from "./components/VagasEscolasTabela";
+import styled from "styled-components";
 
 import { useGerenciamentoVagas } from "./hooks/useGerenciamentoVagas";
 
 
 const { Text } = Typography;
+
+const ResponsiveSelect = styled(StyledSelect)`
+  width: 100%;
+  max-width: 900px;
+`;
 
 const GerenciamentoVagasTela: React.FC = () => {
   const { token } = theme.useToken();
@@ -125,7 +132,7 @@ const GerenciamentoVagasTela: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Gerenciamento de vagas"
         buttons={
-          <PrimaryButton style={{fontWeight:'400'}} color="primary" variant="outlined" icon={<UserSwitchOutlined />}>Nova convocação</PrimaryButton>
+          <Button type="primary" size="large" variant="outlined" icon={<UserSwitchOutlined />}>Nova convocação</Button>
         }
       >
         <Card
@@ -133,8 +140,8 @@ const GerenciamentoVagasTela: React.FC = () => {
           variant="borderless"
         >
           <div style={contentStyle}>
-            <Row gutter={[16, 16]}>
-              <Col span={uploadConcluido ? 8 : 12}>
+            <Row gutter={[0, 16]} style={{ textAlign: "left" }}>
+              <Col xs={24} md={8}>
               <Controller
                   control={control}
                   name="processo_convocacao"
@@ -143,7 +150,8 @@ const GerenciamentoVagasTela: React.FC = () => {
                     label="Processo"
                     labelCol={{ span: 24 }}
                   >
-                     <StyledSelect
+                    <ResponsiveSelect
+                       style={{ marginTop: 6 }}
                        value={field.value}
                        onChange={(value: unknown) => {
                          field.onChange(value as string | undefined);
@@ -166,18 +174,19 @@ const GerenciamentoVagasTela: React.FC = () => {
                           {processoConvocacao.descricao}
                         </Select.Option>
                       ))}
-                    </StyledSelect>
+                    </ResponsiveSelect>
                   </CustomFormItem>
                   )}
                 />
               </Col>
               {(cargoSelecionado || (dadosVagasNasEscolas?.vagas?.length && dadosVagasNasEscolas?.vagas?.length > 0)) && (
-                <Col span={8}>
+                <Col xs={24} md={8}>
                   <CustomFormItem
                     label="Cargo"
                     labelCol={{ span: 24 }}
                   >
-                    <StyledSelect
+                    <ResponsiveSelect
+                      style={{ marginTop: 6 }}
                       placeholder="Selecione o cargo"
                       onChange={(value: unknown) => {
                         handleSelectCargo(value as string | undefined);
@@ -191,7 +200,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                           {cargo.nome}
                         </Select.Option>
                       ))}
-                    </StyledSelect>
+                    </ResponsiveSelect>
                   </CustomFormItem>
                 </Col>
               )}
@@ -203,7 +212,7 @@ const GerenciamentoVagasTela: React.FC = () => {
         {(cargoSelecionado && dadosVagasNasEscolas?.vagas?.length && dadosVagasNasEscolas?.vagas?.length > 0) && (
         <Card style={{ marginTop: "1.25rem" }} variant="borderless">
           <div style={contentStyle}>
-            <Row gutter={16}>
+            <Row gutter={[0, 16]} style={{ textAlign: "left" }}>
               <Col xs={24} md={8}>
                 <Controller
                   control={controlFiltrar}
@@ -215,7 +224,8 @@ const GerenciamentoVagasTela: React.FC = () => {
                       // help={formErrors.dre?.message}
                       labelCol={{ span: 24 }}
                     >
-                      <Select
+                      <ResponsiveSelect
+                        style={{ marginTop: 6 }}
                         {...field}
                         options={optionsDres}
                         placeholder="(Todas)"
@@ -239,13 +249,13 @@ const GerenciamentoVagasTela: React.FC = () => {
                       help={formErrorsFiltrar.escola?.message}
                       labelCol={{ span: 24 }}
                     >
-                      <Input {...field} placeholder="" />
+                      <Input {...field} placeholder="" style={{ marginTop: 6, width: "90%" }} />
                     </CustomFormItem>
                   )}
                 />
               </Col>
-              <Col span={8}>
-                <ActionButtonsContainer>
+              <Col span={8} style={{ display: "flex", alignItems: "flex-start", justifyContent: "flex-end", marginTop: -7 }}>
+                <ActionButtonsContainer style={{ justifyContent: "flex-end" }}>
                   <SecondaryButton onClick={handleLimparFiltros}>Limpar filtros</SecondaryButton>
                   <SecondaryButton icon={<SearchOutlined />} onClick={handleFiltrar}>Buscar</SecondaryButton>
                   <PrimaryButton>Incluir escola</PrimaryButton>

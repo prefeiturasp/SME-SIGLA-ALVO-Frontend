@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Button, Card, Form, Row, Col, Input, Typography, Checkbox } from 'antd';
+import { Button, Card, Form, Row, Col, Input, Typography, Checkbox, Select, Space } from 'antd';
 
 
 export const StyledCardPequeno = styled(Card)`
@@ -491,4 +491,454 @@ export const voltarButtonLeaveStyle = {
   borderColor: '#0F59C8',
   color: '#0F59C8'
 };
+
+// ============================================
+// Estilos do componente NovaConvocacaoStep2Tela
+// ============================================
+
+// Estilos iguais ao da Lista de Convocações
+export const TitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+`;
+
+export const OrangeAccentBar = styled.div`
+  width: 0.25rem;
+  height: 2rem;
+  background-color: #FF6B35;
+  border-radius: 0.125rem;
+`;
+
+export const PageTitle = styled.span`
+  font-family: 'Open Sans';
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: #515151;
+`;
+
+// CSS customizado para estilizar o Steps
+export const CustomStepsStyle = styled.div`
+  .custom-steps .ant-steps-item-title {
+    font-family: 'Open Sans' !important;
+    font-weight: 600 !important;
+    font-style: normal !important;
+    font-size: 16px !important;
+    line-height: 24px !important;
+    letter-spacing: 0% !important;
+    color: #515151 !important;
+    background: transparent !important;
+  }
+
+  /* Estilo para a bolinha do step ativo (número 2) */
+  .custom-steps .ant-steps-item-process .ant-steps-item-icon {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 32px !important;
+    border: 1px solid #1890FF !important;
+    background: #1890FF !important;
+    opacity: 1 !important;
+  }
+`;
+
+// ============================================
+// Estilos específicos para cada Card
+// ============================================
+
+// Estilo baseado exatamente no "Busca processos" da Lista de Convocação
+export const BuscaProcessosTitleStyle = {
+  margin: "0 0 1rem 0"
+};
+
+// Estilo customizado para o título "Dados do Processo"
+export const DadosProcessoTitleStyle = {
+  margin: "0 0 1rem 0",
+  fontFamily: "Open Sans",
+  fontWeight: 600,
+  fontStyle: "normal",
+  fontSize: "18px",
+  lineHeight: "100%",
+  letterSpacing: "0%",
+  color: "#515151",
+};
+
+// Estilo específico para o título "Cargo"
+export const CargoTitleStyle = {
+  margin: "0 0 1rem 0",
+  fontFamily: "Open Sans",
+  fontWeight: 600,
+  fontStyle: "normal",
+  fontSize: "14px",
+  lineHeight: "22px",
+  letterSpacing: "0%",
+  color: "#515151"
+};
+
+// Estilo específico para o título "Processo de convocação de candidatos"
+export const ProcessoConvocacaoTitleStyle = {
+  margin: "0 0 1rem 0",
+  fontFamily: "Open Sans",
+  fontWeight: 400,
+  fontStyle: "normal",
+  fontSize: "18px",
+  lineHeight: "100%", // Mudando para 100% igual ao Dados do Processo
+  letterSpacing: "0%",
+  color: "#515151"
+};
+
+// Card 1: Processo de convocação de candidatos (Título e Steps)
+export const ProcessoConvocacaoCard = styled(Card)`
+  width: 100%;
+  min-height: 147px;
+  gap: 2rem;
+  opacity: 1;
+  border-radius: 0.625rem;
+  padding: 0rem 1rem 0rem 0.25rem;
+  box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+  
+  .ant-card-body {
+    padding: 1rem 0.75rem 1rem 0.75rem !important;
+  }
+`;
+
+// Removido - agora usando estilo padrão do Ant Design com BuscaProcessosTitleStyle
+
+export const StepsContainer = styled.div`
+  margin-top: 3rem;
+  margin-left: 0.35rem; /* Compensando a mudança de padding do card */
+`;
+
+// Card 2: Dados do Processo
+export const DadosProcessoCard = styled(Card)`
+  width: 100%;
+  min-height: 198px;
+  gap: 2rem;
+  opacity: 1;
+  border-radius: 0.625rem;
+  padding: 0rem 0rem 0rem 0.25rem;
+  box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+  
+  .ant-card-body {
+    padding: 1rem 0.75rem 1rem 0.75rem !important;
+  }
+`;
+
+// Removido - agora usando estilo padrão do Ant Design com BuscaProcessosTitleStyle
+
+export const ProcessoInfoLabel = styled(Typography.Text)`
+  font-family: 'Open Sans';
+  font-weight: 600;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0%;
+  color: #515151CC;
+`;
+
+export const ProcessoInfoValue = styled(Typography.Text)`
+  color: #838383;
+  font-family: 'Open Sans';
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0%;
+  margin-top: -18px;
+`;
+
+// Card 3: Seção Cargo
+export const CargoCard = styled(Card)`
+  width: 100%;
+  margin-bottom: 24px;
+  border-radius: 0.625rem;
+  box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1);
+  
+  .ant-card-body {
+    padding: 1rem 0.75rem 1rem 0.75rem !important;
+  }
+`;
+
+// Removido - agora usando estilo padrão do Ant Design com BuscaProcessosTitleStyle
+
+export const CargoSelectContainer = styled.div`
+  margin-top: 8px;
+`;
+
+export const CargoSelectWrapper = styled.div`
+  width: 100%;
+`;
+
+export const CargoSelect = styled(Select)`
+  width: 665px;
+  height: 45px;
+  gap: 4px;
+  opacity: 1;
+  border-radius: 6px; /* Corner Radius padrão */
+  background: #FFFFFF;
+  border: none; /* Removendo borda do componente principal */
+
+  .ant-select-selector {
+    width: 665px !important;
+    height: 45px !important;
+    gap: 4px !important;
+    opacity: 1 !important;
+    border-radius: 6px !important;
+    border-width: 1px !important;
+    border: 1px solid #B1B2B7 !important;
+    background: #FFFFFF !important;
+    padding-right: 12px !important; /* padding-sm */
+    padding-left: 12px !important; /* padding-sm */
+    box-sizing: border-box !important;
+  }
+
+  &:hover .ant-select-selector {
+    border: 1px solid #B1B2B7 !important;
+    box-shadow: none !important;
+  }
+
+  &.ant-select-focused .ant-select-selector {
+    border: 1px solid #B1B2B7 !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  .ant-select-selection-item {
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  .ant-select-selection-placeholder {
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+  }
+`;
+
+export const BuscarCandidatosButton = styled(Button)`
+  /* Dimensões do protótipo */
+  width: 195px;
+  height: 45px;
+  gap: 8px;
+  opacity: 1;
+  border-radius: 8px; /* borderRadiusLG */
+  border-width: 1px;
+  padding-right: 16px; /* padding */
+  padding-left: 16px; /* padding */
+  box-sizing: border-box;
+
+  /* Estilo igual ao SearchButton da Lista de Convocações */
+  border: 1px solid #0F59C8;
+  background-color: #FFFFFF;
+  font-family: 'Open Sans';
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  color: #0F59C8;
+  box-shadow: none;
+
+  .anticon {
+    color: #0F59C8;
+  }
+
+  &:hover {
+    background-color: #0F59C8 !important;
+    border-color: #0F59C8 !important;
+    color: #FFFFFF !important;
+    
+    .anticon {
+      color: #FFFFFF !important;
+    }
+  }
+
+  &:disabled {
+    background-color: #f5f5f5 !important;
+    border-color: #d9d9d9 !important;
+    color: rgba(0, 0, 0, 0.25) !important;
+    
+    .anticon {
+      color: rgba(0, 0, 0, 0.25) !important;
+    }
+  }
+`;
+
+// Botões de navegação com estilo igual ao BuscarCandidatosButton
+export const CancelarButton = styled(Button)`
+  /* Estilo igual ao BuscarCandidatosButton */
+  border: 1px solid #0F59C8;
+  background-color: #FFFFFF;
+  font-family: 'Open Sans';
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  color: #0F59C8;
+  box-shadow: none;
+
+  &:hover {
+    background-color: #0F59C8 !important;
+    border-color: #0F59C8 !important;
+    color: #FFFFFF !important;
+  }
+`;
+
+export const VoltarButton = styled(Button)`
+  /* Estilo igual ao BuscarCandidatosButton */
+  border: 1px solid #0F59C8;
+  background-color: #FFFFFF;
+  font-family: 'Open Sans';
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  color: #0F59C8;
+  box-shadow: none;
+
+  .anticon {
+    color: #0F59C8;
+  }
+
+  &:hover {
+    background-color: #0F59C8 !important;
+    border-color: #0F59C8 !important;
+    color: #FFFFFF !important;
+    
+    .anticon {
+      color: #FFFFFF !important;
+    }
+  }
+`;
+
+export const SalvarEAvancarButton = styled(Button)`
+  /* Estilo baseado no NovaConvocacaoButton */
+  border: 1px solid #002C8C; /* Cor do NovaConvocacaoButton */
+  background-color: #002C8C; /* Cor do NovaConvocacaoButton */
+  font-family: 'Open Sans';
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  color:rgb(255, 255, 255);
+  box-shadow: none;
+
+  .anticon {
+    color:rgb(255, 255, 255);
+  }
+
+  &:hover {
+    background-color: #0F59C8 !important;
+    border-color: #0F59C8 !important;
+    color: #FFFFFF !important;
+    
+    .anticon {
+      color: #FFFFFF !important;
+    }
+  }
+`;
+
+// Botão Gerenciamento de vagas - replicado da Lista de convocações
+export const GerenciamentoVagasButton = styled(Button)`
+  width: 15.5625rem;
+  height: 2.8125rem;
+  gap: 0.5rem;
+  opacity: 1;
+  border-radius: 0.5rem;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  border-width: 0.0625rem;
+  border: 0.0625rem solid #0F59C8;
+  background-color: transparent;
+  font-family: 'Open Sans';
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  color: #0F59C8;
+
+  .anticon {
+    width: 0.944375rem;
+    height: 1.0675rem;
+    opacity: 1;
+    color: #0F59C8;
+  }
+
+  &:hover {
+    background-color: #0F59C8 !important;
+    border-color: #0F59C8 !important;
+    color: #FFFFFF !important;
+    
+    .anticon {
+      color: #FFFFFF !important;
+    }
+  }
+`;
+
+// Container para agrupar título e botão
+export const HeaderWithButtonContainer = styled.div`
+  width: 100%;
+  height: 2.8125rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 1;
+`;
+
+// Botões de navegação
+export const NavigationButtonsContainer = styled(Row)`
+  margin-top: 32px;
+`;
+
+export const NavigationButtonsSpace = styled(Space)`
+  display: flex;
+  align-items: center;
+`;
+
+// ============================================
+// Estilos para Breadcrumbs
+// ============================================
+
+export const BreadcrumbText = styled(Typography.Text)`
+  cursor: pointer;
+`;
+
+// ============================================
+// Estilos para Row e Col do Card 2
+// ============================================
+
+export const ProcessoInfoRow = styled(Row)`
+  .ant-col {
+    margin-bottom: 1rem;
+  }
+`;
+
+export const ProcessoInfoCol = styled(Col)`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const ProcessoInfoDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+// ============================================
+// Estilos para Space do Card 3
+// ============================================
+
+export const CargoSpace = styled(Space)`
+  width: 100%;
+`;
+
+export const CargoSpaceCompact = styled(Space)`
+  width: 100%;
+  gap: 34px;
+`;
  

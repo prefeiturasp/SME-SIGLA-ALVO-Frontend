@@ -1,8 +1,12 @@
 import styled, { createGlobalStyle } from "styled-components";
 import FormItem from "antd/es/form/FormItem";
 import { Layout, Typography, Avatar } from "antd";
-import { UserOutlined, BarChartOutlined, SettingOutlined } from '@ant-design/icons';
-import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
+import {
+  UserOutlined,
+  BarChartOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 
 export const SelectContainer = styled.div`
   display: flex;
@@ -12,8 +16,6 @@ export const SelectContainer = styled.div`
 export const SelectDivider = styled.div`
   width: 49%;
 `;
-
-
 
 export const CustomFormItem = styled(FormItem)`
   padding-bottom: 0;
@@ -36,7 +38,7 @@ export const UserLabel = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-weight: 700;
   font-size: 20px;
   line-height: 100%;
@@ -49,7 +51,7 @@ export const StyledUserAvatar = styled(Avatar)`
 
 export const UserAvatarIcon = styled(AccountCircleRoundedIcon)`
   font-size: 2.5rem !important;
-  color: #1C1D22 !important;
+  color: #1c1d22 !important;
 `;
 
 export const GlobalMenuWidth = createGlobalStyle`
@@ -137,7 +139,7 @@ export const GlobalMenuWidth = createGlobalStyle`
 
 export const StyledLayout = styled(Layout)`
   height: 100vh;
-  background: #ffffff;
+
   overflow: hidden;
   overflow-x: hidden;
 `;
@@ -147,15 +149,15 @@ export const StyledHeader = styled(Layout.Header)`
   align-items: center;
   justify-content: space-between;
   padding: 0 1.5rem;
-  background: #ffffff;
-  border-bottom: 0.0625rem solid #f0f0f0;
+
+  border-bottom: 0.0625rem solid #fafafa;
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
   height: 4.5rem;
   line-height: 4.5rem;
   width: calc(100% - 6.625rem);
   margin-left: 6.625rem;
   z-index: 999;
-  
+
   .ant-breadcrumb {
     flex: 1;
     margin: 0 2rem;
@@ -176,7 +178,7 @@ export const SidebarHeader = styled.div`
   justify-content: center;
   padding: 1.5rem 0.5rem;
   margin: 0.25rem 0.5rem;
-  background: #1C1D22;
+  background: #1c1d22;
 `;
 
 export const AlvoLogo = styled.img`
@@ -187,7 +189,7 @@ export const AlvoLogo = styled.img`
 `;
 
 export const StyledSider = styled(Layout.Sider)`
-  background: #1C1D22 !important;
+  background: #1c1d22 !important;
   position: fixed !important;
   left: 0;
   top: 0;
@@ -197,28 +199,27 @@ export const StyledSider = styled(Layout.Sider)`
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  
+
   .ant-layout-sider-children {
-    background: #1C1D22;
+    background: #1c1d22;
     display: flex;
     flex-direction: column;
     height: 100%;
   }
 `;
 
-
 export const SidebarFooter = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0.75rem 0.5rem;
-  background: #1C1D22;
+  background: #1c1d22;
   color: #ffffff;
-  
+
   .MuiSvgIcon-root {
     font-size: 1.25rem;
     cursor: pointer;
-    
+
     &:hover {
       color: #adb5bd;
     }
@@ -226,20 +227,16 @@ export const SidebarFooter = styled.div`
 `;
 
 export const StyledContent = styled(Layout.Content)`
-  margin-left: 6.625rem;
-  padding: 1.5rem;
-  background: #ffffff;
+  margin: 1.5625rem 2.5rem 1.5625rem 8.625rem;
   height: calc(100vh - 4.5rem - 3.75rem);
   overflow-y: auto;
 `;
 
 export const StyledFooter = styled(Layout.Footer)`
-  margin-left: 6.625rem;
-  text-align: center;
-  background: #ffffff;
+  text-align: end;
   color: #6c757d;
   font-size: 0.75rem;
-  padding: 1rem 1.5rem;
+  padding: 1rem 0rem;
   height: 3.75rem;
   line-height: 1.75rem;
 `;
@@ -251,7 +248,7 @@ export const SidePanel = styled.div`
   width: 16.8125rem;
   height: calc(100vh - 4.5rem);
   background: #ffffff;
-  border-right: 0.0625rem solid #f0f0f0;
+  border-right: 0.0625rem solid #fafafa;
   box-shadow: 0.125rem 0 0.5rem rgba(0, 0, 0, 0.1);
   z-index: 998;
   display: flex;
@@ -267,7 +264,6 @@ export const SidePanelHeader = styled.div`
   background: #ffffff;
 `;
 
-
 export const SidePanelContent = styled.div`
   flex: 1;
   overflow-y: auto;
@@ -282,7 +278,7 @@ export const SidePanelItem = styled.div`
   padding-bottom: 1.25rem;
   padding-left: 1.5rem;
   gap: 0.625rem;
-  border-bottom: 0.0625rem solid #f0f0f0;
+  border-bottom: 0.0625rem solid #fafafa;
   cursor: pointer;
   font-size: 0.875rem;
   color: #515151;
@@ -293,7 +289,7 @@ export const SidePanelItem = styled.div`
   transition: color 0.2s ease;
 
   &:hover {
-    color: #0F59C8;
+    color: #0f59c8;
   }
 `;
 
@@ -305,7 +301,10 @@ export const CustomMenu = styled.div`
   flex: 1;
 `;
 
-export const CustomMenuItem = styled.div<{ $isSelected?: boolean; $isOpen?: boolean }>`
+export const CustomMenuItem = styled.div<{
+  $isSelected?: boolean;
+  $isOpen?: boolean;
+}>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -315,7 +314,7 @@ export const CustomMenuItem = styled.div<{ $isSelected?: boolean; $isOpen?: bool
   border-radius: 0.375rem;
   cursor: pointer;
   color: #ffffff;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-size: 0.875rem;
   font-weight: 700;
   text-align: center;
@@ -325,7 +324,7 @@ export const CustomMenuItem = styled.div<{ $isSelected?: boolean; $isOpen?: bool
 
   span {
     margin-top: 0.25rem;
-    font-family: 'Open Sans', sans-serif;
+    font-family: "Open Sans", sans-serif;
     font-size: 0.875rem;
     font-weight: 700;
     font-style: normal;
@@ -335,11 +334,15 @@ export const CustomMenuItem = styled.div<{ $isSelected?: boolean; $isOpen?: bool
     background-color: #495057;
   }
 
-  ${({ $isSelected }) => $isSelected && `
+  ${({ $isSelected }) =>
+    $isSelected &&
+    `
     background-color: #495057;
   `}
 
-  ${({ $isOpen }) => $isOpen && `
+  ${({ $isOpen }) =>
+    $isOpen &&
+    `
     border: 0.125rem solid #495057;
     background-color: #343a40;
   `}
@@ -362,13 +365,23 @@ export const SidePanelTitle = styled(Typography.Title)`
   color: #212529 !important;
 `;
 
-export const PageTitle = styled(Typography.Title)`
-  margin: 1rem 0 !important;
-  font-weight: 700 !important;
+export const PageTitle = styled(Typography.Text)`
+  border-left: 3px solid #ff8048;
+  color: #1c1d22;
+
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+
+  padding-left: 15px;
 `;
 
-export const PageContentContainer = styled.div<{ $bgColor?: string; $borderRadius?: number }>`
-  background: ${({ $bgColor }) => $bgColor || '#ffffff'};
+export const PageContentContainer = styled.div<{
+  $bgColor?: string;
+  $borderRadius?: number;
+}>`
+  background: ${({ $bgColor }) => $bgColor || "#FAFAFA"};
   min-height: 30vh;
-  border-radius: ${({ $borderRadius }) => $borderRadius || 0}px;
+  border-radius: ${({ $borderRadius }) => $borderRadius || 0}px;]
 `;

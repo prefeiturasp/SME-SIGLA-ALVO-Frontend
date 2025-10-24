@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { useConcursos } from "../../../../hooks/useConcursos";
 import { usePostProcessoConvocacao } from "./usePostProcessoConvocacao";
 import type {
@@ -7,12 +7,14 @@ import type {
   IProcessoConvocacao,
   IVagasResponse,
 } from "../../../../services/resources/convocacao/IConvocacao";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { API } from "../../../../services";
 import { useQuery } from "@tanstack/react-query";
 import useListRequest from "../../../../hooks/useListRequest";
 import type { IEscolhasFiltro } from "../../../../services/resources/escolhas/IEscolhas";
 import type { ICardData } from "../components/Cargo";
+import { yupResolver } from "@hookform/resolvers/yup";
+import useConvocacaoCandidatosSchema from "./useConvocacaoCandidatosSchema";
 
 export type CargosDisponiveisOption = {
   value: string;
@@ -26,20 +28,21 @@ type ConcursoOption = {
   cargos?: CargosDisponiveisOption[];
 };
 
-type FormFields = {
+export type FormFields = {
   concurso: string | undefined;
   tipo_escolha: string | undefined;
   descricao: string;
-  cargo: string | undefined;
   data_convocacao: string;
   data_corte_vagas: string;
 };
 
 export const useNovaConvocacaoCandidatos = () => {
   const location = useLocation();
-  const editData = location.state.editData as IProcessoConvocacao;
-  const isViewMode = location.state.isViewMode as boolean;
+  const editData = location.state?.editData as IProcessoConvocacao;
+  const isViewMode = !!location.state?.isViewMode as boolean;
   const isEdit = !!editData;
+
+  const { uuid } = useParams<{ uuid: string;}>();
 
   const defaultValues = {
     concurso: editData?.concurso_uuid || undefined,
@@ -51,10 +54,14 @@ export const useNovaConvocacaoCandidatos = () => {
 
   const { concursosData, concursosOptionsIsLoading } = useConcursos();
 
-  const { control, reset, handleSubmit } = useForm<FormFields>({
+  const { control, reset, handleSubmit, formState: { errors: formErrors } } = useForm<FormFields>({
     defaultValues: { ...defaultValues },
+    resolver: yupResolver(useConvocacaoCandidatosSchema()) as Resolver<FormFields>,
   });
   
+ 
+
+
   useEffect(() => {
     if (editData?.concurso_uuid && concursosData) {
          popularSelectDeCargos(editData.concurso_uuid);      
@@ -102,7 +109,9 @@ export const useNovaConvocacaoCandidatos = () => {
     setPodeVisualizarVagas(false);
   };
 
-  const handleSub = async (data: FormFields) => {
+  const handleSub = async (data: FormFields): Promise<IProcessoConvocacao|boolean> => {
+    console.log("Processo de convocação ssss");
+
     if (
       !data.concurso ||
       !data.tipo_escolha ||
@@ -111,7 +120,7 @@ export const useNovaConvocacaoCandidatos = () => {
       !data.data_corte_vagas
     ) {
       console.error("Todos os campos são obrigatórios");
-      return;
+      return false;
     }
 
     // Buscar dados do concurso selecionado
@@ -124,7 +133,7 @@ export const useNovaConvocacaoCandidatos = () => {
 
     if (!concursoSelecionado) {
       console.error("Concurso selecionado não encontrado");
-      return;
+      return false;
     }
 
     const payload: IPostProcessoConvocacaoPayload = {
@@ -140,8 +149,10 @@ export const useNovaConvocacaoCandidatos = () => {
       const result = await postProcessoConvocacaoMutation.mutateAsync(payload);
       console.log("Processo de convocação criado com sucesso:", result);
       reset(defaultValues);
+      return result;
     } catch (error) {
       console.error("Erro ao criar processo de convocação:", error);
+      return false;
     }
   };
 
@@ -253,5 +264,8 @@ export const useNovaConvocacaoCandidatos = () => {
     buscarVagasNasEscolasPorCargo,
     isEdit,
     isViewMode,
+    formErrors,
+    editData,
+    uuid
   };
 };

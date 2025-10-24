@@ -19,3 +19,39 @@ ul, ol {
   margin: 0;
   list-style: none;
 }
+
+
+ 
+
+/* Steps number color to red and weights for current/disabled, as fallback to tokens */
+.ant-steps .ant-steps-item-wait .ant-steps-item-icon >.ant-steps-icon {
+  color: #00000040;
+}
+
+.ant-steps-item-process .ant-steps-item-title,
+.ant-steps-item-process .ant-steps-item-description {
+  font-weight: 600;
+}
+
+.ant-steps-item-wait .ant-steps-item-title,
+.ant-steps-item-wait .ant-steps-item-description,
+.ant-steps-item-disabled .ant-steps-item-title,
+.ant-steps-item-disabled .ant-steps-item-description {
+  font-weight: 400;
+}
+
+/* Global Tabs font-weight rules */
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  font-weight: 600;
+}
+
+.ant-tabs-tab.ant-tabs-tab-disabled .ant-tabs-tab-btn {
+  font-weight: 400;
+}
+
+
+
+
+.ant-steps .ant-steps-item-finish .ant-steps-item-icon {
+  border-color: #1890FF !important;
+}
