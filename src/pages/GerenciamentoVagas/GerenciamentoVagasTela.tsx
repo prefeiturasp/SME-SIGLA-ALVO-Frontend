@@ -12,7 +12,7 @@ import {
 } from "antd";
 import type { UploadProps } from "antd";
 import { Button } from "antd";
-import { CloudUploadOutlined, SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
@@ -125,6 +125,7 @@ const GerenciamentoVagasTela: React.FC = () => {
 
     marginTop: 20,
   };
+  const showCargo = Boolean(cargoSelecionado) || ((dadosVagasNasEscolas?.vagas?.length ?? 0) > 0);
   
   return (
     <>
@@ -140,7 +141,7 @@ const GerenciamentoVagasTela: React.FC = () => {
           variant="borderless"
         >
           <div style={contentStyle}>
-            <Row gutter={[0, 16]} style={{ textAlign: "left" }}>
+            <Row gutter={[24, 16]} style={{ textAlign: "left" }}>
               <Col xs={24} md={8}>
               <Controller
                   control={control}
@@ -179,7 +180,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                   )}
                 />
               </Col>
-              {(cargoSelecionado || (dadosVagasNasEscolas?.vagas?.length && dadosVagasNasEscolas?.vagas?.length > 0)) && (
+              {showCargo && (
                 <Col xs={24} md={8}>
                   <CustomFormItem
                     label="Cargo"
@@ -212,7 +213,7 @@ const GerenciamentoVagasTela: React.FC = () => {
         {(cargoSelecionado && dadosVagasNasEscolas?.vagas?.length && dadosVagasNasEscolas?.vagas?.length > 0) && (
         <Card style={{ marginTop: "1.25rem" }} variant="borderless">
           <div style={contentStyle}>
-            <Row gutter={[0, 16]} style={{ textAlign: "left" }}>
+            <Row gutter={[24, 16]} style={{ textAlign: "left" }}>
               <Col xs={24} md={8}>
                 <Controller
                   control={controlFiltrar}
@@ -247,16 +248,16 @@ const GerenciamentoVagasTela: React.FC = () => {
                       help={formErrorsFiltrar.escola?.message}
                       labelCol={{ span: 24 }}
                     >
-                      <Input {...field} placeholder="" style={{ marginTop: 6, width: "90%" }} />
+                      <Input {...field} placeholder="" style={{ marginTop: 6, width: "100%", maxWidth: "900px" }} />
                     </CustomFormItem>
                   )}
                 />
               </Col>
               <Col span={8} style={{ display: "flex", alignItems: "flex-start", justifyContent: "flex-end", marginTop: -7 }}>
                 <ActionButtonsContainer style={{ justifyContent: "flex-end" }}>
-                  <SecondaryButton onClick={handleLimparFiltros}>Limpar filtros</SecondaryButton>
-                  <SecondaryButton icon={<SearchOutlined />} onClick={handleFiltrar}>Buscar</SecondaryButton>
-                  <PrimaryButton>Incluir escola</PrimaryButton>
+                  <Button onClick={handleLimparFiltros}>Limpar filtros</Button>
+                  <Button icon={<SearchOutlined />} onClick={handleFiltrar}>Buscar</Button>
+                  <Button type="primary">Incluir escola</Button>
                 </ActionButtonsContainer>
               </Col>
             </Row>
@@ -280,7 +281,7 @@ const GerenciamentoVagasTela: React.FC = () => {
         )}
          {(cargoSelecionado && dadosVagasNasEscolas?.vagas?.length && dadosVagasNasEscolas?.vagas?.length > 0) && (
         <ActionButtonsContainer>
-          <PrimaryButton onClick={handleSalvar}>Salvar</PrimaryButton>
+          <Button type="primary" size="large" onClick={handleSalvar}>Salvar</Button>
         </ActionButtonsContainer>
         )}
         {!uploadConcluido && (
@@ -301,9 +302,6 @@ const GerenciamentoVagasTela: React.FC = () => {
                     >
                       <Text strong style={{ display: "block", marginBottom: 8 }}>Importar vagas</Text>
                       <Dragger {...draggerProps}>
-                      <p className="ant-upload-drag-icon">
-                          <CloudUploadOutlined style={{ fontSize: "4.5rem", color: "#032B68" }} />
-                      </p>
                       <p className="ant-upload-drag-icon">
                           <CloudUploadIcon style={{ fontSize: "4.5rem", color: "#032B68" }} />
                       </p>
