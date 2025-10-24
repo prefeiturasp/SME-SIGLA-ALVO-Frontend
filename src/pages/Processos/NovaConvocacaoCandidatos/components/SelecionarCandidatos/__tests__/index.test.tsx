@@ -362,7 +362,7 @@ describe('SelecionarCandidatos', () => {
         await user.click(selecionarButton);
       });
 
-      expect(mockOnCandidatosSelecionados).toHaveBeenCalledWith(0, {
+      expect(mockOnCandidatosSelecionados).toHaveBeenCalledWith(2, {
         geral: 1,
         pcd: 1,
         nna: 0
