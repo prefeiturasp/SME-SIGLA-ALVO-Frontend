@@ -237,10 +237,7 @@ const VagasEscolasTabela: React.FC<VagasEscolasTabelaProps> = ({
 
   const rowSelection: any = {
     selectedRowKeys,
-    // preserveSelectedRowKeys: true,
     onChange: (keys: React.Key[], rows: any[]) => {
-      console.log("keys", keys);
-      console.log("rows", rows);
       setSelectedRowKeys(keys);
       const visibleUuids = new Set(filteredData.map((item) => item.uuid));
       setEditableData((prev) =>

@@ -208,7 +208,7 @@ const GerenciamentoVagasTela: React.FC = () => {
           </div>
 
         </Card>
-        
+
         {(cargoSelecionado && dadosVagasNasEscolas?.vagas?.length && dadosVagasNasEscolas?.vagas?.length > 0) && (
         <Card style={{ marginTop: "1.25rem" }} variant="borderless">
           <div style={contentStyle}>
@@ -220,8 +220,6 @@ const GerenciamentoVagasTela: React.FC = () => {
                   render={({ field }) => (
                     <CustomFormItem
                       label={"DRE"}
-                      // validateStatus={formErrors.dre ? "error" : undefined}
-                      // help={formErrors.dre?.message}
                       labelCol={{ span: 24 }}
                     >
                       <ResponsiveSelect

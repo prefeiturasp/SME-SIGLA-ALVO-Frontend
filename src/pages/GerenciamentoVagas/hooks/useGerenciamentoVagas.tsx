@@ -96,12 +96,10 @@ export const useGerenciamentoVagas = () => {
   };
 
   const handleSelectProcessoConvocacao = (value: string | undefined) => {
-    console.log("handleSelectProcessoConvocacao", value);
     setProcessoSelecionado(value);
     setPodeBuscarVagas(Boolean(value));
     const results = (processosConvocacaoData?.results ?? []) as any[];
     const found = results.find((item) => item?.uuid === value);
-    console.log("found", found);
     setConcursoUuid(found?.concurso_uuid);
   }
 
@@ -185,7 +183,6 @@ export const useGerenciamentoVagas = () => {
     setVagasEscolasData(dadosVagasNasEscolas?.vagas || []);
   };
 
-  // console.log("vagasEscolasData", vagasEscolasData);
   return {
     processosConvocacaoData,
     processosConvocacaoIsLoading,
