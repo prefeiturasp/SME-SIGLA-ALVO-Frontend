@@ -29,6 +29,8 @@ import IncluirEscolasModal from "./components/IncluirEscolasModal";
 import styled from "styled-components";
 
 import { useGerenciamentoVagas } from "./hooks/useGerenciamentoVagas";
+import type { IInclusaoVagasEscolasPayload } from "./hooks/types";
+
 
 
 const { Text } = Typography;
@@ -45,38 +47,6 @@ const GerenciamentoVagasTela: React.FC = () => {
   // Estado para controlar o modal de incluir escolas
   const [modalIncluirEscolasVisible, setModalIncluirEscolasVisible] = useState(false);
   
-  // Funções para controlar o modal
-  const handleAbrirModalIncluirEscolas = () => {
-    setModalIncluirEscolasVisible(true);
-  };
-  
-  const handleFecharModalIncluirEscolas = () => {
-    setModalIncluirEscolasVisible(false);
-  };
-  
-  const handleEscolasSelecionadas = (escolas: any[]) => {
-    // Aqui será implementada a lógica para processar as escolas selecionadas
-    console.log('Escolas selecionadas:', escolas);
-    message.success(`${escolas.length} escolas adicionadas com sucesso!`);
-  };
-  
-  const draggerProps: UploadProps = {
-    name: 'file',
-    multiple: false,
-    accept: '.csv',
-    beforeUpload: (file) => {
-      handleFileUpload(file as File);
-      return false;
-    },
-    onChange(info) {
-      const { status, name } = info.file;
-      if (status === 'done') {
-        message.success(`${name} enviado com sucesso`);
-      } else if (status === 'error') {
-        message.error(`${name} falhou ao enviar`);
-      }
-    },
-  };
   const {
     processosConvocacaoData,
     processosConvocacaoIsLoading,
@@ -106,7 +76,40 @@ const GerenciamentoVagasTela: React.FC = () => {
     selecionadasKeys,
     setSelecionadasKeys,
     cargoSelecionado,
+    postInclusaoVagasEscolasMutation,
   } = useGerenciamentoVagas();
+
+  // Funções para controlar o modal
+  const handleAbrirModalIncluirEscolas = () => {
+    setModalIncluirEscolasVisible(true);
+  };
+  
+  const handleFecharModalIncluirEscolas = () => {
+    setModalIncluirEscolasVisible(false);
+  };
+  
+    const handleEscolasSelecionadas = (payload: IInclusaoVagasEscolasPayload) => {
+      postInclusaoVagasEscolasMutation.mutate(payload);
+    };
+  
+  const draggerProps: UploadProps = {
+    name: 'file',
+    multiple: false,
+    accept: '.csv',
+    beforeUpload: (file) => {
+      handleFileUpload(file as File);
+      return false;
+    },
+    onChange(info) {
+      const { status, name } = info.file;
+      if (status === 'done') {
+        message.success(`${name} enviado com sucesso`);
+      } else if (status === 'error') {
+        message.error(`${name} falhou ao enviar`);
+      }
+    },
+  };
+
   const navigate = useNavigate();
   const breadcrumbItems = [
     {
@@ -275,18 +278,9 @@ const GerenciamentoVagasTela: React.FC = () => {
               </Col>
               <Col span={8} style={{ display: "flex", alignItems: "flex-start", justifyContent: "flex-end", marginTop: -7 }}>
                 <ActionButtonsContainer style={{ justifyContent: "flex-end" }}>
-<<<<<<< Updated upstream
-                  <Button onClick={handleLimparFiltros}>Limpar filtros</Button>
-                  <Button icon={<SearchOutlined />} onClick={handleFiltrar}>Buscar</Button>
-                  <Button type="primary">Incluir escola</Button>
-=======
                   <SecondaryButton onClick={handleLimparFiltros}>Limpar filtros</SecondaryButton>
                   <SecondaryButton icon={<SearchOutlined />} onClick={handleFiltrar}>Buscar</SecondaryButton>
                   <PrimaryButton onClick={handleAbrirModalIncluirEscolas}>Incluir escola</PrimaryButton>
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
                 </ActionButtonsContainer>
               </Col>
             </Row>
@@ -358,6 +352,10 @@ const GerenciamentoVagasTela: React.FC = () => {
         onClose={handleFecharModalIncluirEscolas}
         processo={processosConvocacaoData?.results?.find((p: any) => p.uuid === control._formValues?.processo_convocacao)?.descricao || "Carregando..."}
         cargo={(concursoData?.cargos as any)?.find((c: any) => c.uuid === cargoSelecionado)?.nome || "Cargo"}
+        cargoCodigo={(concursoData?.cargos as any)?.find((c: any) => c.uuid === cargoSelecionado)?.codigo}
+        cargoNome={(concursoData?.cargos as any)?.find((c: any) => c.uuid === cargoSelecionado)?.nome}
+        processoNome={processosConvocacaoData?.results?.find((p: any) => p.uuid === control._formValues?.processo_convocacao)?.descricao}
+        processoUuid={control._formValues?.processo_convocacao}
         dadosVagasImportadas={dadosVagasNasEscolas}
         onEscolasSelecionadas={handleEscolasSelecionadas}
       />

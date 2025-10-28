@@ -1,13 +1,17 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosEscolhas } from "../../axios";
-import type { IEscolhasFiltro } from "./IEscolhas";
+import type { IEscolhasFiltro, IDREsResponse, IEscolasResponse, IBuscarDREsParams, IBuscarEscolasParams } from "./IEscolhas";
 import type { IListRequest } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 import type {  IVagasResponse } from "../convocacao/IConvocacao";
+import type { IInclusaoVagasEscolasPayload } from "../../../pages/GerenciamentoVagas/hooks/types";
 
 export const URL = {
   getVagasEscolas: () => `/api/v1/vagas-escolas/`,
   patchVagasEscolasUtilizadas: () => `/api/v1/vagas-escolas/utilizadas/`,
+  getDREs: () => `/api/v1/dres/`,
+  getEscolas: () => `/api/v1/escolas/`,
+  postInclusaoVagasEscolas: () => `/api/v1/vagas-escolas/inclusao/`,
 };
 
 // TODO adicionar JWT no header Authorization
@@ -51,3 +55,65 @@ export const patchVagasEscolasUtilizadas = (
     abort,
   };
 };
+
+// GET DREs do MS-Escolhas
+export const getDREs = (
+  params: IBuscarDREsParams = {},
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosEscolhas
+    .get<IDREsResponse>(URL.getDREs(), {
+      params: { page_size: 100, ...params },
+      paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// GET Escolas do MS-Escolhas
+export const getEscolas = (
+  params: IBuscarEscolasParams,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  
+  const response = appAxiosEscolhas
+    .get<IEscolasResponse>(URL.getEscolas(), {
+      params: { ...params },
+      paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// POST Inclusão de Vagas Escolas
+export const postInclusaoVagasEscolas = (
+  payload: IInclusaoVagasEscolasPayload,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosEscolhas
+    .post(URL.postInclusaoVagasEscolas(), payload, {
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+    return {
+      response,
+      abort,
+    };
+  };
