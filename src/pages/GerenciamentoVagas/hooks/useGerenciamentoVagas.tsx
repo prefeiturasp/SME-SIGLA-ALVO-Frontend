@@ -10,6 +10,7 @@ import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
 import { useGetConcursoByUuid } from "./useGetConcursoPorUuid";
 import type { IVaga } from "../../../services/resources/convocacao/IConvocacao";
 import { usePatchVagasEscolasUtilizadas } from "./usePatchVagasEscolasUtilizadas";
+import { usePostInclusaoVagasEscolas } from "./usePostInclusaoVagasEscolas";
 
 
 export const useGerenciamentoVagas = () => {
@@ -50,6 +51,7 @@ export const useGerenciamentoVagas = () => {
   const postImportacaoArquivosVagasMutation = usePostImportacaoArquivosVagas({
     onSuccess: () => importacoesArquivosRefetch(),
   });
+  const postInclusaoVagasEscolasMutation = usePostInclusaoVagasEscolas();
   const {
     control,
     handleSubmit,
@@ -229,6 +231,7 @@ export const useGerenciamentoVagas = () => {
     formErrorsFiltrar,
     handleFiltrar,
     handleLimparFiltros,
+    postInclusaoVagasEscolasMutation,
     // Lista com uuid e valores utilizados (extras ou base) para as linhas selecionadas
     vagasUtilizadas: selecionadas.map((row) => {
       const current: any = vagasEscolasData.find((x) => x.uuid === row.uuid) || row as any;
