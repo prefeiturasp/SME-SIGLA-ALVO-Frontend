@@ -5,7 +5,8 @@ import ProtectedRoute from "./protected";
 import { HomeTela } from "../pages/Home/HomeTela";
 import ConvocacaoCandidatosTela from "../pages/Processos/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
 import NovaConvocacaoCandidatosTela from "../pages/Processos/NovaConvocacaoCandidatos/NovaConvocacaoCandidatosTela";
-import ImportacaoDadosTela from "../pages/Processos/ImportacaoDados/ImportacaoDadosTela";
+import ImportacaoDadosTela from "../pages/ImportacaoDados/ImportacaoDadosTela";
+import ImportacaoDados2 from "../pages/Processos/ImportacaoDados/ImportacaoDados2";
 import LayoutPadraoVagasTela from "../pages/Processos/ImportacaoDados/LayoutPadraoVagas/LayoutPadraoVagasTela";
 import HistoricoVagasTela from "../pages/Processos/ImportacaoDados/HistoricoVagas/HistoricoVagasTela";
 import NotFoundTela from "../pages/NotFound/NotFoundTela";
@@ -110,6 +111,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <DadosDoProcesso />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/processos/importacao-dados2",
+    element: (
+      <ProtectedRoute>
+        <ImportacaoDados2 />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,

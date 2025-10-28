@@ -11,11 +11,11 @@ export const theme = {
     colorError: "#DB001B",  
     colorText: "#1C1D22",
     colorTextSecondary: "#515151",
-    colorTextDescription: "rgba(81, 81, 81, 0.80);",
+    colorTextDescription: "#515151",
     fontSize: 16,
-    fontWeightStrong: 600,
+    fontWeightStrong: 700,
     fontWeight: 400,
-   },
+  },
   components: {
     Form: {
       labelRequiredMarkColor: "#515151",
@@ -53,8 +53,15 @@ export const theme = {
       fontSizeSM: 14,
       fontSize: 16,
 
-      
+      paddingInlineSM: 12,
+      paddingBlockSM: 4,
+     
+     
+     controlLineWidth: 1,
+     controlOutlineWidth: 1,
 
+     
+     
       borderRadius: 8, // borda arredondada
       colorBorder: "#B1B2B7", // cor da borda padrão
       defaultBorderColor: "#B1B2B7",
@@ -78,8 +85,13 @@ export const theme = {
       headerBorderWidth: 0, // remove a borda inferior do header
 
     },
-    
-      Steps: {      
+    Tabs:{
+  
+      
+    colorPrimary: "#0F59C8",
+      
+  },    
+  Steps: {      
       colorPrimary: "#1890FF",      
       
       colorTextDescription: "#00000073", // cor da descrição

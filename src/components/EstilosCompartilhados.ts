@@ -55,7 +55,7 @@ export const SectionCard = styled(Card)`
 `;
 
 // Títulos das seções
-export const SectionTitle = styled(Typography.Title).attrs({ level: 4 })`
+export const SectionTitle = styled(Typography.Title).attrs({ level: 5 })`
   margin-bottom: 1.5rem !important;
   color: #333 !important;
 `;
@@ -155,9 +155,10 @@ export const SectionDivider = styled.div`
 // Upload personalizado do Ant Design
 export const StyledUpload = styled(Upload)`
   width: 100%;
-
+  
   .ant-upload {
     width: 100%;
+    height: 80px;
   }
 
   .ant-upload-drag {
