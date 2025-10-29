@@ -38,6 +38,8 @@ export const CustomModal2 = styled(Modal)`
 // Container para conteúdo das abas
 export const TabContentContainer = styled.div`
   padding: 0.5rem 0 1.5rem 0;
+  min-height: 60vh; /* ocupa toda a altura da tela */
+
 
   /* Remove qualquer outline ou border de debug */
   .ant-row,
@@ -55,7 +57,7 @@ export const SectionCard = styled(Card)`
 `;
 
 // Títulos das seções
-export const SectionTitle = styled(Typography.Title).attrs({ level: 4 })`
+export const SectionTitle = styled(Typography.Title).attrs({ level: 5 })`
   margin-bottom: 1.5rem !important;
   color: #333 !important;
 `;
@@ -130,13 +132,18 @@ export const MultilineText = styled.div`
   white-space: pre-line;
 `;
 
+
+export const GrupoEsquerda = styled.div`
+    display: flex;
+    gap: 16px;   
+`
 // Área de upload de arquivos
-export const UploadArea = styled.div`
-  border: 0.125rem dashed #d9d9d9;
+export const UploadArea = styled.div<{ status?: string }>`
+  border: 0.125rem dashed ${props => props.status === "error" ? "#DB001B" : "#d9d9d9"};
   border-radius: 0.375rem;
   padding: 0.5rem 0.75rem;
   text-align: center;
-  background-color: #fafafa;
+  background-color: "#fafafa"
   height: 2.5rem;
   display: flex;
   align-items: center;
@@ -154,10 +161,12 @@ export const SectionDivider = styled.div`
 
 // Upload personalizado do Ant Design
 export const StyledUpload = styled(Upload)`
-  width: 100%;
-
+  
+  
   .ant-upload {
     width: 100%;
+    height: 80px;
+    margin-top: 16px;
   }
 
   .ant-upload-drag {
@@ -178,10 +187,12 @@ export const StyledUpload = styled(Upload)`
 
 // Container para os botões de ação
 export const ActionButtonsContainer = styled.div`
+  margin-top: auto;
+
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  margin-top: 1.5rem;
+
   padding: 1rem 0;
 `;
 
@@ -336,3 +347,9 @@ line-height: 22px;
 export const CustomTitle = styled(Typography.Title).attrs({ level: 4 })`
   margin: 2.375rem 0 1rem 0;
 `;
+export const deleteIcon = {
+  width: '1.07125rem',
+  height: '1.11625rem',
+  color: '#838383',
+  fontSize: '1.07125rem'
+};

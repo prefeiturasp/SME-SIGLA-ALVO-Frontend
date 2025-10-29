@@ -32,7 +32,7 @@ export const CustomFormItem = styled(FormItem)`
     
   .ant-form-item-label {
     padding-bottom: 0;
-    margin-bottom: -4px; /* encosta mais o label do campo */
+    margin-bottom: 0.75rem; 
   }
   .ant-form-item-label > label {
     font-weight: 700;
