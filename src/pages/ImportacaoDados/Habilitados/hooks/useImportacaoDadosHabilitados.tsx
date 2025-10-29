@@ -96,7 +96,6 @@ export const useImportacaoDados = () => {
 
 
 
-  const { handleBaixarArquivo, isDownloading } = useLayoutDownload();
 
   
   return {
@@ -113,8 +112,6 @@ export const useImportacaoDados = () => {
     createImportacaoError: postImportacaoArquivosMutation.error,
     listRequest,
     onAntTableChange,
-    handleBaixarArquivo,
-    isDownloading,
   };
 };
 

@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { App } from 'antd';
 import React from 'react';
 import * as yup from 'yup';
-import { useImportacaoDados } from '../useImportacaoDados';
+import { useImportacaoDadosHabilitados } from '../useImportacaoDadosHabilitados';
 import useImportacaoSchema from '../useImportacaoSchema';
 import { useConcursos } from '../../../../../../hooks/useConcursos';
 import type { 
@@ -321,7 +321,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
     });
   });
 
-  describe('useImportacaoDados.tsx - Hook Principal', () => {
+  describe('useImportacaoDadosHabilitados.tsx - Hook Principal', () => {
     const mockPostResponse = { id: 1, status: 'success' };
     const mockGetResponse = [
       {
@@ -342,7 +342,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve inicializar com valores padrão corretos', () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosHabilitados(), { wrapper });
 
       expect(result.current.control).toBeDefined();
       expect(result.current.handleSubmit).toBeDefined();
@@ -354,7 +354,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve executar query para buscar importações', async () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosHabilitados(), { wrapper });
 
       // Verificar se o hook inicializa corretamente
       expect(result.current.importacoesArquivosIsLoading).toBe(true);
@@ -369,7 +369,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve executar handleEnviarForm com sucesso', async () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosHabilitados(), { wrapper });
 
       const testFile = new File(['test'], 'test.csv', { type: 'text/csv' });
       const formData = {
@@ -393,7 +393,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve retornar early quando arquivo ou concurso estão ausentes', async () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosHabilitados(), { wrapper });
 
       const formDataSemArquivo = {
         concurso: 'CONCURSO_001',
@@ -420,7 +420,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve executar handleReset corretamente', () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosHabilitados(), { wrapper });
 
       act(() => {
         result.current.handleReset();
@@ -432,7 +432,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve executar handleFileUpload corretamente', () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosHabilitados(), { wrapper });
 
       const testFile = new File(['test'], 'test.csv', { type: 'text/csv' });
 
@@ -446,7 +446,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve mostrar estado de loading durante criação', async () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosHabilitados(), { wrapper });
 
       // Verificar estado inicial
       expect(result.current.isCreatingImportacao).toBe(false);
@@ -470,7 +470,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve testar catch block no handleEnviarForm', async () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosHabilitados(), { wrapper });
 
       // Mock para simular erro no mutateAsync
       const error = new Error('Erro no mutateAsync');
@@ -498,7 +498,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve configurar query com parâmetros corretos', () => {
       const wrapper = createWrapper();
-      renderHook(() => useImportacaoDados(), { wrapper });
+      renderHook(() => useImportacaoDadosHabilitados(), { wrapper });
 
       expect(API.ImportacaoDados.getImportacaoArquivosHabilitados).toHaveBeenCalledWith(
         expect.objectContaining({ pagination: expect.any(Object) }),
@@ -508,7 +508,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve retornar todas as propriedades necessárias', () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosHabilitados(), { wrapper });
 
       expect(result.current).toHaveProperty('control');
       expect(result.current).toHaveProperty('handleSubmit');
@@ -525,7 +525,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
 
     it('deve cobrir linhas 86-87 - quando concurso selecionado não é encontrado', async () => {
       const wrapper = createWrapper();
-      const { result } = renderHook(() => useImportacaoDados(), { wrapper });
+      const { result } = renderHook(() => useImportacaoDadosHabilitados(), { wrapper });
 
       // Mock para simular concurso não encontrado
       mockUseConcursos.mockReturnValue({

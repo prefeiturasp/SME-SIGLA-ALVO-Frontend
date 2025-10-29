@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Row, Col, Select, Button, Typography, Space } from "antd";
 import { Controller } from "react-hook-form";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useImportacaoDados } from "./hooks/useImportacaoDados";
+import { useImportacaoDados } from "./hooks/useImportacaoDadosHabilitados";
 import { CustomFormItem } from "../../../components/FormStyle";
 import {
   TabContentContainer,
@@ -13,6 +13,7 @@ import {
   UploadArea,
   StyledUpload,
   ActionButtonsContainer,
+  GrupoEsquerda,
 } from "../../../components/EstilosCompartilhados";
 import { useConcursos } from "../../../hooks/useConcursos";
 import Title from "antd/es/typography/Title";
@@ -44,16 +45,17 @@ const props: UploadProps = {
 
 import { DownloadOutlined } from "@ant-design/icons";
 import FormItem from "antd/es/form/FormItem";
+import { useNavigate } from "react-router-dom";
 
 interface HabilitadosProps {
-  onShowHistorico: () => void;
   onShowLayoutPadrao: () => void;
+  onShowHistorico: () => void;
+
 }
 
-const { Text } = Typography;
-const Habilitados: React.FC<HabilitadosProps> = ({
-  onShowHistorico,
-  onShowLayoutPadrao,
+const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
+    onShowLayoutPadrao,
+    onShowHistorico,
 }) => {
   const {
     control,
@@ -61,46 +63,20 @@ const Habilitados: React.FC<HabilitadosProps> = ({
     handleFileUpload,
     handleSubmit,
     handleEnviarForm,
-    watch,
-    importacoesArquivos,
-    importacoesArquivosIsLoading,
-    handleBaixarArquivo,
+    watch    
   } = useImportacaoDados();
+  const navigate = useNavigate();
   const { concursosData, concursosOptionsIsLoading } = useConcursos();
   const watchedFile = watch("arquivo");
-
+  
   return (
+    <>
     <TabContentContainer>
-      <>
-        <Row
-          gutter={[0, 16]}
-          style={{
-            padding: "20px 16px",
-            borderRadius: "8px",
-            backgroundColor: "#FFFFFF",
-            marginBottom: "1.8125rem",
-          }}
-        >
-          <Space size={16}>
-            <Button      
-              size="large"
-              onClick={() => handleBaixarArquivo("HABILITADOS")}
-            >
-              <DownloadOutlined /> Layout Padrão
-            </Button>
-
-            <Text style={{ fontSize: "14px" }}>
-              O Layout padrão mostra o formato correto dos campos e colunas que
-              você deve preencher para que a importação funcione sem erros.
-            </Text>
-          </Space>
-        </Row>
+      
 
         <Row
-          style={{
-            marginBottom: "1.8125rem",
-          }}
-          gutter={16}
+          
+          gutter={40}
         >
           <Col xs={24} sm={12}>
             <Controller
@@ -155,7 +131,7 @@ const Habilitados: React.FC<HabilitadosProps> = ({
             render={() => (
               <FormItem
                 validateStatus={formErrors.arquivo ? "error" : undefined}
-                help={formErrors.arquivo?.message}
+                help={formErrors.arquivo?.message}                
                 labelCol={{ span: 24 }}
               >
                 <StyledUpload
@@ -168,14 +144,20 @@ const Habilitados: React.FC<HabilitadosProps> = ({
                   showUploadList={false}
                   multiple={false}
                 >
-                  <UploadArea style={{ height: "80px" }}>
-                  <CloudUploadOutlined style={{ fontSize: 40, color: "#BFBFBF" }} />
+                  <UploadArea style={{ height: "64px" }} status={formErrors.arquivo ? "error" : undefined}>
+                  <GrupoEsquerda>
+                  <CloudUploadOutlined style={{ fontSize: 38, color: "#838383" }} />
 
-                    <span style={{ color: "#666", fontSize: "0.875rem" }}>
+                    <span style={{ color: "#666", fontSize: "14px", textAlign: "left" }}>
                       {watchedFile
                         ? watchedFile.name
-                        : "Selecione ou arraste e solte aqui o arquivo de importação"}
+                        : <>
+                        Selecione ou arraste e solte aqui <br />o arquivo de importação (.csv)
+                          </>                      
+                        }
                     </span>
+                    </GrupoEsquerda>
+
                     <Button type="primary" size="small" style={{ fontSize: "14px" }}>
                       Selecionar
                     </Button>
@@ -187,18 +169,20 @@ const Habilitados: React.FC<HabilitadosProps> = ({
         </Col>
         </Row>
 
-      <ActionButtonsContainer>
-        <Button type="primary" ghost size="large" onClick={onShowHistorico}>
-          Histórico
-        </Button>        
+      
 
-        <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)}>
-        Importar
-        </Button>
-      </ActionButtonsContainer>
-      </>
     </TabContentContainer>
+    <ActionButtonsContainer>
+    <Button type="primary" ghost size="large" onClick={onShowHistorico}>
+      Histórico
+    </Button>        
+
+    <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)}>
+    Importar
+    </Button>
+  </ActionButtonsContainer>
+  </>
   );
 };
 
-export default Habilitados;
+export default HabilitadosFormTab;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, fireEvent } from '@testing-library/react';
 import { App } from 'antd';
-import Vagas from '../VagasTela';
+import Vagas from '../VagasFormTab';
 import { renderWithProviders } from '../../../../../test-utils';
 import { useImportacaoDadosVagas } from '../hooks/useImportacaoDadosVagas';
 

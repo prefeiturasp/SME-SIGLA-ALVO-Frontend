@@ -1,9 +1,9 @@
 import React from "react";
 import { Table, Typography, Button } from "antd";
 import { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from "./styles";
-import { API } from "../../../../../../services";
+import { API } from "../../../../services";
 import { useQuery } from "@tanstack/react-query";
-import type { ILayout } from "../../../../../../services/resources/importacaoDados/IImportacaoArquivos";
+import type { ILayout } from "../../../../services/resources/importacaoDados/IImportacaoArquivos";
 
 const columns = [
   {

@@ -22,18 +22,18 @@ import {
   UploadArea,
   StyledUpload,
   ActionButtonsContainer,
+  GrupoEsquerda,
 } from "../../../components/EstilosCompartilhados";
 import { useNavigate } from "react-router-dom";
 
-import { CloudUploadOutlined, DownloadOutlined } from "@ant-design/icons";
-import Dragger from "antd/es/upload/Dragger";
+import { CloudUploadOutlined } from "@ant-design/icons";
 import FormItem from "antd/es/form/FormItem";
 
 interface VagasProps {
   onShowLayoutPadrao: () => void;
 }
 const { Text, Title } = Typography;
-const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
+const VagasFormTab: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
   const {
     control,
     formErrors,
@@ -55,6 +55,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
 
   return (
     <>
+    <TabContentContainer>
       <Row style={{ marginBottom: "1.8125rem" }}>
         <Title level={5} type="secondary" style={{ marginTop: "0" }}>
           Selecione abaixo o tipo de arquivo que deseja carregar
@@ -68,29 +69,9 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
           e acompanhe em tempo real as opções abertas para escolha.
         </Text>
       </Row>
-      <Row
-        gutter={[0, 16]}
-        style={{
-          padding: "20px 16px",
-          borderRadius: "8px",
-          backgroundColor: "#FFFFFF",
-          marginBottom: "1.8125rem",
-        }}
-      >
-        <Space size={16}>
-          <Button onClick={() => handleBaixarArquivo("VAGAS")}>
-            <DownloadOutlined /> Layout Padrão
-          </Button>
+      
 
-          <Text style={{ fontSize: "14px" }}>
-            O Layout padrão mostra o formato correto dos campos e colunas que
-            você deve preencher para que a importação dos dados funcione sem
-            erros.
-          </Text>
-        </Space>
-      </Row>
-
-      <Row gutter={16} style={{ marginBottom: "1.8125rem" }}>
+      <Row gutter={40} style={{ marginBottom: "1.8125rem" }}>
         <Col xs={24} sm={12}>
           <Controller
             control={control}
@@ -154,14 +135,20 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
                   showUploadList={false}
                   multiple={false}
                 >
-                  <UploadArea style={{ height: "80px" }}>
-                  <CloudUploadOutlined style={{ fontSize: 40, color: "#BFBFBF" }} />
+                  <UploadArea style={{ height: "64px" }} status={formErrors.arquivo ? "error" : undefined}>
+                  <GrupoEsquerda>
+                  <CloudUploadOutlined style={{ fontSize: 38, color: "#838383" }} />
 
-                    <span style={{ color: "#666", fontSize: "0.875rem" }}>
+                    <span style={{ color: "#666", fontSize: "14px", textAlign: "left" }}>
                       {watchedFile
                         ? watchedFile.name
-                        : "Selecione ou arraste e solte aqui o arquivo de importação"}
+                        : <>
+                        Selecione ou arraste e solte aqui <br />o arquivo de importação (.csv)
+                          </>                      
+                        }
                     </span>
+                    </GrupoEsquerda>
+
                     <Button type="primary" size="small" style={{ fontSize: "14px" }}>
                       Selecionar
                     </Button>
@@ -173,26 +160,19 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
         </Col>
       </Row>
 
-      {/* <ActionButtonsContainer>
-        <Button type="primary" ghost size="large" onClick={onShowHistorico}>
-          Histórico
-        </Button>
+      
+      </TabContentContainer>
+    <ActionButtonsContainer>
+    <Button type="primary" ghost size="large" onClick={onShowHistorico}>
+      Histórico
+    </Button>        
 
-        <Button
-          type="primary"
-          ghost
-          size="large"
-          onClick={handleSubmit(handleEnviarForm)}
-        >
-          Importar
-        </Button>
-
-        <Button type="primary" size="large" onClick={onShowLayoutPadrao}>
-          Layout padrão
-        </Button>
-      </ActionButtonsContainer> */}
-    </>
+    <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)}>
+    Importar
+    </Button>
+  </ActionButtonsContainer>
+  </>
   );
 };
 
-export default Vagas;
+export default VagasFormTab;

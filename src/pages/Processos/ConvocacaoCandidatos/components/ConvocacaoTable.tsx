@@ -17,13 +17,14 @@ import {
   statusHeaderContainer,
   editIcon,
   viewIcon,
-  deleteIcon,
   finalizarButton,
   finalizarButtonHover,
   finalizarButtonLeave,
   emptyTextContainer,
   hiddenButton
 } from "./style";
+
+import { deleteIcon } from "../../../../components/EstilosCompartilhados";
 
 interface ConvocacaoTableProps extends TableProps<IProcessoConvocacao> {
   data: IProcessoConvocacao[];

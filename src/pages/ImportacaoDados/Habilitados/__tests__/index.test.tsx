@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConfigProvider } from 'antd';
-import Habilitados from '../HabilitadosTela';
+import Habilitados from '../HabilitadosTab';
 import LayoutPadrao from '../components/LayoutPadrao';
 import { useImportacaoDados } from '../hooks/useImportacaoDados';
 import { useConcursos } from "../../../../../hooks/useConcursos";
