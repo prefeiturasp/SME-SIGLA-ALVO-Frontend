@@ -285,6 +285,7 @@ const SelecaoCargos: React.FC = () => {
                   onClick={handleBuscarCandidatos}
                   disabled={!cargoSelecionado && cargosAdicionados.length === 0}
                   style={{
+                    marginTop: '10px',
                     ...inlineStyles.buscarButton,
                     ...inlineStyles.buscarButtonAdditional,
                     ...inlineStyles.buttonInlineStyles,
