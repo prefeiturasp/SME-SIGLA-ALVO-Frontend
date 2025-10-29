@@ -86,6 +86,6 @@ export const appAxiosEscolhas = axios.create({
 addAuthInterceptor(appAxiosEscolhas);
 
 export const appAxiosAgenda = axios.create({
-  baseURL: getEnv("AGENDA_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-agenda"),
+  baseURL: getEnv("AGENDA_API_URL", "http://localhost:8006"),
 });
 addAuthInterceptor(appAxiosAgenda);

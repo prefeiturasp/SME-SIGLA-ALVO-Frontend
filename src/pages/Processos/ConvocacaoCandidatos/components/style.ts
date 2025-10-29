@@ -69,12 +69,7 @@ export const viewIcon = {
   fontSize: '0.9095982313156128rem'
 };
 
-export const deleteIcon = {
-  width: '1.07125rem',
-  height: '1.11625rem',
-  color: '#838383',
-  fontSize: '1.07125rem'
-};
+
 
 // Estilos para o botão "Finalizar Processo"
 export const finalizarButton = {

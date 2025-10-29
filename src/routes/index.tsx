@@ -4,10 +4,10 @@ import ProtectedRoute from "./protected";
 
 import { HomeTela } from "../pages/Home/HomeTela";
 import ConvocacaoCandidatosTela from "../pages/Processos/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
-import NovaConvocacaoCandidatosTela from "../pages/Processos/NovaConvocacaoCandidatos/NovaConvocacaoCandidatosTela";
-import ImportacaoDadosTela from "../pages/Processos/ImportacaoDados/ImportacaoDadosTela";
-import LayoutPadraoVagasTela from "../pages/Processos/ImportacaoDados/LayoutPadraoVagas/LayoutPadraoVagasTela";
-import HistoricoVagasTela from "../pages/Processos/ImportacaoDados/HistoricoVagas/HistoricoVagasTela";
+import ImportacaoDadosTela from "../pages/ImportacaoDados/ImportacaoDadosTela";
+import ImportacaoDados2 from "../pages/Processos/ImportacaoDados/ImportacaoDados2";
+import LayoutPadraoTela from "../pages/LayoutPadraoTela/LayoutPadraoTela";
+import HistoricoVagasTela from "../pages/HistoricoVagas/HistoricoVagasTela";
 import NotFoundTela from "../pages/NotFound/NotFoundTela";
 import LoginTela from "../pages/Login/LoginTela";
 import EsqueceuSenhaTela from "../pages/Login/EsqueceuSenhaTela";
@@ -127,6 +127,15 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
+    path: "/processos/importacao-dados2",
+    element: (
+      <ProtectedRoute>
+        <ImportacaoDados2 />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
     path: "/processos/importacao-dados",
     element: (
       <ProtectedRoute>
@@ -139,7 +148,7 @@ const router = createBrowserRouter([
     path: "/processos/importacao-dados/layout-padrao-vagas",
     element: (
       <ProtectedRoute>
-        <LayoutPadraoVagasTela tipo={"VAGAS"} />
+        <LayoutPadraoTela tipo={"VAGAS"} />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -148,7 +157,7 @@ const router = createBrowserRouter([
     path: "/processos/importacao-dados/layout-padrao-habilitados",
     element: (
       <ProtectedRoute>
-        <LayoutPadraoVagasTela tipo={"HABILITADOS"} />
+        <LayoutPadraoTela tipo={"HABILITADOS"} />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,

@@ -820,5 +820,6 @@ export const useAgenda = () => {
     // Estados e funções para expansão automática
     cargoParaExpandir,
     limparExpansao,
+    uuid,
   };
 };

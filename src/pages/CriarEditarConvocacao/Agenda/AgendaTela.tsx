@@ -58,7 +58,8 @@ const AgendaTela: React.FC = () => {
     calcularIntervaloClassificacao,
     verificarConflitoTempoReal,
     cargoParaExpandir,
-    limparExpansao,
+    limparExpansao, 
+    uuid,
   } = useAgenda();
 
   const isEdit = false;
@@ -103,11 +104,11 @@ const AgendaTela: React.FC = () => {
 
   const current = 2; // Step 3 - Agenda
   const next = () => {
-    navigate('/processos/convocacao/nova/resumo')
+    navigate(`/processos/convocacao/editar/${uuid}/resumo`);    
   };
 
   const prev = () => {
-    navigate('/processos/convocacao/nova/selecao-cargos')    
+    navigate(`/processos/convocacao/editar/${uuid}/selecao-cargos`)    
   };
 
   const formatDate = (value?: string) => {

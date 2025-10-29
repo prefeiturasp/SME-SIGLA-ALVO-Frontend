@@ -1,0 +1,1 @@
+Apagar esses componentes da pasta processos após a refatoração

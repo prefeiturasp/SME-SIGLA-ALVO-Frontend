@@ -23,10 +23,17 @@ const Resumo: React.FC = () => {
   const navigate = useNavigate();
 
   const { agendaData, agendaIsLoading } = useAgenda(uuid as string);
-  const totalPorAgenda = agendaData?.map((agenda) => {
-    return agenda.candidatos_classificados.reduce((acc, candidato) => acc + candidato.qtd_candidatos, 0);
-  }) || [];
-  
+  const totalPorAgenda = Array.isArray(agendaData)
+  ? agendaData?.map((agenda: IAgenda) =>
+      Array.isArray(agenda?.candidatos_classificados)
+        ? agenda.candidatos_classificados.reduce(
+            (acc: number, candidato: ICandidatosClassificados) => acc + (candidato?.qtd_candidatos ?? 0),
+            0
+          )
+        : 0
+    )
+  : [];
+
   
   const { processoConvocacaoData, processoConvocacaoIsLoading } =
     useConvocacaoById(uuid as string);
@@ -139,7 +146,7 @@ const Resumo: React.FC = () => {
             <Collapse
               size="large"
               defaultActiveKey={['0']}
-              items={agendaData.map((agenda, index: number) => (
+              items={agendaData?.map((agenda: IAgenda, index: number) => (
                  {
                   key: index,
                   label: <>{agenda.cargo_nome}   -   {totalPorAgenda[index] } Vagas no total</>,

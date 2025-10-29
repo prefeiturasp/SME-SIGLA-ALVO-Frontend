@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Tabs, Button } from 'antd';
-import { PrimaryButton as SharedPrimaryButton, SecondaryButton as SharedSecondaryButton } from '../../../components/EstilosCompartilhados';
+import { PrimaryButton as SharedPrimaryButton, SecondaryButton as SharedSecondaryButton } from '../../components/EstilosCompartilhados'; 
 
 // Estilos para as abas
 export const StyledTabs = styled(Tabs)`

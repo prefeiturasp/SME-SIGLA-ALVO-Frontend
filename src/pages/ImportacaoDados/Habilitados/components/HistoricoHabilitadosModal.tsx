@@ -2,20 +2,27 @@ import React from "react";
 import { DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import dayjs from "dayjs";
-import { Button, Space, Typography } from "antd";
-import { StyledTable } from "../../../../../components/EstilosCompartilhados";
-import { useImportacaoDados } from "../hooks/useImportacaoDados";
-
-
+import { Button, Layout, Modal, Space, Typography } from "antd";
+import { StyledTable } from "../../../../components/EstilosCompartilhados";
+import { useImportacaoDados } from "../hooks/useImportacaoDadosHabilitados";
+import { deleteIcon } from "../../../../components/EstilosCompartilhados";
 
 const { Title } = Typography;
 
 interface HistoricoProps extends TableProps<any> {
   data?: any[];
   onVoltar?: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({ data, onVoltar, ...rest }) => {
+const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({
+  data,
+  onVoltar,
+  isOpen,
+  onClose,
+  ...rest
+}) => {
   const {
     importacoesArquivos,
     importacoesArquivosIsLoading,
@@ -31,9 +38,8 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({ data, onVoltar, .
     }
   };
 
-
-  const handleDelete = (id: string) => {
-    console.log("Delete", id);
+  const handleDelete = (uuid: string) => {
+    console.log("Delete", uuid);
   };
 
   const columns: ColumnsType<any> = [
@@ -41,7 +47,7 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({ data, onVoltar, .
       title: "Data",
       dataIndex: "criado_em",
       key: "criado_em",
-      render: (text: string) => text ? dayjs(text).format("DD/MM/YYYY HH:mm") : "-",
+      render: (text: string) => (text ? dayjs(text).format("DD/MM/YYYY") : "-"),
     },
     {
       title: "Concurso",
@@ -50,8 +56,8 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({ data, onVoltar, .
     },
     {
       title: "Arquivo",
-      dataIndex: "arquivo",
-      key: "arquivo",
+      dataIndex: "nome_arquivo",
+      key: "nome_arquivo",
       render: (text: string) => text || "-",
     },
     {
@@ -60,12 +66,11 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({ data, onVoltar, .
       dataIndex: "",
       key: "x",
       render: (_, record) => (
-        <Space size="small">
+        <Space size="small">          
           <Button
-            type="link"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
+            type={"link"}
+            icon={<DeleteOutlined style={deleteIcon} />}
+            onClick={() => handleDelete(record.uuid)}
           />
         </Space>
       ),
@@ -73,11 +78,18 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({ data, onVoltar, .
   ];
 
   return (
-    <>
-      <Title level={4} style={{ margin: "1rem 0" }}>
-        Histórico
-      </Title>
-
+    <Modal
+      open={isOpen}
+      onCancel={onClose}
+      footer={null}
+      width={"53.75rem"}
+      centered
+      title={
+        <Typography.Text style={{ fontSize: 16 }}>
+          Histórico de Importações da Fundação
+        </Typography.Text>
+      }
+    >
       <StyledTable<any>
         columns={columns}
         dataSource={importacoesArquivos?.results || []}
@@ -96,29 +108,14 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({ data, onVoltar, .
           total: importacoesArquivos?.count,
           showTotal: (total: number, range: [number, number]) => (
             <span style={{ marginLeft: 16 }}>
-              {`Mostrando ${(range?.[0] ?? 0)}-${(range?.[1] ?? 0)} de ${(total ?? 0)} registro(s)`}
+              {`Mostrando ${range?.[0] ?? 0}-${range?.[1] ?? 0} de ${total ?? 0} registro(s)`}
             </span>
           ),
         }}
         onChange={onAntTableChange}
         {...rest}
       />
-
-      <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
-        <Button
-          type="primary"
-          ghost
-          size="large"
-          onClick={handleVoltar}
-          style={{
-            fontWeight: 700,
-            borderRadius: '0.375rem'
-          }}
-        >
-          Voltar
-        </Button>
-      </div>
-    </>
+    </Modal>
   );
 };
 

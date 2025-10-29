@@ -1,7 +1,7 @@
 /node_modules
 mock-server/node_modules
 mock-server/package-lock.json
-mock-server/
+
 package-lock.json
 .env
 .env.dev
