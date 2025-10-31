@@ -10,7 +10,6 @@ const useGetProcessosConvocacaoPorUUID = (uuid: string, axiosRequestConfig?: Axi
          uuid,
          { signal, ...axiosRequestConfig }
       ).response,
-    staleTime: 1000 * 60 * 5,
     retry: 0,
     enabled: !!uuid, // Só executa se uuid não for vazio/undefined
   });

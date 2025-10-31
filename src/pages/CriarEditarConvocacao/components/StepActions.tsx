@@ -26,29 +26,33 @@ export const StepActions: React.FC<StepActionsProps> = ({
         {/* Botão Cancelar à esquerda */}
         <Col>
         {onCancel && (
-          <SecondaryButton
+          <Button
+            size="large"
             style={{ margin: "0 8px" }}
             onClick={onCancel}
           >
             Cancelar
-            </SecondaryButton>
+            </Button>
           )}
         </Col>
 
         {/* Ações à direita */}
         <Col>
           {current > 0 && (
-            <SecondaryButton
+            <Button
+              size="large"
+              variant="outlined"
               icon={<LeftOutlined />}
               style={{ margin: "0 8px" }}
               onClick={prev}
             >
               Voltar
-            </SecondaryButton>
+            </Button>
           )}
 
           {current < steps.length - 1 && (
-            <PrimaryButton
+            <Button
+              size="large"
               iconPosition="end"
               icon={<RightOutlined />}
               type="primary"
@@ -57,17 +61,18 @@ export const StepActions: React.FC<StepActionsProps> = ({
               loading={loading}            
             >
               Salvar e avançar
-            </PrimaryButton>
+            </Button>
           )}
 
           {current === steps.length - 1 && (
-            <PrimaryButton
+            <Button
               type="primary"
+              size="large"
               style={{ margin: "0 8px" }}
               onClick={next}
             >
               Finalizar
-            </PrimaryButton>
+            </Button>
           )}
         </Col>
       </Row>

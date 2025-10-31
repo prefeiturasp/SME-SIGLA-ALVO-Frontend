@@ -15,6 +15,8 @@ import type { IEscolhasFiltro } from "../../../../services/resources/escolhas/IE
 import type { ICardData } from "../components/Cargo";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useConvocacaoCandidatosSchema from "./useConvocacaoCandidatosSchema";
+import { useGetProcessosConvocacaoPorUUID } from "../../../CriarEditarConvocacao/SelecaoCargos/hooks/useGetProcessosConvocacaoPorUUID";
+import { usePatchProcessoConvocacao } from "./usePatchProcessoConvocacao";
 
 export type CargosDisponiveisOption = {
   value: string;
@@ -32,6 +34,7 @@ export type FormFields = {
   concurso: string | undefined;
   tipo_escolha: string | undefined;
   descricao: string;
+  cargo?: string;
   data_convocacao: string;
   data_corte_vagas: string;
 };
@@ -52,6 +55,7 @@ export const useNovaConvocacaoCandidatos = () => {
     data_corte_vagas: editData?.data_corte_vagas || "",
   };
 
+  const { processoConvocacaoData, processoConvocacaoIsLoading } = useGetProcessosConvocacaoPorUUID(uuid!);
   const { concursosData, concursosOptionsIsLoading } = useConcursos();
 
   const { control, reset, handleSubmit, formState: { errors: formErrors } } = useForm<FormFields>({
@@ -67,6 +71,22 @@ export const useNovaConvocacaoCandidatos = () => {
          popularSelectDeCargos(editData.concurso_uuid);      
     }
   }, [editData,concursosData]);
+
+  // Quando carregar processoConvocacaoData (edição), preencher o form
+  useEffect(() => {
+    if (processoConvocacaoData) {
+      reset({
+        concurso: processoConvocacaoData.concurso_uuid || undefined,
+        tipo_escolha: processoConvocacaoData.tipo_escolha || undefined,
+        descricao: processoConvocacaoData.descricao || "",
+        data_convocacao: processoConvocacaoData.data_convocacao || "",
+        data_corte_vagas: processoConvocacaoData.data_corte_vagas || "",
+      });
+      if (processoConvocacaoData.concurso_uuid) {
+        popularSelectDeCargos(processoConvocacaoData.concurso_uuid);
+      }
+    }
+  }, [processoConvocacaoData, reset]);
 
   // Mutation para post de processo de convocação (hook centralizado)
   const postProcessoConvocacaoMutation = usePostProcessoConvocacao();
@@ -189,6 +209,15 @@ export const useNovaConvocacaoCandidatos = () => {
     (cargosDisponiveis || []).find((opt) => opt.value === watchFields.cargo)
       ?.codigo || "";
 
+  // Verifica se houve edição em relação ao processo carregado
+  const hasEdits = Boolean(processoConvocacaoData) && (
+    (watchFields.concurso || "") !== (processoConvocacaoData?.concurso_uuid || "") ||
+    (watchFields.tipo_escolha || "") !== (processoConvocacaoData?.tipo_escolha || "") ||
+    (watchFields.descricao || "") !== (processoConvocacaoData?.descricao || "") ||
+    (watchFields.data_convocacao || "") !== (processoConvocacaoData?.data_convocacao || "") ||
+    (watchFields.data_corte_vagas || "") !== (processoConvocacaoData?.data_corte_vagas || "")
+  );
+
   const { listRequest, setListRequest, onAntTableChange } =
     useListRequest<IEscolhasFiltro>({
       pagination: { page: 1, page_size: 10 },
@@ -229,6 +258,26 @@ export const useNovaConvocacaoCandidatos = () => {
     });
   };
 
+  // Patch mutation para atualizar processo de convocação
+  const patchProcessoConvocacaoMutation = usePatchProcessoConvocacao();
+
+  // Atualiza o processo com os dados do formulário
+  const patchProcessoFromForm = async (formData: FormFields) => {
+    const concursosArray = Array.isArray(concursosData)
+      ? (concursosData as unknown as ConcursoOption[])
+      : ((concursosData as any)?.results || []) as ConcursoOption[];
+    const concursoSel = concursosArray.find((c: any) => c.value === formData.concurso);
+    const payload: Partial<IPostProcessoConvocacaoPayload> = {
+      concurso_nome: (concursoSel as any)?.label,
+      concurso_uuid: (concursoSel as any)?.value,
+      tipo_escolha: formData.tipo_escolha,
+      descricao: formData.descricao,
+      data_convocacao: formData.data_convocacao,
+      data_corte_vagas: formData.data_corte_vagas,
+    };
+    await patchProcessoConvocacaoMutation.mutateAsync({ uuid: (uuid || editData?.uuid)!, payload });
+  };
+
   return {
     // Form controls
     control,
@@ -266,6 +315,10 @@ export const useNovaConvocacaoCandidatos = () => {
     isViewMode,
     formErrors,
     editData,
-    uuid
+    uuid,
+    processoConvocacaoData,
+    hasEdits,
+    patchProcessoConvocacaoMutation,
+    patchProcessoFromForm
   };
 };

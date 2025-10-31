@@ -65,7 +65,7 @@ export const SectionTitle = styled(Typography.Title).attrs({ level: 5 })`
 // Estilos para o select de concurso
 export const StyledSelect = styled(Select)`
   width: 100%;
-
+  max-width: 900px;
   .ant-select-selector {
     border-radius: 0.375rem;
   }

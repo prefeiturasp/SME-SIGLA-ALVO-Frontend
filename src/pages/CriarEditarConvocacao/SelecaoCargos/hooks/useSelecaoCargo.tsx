@@ -38,6 +38,7 @@ export const useSelecaoCargo = () => {
     totalPcd: 0,
     totalNna: 0,
   });
+  console.log("111");
   const { processoConvocacaoData, processoConvocacaoIsLoading } = useGetProcessosConvocacaoPorUUID(uuid!);
   const { concursoData, concursoIsLoading } = useGetConcursoByUuid(processoConvocacaoData?.concurso_uuid || '');
 

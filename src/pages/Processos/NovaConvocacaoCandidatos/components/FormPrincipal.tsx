@@ -25,6 +25,13 @@ interface FormPrincipalProps {
   popularSelectDeCargos: (value: string) => void;
   isViewMode?: boolean;
   formErrors: FieldErrors<FormFields>;
+  processoConvocacaoData?: {
+    concurso_uuid?: string;
+    tipo_escolha?: string;
+    descricao?: string;
+    data_convocacao?: string;
+    data_corte_vagas?: string;
+  };
 }
 
 const FormPrincipal: React.FC<FormPrincipalProps> = ({
@@ -35,6 +42,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
   popularSelectDeCargos,
   isViewMode = false, 
   formErrors,
+  processoConvocacaoData,
 }) => {
   return (
     <Row gutter={30}>
