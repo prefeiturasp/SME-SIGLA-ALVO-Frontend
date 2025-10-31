@@ -158,6 +158,7 @@ const SelecaoCargos: React.FC = () => {
             color="primary"
             variant="outlined"
             icon={<UserSwitchOutlined />}
+            onClick={() => navigate('/processos/gerenciamento-vagas')}
           >
             Gerenciamento de vagas
           </Button>
