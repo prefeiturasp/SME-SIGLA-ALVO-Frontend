@@ -3,7 +3,8 @@ import { appAxiosImportaArquivos } from "../../axios";
 import type { 
   IGetLayout,
   IImportacaoFundacao,
-  IUltimasImportacoesVagas
+  IUltimasImportacoesVagas,
+  IErroImportacaoResposta
 } from "./IImportacaoArquivos";
 import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
@@ -179,7 +180,7 @@ export const getErrosHabilitados = (
 ) => {
   const { signal, abort } = new AbortController();
   const response = appAxiosImportaArquivos
-    .get<PaginatedResponse<{ mensagem: string; erros: string; concurso_uuid: string | null; processo_uuid: string | null }>>(
+    .get<PaginatedResponse<IErroImportacaoResposta>>(
       URL.getErrosHabilitados(),
       {
         params: { importacao_uuid, ...params },
@@ -225,7 +226,7 @@ export const getErrosVagas = (
 ) => {
   const { signal, abort } = new AbortController();
   const response = appAxiosImportaArquivos
-    .get<PaginatedResponse<{ mensagem: string; erros: string; concurso_uuid: string | null; processo_uuid: string | null }>>(
+    .get<PaginatedResponse<IErroImportacaoResposta>>(
       URL.getErrosVagas(),
       {
         params: { importacao_uuid, ...params },

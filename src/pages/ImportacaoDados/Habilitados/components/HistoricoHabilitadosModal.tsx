@@ -8,7 +8,10 @@ import { StyledTable } from "../../../../components/EstilosCompartilhados";
 import { useImportacaoDados } from "../hooks/useImportacaoDadosHabilitados";
 import { deleteIcon } from "../../../../components/EstilosCompartilhados";
 import { API } from "../../../../services";
-import { useGetDownloadErro } from "../hooks/useGetDownloadErro";
+import {
+  useGetDownloadError,
+  TipoImportacao,
+} from "../../hooks/useGetDownloadError";
 import ErroModal from "./ErroModal";
 
 interface HistoricoProps extends TableProps<any> {
@@ -44,7 +47,9 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({
     enabled: !!selectedImportacaoUuid && isErrosModalOpen,
   });
 
-  const { handleDownload, isDownloading } = useGetDownloadErro();
+  const { handleDownload, isDownloading } = useGetDownloadError(
+    TipoImportacao.HABILITADOS
+  );
 
   const handleVoltar = () => {
     if (onVoltar) {

@@ -9,6 +9,13 @@ export interface IErroImportacao {
   criado_em: string;
 }
 
+export interface IErroImportacaoResposta {
+  mensagem: string;
+  erros: string;
+  concurso_uuid: string | null;
+  processo_uuid: string | null;
+}
+
 export interface IUltimasImportacoesVagas {
   uuid: string;
   nome_arquivo: string;

@@ -1,5 +1,12 @@
 import React from "react";
-import { Modal, Typography, Input, Row, Col, Button, Spin } from "antd";
+import { Modal, Typography, Col, Button, Spin } from "antd";
+import {
+  ModalTitle,
+  StyledRow,
+  StyledTextArea,
+  ErroContainer,
+  ButtonsContainer,
+} from "../../Vagas/components/style";
 
 interface ErroModalProps {
   open: boolean;
@@ -29,38 +36,22 @@ const ErroModal: React.FC<ErroModalProps> = ({
       footer={null}
       width={"53.75rem"}
       centered
-      title={
-        <Typography.Text style={{ fontSize: 16 }}>
-          Erros da Importação
-        </Typography.Text>
-      }
+      title={<ModalTitle>Erros da Importação</ModalTitle>}
     >
       <Spin spinning={isLoading}>
-        <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+        <StyledRow gutter={[16, 16]}>
           <Col span={24}>
             <Typography.Text strong>Mensagem:</Typography.Text>
-            <Input.TextArea
+            <StyledTextArea
               rows={3}
               value={importacaoErro?.mensagem || ""}
               placeholder="Mensagem de erro resumida"
               readOnly
-              style={{ marginTop: 8 }}
             />
           </Col>
           <Col span={24}>
             <Typography.Text strong>Erro:</Typography.Text>
-            <div
-              style={{
-                marginTop: 8,
-                padding: "4px 11px",
-                minHeight: "146px",
-                border: "1px solid #d9d9d9",
-                borderRadius: "6px",
-                backgroundColor: "#fff",
-                whiteSpace: "pre-line",
-                fontSize: "14px",
-                lineHeight: "1.5715",
-              }}
+            <ErroContainer
               dangerouslySetInnerHTML={{
                 __html: importacaoErro?.erros
                   ? importacaoErro.erros
@@ -76,12 +67,10 @@ const ErroModal: React.FC<ErroModalProps> = ({
               }}
             />
           </Col>
-        </Row>
+        </StyledRow>
       </Spin>
-      <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end", gap: 8 }}>
-        <Button onClick={onClose}>
-          Cancelar
-        </Button>
+      <ButtonsContainer>
+        <Button onClick={onClose}>Cancelar</Button>
         <Button 
           type="primary" 
           onClick={onDownload}
@@ -90,7 +79,7 @@ const ErroModal: React.FC<ErroModalProps> = ({
         >
           Download
         </Button>
-      </div>
+      </ButtonsContainer>
     </Modal>
   );
 };

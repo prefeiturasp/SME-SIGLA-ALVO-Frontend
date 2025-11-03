@@ -8,7 +8,7 @@ import { CustomTitle } from "./style";
 import { StyledTable } from "../../../../components/EstilosCompartilhados";
 import type { IUltimasImportacoesVagas } from "../../../../services/resources/importacaoDados/IImportacaoArquivos";
 import ErroModal from "./ErroModal";
-import { useGetDownloadError } from "../hooks/useGetDownloadError";
+import { useGetDownloadError, TipoImportacao } from "../../hooks/useGetDownloadError";
 
 interface UltimasImportacoesDeVagasTableProps extends TableProps<IUltimasImportacoesVagas> {
   data: IUltimasImportacoesVagas[];
@@ -17,7 +17,8 @@ const UltimasImportacoesDeVagasTable: React.FC<UltimasImportacoesDeVagasTablePro
   const [isErrosModalOpen, setIsErrosModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<IUltimasImportacoesVagas | null>(null);
 
-  const downloadMutation = useGetDownloadError();
+  const { handleDownload: handleDownloadError, isDownloading } =
+    useGetDownloadError(TipoImportacao.VAGAS);
 
   const handleOpenErrosModal = (record: IUltimasImportacoesVagas) => {
     setSelectedRecord(record);
@@ -31,7 +32,7 @@ const UltimasImportacoesDeVagasTable: React.FC<UltimasImportacoesDeVagasTablePro
 
   const handleDownload = () => {
     if (selectedRecord?.uuid) {
-      downloadMutation.mutate(selectedRecord.uuid);
+      handleDownloadError(selectedRecord.uuid);
     }
   };
 
@@ -106,7 +107,7 @@ const UltimasImportacoesDeVagasTable: React.FC<UltimasImportacoesDeVagasTablePro
         onClose={handleCloseErrosModal}
         importacaoErro={importacaoErro}
         onDownload={handleDownload}
-        isDownloading={downloadMutation.isPending}
+        isDownloading={isDownloading}
       />
     </>
   );
