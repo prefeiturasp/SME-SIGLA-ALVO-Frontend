@@ -49,17 +49,17 @@ function generateData() {
         {
           uuid: "1",
           qtd_candidatos: 2,
-          classificacao: "1a até 2a",
+          classificacao: "1ª até 2ª",
           data_escolha: "07/10/2025",
-          sessao: "2",
+          sessao: "1",
           horario: "03:00 às 21:00",
         },
         {
           uuid: "2",
           qtd_candidatos: 1,
-          classificacao: "9a",
+          classificacao: "9ª",
           data_escolha: "07/10/2025",
-          sessao: "4",
+          sessao: "2",
           horario: "03:00 às 21:00",
         },
       ]
@@ -71,17 +71,17 @@ function generateData() {
         {
           uuid: "1",
           qtd_candidatos: 2,
-          classificacao: "1a até 2a",
+          classificacao: "1ª até 2ª",
           data_escolha: "07/10/2025",
-          sessao: "2",
+          sessao: "1",
           horario: "03:00 às 21:00",
         },
         {
           uuid: "2",
           qtd_candidatos: 1,
-          classificacao: "9a",
+          classificacao: "9ª",
           data_escolha: "07/10/2025",
-          sessao: "4",
+          sessao: "2",
           horario: "03:00 às 21:00",
         },
     ]

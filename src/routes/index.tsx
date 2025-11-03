@@ -34,11 +34,6 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
-    path: "/processos/gerenciamento-vagas",
-    element: <GerenciamentoVagasTela />,
-    errorElement: <RouteError />,
-  },
-  {
     path: "/login",
     element: <LoginTela />,
     errorElement: <RouteError />,

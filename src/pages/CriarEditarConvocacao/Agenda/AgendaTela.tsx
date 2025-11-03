@@ -7,6 +7,7 @@ import {
   Row,
   Col,
   Divider,
+  theme,
 } from "antd";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
@@ -26,10 +27,12 @@ import {
 import dayjs from "dayjs";
 import AgendaForm from "./components/AgendaForm";
 import AgendaTabela from "./components/AgendaTabela";
+import { StyledCardWithoutBorder } from "../../../components/EstilosCompartilhados";
 
 const { Text } = Typography;
 
 const AgendaTela: React.FC = () => {
+  const { token } = theme.useToken();
   const navigate = useNavigate();
 
   const {
@@ -143,14 +146,11 @@ const AgendaTela: React.FC = () => {
       <GlobalStyles />
       <BaseTela
         breadcrumbItems={breadcrumbItems}
-        title={
-          <Text style={inlineStyles.titleCombinedStyles}>
-            Nova Convocação
-          </Text>
-        }
+        title="Nova convocação"
         buttons={
           <Button
-            className="gerenciamento-vagas-btn"
+            color="primary"
+            variant="outlined"
             icon={<UserSwitchOutlined />}
             onClick={() => navigate('/processos/gerenciamento-vagas')}
           >
@@ -158,26 +158,13 @@ const AgendaTela: React.FC = () => {
           </Button>
         }
       >
-        <Card 
-          title={
-            <Text style={inlineStyles.titleTextWithFont}>
-              Processo de convocação de candidatos
-            </Text>
-          }
-          styles={inlineStyles.cardHeaderStyles}
-          variant="borderless"
-        >
+        <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
           <Steps current={current} items={items} />
-        </Card>
+        </StyledCardWithoutBorder>
 
-        <Card
-          style={inlineStyles.marginTop}
-          title={
-            <Text style={inlineStyles.cardTitleWithFont}>
-              Dados do Processo
-            </Text>
-          }
-          styles={inlineStyles.cardHeaderStylesSimple}
+        <StyledCardWithoutBorder
+          style={{ marginTop: "1.25rem" }}
+          title="Dados do processo"
           variant="borderless"
         >
           <div style={{ ...contentStyle, ...inlineStyles.containerWithMarginTop }}>
@@ -234,9 +221,9 @@ const AgendaTela: React.FC = () => {
               </Col>
             </Row>
           </div>
-        </Card>
+        </StyledCardWithoutBorder>
 
-        <Card
+        <StyledCardWithoutBorder
           style={inlineStyles.marginTop}
           styles={{ body: { paddingTop: 0 }, header: { borderBottom: 'none' } }}
           title={
@@ -291,7 +278,7 @@ const AgendaTela: React.FC = () => {
             prev={prev}
             onCancel={() => console.log("cancelado!")}
           />
-        </Card>
+        </StyledCardWithoutBorder>
       </BaseTela>
     </>
   );

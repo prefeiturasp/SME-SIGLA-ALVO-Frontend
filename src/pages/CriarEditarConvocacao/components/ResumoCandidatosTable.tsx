@@ -14,20 +14,18 @@ interface ResumoCandidatosTableProps extends TableProps<ICandidatosClassificados
   data: ICandidatosClassificados[];
 }
 const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, title, ...rest }) => {
-  
-  
 
   const columns: ColumnsType<ICandidatosClassificados> = [
     {
       title: "Qtd. Candidatos",
       dataIndex: "qtd_candidatos",
-      key: "qtd_candidatos",      
+      key: "qtd_candidatos",
     },
 
     {
       title: "Classificação",
       dataIndex: "classificacao",
-      key: "classificacao",      
+      key: "classificacao",
     },
     {
       title: "Data da escolha",
@@ -37,13 +35,13 @@ const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, tit
     {
       title: "Sessão",
       dataIndex: "sessao",
-      key: "sessao",      
+      key: "sessao",
 
     },
     {
       title: "Horário",
       dataIndex: "horario",
-      key: "horario",      
+      key: "horario",
     },
   ];
 
@@ -55,8 +53,8 @@ const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, tit
       <StyledTable
         columns={columns}
         dataSource={data}
-        rowKey={(record) => `${record.uuid}`}                
-        pagination={false}        
+        rowKey={(record) => `${record.uuid}`}
+        pagination={false}
         {...rest}
       />
     </>

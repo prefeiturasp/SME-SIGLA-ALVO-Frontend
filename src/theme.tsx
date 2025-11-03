@@ -14,6 +14,7 @@ export const theme = {
     fontSize: 16,
     fontWeightStrong: 700,
     fontWeight: 400,
+    controlPaddingHorizontal: 20,
   },
   components: {
     Form: {
@@ -47,20 +48,18 @@ export const theme = {
 
       paddingInlineSM: 12,
       paddingBlockSM: 4,
-     
-     
-     controlLineWidth: 1,
-     controlOutlineWidth: 1,
+      paddingInlineLG: 20,
+      paddingBlockLG: 4,
 
-     
-     
+      controlLineWidth: 1,
+      controlOutlineWidth: 1,
       borderRadius: 8, // borda arredondada
       colorBorder: "#B1B2B7", // cor da borda padrão
-      defaultBorderColor: "#B1B2B7",
-      defaultColor: "#161718", // cor do texto no botão padrão
+      defaultBorderColor: "#002c8c",
+      defaultColor: "#002c8c", // cor do texto no botão padrão
       defaultBg: "#FFFFFF",
-      paddingInline: 16, // padding horizontal
-      paddingBlock: 0, // padding vertical
+      paddingInline: 20, // padding horizontal
+      paddingBlock: 20, // padding vertical
       fontWeight: 600,
       colorPrimaryHover: "#0650C0", // hover do botão primário
       colorPrimaryActive: "#04357A", // active do botão primário
@@ -77,6 +76,7 @@ export const theme = {
       colorSecondaryBgDisabled: "#F0F0F0", // fundo do botão secundário no disabled
       colorSecondaryBgLoading: "#F0F0F0", // fundo do botão secundário no loading
       colorText: "#838383", // texto padrão
+
     },
     Card: {
       fontWeight: 400,           // peso do texto do conteúdo
