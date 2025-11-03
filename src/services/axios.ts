@@ -76,7 +76,7 @@ export const appAxiosImportaArquivos = axios.create({
 addAuthInterceptor(appAxiosImportaArquivos);
 
 export const appAxiosAdminUsuarios = axios.create({
-  baseURL: getEnv("ADMIN_USUARIOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-admin-usuarios"),
+  baseURL: getEnv("ADMIN_USUARIOS_API_URL", "http://localhost:8000"),
 });
 addAuthInterceptor(appAxiosAdminUsuarios);
 

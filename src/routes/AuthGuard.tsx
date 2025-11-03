@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const isAuthenticated = Boolean(localStorage.getItem("TOKEN"));
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login', { replace: true });

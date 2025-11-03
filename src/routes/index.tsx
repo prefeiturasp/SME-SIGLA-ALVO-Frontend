@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { DashboardTela } from "../pages/Dashboard/DashboardTela";
-import ProtectedRoute from "./protected";
+import ProtectedRoute from "./AuthGuard";
 
 import { HomeTela } from "../pages/Home/HomeTela";
 import ConvocacaoCandidatosTela from "../pages/Processos/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
@@ -20,6 +20,7 @@ import DadosDoProcesso from "../pages/CriarEditarConvocacao/DadosDoProcesso";
 import SelecaoCargosTela from "../pages/CriarEditarConvocacao/SelecaoCargos/SelecaoCargosTela";
 import Agenda from "../pages/CriarEditarConvocacao/Agenda";
 import Resumo from "../pages/CriarEditarConvocacao/Resumo";
+import PermissionContextGuard from "./PermissionContextGuard";
 
 //TODO ADD FEATURE FLAG
 
@@ -67,7 +68,9 @@ const router = createBrowserRouter([
     path: "/processos/convocacao",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="processoconvocacao,convocacao,candidato">
         <ConvocacaoCandidatosTela />
+        </PermissionContextGuard>        
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
