@@ -3,7 +3,8 @@ import { appAxiosImportaArquivos } from "../../axios";
 import type { 
   IGetLayout,
   IImportacaoFundacao,
-  IUltimasImportacoesVagas
+  IUltimasImportacoesVagas,
+  IErroImportacaoResposta
 } from "./IImportacaoArquivos";
 import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
@@ -15,8 +16,12 @@ export const URL = {
   getImportacaoArquivos: () => `/api/v1/importacao-arquivo/`,
   postImportacaoArquivosHabilitados: () => `/api/v1/importacao-arquivo/habilitados/`,
   getImportacaoArquivosHabilitados: () => `/api/v1/importacao-arquivo/habilitados/`,
+  getErrosHabilitados: () => `/api/v1/importacao-arquivo/habilitados/erros/`,
+  getErrosHabilitadosDownload: () => `/api/v1/importacao-arquivo/habilitados/erros/download/`,
   getUltimasImportacoesArquivosVagas: () => `/api/v1/importacao-arquivo/vagas/`,
   postImportacaoArquivosVagas: () => `/api/v1/importacao-arquivo/vagas/`,
+  getErrosVagas: () => `/api/v1/importacao-arquivo/vagas/erros/`,
+  getErrosVagasDownload: () => `/api/v1/importacao-arquivo/vagas/erros/download/`,
 };
 
 export const postImportacaoArquivosVagas = (
@@ -161,6 +166,98 @@ export const getLayoutDownload = (
     })
     .then((response) => response.data);
 
+  return {
+    response,
+    abort,
+  };
+};
+
+// Buscar erros de habilitados
+export const getErrosHabilitados = (
+  importacao_uuid: string,
+  params?: Record<string, any>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosImportaArquivos
+    .get<PaginatedResponse<IErroImportacaoResposta>>(
+      URL.getErrosHabilitados(),
+      {
+        params: { importacao_uuid, ...params },
+        paramsSerializer: queryParamsSerializer,
+        signal,
+        ...axiosRequestConfig,
+      }
+    )
+    .then((response) => response.data);
+  return {
+    response,
+    abort,
+  };
+};
+
+// Download erros de habilitados - retorna Blob
+export const getErrosHabilitadosDownload = (
+  importacao_uuid: string,
+  params?: Record<string, any>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosImportaArquivos
+    .get<Blob>(URL.getErrosHabilitadosDownload(), {
+      params: { importacao_uuid, ...params },
+      paramsSerializer: queryParamsSerializer,
+      responseType: 'blob',
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+  return {
+    response,
+    abort,
+  };
+};
+
+// Buscar erros de vagas
+export const getErrosVagas = (
+  importacao_uuid: string,
+  params?: Record<string, any>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosImportaArquivos
+    .get<PaginatedResponse<IErroImportacaoResposta>>(
+      URL.getErrosVagas(),
+      {
+        params: { importacao_uuid, ...params },
+        paramsSerializer: queryParamsSerializer,
+        signal,
+        ...axiosRequestConfig,
+      }
+    )
+    .then((response) => response.data);
+  return {
+    response,
+    abort,
+  };
+};
+
+// Download erros de vagas - retorna Blob
+export const getErrosVagasDownload = (
+  importacao_uuid: string,
+  params?: Record<string, any>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosImportaArquivos
+    .get<Blob>(URL.getErrosVagasDownload(), {
+      params: { importacao_uuid, ...params },
+      paramsSerializer: queryParamsSerializer,
+      responseType: 'blob',
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
   return {
     response,
     abort,
