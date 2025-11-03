@@ -6,7 +6,6 @@ export interface IImportacaoHabilitadosFiltros {
 export interface IUltimaImportacaoHabilitados {
   arquivo: string;
   concurso: string;
-  data_importacao: string;
 }
 
 export interface IImportacaoHabilitadosPayload {

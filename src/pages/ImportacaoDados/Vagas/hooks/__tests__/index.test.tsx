@@ -311,7 +311,6 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       {
         arquivo: 'arquivo1.csv',
         concurso: 'CONCURSO_001',
-        data_importacao: '2024-01-01T10:00:00Z',
       },
     ];
 

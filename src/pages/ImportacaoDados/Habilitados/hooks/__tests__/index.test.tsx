@@ -142,12 +142,10 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       const ultimaImportacao: IUltimaImportacaoHabilitados = {
         arquivo: 'arquivo.csv',
         concurso: 'CONCURSO_001',
-        data_importacao: '2024-01-01T10:00:00Z',
       };
 
       expect(ultimaImportacao.arquivo).toBe('arquivo.csv');
       expect(ultimaImportacao.concurso).toBe('CONCURSO_001');
-      expect(ultimaImportacao.data_importacao).toBe('2024-01-01T10:00:00Z');
     });
 
     it('deve definir corretamente IImportacaoHabilitadosPayload', () => {
@@ -327,7 +325,6 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       {
         arquivo: 'arquivo1.csv',
         concurso: 'CONCURSO_001',
-        data_importacao: '2024-01-01T10:00:00Z',
       },
     ];
 
