@@ -415,7 +415,7 @@ export const modalInlineStyles = {
   },
   // Estilos do divisor final
   finalDivider: {
-    margin: "75px 0 0px 0",
+    margin: "0 0 5px 0",
     width: "100%",
     height: "0px",
     opacity: 1,
@@ -429,7 +429,7 @@ export const modalInlineStyles = {
     alignItems: 'center',
     gap: '1rem',
     width: '100%',
-    marginTop: '0.5rem'
+    marginTop: '0.25rem'
   },
   // Estilos da tabela
   tableHeaderCell: {

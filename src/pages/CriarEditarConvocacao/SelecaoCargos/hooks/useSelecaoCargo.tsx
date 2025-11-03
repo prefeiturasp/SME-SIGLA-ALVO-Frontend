@@ -38,7 +38,6 @@ export const useSelecaoCargo = () => {
     totalPcd: 0,
     totalNna: 0,
   });
-  console.log("111");
   const { processoConvocacaoData, processoConvocacaoIsLoading } = useGetProcessosConvocacaoPorUUID(uuid!);
   const { concursoData, concursoIsLoading } = useGetConcursoByUuid(processoConvocacaoData?.concurso_uuid || '');
 
@@ -59,8 +58,6 @@ export const useSelecaoCargo = () => {
 
   const handleBuscarCandidatos = () => {
     if (cargoSelecionado) {
-      // Limpar último cargo selecionado quando for um novo cargo
-      // Só manter se estiver editando um cargo existente
       if (!ultimoCargoSelecionado || ultimoCargoSelecionado.uuid !== cargoSelecionado) {
         setUltimoCargoSelecionado(null);
       }

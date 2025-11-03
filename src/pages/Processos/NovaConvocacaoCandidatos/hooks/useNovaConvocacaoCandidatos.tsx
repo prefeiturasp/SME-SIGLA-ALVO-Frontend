@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { useConcursos } from "../../../../hooks/useConcursos";
 import { usePostProcessoConvocacao } from "./usePostProcessoConvocacao";
@@ -58,37 +58,27 @@ export const useNovaConvocacaoCandidatos = () => {
   const { processoConvocacaoData, processoConvocacaoIsLoading } = useGetProcessosConvocacaoPorUUID(uuid!);
   const { concursosData, concursosOptionsIsLoading } = useConcursos();
 
+  const formValues = useMemo<FormFields>(() => ({
+    concurso: processoConvocacaoData?.concurso_uuid ?? defaultValues.concurso,
+    tipo_escolha: processoConvocacaoData?.tipo_escolha ?? defaultValues.tipo_escolha,
+    descricao: processoConvocacaoData?.descricao ?? defaultValues.descricao,
+    data_convocacao: processoConvocacaoData?.data_convocacao ?? defaultValues.data_convocacao,
+    data_corte_vagas: processoConvocacaoData?.data_corte_vagas ?? defaultValues.data_corte_vagas,
+  }), [processoConvocacaoData, defaultValues.concurso, defaultValues.tipo_escolha, defaultValues.descricao, defaultValues.data_convocacao, defaultValues.data_corte_vagas]);
+
   const { control, reset, handleSubmit, formState: { errors: formErrors } } = useForm<FormFields>({
     defaultValues: { ...defaultValues },
+    values: formValues,
     resolver: yupResolver(useConvocacaoCandidatosSchema()) as Resolver<FormFields>,
   });
-  
- 
 
+  const selectedConcursoValueForCargos = (useWatch({ control }).concurso ?? formValues.concurso);
+  const derivedCargosDisponiveis = useMemo<CargosDisponiveisOption[]>(() => {
+    const concursosArray = (concursosData as unknown as ConcursoOption[]) || [];
+    const concursoSel = concursosArray.find((c) => c.value === selectedConcursoValueForCargos);
+    return (concursoSel?.cargos as CargosDisponiveisOption[] | undefined) || [];
+  }, [concursosData, selectedConcursoValueForCargos]);
 
-  useEffect(() => {
-    if (editData?.concurso_uuid && concursosData) {
-         popularSelectDeCargos(editData.concurso_uuid);      
-    }
-  }, [editData,concursosData]);
-
-  // Quando carregar processoConvocacaoData (edição), preencher o form
-  useEffect(() => {
-    if (processoConvocacaoData) {
-      reset({
-        concurso: processoConvocacaoData.concurso_uuid || undefined,
-        tipo_escolha: processoConvocacaoData.tipo_escolha || undefined,
-        descricao: processoConvocacaoData.descricao || "",
-        data_convocacao: processoConvocacaoData.data_convocacao || "",
-        data_corte_vagas: processoConvocacaoData.data_corte_vagas || "",
-      });
-      if (processoConvocacaoData.concurso_uuid) {
-        popularSelectDeCargos(processoConvocacaoData.concurso_uuid);
-      }
-    }
-  }, [processoConvocacaoData, reset]);
-
-  // Mutation para post de processo de convocação (hook centralizado)
   const postProcessoConvocacaoMutation = usePostProcessoConvocacao();
 
   const watchFields = useWatch({ control });
@@ -288,7 +278,7 @@ export const useNovaConvocacaoCandidatos = () => {
     // Data
     concursosData: (concursosData as unknown as ConcursoOption[]) || [],
     concursosOptionsIsLoading,
-    cargosDisponiveis,
+    cargosDisponiveis: cargosDisponiveis.length ? cargosDisponiveis : derivedCargosDisponiveis,
     cardData,
     cargoSelecionado,
     podeVisualizarVagas,

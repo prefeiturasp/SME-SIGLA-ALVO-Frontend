@@ -139,15 +139,6 @@ const SelecaoCargos: React.FC = () => {
       .join(' ');
   };
 
-  // const contentStyle: React.CSSProperties = {
-  //   lineHeight: "normal",
-  //   textAlign: "left",
-
-  //   borderRadius: token.borderRadiusLG,
-
-  //   marginTop: 20,
-  // };
-
   return (
     <>
       <BaseTela
