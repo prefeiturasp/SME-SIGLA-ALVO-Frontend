@@ -36,16 +36,7 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({
   } = useImportacaoDados();
 
   const [isErrosModalOpen, setIsErrosModalOpen] = useState(false);
-  const [selectedImportacaoUuid, setSelectedImportacaoUuid] = useState<string | null>(null);
-
-  const { data: errosData, isLoading: errosIsLoading } = useQuery({
-    queryKey: ["erros-habilitados", selectedImportacaoUuid],
-    queryFn: ({ signal }) => {
-      if (!selectedImportacaoUuid) return null;
-      return API.ImportacaoDados.getErrosHabilitados(selectedImportacaoUuid, undefined, { signal }).response;
-    },
-    enabled: !!selectedImportacaoUuid && isErrosModalOpen,
-  });
+  const [selectedRecord, setSelectedRecord] = useState<any | null>(null);
 
   const { handleDownload, isDownloading } = useGetDownloadError(
     TipoImportacao.HABILITADOS
@@ -63,23 +54,23 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({
     console.log("Delete", uuid);
   };
 
-  const handleOpenErrosModal = (uuid: string) => {
-    setSelectedImportacaoUuid(uuid);
+  const handleOpenErrosModal = (record: any) => {
+    setSelectedRecord(record);
     setIsErrosModalOpen(true);
   };
 
   const handleCloseErrosModal = () => {
     setIsErrosModalOpen(false);
-    setSelectedImportacaoUuid(null);
+    setSelectedRecord(null);
   };
 
   const handleDownloadClick = () => {
-    if (selectedImportacaoUuid) {
-      handleDownload(selectedImportacaoUuid);
+    if (selectedRecord?.uuid) {
+      handleDownload(selectedRecord.uuid);
     }
   };
 
-  const primeiroErro = errosData?.results?.[0] || null;
+  const importacaoErro = selectedRecord?.erros?.[0] || null;
 
   const columns: ColumnsType<any> = [
     {
@@ -122,7 +113,7 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({
             <Tooltip title="Importação com erro, clique para visualizar">
               <WarningOutlined 
                 style={{ cursor: "pointer", fontSize: "18px", color: "#ff4d4f" }} 
-                onClick={() => handleOpenErrosModal(record.uuid)}
+                onClick={() => handleOpenErrosModal(record)}
               />
             </Tooltip>
           )}
@@ -173,8 +164,8 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({
       <ErroModal
         open={isErrosModalOpen}
         onClose={handleCloseErrosModal}
-        isLoading={errosIsLoading}
-        importacaoErro={primeiroErro}
+        isLoading={false}
+        importacaoErro={importacaoErro}
         onDownload={handleDownloadClick}
         isDownloading={isDownloading}
       />
