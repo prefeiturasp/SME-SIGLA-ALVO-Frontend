@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Collapse, Space, Steps, theme, Typography } from "antd";
+import { Button, Collapse, Steps, theme, Tooltip, Typography } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -13,10 +13,14 @@ import { useAgenda } from "../../hooks/useAgenda";
 import useConvocacaoById from "../Processos/ConvocacaoCandidatos/hooks/useConvocacaoById";
 import { usePatchProcessoConvocacao } from "../Processos/NovaConvocacaoCandidatos/hooks/usePatchProcessoConvocacao";
 import type { IAgenda, ICandidatosClassificados } from "../../services/resources/agenda/IAgenda";
+import { useGetPermissions } from "../../routes/PermissionContextGuard";
 
 const { Text } = Typography;
 
 const Resumo: React.FC = () => {
+  const { can } = useGetPermissions();
+  const canChangeProcessoConvocacao = can("change_processoconvocacao");
+  const canAddImportacaoArquivoVagas = can("add_importacaoarquivovagas");
   const { token } = theme.useToken();
 
   const { uuid } = useParams<{ uuid: string }>();
@@ -103,14 +107,18 @@ const Resumo: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
         buttons={
+          <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
           <Button
             style={{ fontWeight: "400" }}
             color="primary"
             variant="outlined"
             icon={<UserSwitchOutlined />}
+            disabled={!canAddImportacaoArquivoVagas}
+            onClick={() => navigate('/processos/gerenciamento-vagas')}
           >
             Gerenciamento de vagas
           </Button>
+          </Tooltip>
         }
       >
         <StyledCardWithoutBorder
@@ -165,8 +173,10 @@ const Resumo: React.FC = () => {
             current={current}
             steps={steps}
             next={next}
-            prev={prev}
-            onCancel={() => console.log("cancelado!")}
+            prev={prev} 
+            onCancel={() => navigate(`/processos/convocacao`)}
+            canSalvarEAvancar={canChangeProcessoConvocacao}
+            canVoltar={canChangeProcessoConvocacao}
           />
         </StyledCardWithoutBorder>
       </BaseTela>

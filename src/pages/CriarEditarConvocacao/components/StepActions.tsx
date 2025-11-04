@@ -1,15 +1,20 @@
 import React from "react";
-import { Row, Col, Button, message } from "antd";
+import { Row, Col, Button, message, Tooltip } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
-import { PrimaryButton, SecondaryButton } from "../../../components/EstilosCompartilhados";
+import {
+  PrimaryButton,
+  SecondaryButton,
+} from "../../../components/EstilosCompartilhados";
 
 interface StepActionsProps {
   current: number;
   steps: { title: string }[];
   next: () => void | Promise<void>;
   prev: () => void;
-  onCancel?: () => void;  
+  onCancel?: () => void;
   loading?: boolean;
+  canSalvarEAvancar: boolean;
+  canVoltar: boolean;
 }
 
 export const StepActions: React.FC<StepActionsProps> = ({
@@ -19,18 +24,17 @@ export const StepActions: React.FC<StepActionsProps> = ({
   prev,
   onCancel,
   loading,
+  canSalvarEAvancar,
+  canVoltar,
 }) => {
   return (
     <div style={{ marginTop: 24 }}>
       <Row align="middle" justify="space-between">
         {/* Botão Cancelar à esquerda */}
         <Col>
-        {onCancel && (
-          <SecondaryButton
-            style={{ margin: "0 8px" }}
-            onClick={onCancel}
-          >
-            Cancelar
+          {onCancel && (
+            <SecondaryButton style={{ margin: "0 8px" }} onClick={onCancel}>
+              Cancelar
             </SecondaryButton>
           )}
         </Col>
@@ -38,36 +42,66 @@ export const StepActions: React.FC<StepActionsProps> = ({
         {/* Ações à direita */}
         <Col>
           {current > 0 && (
-            <SecondaryButton
-              icon={<LeftOutlined />}
-              style={{ margin: "0 8px" }}
-              onClick={prev}
+            <Tooltip
+              title={
+                !canVoltar
+                  ? "Você não possui permissão para essa ação"
+                  : "Voltar"
+              }
+              arrow={true}
             >
-              Voltar
-            </SecondaryButton>
+              <SecondaryButton
+                icon={<LeftOutlined />}
+                style={{ margin: "0 8px" }}
+                onClick={prev}
+                disabled={!canVoltar}
+              >
+                Voltar
+              </SecondaryButton>
+            </Tooltip>
           )}
 
           {current < steps.length - 1 && (
-            <PrimaryButton
-              iconPosition="end"
-              icon={<RightOutlined />}
-              type="primary"
-              style={{ margin: "0 8px" }}
-              onClick={next} 
-              loading={loading}            
+            <Tooltip
+              title={
+                !canSalvarEAvancar
+                  ? "Você não possui permissão para essa ação"
+                  : "Salvar e avançar"
+              }
+              arrow={true}
             >
-              Salvar e avançar
-            </PrimaryButton>
+              <PrimaryButton
+                iconPosition="end"
+                icon={<RightOutlined />}
+                type="primary"
+                style={{ margin: "0 8px" }}
+                onClick={next}
+                loading={loading}
+                disabled={!canSalvarEAvancar}
+              >
+                Salvar e avançar
+              </PrimaryButton>
+            </Tooltip>
           )}
 
           {current === steps.length - 1 && (
-            <PrimaryButton
-              type="primary"
-              style={{ margin: "0 8px" }}
-              onClick={next}
+            <Tooltip
+              title={
+                !canSalvarEAvancar
+                  ? "Você não possui permissão para essa ação"
+                  : "Finalizar"
+              }
+              arrow={true}
             >
-              Finalizar
-            </PrimaryButton>
+              <PrimaryButton
+                type="primary"
+                style={{ margin: "0 8px" }}
+                onClick={next}
+                disabled={!canSalvarEAvancar}
+              >
+                Finalizar
+              </PrimaryButton>
+            </Tooltip>
           )}
         </Col>
       </Row>

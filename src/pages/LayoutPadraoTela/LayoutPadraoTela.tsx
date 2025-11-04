@@ -5,6 +5,7 @@ import BaseTela, { type TitleItem } from "../Base/BaseTela";
 
 import LayoutPadrao from "./components/LayoutPadrao";
 import useLayout from "./useLayout";
+import { useGetPermissions } from "../../routes/PermissionContextGuard";
 
 const { Text } = Typography;
 
@@ -22,7 +23,8 @@ interface LayoutPadraoProps {
 }
 
 const LayoutPadraoTela: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) => {
-
+  const { can } = useGetPermissions();
+  const canViewLayoutArquivoImportacao = can("view_layoutarquivoimportacao");
   const { dataLayout, layoutIsLoading } = useLayout(tipo);
 
 
@@ -41,7 +43,9 @@ const LayoutPadraoTela: React.FC<LayoutPadraoProps> = ({ tipo = 'VAGAS' }) => {
         loading={layoutIsLoading}
         tipo={tipo}
         title={tipo === 'VAGAS' ? 'Layout: Arquivo de Vagas' : 'Layout: Arquivo de Aprovados (HABILITADOS)'}
-        onVoltar={handleVoltar} dataSource={dataLayout?.results[0].estrutura || []} />
+        onVoltar={handleVoltar} dataSource={dataLayout?.results[0].estrutura || []} 
+        canExportar={canViewLayoutArquivoImportacao}
+        />
     </BaseTela>
   );
 };

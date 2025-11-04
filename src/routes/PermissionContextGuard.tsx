@@ -37,12 +37,13 @@ export function useGetPermissions() {
 }
 
 export interface PermissionContextGuardProps {
-  redirectTo?: 'string' ;
+  redirectTo?: string ;
   children: React.ReactNode;
   model?: string;  
+  permissaoDeExibirATELA: string;
 }
 
- const PermissionContextGuard: React.FC<PermissionContextGuardProps> = ({  children, model, redirectTo }) => {
+ const PermissionContextGuard: React.FC<PermissionContextGuardProps> = ({  children, model, redirectTo, permissaoDeExibirATELA }) => {
   const params = useParams();
   const navigate = useNavigate();
   
@@ -68,12 +69,12 @@ export interface PermissionContextGuardProps {
     [dataPermissions, can],
   );
 
-
-  if (dataPermissions?.permissoes?.length === 0) {
-    if (redirectTo === 'string') {
+  
+  if (!can(permissaoDeExibirATELA)) {        
+    if (redirectTo ) {      
       navigate(redirectTo);
-    } else if (redirectTo === 'function') {
-      navigate('/');
+    } else {           
+      navigate('/403');
     }
   }
 

@@ -21,8 +21,9 @@ import SelecaoCargosTela from "../pages/CriarEditarConvocacao/SelecaoCargos/Sele
 import Agenda from "../pages/CriarEditarConvocacao/Agenda";
 import Resumo from "../pages/CriarEditarConvocacao/Resumo";
 import PermissionContextGuard from "./PermissionContextGuard";
+import ForbiddenTela from "../pages/Forbidden/ForbiddenTela";
 
-//TODO ADD FEATURE FLAG
+
 
 const router = createBrowserRouter([
   {
@@ -32,11 +33,6 @@ const router = createBrowserRouter([
         <HomeTela />
       </ProtectedRoute>
     ),
-    errorElement: <RouteError />,
-  },
-  {
-    path: "/processos/gerenciamento-vagas",
-    element: <GerenciamentoVagasTela />,
     errorElement: <RouteError />,
   },
   {
@@ -58,46 +54,47 @@ const router = createBrowserRouter([
     path: "/criar-nova-senha/:uid/:token",
     element: <NovaSenhaTela />,
     errorElement: <RouteError />,
-  },
+  },  
   {
-    path: "/processos/gerenciamento-vagas",
-    element: <GerenciamentoVagasTela />,
+    path: "/processos/gerenciamento-vagas",    
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="processoconvocacao,importacaoarquivovagas" permissaoDeExibirATELA="add_importacaoarquivovagas">
+        <GerenciamentoVagasTela />
+        </PermissionContextGuard>        
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
   {
     path: "/processos/convocacao",
     element: (
       <ProtectedRoute>
-        <PermissionContextGuard model="processoconvocacao,convocacao,candidato">
+        <PermissionContextGuard model="processoconvocacao,convocacao,candidato,importacaoarquivovagas" permissaoDeExibirATELA="view_processoconvocacao">
         <ConvocacaoCandidatosTela />
         </PermissionContextGuard>        
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
-  },
-
+  },  
   {
     path: "/processos/convocacao/dados-processo/criar",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="processoconvocacao,convocacao,candidato,importacaoarquivovagas" permissaoDeExibirATELA="add_processoconvocacao">
         <DadosDoProcesso />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
   },
   {
-    path: "/processos/convocacao/nova/:uuid/selecao-cargos",
-    element: (
-      <ProtectedRoute>
-        <SelecaoCargosTela />
-      </ProtectedRoute>
-    ),
-  },
-  {
     path: "/processos/convocacao/editar/:uuid/selecao-cargos",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="processoconvocacao,convocacao,candidato,importacaoarquivovagas" permissaoDeExibirATELA="change_processoconvocacao">
         <SelecaoCargosTela />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -106,7 +103,9 @@ const router = createBrowserRouter([
     path: "/processos/convocacao/editar/:uuid/agenda",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="processoconvocacao,convocacao,candidato,importacaoarquivovagas" permissaoDeExibirATELA="change_processoconvocacao">
         <Agenda />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -115,34 +114,32 @@ const router = createBrowserRouter([
     path: "/processos/convocacao/editar/:uuid/resumo",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="processoconvocacao,convocacao,candidato,importacaoarquivovagas" permissaoDeExibirATELA="change_processoconvocacao">                
         <Resumo />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
   },
   {
-    path: "/processos/convocacao/editar/:uuid/dados-processo",
+    path: "/processos/convocacao/editar/:uuid/dados-processo",    
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="processoconvocacao,convocacao,candidato,importacaoarquivovagas" permissaoDeExibirATELA="add_processoconvocacao">
         <DadosDoProcesso />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
   },
-  {
-    path: "/processos/importacao-dados2",
-    element: (
-      <ProtectedRoute>
-        <ImportacaoDados2 />
-      </ProtectedRoute>
-    ),
-    errorElement: <RouteError />,
-  },
+
   {
     path: "/processos/importacao-dados",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="layoutarquivoimportacao,importacaoarquivovagas,importacaoarquivohabilitado" permissaoDeExibirATELA="add_importacaoarquivovagas">
         <ImportacaoDadosTela />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -151,7 +148,9 @@ const router = createBrowserRouter([
     path: "/processos/importacao-dados/layout-padrao-vagas",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="layoutarquivoimportacao" permissaoDeExibirATELA="view_layoutarquivoimportacao">
         <LayoutPadraoTela tipo={"VAGAS"} />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -159,9 +158,11 @@ const router = createBrowserRouter([
   {
     path: "/processos/importacao-dados/layout-padrao-habilitados",
     element: (
+      <PermissionContextGuard model="layoutarquivoimportacao" permissaoDeExibirATELA="view_layoutarquivoimportacao">
       <ProtectedRoute>
         <LayoutPadraoTela tipo={"HABILITADOS"} />
       </ProtectedRoute>
+      </PermissionContextGuard>
     ),
     errorElement: <RouteError />,
   },
@@ -169,7 +170,9 @@ const router = createBrowserRouter([
     path: "/processos/importacao-dados/historico-vagas",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="importacaoarquivovagas" permissaoDeExibirATELA="view_importacaoarquivovagas">
         <HistoricoVagasTela />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -183,9 +186,24 @@ const router = createBrowserRouter([
     ),
     errorElement: <RouteError />,
   },
+  // TODO remover esta rota
+  {
+    path: "/processos/importacao-dados2",
+    element: (
+      <ProtectedRoute>
+        <ImportacaoDados2 />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  }, 
   {
     path: "*",
     element: <NotFoundTela />,
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/403",
+    element: <ForbiddenTela />,
     errorElement: <RouteError />,
   },
 ]);

@@ -7,6 +7,7 @@ import {
   Row,
   Col,
   Divider,
+  Tooltip,
 } from "antd";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
@@ -26,12 +27,15 @@ import {
 import dayjs from "dayjs";
 import AgendaForm from "./components/AgendaForm";
 import AgendaTabela from "./components/AgendaTabela";
+import { useGetPermissions } from "../../../routes/PermissionContextGuard";
 
 const { Text } = Typography;
 
 const AgendaTela: React.FC = () => {
   const navigate = useNavigate();
-
+  const { can } = useGetPermissions();
+  const canAddImportacaoArquivoVagas = can("add_importacaoarquivovagas");
+  const canChangeProcessoConvocacao = can("change_processoconvocacao");
   const {
     processoConvocacaoData,
     cargosAdicionados,
@@ -149,13 +153,17 @@ const AgendaTela: React.FC = () => {
           </Text>
         }
         buttons={
+          <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
+
           <Button
             className="gerenciamento-vagas-btn"
             icon={<UserSwitchOutlined />}
+            disabled={!canAddImportacaoArquivoVagas}
             onClick={() => navigate('/processos/gerenciamento-vagas')}
           >
             Gerenciamento de vagas
           </Button>
+          </Tooltip>
         }
       >
         <Card 
@@ -289,7 +297,9 @@ const AgendaTela: React.FC = () => {
             steps={steps}
             next={next}
             prev={prev}
-            onCancel={() => console.log("cancelado!")}
+            onCancel={() => navigate(`/processos/convocacao`)}
+            canSalvarEAvancar={canChangeProcessoConvocacao}
+            canVoltar={canChangeProcessoConvocacao}
           />
         </Card>
       </BaseTela>
