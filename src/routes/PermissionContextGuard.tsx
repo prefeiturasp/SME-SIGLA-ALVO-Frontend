@@ -7,6 +7,7 @@ import {  useNavigate, useParams } from 'react-router-dom';
 import type { IUsuarioPermissoes, IUsuarioPermissoesItem } from '../services/resources/permissoes/IPermissoes';
 import { Spin } from 'antd';
 import { API } from '../services';
+import { LoadingContainer } from '../components/EstilosCompartilhados';
 
 
 
@@ -79,7 +80,7 @@ export interface PermissionContextGuardProps {
   }
 
   if (isLoading && !isError) {
-    return <Spin data-testid="@loading-element" spinning />;
+    return  <LoadingContainer data-testid="@loading-element"><Spin size="large" spinning/></LoadingContainer>   
   }
 
   return <PermissionContext.Provider value={permissions}>{children}</PermissionContext.Provider>;

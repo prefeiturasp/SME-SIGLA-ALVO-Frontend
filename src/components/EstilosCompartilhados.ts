@@ -353,3 +353,10 @@ export const deleteIcon = {
   color: '#838383',
   fontSize: '1.07125rem'
 };
+
+export const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
