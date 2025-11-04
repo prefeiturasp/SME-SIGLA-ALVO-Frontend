@@ -2,15 +2,27 @@ export interface IImportacaoFundacao {
   uuid: string;
   arquivo: string;
   concurso: string;
-  data_importacao: string;
 }
+export interface IErroImportacao {
+  mensagem: string;
+  erros: string;
+  criado_em: string;
+}
+
+export interface IErroImportacaoResposta {
+  mensagem: string;
+  erros: string;
+  concurso_uuid: string | null;
+  processo_uuid: string | null;
+}
+
 export interface IUltimasImportacoesVagas {
   uuid: string;
-  metodo_de_importacao: string;
-  data_de_fechamento_do_modulo: string;
-  cargo: string;
-  opcoes_de_importacao: string;
-  data_importacao: string;  
+  nome_arquivo: string;
+  processo_nome: string;
+  criado_em: string;
+  status: string;
+  erros?: IErroImportacao[] | null;
 }
 
 

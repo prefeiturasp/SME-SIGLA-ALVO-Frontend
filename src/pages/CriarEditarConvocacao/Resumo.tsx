@@ -41,7 +41,6 @@ const Resumo: React.FC = () => {
   
   const { processoConvocacaoData, processoConvocacaoIsLoading } =
     useConvocacaoById(uuid as string);
-  // de onde vem o cargo tem que ser varias tabelas ? rodar no wire mock
   const patchProcessoConvocacaoMutation = usePatchProcessoConvocacao();
 
   const breadcrumbItems = [
@@ -86,21 +85,13 @@ const Resumo: React.FC = () => {
   const current = 3;
 
   const next = async () => {
-    patchProcessoConvocacaoMutation.mutate(
-      { uuid: uuid as string, payload: { status: "EM_ANDAMENTO" } },
-      {
-        onSuccess: () => {
-          navigate(`/processos/convocacao/`);
-        },
-      }
-    );
+    navigate(`/processos/convocacao/`);
   };
 
   const prev = () => {
     navigate(`/processos/convocacao/editar/${uuid}/agenda`);
   };
-  
-  
+
   return (
     <>
       <BaseTela
@@ -109,7 +100,6 @@ const Resumo: React.FC = () => {
         buttons={
           <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
           <Button
-            style={{ fontWeight: "400" }}
             color="primary"
             variant="outlined"
             icon={<UserSwitchOutlined />}

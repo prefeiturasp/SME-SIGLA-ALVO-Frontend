@@ -34,13 +34,7 @@ import type { IInclusaoVagasEscolasPayload } from "./hooks/types";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 
 
-
 const { Text } = Typography;
-
-const ResponsiveSelect = styled(StyledSelect)`
-  width: 100%;
-  max-width: 900px;
-`;
 
 const GerenciamentoVagasTela: React.FC = () => {
   const { token } = theme.useToken();
@@ -180,7 +174,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                     label="Processo"
                     labelCol={{ span: 24 }}
                   >
-                    <ResponsiveSelect
+                    <StyledSelect
                        style={{ marginTop: 6 }}
                        value={field.value}
                        onChange={(value: unknown) => {
@@ -204,7 +198,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                           {processoConvocacao.descricao}
                         </Select.Option>
                       ))}
-                    </ResponsiveSelect>
+                    </StyledSelect>
                   </CustomFormItem>
                   )}
                 />
@@ -215,7 +209,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                     label="Cargo"
                     labelCol={{ span: 24 }}
                   >
-                    <ResponsiveSelect
+                    <StyledSelect
                       style={{ marginTop: 6 }}
                       placeholder="Selecione o cargo"
                       onChange={(value: unknown) => {
@@ -230,7 +224,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                           {cargo.nome}
                         </Select.Option>
                       ))}
-                    </ResponsiveSelect>
+                    </StyledSelect>
                   </CustomFormItem>
                 </Col>
               )}
@@ -252,7 +246,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                       label={"DRE"}
                       labelCol={{ span: 24 }}
                     >
-                      <ResponsiveSelect
+                      <StyledSelect
                         style={{ marginTop: 6 }}
                         {...field}
                         options={optionsDres}

@@ -32,10 +32,14 @@ export const StepActions: React.FC<StepActionsProps> = ({
       <Row align="middle" justify="space-between">
         {/* Botão Cancelar à esquerda */}
         <Col>
-          {onCancel && (
-            <SecondaryButton style={{ margin: "0 8px" }} onClick={onCancel}>
-              Cancelar
-            </SecondaryButton>
+        {onCancel && (
+          <Button
+            size="large"
+            style={{ margin: "0 8px" }}
+            onClick={onCancel}
+          >
+            Cancelar
+            </Button>
           )}
         </Col>
 

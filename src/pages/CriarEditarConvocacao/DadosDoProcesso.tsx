@@ -25,15 +25,19 @@ const DadosDoProcesso: React.FC = () => {
   const canAddImportacaoArquivoVagas = can("add_importacaoarquivovagas");
   const {
     control,
-    handleSubmit,    
+    handleSubmit,
     concursosData,
-    concursosOptionsIsLoading,    
-    isCargoLiberado,    
+    concursosOptionsIsLoading,
+    isCargoLiberado,
     popularSelectDeCargos,
-    handleSub,        
+    handleSub,
     isEdit,
+    uuid,
     isViewMode,
-    formErrors,  
+    formErrors,
+    processoConvocacaoData,
+    hasEdits,
+    patchProcessoFromForm
     } = useNovaConvocacaoCandidatos();
   const breadcrumbItems = [
     {
@@ -75,13 +79,19 @@ const DadosDoProcesso: React.FC = () => {
   ] as TitleItem[];
 
   const current = 0;
-
   const next = async () => {
-    
     await handleSubmit(async (formData) => {
+      if (isEdit || uuid) {
+        if (hasEdits) {
+          await patchProcessoFromForm(formData);
+          navigate(`/processos/convocacao/editar/${uuid}/selecao-cargos`);
+        }
+        navigate(`/processos/convocacao/editar/${uuid}/selecao-cargos`);
+        return;
+      }
       const result = await handleSub(formData);
       if (result && typeof result === 'object' && 'uuid' in result) {
-        navigate(`/processos/convocacao/editar/${result.uuid}/selecao-cargos`, {state:{editData: result, isViewMode: false}});         
+        navigate(`/processos/convocacao/editar/${result.uuid}/selecao-cargos`, { state: { editData: result, isViewMode: false } });
       }
     })();
   };
@@ -90,13 +100,10 @@ const DadosDoProcesso: React.FC = () => {
     console.log("voltar");
   };
 
-  const contentStyle: React.CSSProperties = {
-    minHeight: "40vh",
-    
-    
+  const cancel = () => {
+    navigate("/processos/convocacao/")
   };
 
-  // editData
   return (
     <>
       <BaseTela
@@ -106,7 +113,6 @@ const DadosDoProcesso: React.FC = () => {
           <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
 
           <Button
-            style={{ fontWeight: "400" }}
             color="primary"
             variant="outlined"
             icon={<UserSwitchOutlined />}
@@ -127,7 +133,7 @@ const DadosDoProcesso: React.FC = () => {
           title={steps[current].title}
           variant="borderless"
         >
-          <div style={contentStyle}>
+          <div>
             <FormPrincipal
               control={control}
               concursosData={concursosData}
@@ -136,6 +142,7 @@ const DadosDoProcesso: React.FC = () => {
               popularSelectDeCargos={popularSelectDeCargos}
               isViewMode={isViewMode} 
               formErrors={formErrors}
+              processoConvocacaoData={processoConvocacaoData}
             />
           </div>
 
@@ -146,9 +153,9 @@ const DadosDoProcesso: React.FC = () => {
             next={next}
             prev={prev}
             loading={false}
-            onCancel={() => navigate(`/processos/convocacao`)}
             canSalvarEAvancar={canAddProcessoConvocacao}
             canVoltar={canViewProcessoConvocacao}            
+            onCancel={cancel}
           />
         </StyledCardWithoutBorder>
       </BaseTela>

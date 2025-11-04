@@ -58,8 +58,6 @@ export const useSelecaoCargo = () => {
 
   const handleBuscarCandidatos = () => {
     if (cargoSelecionado) {
-      // Limpar último cargo selecionado quando for um novo cargo
-      // Só manter se estiver editando um cargo existente
       if (!ultimoCargoSelecionado || ultimoCargoSelecionado.uuid !== cargoSelecionado) {
         setUltimoCargoSelecionado(null);
       }

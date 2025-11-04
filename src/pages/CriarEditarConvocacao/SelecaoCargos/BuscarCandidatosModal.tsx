@@ -384,17 +384,19 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
         </div>
 
 
-        <ButtonContainer>
-          <div style={modalInlineStyles.buttonsContainer}>
-            <Button
-              className="modal-buscar-btn modal-action-btn"
-              size="large"
-              icon={<SearchOutlined />}
-              onClick={handleBuscar}
-            >
-              Buscar
-            </Button>
-          </div>
+        {/* <ButtonContainer> */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
+          <Button
+            // className="modal-buscar-btn modal-action-btn"
+            size="large"
+            icon={<SearchOutlined />}
+            onClick={handleBuscar}
+            variant="outlined"
+            style={{ width: 'fit-content' }}
+          >
+            Buscar
+          </Button>
+        </div>
 
           {mostrarTabelaCandidatos && (
             <div style={modalInlineStyles.tableContainer}>
@@ -431,11 +433,11 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
                   }}
                   pagination={{
                     pageSize: 10,
-                    showSizeChanger: false,
+                    showSizeChanger: true,
                     showQuickJumper: false,
                     showTotal: (total, range) => 
                       `${range[0]}-${range[1]} de ${total} candidatos`,
-                    position: ['bottomLeft', 'bottomRight'],
+                    position: ['bottomRight'],
 
                   }}
                   locale={{
@@ -462,22 +464,21 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
             <Button
               onClick={onClose}
               size="large"
-              className="modal-action-btn modal-cancel-btn"
-              style={modalInlineStyles.cancelButton}
-            >
-              <span className="modal-cancel-label">Cancelar</span>
+              variant="outlined"
+              style={{ width: 'fit-content' }}
+            >Cancelar
             </Button>
             <Button
               type="primary"
               size="large"
-              className="modal-action-btn modal-adicionar-btn"
               onClick={handleSelecionar}
               disabled={isAdicionarDisabilitado}
-            >
-              <span className="modal-adicionar-label">Adicionar ao cargo</span>
+              variant="outlined"
+              style={{ width: 'fit-content' }}
+            >Adicionar ao cargo
             </Button>
           </div>
-        </ButtonContainer>
+        {/* </ButtonContainer> */}
               </div>
     </Modal>
     </>

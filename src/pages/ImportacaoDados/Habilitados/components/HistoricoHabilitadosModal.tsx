@@ -1,13 +1,18 @@
-import React from "react";
-import { DeleteOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { DeleteOutlined, WarningOutlined } from "@ant-design/icons";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import dayjs from "dayjs";
-import { Button, Layout, Modal, Space, Typography } from "antd";
+import { Button, Modal, Space, Typography, Tooltip } from "antd";
+import { useQuery } from "@tanstack/react-query";
 import { StyledTable } from "../../../../components/EstilosCompartilhados";
 import { useImportacaoDados } from "../hooks/useImportacaoDadosHabilitados";
 import { deleteIcon } from "../../../../components/EstilosCompartilhados";
-
-const { Title } = Typography;
+import { API } from "../../../../services";
+import {
+  useGetDownloadError,
+  TipoImportacao,
+} from "../../hooks/useGetDownloadError";
+import ErroModal from "./ErroModal";
 
 interface HistoricoProps extends TableProps<any> {
   data?: any[];
@@ -30,6 +35,13 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({
     onAntTableChange,
   } = useImportacaoDados();
 
+  const [isErrosModalOpen, setIsErrosModalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<any | null>(null);
+
+  const { handleDownload, isDownloading } = useGetDownloadError(
+    TipoImportacao.HABILITADOS
+  );
+
   const handleVoltar = () => {
     if (onVoltar) {
       onVoltar();
@@ -42,36 +54,69 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({
     console.log("Delete", uuid);
   };
 
+  const handleOpenErrosModal = (record: any) => {
+    setSelectedRecord(record);
+    setIsErrosModalOpen(true);
+  };
+
+  const handleCloseErrosModal = () => {
+    setIsErrosModalOpen(false);
+    setSelectedRecord(null);
+  };
+
+  const handleDownloadClick = () => {
+    if (selectedRecord?.uuid) {
+      handleDownload(selectedRecord.uuid);
+    }
+  };
+
+  const importacaoErro = selectedRecord?.erros?.[0] || null;
+
   const columns: ColumnsType<any> = [
     {
       title: "Data",
       dataIndex: "criado_em",
       key: "criado_em",
+      align: "center",
       render: (text: string) => (text ? dayjs(text).format("DD/MM/YYYY") : "-"),
     },
     {
       title: "Concurso",
       dataIndex: "concurso_nome",
       key: "concurso_nome",
+      align: "center",
+      render: (concurso: string) => concurso || "-",
     },
     {
       title: "Arquivo",
       dataIndex: "nome_arquivo",
       key: "nome_arquivo",
+      align: "center",
       render: (text: string) => text || "-",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      align: "center",
+      render: (status: string) => status || "-",
     },
     {
       width: "12%",
       title: "Ações",
       dataIndex: "",
       key: "x",
+      align: "center",
       render: (_, record) => (
-        <Space size="small">          
-          <Button
-            type={"link"}
-            icon={<DeleteOutlined style={deleteIcon} />}
-            onClick={() => handleDelete(record.uuid)}
-          />
+        <Space size="small">
+          {record.status === "ERRO" && (
+            <Tooltip title="Importação com erro, clique para visualizar">
+              <WarningOutlined 
+                style={{ cursor: "pointer", fontSize: "18px", color: "#ff4d4f" }} 
+                onClick={() => handleOpenErrosModal(record)}
+              />
+            </Tooltip>
+          )}
         </Space>
       ),
     },
@@ -114,6 +159,15 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({
         }}
         onChange={onAntTableChange}
         {...rest}
+      />
+      
+      <ErroModal
+        open={isErrosModalOpen}
+        onClose={handleCloseErrosModal}
+        isLoading={false}
+        importacaoErro={importacaoErro}
+        onDownload={handleDownloadClick}
+        isDownloading={isDownloading}
       />
     </Modal>
   );

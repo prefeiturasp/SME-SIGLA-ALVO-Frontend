@@ -27,7 +27,7 @@ export const CustomFormItem = styled(FormItem)`
   .ant-input-number,
   .MuiInputBase-root {
     width: 100%;
-    height: 2.5rem;
+    height: 45px;
   }
     
   .ant-form-item-label {

@@ -10,6 +10,7 @@ import {
   Select,
   Divider,
   Table,
+  Form,
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Tooltip } from "antd";
@@ -27,13 +28,14 @@ import { StepActions } from "../components/StepActions";
 import { items, steps } from "../components/StepsNames";
 import BuscarCandidatosModal from "./BuscarCandidatosModal";
 import { useSelecaoCargo } from "./hooks/useSelecaoCargo";
+import { CustomFormItem } from "../../../components/FormStyle";
+import { StyledSelect, StyledCardWithoutBorder } from "../../../components/EstilosCompartilhados";
 import { 
   StyledCardAmpla, 
   StyledCardNNA, 
   StyledCardPCD, 
   commonStyles,
   inlineStyles,
-  GlobalStyles,
   processInfoStyles
 } from "./styles";
 import dayjs from "dayjs";
@@ -112,18 +114,15 @@ const SelecaoCargos: React.FC = () => {
   const current=1;
  
   const next = () => {
-
     navigate(`/processos/convocacao/editar/${uuid}/agenda`)
-
   };
-
   const prev = () => {
-    navigate(`/processos/convocacao/editar/${uuid}/dados-processo`)    
+    navigate(`/processos/convocacao/editar/${uuid}/dados-processo`)
+  };
+  const cancel = () => {
+    navigate("/processos/convocacao/")
   };
   
-
-
-
   const formatDate = (value?: string) => {
     if (!value) return '—';
     const d = dayjs(value);
@@ -137,7 +136,6 @@ const SelecaoCargos: React.FC = () => {
       ESCOLHA: 'Escolha',
     };
     if (map[value]) return map[value];
-    // Fallback: transforma ENUM em Título
     return value
       .toLowerCase()
       .split('_')
@@ -145,31 +143,18 @@ const SelecaoCargos: React.FC = () => {
       .join(' ');
   };
 
-  const contentStyle: React.CSSProperties = {
-    lineHeight: "normal",
-    textAlign: "left",
-
-    borderRadius: token.borderRadiusLG,
-
-    marginTop: 20,
-  };
-
   return (
     <>
-      <GlobalStyles />
       <BaseTela
         breadcrumbItems={breadcrumbItems}
-        title={
-          <Text style={inlineStyles.titleCombinedStyles}>
-            Nova Convocação
-          </Text>
-        }
+        title="Nova convocação"
         buttons={
           <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
           <Button
-            className="gerenciamento-vagas-btn"
-            disabled={!canAddImportacaoArquivoVagas}
+            color="primary"
+            variant="outlined"
             icon={<UserSwitchOutlined />}
+            disabled={!canAddImportacaoArquivoVagas}
             onClick={() => navigate('/processos/gerenciamento-vagas')}
           >
             Gerenciamento de vagas
@@ -177,29 +162,16 @@ const SelecaoCargos: React.FC = () => {
           </Tooltip>
         }
       >
-        <Card 
-          title={
-            <Text style={inlineStyles.titleTextWithFont}>
-              Processo de convocação de candidatos
-            </Text>
-          }
-          styles={inlineStyles.cardHeaderStyles}
-          variant="borderless"
-        >
+        <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
           <Steps current={current} items={items} />
-        </Card>
+        </StyledCardWithoutBorder>
 
-        <Card
-          style={inlineStyles.marginTop}
-          title={
-            <Text style={inlineStyles.cardTitleWithFont}>
-              Dados do Processo
-            </Text>
-          }
-          styles={inlineStyles.cardHeaderStylesSimple}
+        <StyledCardWithoutBorder
+          style={{ marginTop: "1.25rem" }}
+          title="Dados do processo"
           variant="borderless"
         >
-          <div style={{ ...contentStyle, ...inlineStyles.containerWithMarginTop }}>
+          <div>
             <Row gutter={[16, 16]}>
               <Col span={8}>
                 <div style={processInfoStyles.container}>
@@ -253,65 +225,57 @@ const SelecaoCargos: React.FC = () => {
               </Col>
             </Row>
           </div>
-        </Card>
+        </StyledCardWithoutBorder>
 
-        <Card
+        <StyledCardWithoutBorder
           style={inlineStyles.marginTop}
           styles={{ body: { paddingTop: 8 }, header: { borderBottom: 'none' } }}
           title={
             <Text style={inlineStyles.tableTitleWithFont}>
-              Seleção e configuração de candidatos
+              Seleção e configuração do(s) cargo(s)
             </Text>
           }
           variant="borderless"
         >
-          <div style={{ ...contentStyle, ...inlineStyles.containerWithMarginTop }}>
-            <div style={processInfoStyles.container}>
-              <Text strong style={processInfoStyles.label}>
-                Cargo:
-              </Text>
-              <div style={inlineStyles.selectContainer}>
-                <Select
-                  placeholder={concursoIsLoading ? "Carregando cargos..." : "Selecione o cargo"}
-                  onChange={handleCargoChange}
-                  className="cargo-select"
-                  style={inlineStyles.selectWidth}
-                  loading={concursoIsLoading}
-                  disabled={concursoIsLoading}
-                >
-                  {cargosDisponiveis.map((cargo) => (
-                    <Option key={cargo.value} value={cargo.value}>
-                      {cargo.label}
-                    </Option>
-                  ))}
-                </Select>
+            <Row gutter={[16, 16]} align="bottom">
+              <Col xs={24} md={12}>
+                <Form layout="vertical">
+                  <CustomFormItem label="Cargo">
+                    <StyledSelect
+                      placeholder={concursoIsLoading ? "Carregando cargos..." : "Selecione o cargo"}
+                      onChange={(value) => handleCargoChange(value as string)}
+                      loading={concursoIsLoading}
+                      disabled={concursoIsLoading}
+                    >
+                      {cargosDisponiveis.map((cargo) => (
+                        <Option key={cargo.value} value={cargo.value}>
+                          {cargo.label}
+                        </Option>
+                      ))}
+                    </StyledSelect>
+                  </CustomFormItem>
+                </Form>
+              </Col>
+              <Col xs={24} md={12} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
                 <Button 
-                  type="primary" 
-                  className="buscar-candidatos-btn"
+                  size="large"
                   icon={<SearchOutlined />}
                   onClick={handleBuscarCandidatos}
                   disabled={!cargoSelecionado && cargosAdicionados.length === 0}
-                  style={{
-                    marginTop: '10px',
-                    ...inlineStyles.buscarButton,
-                    ...inlineStyles.buscarButtonAdditional,
-                    ...inlineStyles.buttonInlineStyles,
-                    paddingLeft: token.padding,
-                    paddingRight: token.padding
-                  }}
+                  style={{ marginBottom: 3 }}
                 >
                   Buscar candidatos
                 </Button>
-              </div>
-            </div>
-          </div>
+              </Col>
+            </Row>
+          
 
           {/* Cards dinâmicos - aparecem apenas após adicionar cargos */}
           {cargosAdicionados.length > 0 && (
             <>
               
               <Row gutter={0} justify="start" align="top">
-                <Col style={inlineStyles.colNoPadding}>
+                <Col xs={24} md={12} style={inlineStyles.colNoPadding}>
                   <Row gutter={0} justify="start">
                     <Col style={inlineStyles.colNoPadding}>
                       <div style={inlineStyles.cardsContainer}>
@@ -440,11 +404,11 @@ const SelecaoCargos: React.FC = () => {
             steps={steps}
             next={next}
             prev={prev}
-            onCancel={() => navigate(`/processos/convocacao`)}
-            canSalvarEAvancar={canChangeProcessoConvocacao}
+             canSalvarEAvancar={canChangeProcessoConvocacao}
             canVoltar={canChangeProcessoConvocacao}
+            onCancel={cancel}
           />
-        </Card>
+        </StyledCardWithoutBorder>
 
         {cargoSelecionado && (
           <BuscarCandidatosModal
