@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import {useGetProcessosConvocacaoPorUUID} from "./useGetProcessosConvocacaoPorUUID";
+import { useGetProcessosConvocacaoPorUUID } from "./useGetProcessosConvocacaoPorUUID";
 import { useGetConcursoByUuid } from "./useGetConcursosPorUuid";
+import { useGetCargo } from "./useGetCargo";
+import { usePostCargo } from "./usePostCargo";
 
 export type CargosDisponiveisOption = {
   value: string;
@@ -40,6 +42,13 @@ export const useSelecaoCargo = () => {
   });
   const { processoConvocacaoData, processoConvocacaoIsLoading } = useGetProcessosConvocacaoPorUUID(uuid!);
   const { concursoData, concursoIsLoading } = useGetConcursoByUuid(processoConvocacaoData?.concurso_uuid || '');
+  
+  // Hooks para gerenciar cargos
+  const { cargosData, carregarCargos } = useGetCargo(
+    uuid,
+    !!uuid && !!processoConvocacaoData && !processoConvocacaoIsLoading
+  );
+  const postCargoMutation = usePostCargo();
 
   // Popular select de cargos quando os dados forem carregados
   useEffect(() => {
@@ -128,9 +137,7 @@ export const useSelecaoCargo = () => {
   };
 
   const handleEditarCargo = (cargo: CargoAdicionado) => {
-    // Definir o cargo para edição
     setCargoSelecionado(cargo.uuid);
-    // Definir o último cargo selecionado como o cargo sendo editado
     setUltimoCargoSelecionado(cargo);
     setModalSelecionarCandidatosVisible(true);
   };
@@ -152,6 +159,51 @@ export const useSelecaoCargo = () => {
       return updated;
     });
   };
+// Função para salvar cargos no backend
+  const salvarCargosNoBackend = async (): Promise<boolean> => {
+    if (!uuid || cargosAdicionados.length === 0) {
+      return true;
+    }
+
+    try {
+      const payload = cargosAdicionados.map(cargo => ({
+        nome: cargo.nome,
+        cargo_uuid: cargo.uuid,
+        vagas: cargo.vagas,
+        geral: cargo.geral,
+        pcd: cargo.pcd,
+        nna: cargo.nna,
+        total_candidatos: cargo.totalCandidatos,
+      }));
+
+      await postCargoMutation.mutateAsync({ processoUuid: uuid, payload });
+      return true;
+    } catch (error: any) {
+      console.error('Erro ao salvar cargos:', error);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    if (cargosData && cargosData.length > 0) {
+      const cargosConvertidos: CargoAdicionado[] = cargosData.map((cargo: any) => ({
+        uuid: cargo.cargo_uuid,
+        nome: cargo.nome,
+        vagas: cargo.vagas || 0,
+        geral: cargo.geral || 0,
+        pcd: cargo.pcd || 0,
+        nna: cargo.nna || 0,
+        totalCandidatos: cargo.total_candidatos || 0,
+      }));
+
+      setCargosAdicionados(cargosConvertidos);
+      const novasVagasInfo = calcularVagasInfo(cargosConvertidos);
+      setVagasInfo(novasVagasInfo);
+    } else if (cargosData && cargosData.length === 0) {
+      setCargosAdicionados([]);
+      setVagasInfo({ totalGeral: 0, totalPcd: 0, totalNna: 0 });
+    }
+  }, [cargosData]);
 
   return {
     processoConvocacaoData,
@@ -170,6 +222,9 @@ export const useSelecaoCargo = () => {
     vagasInfo,
     handleEditarCargo,
     handleExcluirCargo,
+    salvarCargosNoBackend,
+    salvandoCargos: postCargoMutation.isPending,
+    carregarCargos,
     uuid
   };
 };

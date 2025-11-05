@@ -1,5 +1,3 @@
-import { number } from "yup";
-
 export interface IProcessoConvocacao {
 concurso_nome : string;
 concurso_uuid : string;
@@ -131,4 +129,14 @@ export interface IConvocacaoFiltros {
   dre: string;
   escola: string;
   
+}
+
+export interface ICargoProcesso {
+  nome: string;
+  cargo_uuid: string;
+  vagas: number;
+  geral: number;
+  pcd: number;
+  nna: number;
+  total_candidatos: number;
 }

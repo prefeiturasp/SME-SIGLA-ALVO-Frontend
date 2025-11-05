@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Button,
-  Card,
   Steps,
   theme,
   Typography,
@@ -63,6 +62,8 @@ const SelecaoCargos: React.FC = () => {
     vagasInfo,
     handleEditarCargo,
     handleExcluirCargo,
+    salvarCargosNoBackend,
+    salvandoCargos,
     uuid,
   } = useSelecaoCargo();
 
@@ -109,8 +110,11 @@ const SelecaoCargos: React.FC = () => {
 
   const current=1;
  
-  const next = () => {
-    navigate(`/processos/convocacao/editar/${uuid}/agenda`)
+  const next = async () => {
+    const sucesso = await salvarCargosNoBackend();
+    if (sucesso) {
+      navigate(`/processos/convocacao/editar/${uuid}/agenda`);
+    }
   };
   const prev = () => {
     navigate(`/processos/convocacao/editar/${uuid}/dados-processo`)

@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosProcessoConvocacao } from "../../axios";
-import type { ISample, IProcessoConvocacao, IPostProcessoConvocacaoPayload, IProcessoConvocacaoResumo } from "./IConvocacao";
+import type { ISample, IProcessoConvocacao, IPostProcessoConvocacaoPayload, IProcessoConvocacaoResumo, ICargoProcesso } from "./IConvocacao";
 import type { IBackendWithSubOptions, IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
@@ -14,6 +14,8 @@ export const URL = {
   getProcessosConvocacaoOptions: () => `/api/v1/processos-convocacao/?formato=select`,
   getCargos: () => `/api/v1/cargos/`,
   getCargosPorConcurso: (concursoUuid: string) => `/api/v1/cargos/concurso/${concursoUuid}/`,
+  getCargosProcesso: (processoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/`,
+  postCargosProcesso: (processoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/`,
 };
 
 
@@ -248,6 +250,51 @@ export const getCargosPorConcursoData = (
   const response = appAxiosProcessoConvocacao
     .get<IBackendWithSubOptions[]>(URL.getCargosPorConcurso(concursoUuid), {
        signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+/**
+ * Busca os cargos de um processo de convocação
+ */
+export const getCargosProcesso = (
+  processoUuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .get<any[]>(URL.getCargosProcesso(processoUuid), {
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+/**
+ * Salva os cargos de um processo de convocação
+ */
+export const postCargosProcesso = (
+  processoUuid: string,
+  payload: Array<ICargoProcesso>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .post<any>(URL.postCargosProcesso(processoUuid), payload, {
+      signal,
       ...axiosRequestConfig,
     })
     .then((response) => response.data);
