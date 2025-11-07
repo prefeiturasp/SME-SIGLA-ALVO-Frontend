@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useForm, type Resolver } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -6,6 +6,12 @@ import dayjs from "dayjs";
 import { useGetProcessosConvocacaoPorUUID } from "../../SelecaoCargos/hooks/useGetProcessosConvocacaoPorUUID";
 import { useGetConcursoByUuid } from "../../SelecaoCargos/hooks/useGetConcursosPorUuid";
 import useAgendaSchema, { type IAgendaFields } from "./useAgendaSchema";
+import type { IAgenda, IAgendaCreate } from "../../../../services/resources/agenda/IAgenda";
+import { usePostAgenda } from "./usePostAgenda";
+import { useDeleteAgenda } from "./useDeleteAgenda";
+import { useGetAgendas } from "./useGetAgendas";
+import { getCargosProcesso } from "../../../../services/resources/convocacao";
+import { App } from "antd";
 
 export type CargoAdicionado = {
   uuid: string;
@@ -27,7 +33,9 @@ export type Option = { value: string; label: string };
 
 export type PeriodoItem = {
   id: number;
+  uuid?: string;
   cargo: string;
+  cargoUuid?: string;
   classificacao: number;
   dataEscolha: string;
   sessao: string;
@@ -36,9 +44,14 @@ export type PeriodoItem = {
   horaFim?: string;
   isRetardatario?: boolean;
   tipoEscolha?: string;
+  modalidade?: 'Presencial' | 'Online' | null;
   numeroSessao?: number;
   dataEscolhaOriginal?: any;
   horaInicioOriginal?: any;
+  horaFimOriginal?: any;
+  processoConvocacaoUuid?: string;
+  escolhaEm?: string;
+  nomeacaoEm?: string;
 };
 
 export const useAgenda = () => {
@@ -67,8 +80,114 @@ export const useAgenda = () => {
   // Estado para controlar expansão automática da tabela
   const [cargoParaExpandir, setCargoParaExpandir] = useState<string | null>(null);
 
+  // Estados para controle de API
+  const [agendasLoading, setAgendasLoading] = useState(false);
+  const { notification } = App.useApp();
+  
+  // Hook para criar agendas
+  const postAgendaMutation = usePostAgenda();
+  
+  // Hook para deletar agendas
+  const deleteAgendaMutation = useDeleteAgenda();
+
   const { processoConvocacaoData, processoConvocacaoIsLoading } = useGetProcessosConvocacaoPorUUID(uuid!);
   const { concursoData, concursoIsLoading } = useGetConcursoByUuid(processoConvocacaoData?.concurso_uuid || '');
+
+  const mapAgendaToPeriodoItem = useCallback((agenda: IAgenda): PeriodoItem => {
+    const dataEscolhaOriginal = agenda.escolha_em ? dayjs(agenda.escolha_em) : null;
+    const horaInicioOriginal = agenda.hora_convocacao_inicio 
+      ? dayjs(`2000-01-01 ${agenda.hora_convocacao_inicio}`) 
+      : null;
+    const horaFimOriginal = agenda.hora_convocacao_fim 
+      ? dayjs(`2000-01-01 ${agenda.hora_convocacao_fim}`) 
+      : null;
+
+    // Formatar data de escolha
+    let dataEscolhaFormatada: string;
+    if (agenda.escolha_em) {
+      dataEscolhaFormatada = dayjs(agenda.escolha_em).format('DD/MM/YYYY');
+    } else {
+      dataEscolhaFormatada = dayjs(agenda.data_escolha).format('DD/MM/YYYY');
+    }
+
+    // Formatar horário
+    let horario: string;
+    if (agenda.modalidade === 'Presencial' && horaInicioOriginal && horaFimOriginal) {
+      horario = `${horaInicioOriginal.format('HH:mm')} às ${horaFimOriginal.format('HH:mm')}`;
+    } else {
+      horario = agenda.modalidade === 'Online' ? 'Online' : '—';
+    }
+
+    const stableId = agenda.uuid 
+      ? parseInt(agenda.uuid.replace(/-/g, '').substring(0, 15), 16) 
+      : Date.now() + Math.random();
+
+    return {
+      id: stableId,
+      uuid: agenda.uuid,
+      cargo: agenda.cargo_nome,
+      cargoUuid: agenda.cargo_uuid,
+      classificacao: agenda.classificacao || 0,
+      dataEscolha: dataEscolhaFormatada,
+      sessao: agenda.sessao || '—',
+      horario: horario,
+      horaInicio: horaInicioOriginal?.format('HH:mm'),
+      horaFim: horaFimOriginal?.format('HH:mm'),
+      isRetardatario: agenda.retardatario || false,
+      tipoEscolha: agenda.modalidade || undefined,
+      modalidade: agenda.modalidade || null,
+      dataEscolhaOriginal: dataEscolhaOriginal,
+      horaInicioOriginal: horaInicioOriginal,
+      horaFimOriginal: horaFimOriginal,
+      processoConvocacaoUuid: agenda.processo_convocacao_uuid,
+      escolhaEm: agenda.escolha_em || undefined,
+      nomeacaoEm: agenda.nomeacao_em || undefined,
+    };
+  }, []);
+
+  const mapPeriodoItemToAgendaCreate = (periodo: PeriodoItem, processoUuid: string, processoNome: string): IAgendaCreate => {
+    let escolhaEm: string | null = null;
+    if (periodo.dataEscolhaOriginal) {
+      escolhaEm = dayjs(periodo.dataEscolhaOriginal).format('YYYY-MM-DD');
+    } else if (periodo.escolhaEm) {
+      escolhaEm = periodo.escolhaEm;
+    }
+
+    let nomeacaoEm: string | null = null;
+    if (periodo.nomeacaoEm) {
+      nomeacaoEm = periodo.nomeacaoEm;
+    }
+
+    let horaConvocacaoInicio: string | null = null;
+    let horaConvocacaoFim: string | null = null;
+    
+    if (periodo.horaInicioOriginal) {
+      horaConvocacaoInicio = dayjs(periodo.horaInicioOriginal).format('HH:mm:ss');
+      if (periodo.horaFimOriginal) {
+        horaConvocacaoFim = dayjs(periodo.horaFimOriginal).format('HH:mm:ss');
+      }
+    } else if (periodo.horaInicio && periodo.horaFim) {
+      horaConvocacaoInicio = `${periodo.horaInicio}:00`;
+      horaConvocacaoFim = `${periodo.horaFim}:00`;
+    }
+
+    return {
+      ...(periodo.uuid && { uuid: periodo.uuid }),
+      processo_convocacao_uuid: processoUuid,
+      processo_convocacao_nome: processoNome,
+      cargo_uuid: periodo.cargoUuid || '',
+      cargo_nome: periodo.cargo,
+      data_escolha: dayjs().toISOString(),
+      modalidade: (periodo.tipoEscolha || periodo.modalidade) as 'Presencial' | 'Online' | null,
+      escolha_em: escolhaEm,
+      nomeacao_em: nomeacaoEm,
+      classificacao: periodo.classificacao || null,
+      sessao: periodo.sessao || null,
+      retardatario: periodo.isRetardatario || false,
+      hora_convocacao_inicio: horaConvocacaoInicio,
+      hora_convocacao_fim: horaConvocacaoFim,
+    };
+  };
 
   // Configuração do formulário da agenda
   const defaultValues: IAgendaFields = {
@@ -156,12 +275,10 @@ export const useAgenda = () => {
   const calcularHorariosSessoes = (horaInicio: any, horaFim: any, numeroSessao: number): string => {
     if (!horaInicio || !horaFim) return '';
     
-    // Calcular diferença em horas
-    const diffHoras = horaFim.diff(horaInicio, 'hour');
+    const diffMinutos = horaFim.diff(horaInicio, 'minute');
     
-    // Calcular início da sessão atual (sessão 1 = 0 horas de diferença, sessão 2 = diffHoras horas, etc.)
-    const inicioSessao = horaInicio.add((numeroSessao - 1) * diffHoras, 'hour');
-    const fimSessao = inicioSessao.add(diffHoras, 'hour');
+    const inicioSessao = horaFim.add((numeroSessao - 2) * diffMinutos, 'minute');
+    const fimSessao = inicioSessao.add(diffMinutos, 'minute');
     
     return `${inicioSessao.format('HH:mm')} às ${fimSessao.format('HH:mm')}`;
   };
@@ -173,8 +290,13 @@ export const useAgenda = () => {
     const quantidadeClassificados = watchedFields.quantidadeClassificados;
     const maxCandidatos = getMaxCandidatosDisponiveis();
     
+    if (maxCandidatos !== undefined && maxCandidatos <= 0) {
+      return false;
+    }
+    
+    // Se a quantidade excede os disponíveis
     if (maxCandidatos && quantidadeClassificados && quantidadeClassificados > maxCandidatos) {
-      return false; // Quantidade inválida - ultrapassa o limite
+      return false;
     }
     
     return true;
@@ -221,8 +343,8 @@ export const useAgenda = () => {
     return isAgendaComplete() && isQuantidadeValida();
   };
 
-  // Função para adicionar período à tabela
-  const handleAdicionarPeriodo = async () => {
+  // Função para adicionar período à tabela (apenas localmente)
+  const handleAdicionarPeriodo = () => {
     // Verificar se há erros de validação
     const hasErrors = Object.keys(formErrors).length > 0;
     
@@ -244,10 +366,9 @@ export const useAgenda = () => {
     let dataEscolhaOriginal: any;
     
     if (watchedFields.tipoEscolha === "Online" && Array.isArray(watchedFields.escolhaEm)) {
-      // Para Online, usar o range de datas
       const [dataInicio, dataFim] = watchedFields.escolhaEm;
       dataEscolhaFormatada = `${dataInicio?.format('DD/MM/YYYY')} a ${dataFim?.format('DD/MM/YYYY')}`;
-      dataEscolhaOriginal = dataInicio; // Usar data de início para ordenação
+      dataEscolhaOriginal = dataInicio;
     } else {
       // Para Presencial, usar data única
       dataEscolhaFormatada = watchedFields.escolhaEm?.format('DD/MM/YYYY');
@@ -258,6 +379,7 @@ export const useAgenda = () => {
     const novosPeriodos: PeriodoItem[] = [];
     const numeroSessoes = watchedFields.sessao || 1;
 
+    const invervaloSessao = watchedFields.horaFim.diff(watchedFields.horaInicio, 'hour');
     for (let i = 0; i < numeroSessoes; i++) {
       const numeroSessaoAtual = i + 1;
       
@@ -274,7 +396,7 @@ export const useAgenda = () => {
       // Determinar a quantidade de classificados para esta sessão
       let quantidadeClassificados;
       if (isRetardatario) {
-        quantidadeClassificados = 0; // Retardatário não tem classificação
+        quantidadeClassificados = 0;
       } else {
         quantidadeClassificados = quantidadesPorSessao[i];
       }
@@ -283,20 +405,18 @@ export const useAgenda = () => {
       let horario: string;
       if (watchedFields.tipoEscolha === "Presencial") {
         if (numeroSessaoAtual === 1) {
-          // Primeira sessão usa o horário original
           horario = `${watchedFields.horaInicio?.format('HH:mm')} às ${watchedFields.horaFim?.format('HH:mm')}`;
         } else {
-          // Sessões subsequentes calculam automaticamente
           horario = calcularHorariosSessoes(watchedFields.horaInicio, watchedFields.horaFim, numeroSessaoAtual);
         }
       } else {
-        // Para Online, não há horário específico
         horario = "Online";
       }
 
       const novoPeriodo: PeriodoItem = {
-        id: Date.now() + i, // ID único baseado no timestamp + índice
+        id: Date.now() + i,
         cargo: nomeCargo,
+        cargoUuid: agendaAberto?.cargo.uuid,
         classificacao: quantidadeClassificados,
         dataEscolha: dataEscolhaFormatada,
         dataEscolhaOriginal: dataEscolhaOriginal,
@@ -305,13 +425,17 @@ export const useAgenda = () => {
         numeroSessao: isRetardatario ? undefined : numeroSessaoAtual,
         horario: horario,
         horaInicioOriginal: watchedFields.horaInicio,
-        horaInicio: watchedFields.horaInicio?.format('HH:mm'),
-        horaFim: watchedFields.horaFim?.format('HH:mm'), 
+        horaFimOriginal: watchedFields.horaFim,
+        horaInicio: watchedFields.horaInicio?.add(i * invervaloSessao, 'hour').format('HH:mm'),
+        horaFim: watchedFields.horaFim?.add(i * invervaloSessao, 'hour').format('HH:mm'), 
         tipoEscolha: watchedFields.tipoEscolha,
+        modalidade: watchedFields.tipoEscolha as 'Presencial' | 'Online' | null,
+        processoConvocacaoUuid: uuid,
+        escolhaEm: watchedFields.escolhaEm ? (Array.isArray(watchedFields.escolhaEm) ? watchedFields.escolhaEm[0]?.format('YYYY-MM-DD') : watchedFields.escolhaEm.format('YYYY-MM-DD')) : undefined,
+        nomeacaoEm: watchedFields.nomeacaoEm ? watchedFields.nomeacaoEm.format('YYYY-MM-DD') : undefined,
       };
       novosPeriodos.push(novoPeriodo);
     }
-    
     setPeriodosList(prev => {
       const novaLista = [...prev, ...novosPeriodos];
       
@@ -328,7 +452,6 @@ export const useAgenda = () => {
       // Ordenar cada grupo cronologicamente
       Object.keys(periodosAgrupados).forEach(cargo => {
         periodosAgrupados[cargo].sort((a: PeriodoItem, b: PeriodoItem) => {
-          // Primeiro ordena por data
           const dataA = a.dataEscolhaOriginal;
           const dataB = b.dataEscolhaOriginal;
           
@@ -399,6 +522,63 @@ export const useAgenda = () => {
     
     // Fechar o card de agenda após adicionar período
     setAgendaAberto(null);
+  };
+
+  // Função para salvar todas as agendas no backend
+  const salvarAgendasNoBackend = async (): Promise<boolean> => {
+    if (!uuid || !processoConvocacaoData || periodosList.length === 0) {
+      return true;
+    }
+
+    try {
+      setAgendasLoading(true);
+      const todasAgendas: IAgendaCreate[] = periodosList.map(periodo => 
+        mapPeriodoItemToAgendaCreate(
+          periodo,
+          uuid,
+          processoConvocacaoData.concurso_nome || 'Processo de Convocação'
+        )
+      );
+
+      const resultados: IAgenda[] = await postAgendaMutation.mutateAsync(todasAgendas);
+      
+      // Atualizar os períodos com os UUIDs retornados do backend
+      setPeriodosList(prev => {
+        return prev.map((periodo, index) => {
+          if (periodo.uuid) {
+            const resultado = resultados.find(r => r.uuid === periodo.uuid);
+            if (resultado) {
+              return {
+                ...periodo,
+                uuid: resultado.uuid,
+              };
+            }
+            return periodo;
+          }
+
+          if (resultados[index]) {
+            return {
+              ...periodo,
+              uuid: resultados[index].uuid,
+            };
+          }
+          return periodo;
+        });
+      });
+
+      return true;
+    } catch (error: any) {
+      console.error('Erro ao salvar agendas:', error);
+      notification.error({
+        message: 'Erro ao Salvar Agendas',
+        description: error?.message || 'Ocorreu um erro ao salvar as agendas. Tente novamente.',
+        placement: 'top',
+        duration: 3.5,
+      });
+      return false;
+    } finally {
+      setAgendasLoading(false);
+    }
   };
 
   // Função para atualizar período na tabela
@@ -485,36 +665,45 @@ export const useAgenda = () => {
   };
 
   // Função para remover período da tabela e reordenar sessões
-  const handleRemoverPeriodo = (id: number) => {
+  const handleRemoverPeriodo = async (id: number) => {
+    const periodoParaRemover = periodosList.find(p => p.id === id);
+    
+    // Deletar do backend se tiver UUID
+    if (periodoParaRemover?.uuid) {
+      try {
+        setAgendasLoading(true);
+        await deleteAgendaMutation.mutateAsync(periodoParaRemover.uuid);
+        
+      } catch (error: any) {
+        console.error('Erro ao deletar agenda:', error);
+        return;
+      } finally {
+        setAgendasLoading(false);
+      }
+    }
+
     setPeriodosList(prev => {
-      // Filtrar o período removido
       const periodosRestantes = prev.filter(periodo => periodo.id !== id);
       
-      // Separar sessões normais, retardatários e online
       const sessoesPresenciais = periodosRestantes.filter(p => !p.isRetardatario && p.tipoEscolha === "Presencial");
       const sessoesOnline = periodosRestantes.filter(p => !p.isRetardatario && p.tipoEscolha === "Online");
       const retardatarios = periodosRestantes.filter(p => p.isRetardatario);
       
-      // Reordenar as sessões presenciais
       const sessoesPresenciaisReordenadas = sessoesPresenciais.map((periodo, index) => ({
         ...periodo,
         numeroSessao: index + 1,
         sessao: `Sessão ${index + 1}`
       }));
       
-      // Reordenar as sessões online
       const sessoesOnlineReordenadas = sessoesOnline.map((periodo, index) => ({
         ...periodo,
         numeroSessao: index + 1,
         sessao: `Sessão ${index + 1}`
       }));
       
-      // Combinar novamente (sessões presenciais reordenadas + sessões online reordenadas + retardatários)
       const periodosComSessaoReordenada = [...sessoesPresenciaisReordenadas, ...sessoesOnlineReordenadas, ...retardatarios];
       
-      // Ordenar cronologicamente após reordenação das sessões
       const periodosOrdenados = periodosComSessaoReordenada.sort((a, b) => {
-        // Primeiro ordena por data
         const dataA = a.dataEscolhaOriginal;
         const dataB = b.dataEscolhaOriginal;
         
@@ -524,7 +713,6 @@ export const useAgenda = () => {
             return comparacaoData;
           }
           
-          // Se as datas forem iguais, ordena por horário
           const horaA = a.horaInicioOriginal;
           const horaB = b.horaInicioOriginal;
           
@@ -536,7 +724,6 @@ export const useAgenda = () => {
         return 0;
       });
 
-      // Após ordenação cronológica, reordenar as sessões na ordem cronológica
       let contadorSessaoPresencial = 1;
       let contadorSessaoOnline = 1;
       const periodosComSessaoCronologica = periodosOrdenados.map(periodo => {
@@ -560,12 +747,9 @@ export const useAgenda = () => {
         return periodo;
       });
       
-      // Atualizar o contador de sessão para o próximo número
       setContadorSessao(Math.max(contadorSessaoPresencial, contadorSessaoOnline));
       
-      // Revalidar o formulário após remoção para atualizar os limites
       setTimeout(() => {
-        // Trigger revalidation do campo quantidadeClassificados
         setValue('quantidadeClassificados', watchedFields.quantidadeClassificados);
       }, 0);
       
@@ -577,18 +761,15 @@ export const useAgenda = () => {
     reset(defaultValues);
   };
 
-  // Função para limpar o estado de expansão
   const limparExpansao = () => {
     setCargoParaExpandir(null);
   };
 
-  // Função para calcular o intervalo de classificação para um período específico
   const calcularIntervaloClassificacao = (periodo: PeriodoItem): string => {
     if (periodo.isRetardatario) {
       return "-";
     }
     
-    // Encontrar todos os períodos do mesmo cargo que vêm antes do período atual
     const periodosMesmoCargo = periodosList
       .filter(p => p.cargo === periodo.cargo)
       .sort((a, b) => {
@@ -682,7 +863,7 @@ export const useAgenda = () => {
     setEditingKey(null);
   };
 
-  // Função para salvar edição
+  // Função para salvar edição (apenas em memória, sem fazer request)
   const saveEdit = (key: number, periodoDataItem: PeriodoItem, values: any) => {
     if (values.classificacao) {
       // Se for tipo Presencial, verificar horários
@@ -697,12 +878,31 @@ export const useAgenda = () => {
         }
       }
       
-      // Atualizar o período
-      handleUpdatePeriodo(key, { 
+      let horarioFormatado: string;
+      let horaInicioOriginal: any = null;
+      let horaFimOriginal: any = null;
+      
+      if (periodoDataItem?.tipoEscolha === "Presencial" && values.horaInicio && values.horaFim) {
+        horarioFormatado = `${values.horaInicio} às ${values.horaFim}`;
+        try {
+          horaInicioOriginal = dayjs(`2000-01-01 ${values.horaInicio}`);
+          horaFimOriginal = dayjs(`2000-01-01 ${values.horaFim}`);
+        } catch (e) {
+          console.error('Erro ao criar objetos dayjs:', e);
+        }
+      } else {
+        horarioFormatado = periodoDataItem?.tipoEscolha === "Online" ? "Online" : (periodoDataItem?.horario || "—");
+      }
+      
+      const updates = { 
         horaInicio: values.horaInicio,
         horaFim: values.horaFim,
+        horario: horarioFormatado,
+        horaInicioOriginal: horaInicioOriginal,
+        horaFimOriginal: horaFimOriginal,
         classificacao: parseInt(values.classificacao)
-      });
+      };
+      handleUpdatePeriodo(key, updates);
       
       setEditingKey(null);
       return { success: true };
@@ -715,46 +915,145 @@ export const useAgenda = () => {
     return data;
   };
 
-  // Função para carregar dados do step anterior
-  const carregarDadosDoStepAnterior = () => {
-    // Por enquanto, manteremos dados simulados até implementar o store global
-    const dadosSimulados: CargoAdicionado[] = [
-      {
-        uuid: "cargo-1",
-        nome: "Professor de Matemática",
-        vagas: 10,
-        geral: 8,
-        pcd: 1,
-        nna: 1,
-        totalCandidatos: 25
-      },
-      {
-        uuid: "cargo-2", 
-        nome: "Professor de Português",
-        vagas: 5,
-        geral: 4,
-        pcd: 0,
-        nna: 1,
-        totalCandidatos: 15
-      }
-    ];
+  // Função para carregar dados do step anterior (cargos do backend)
+  const carregarDadosDoStepAnterior = async () => {
+    if (!uuid || !processoConvocacaoData) return;
 
-    setCargosAdicionados(dadosSimulados);
-    const novasVagasInfo = calcularVagasInfo(dadosSimulados);
-    setVagasInfo(novasVagasInfo);
+    try {
+      const cargos = await getCargosProcesso(uuid).response;
+
+      const cargosConvertidos: CargoAdicionado[] = cargos.map((cargo: any) => ({
+        uuid: cargo.cargo_uuid,
+        nome: cargo.nome,
+        vagas: cargo.vagas || 0,
+        geral: cargo.geral || 0,
+        pcd: cargo.pcd || 0,
+        nna: cargo.nna || 0,
+        totalCandidatos: cargo.total_candidatos || 0,
+      }));
+
+      setCargosAdicionados(cargosConvertidos);
+      const novasVagasInfo = calcularVagasInfo(cargosConvertidos);
+      setVagasInfo(novasVagasInfo);
+    } catch (error: any) {
+      console.error('Erro ao carregar cargos do step anterior:', error);
+      if (error?.response?.status !== 404) {
+        notification.error({
+          message: 'Erro ao carregar cargos',
+          description: error?.message || 'Não foi possível carregar os cargos do servidor.',
+          placement: 'top',
+          duration: 3.5,
+        });
+      }
+      setCargosAdicionados([]);
+      setVagasInfo({ totalGeral: 0, totalPcd: 0, totalNna: 0 });
+    }
   };
 
-  // Carregar dados quando o componente montar
-  useEffect(() => {
-    carregarDadosDoStepAnterior();
-  }, []);
+  // Hook para buscar agendas do backend
+  const { agendasData, agendasIsLoading } = useGetAgendas(
+    uuid && processoConvocacaoData
+      ? {
+          pagination: { page: 1, page_size: 100 },
+          filters: {
+            processo_convocacao_uuid: uuid,
+          },
+        }
+      : undefined
+  );
 
-  // Limpar agenda aberto quando cargo é excluído
-  useEffect(() => {
-    if (agendaAberto && !cargosAdicionados.find(c => c.uuid === agendaAberto.cargoUuid)) {
-      setAgendaAberto(null);
+  // Carregar dados quando o componente montar e processoConvocacaoData estiver disponível (sem useEffect)
+  const carregarStepAnteriorState = useRef<{
+    uuid?: string;
+    processoUuid?: string;
+  }>({});
+
+  const shouldCarregarStepAnterior =
+    !!uuid && !!processoConvocacaoData && !processoConvocacaoIsLoading;
+
+  if (shouldCarregarStepAnterior) {
+    const processoUuidAtual = processoConvocacaoData?.concurso_uuid || "";
+    const depsMudaram =
+      carregarStepAnteriorState.current.uuid !== uuid ||
+      carregarStepAnteriorState.current.processoUuid !== processoUuidAtual;
+
+    if (depsMudaram) {
+      carregarStepAnteriorState.current = {
+        uuid,
+        processoUuid: processoUuidAtual,
+      };
+      Promise.resolve().then(() => {
+        carregarDadosDoStepAnterior();
+      });
     }
-  }, [cargosAdicionados, agendaAberto]);
+  } else if (carregarStepAnteriorState.current.uuid || carregarStepAnteriorState.current.processoUuid) {
+    carregarStepAnteriorState.current = {};
+  }
+
+  const agendasUuidsString = agendasData?.results 
+    ? JSON.stringify(agendasData.results.map(a => a.uuid).sort())
+    : null;
+
+  // Sincronizar periodosList com agendasData sem useEffect
+  const agendasSyncState = useRef<string | null>(null);
+
+  if (agendasUuidsString !== agendasSyncState.current) {
+    agendasSyncState.current = agendasUuidsString;
+
+    if (agendasData?.results && agendasData.results.length > 0) {
+      const periodos = agendasData.results.map(mapAgendaToPeriodoItem);
+
+      Promise.resolve().then(() => {
+        setPeriodosList(prev => {
+          const currentUuids = new Set(prev.filter(p => p.uuid).map(p => p.uuid));
+          const newUuids = new Set(periodos.filter(p => p.uuid).map(p => p.uuid));
+
+          if (
+            currentUuids.size === newUuids.size &&
+            currentUuids.size > 0 &&
+            [...currentUuids].every(uuid => newUuids.has(uuid))
+          ) {
+            return prev;
+          }
+
+          return periodos;
+        });
+      });
+    } else if (agendasData?.results && agendasData.results.length === 0) {
+      Promise.resolve().then(() => {
+        setPeriodosList(prev => {
+          const hasExistingWithUuid = prev.some(p => p.uuid);
+          if (hasExistingWithUuid) {
+            return [];
+          }
+          return prev;
+        });
+      });
+    }
+  }
+
+  // Atualizar estado de loading sem useEffect
+  const agendasLoadingState = useRef(agendasIsLoading);
+  if (agendasLoadingState.current !== agendasIsLoading) {
+    agendasLoadingState.current = agendasIsLoading;
+    Promise.resolve().then(() => {
+      setAgendasLoading(agendasIsLoading);
+    });
+  }
+
+  // Limpar agenda aberto quando cargo é excluído (sem useEffect)
+  const limparAgendaAbertaState = useRef(false);
+  if (
+    agendaAberto &&
+    !cargosAdicionados.find(c => c.uuid === agendaAberto.cargoUuid) &&
+    !limparAgendaAbertaState.current
+  ) {
+    limparAgendaAbertaState.current = true;
+    Promise.resolve().then(() => {
+      setAgendaAberto(null);
+      limparAgendaAbertaState.current = false;
+    });
+  }
 
   // Função para lidar com o clique no botão Agendar (apenas abrir card)
   const handleAgendarCargo = (cargoUuid: string) => {
@@ -820,6 +1119,8 @@ export const useAgenda = () => {
     // Estados e funções para expansão automática
     cargoParaExpandir,
     limparExpansao,
+    agendasLoading,
+    salvarAgendasNoBackend,
     uuid,
   };
 };

@@ -133,7 +133,16 @@ const useAgendaSchema = (getMaxCandidatos?: () => number | undefined) => {
       .integer("Quantidade deve ser um número inteiro")
       .test("max-candidatos", function(value) {
         const maxCandidatos = getMaxCandidatos?.();
-        if (maxCandidatos && value && value > maxCandidatos) {
+        
+        // Se não há candidatos disponíveis (maxCandidatos é 0 ou undefined/null)
+        if (maxCandidatos !== undefined && maxCandidatos <= 0) {
+          return this.createError({
+            message: "Quantidade de Candidatos excedida"
+          });
+        }
+        
+        // Se a quantidade excede os disponíveis
+        if (maxCandidatos !== undefined && value && value > maxCandidatos) {
           return this.createError({
             message: `Quantidade superior a ${maxCandidatos} candidatos disponíveis`
           });

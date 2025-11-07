@@ -207,14 +207,14 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                   />
                 )}
               />
-              {formErrors.quantidadeClassificados && (
-                <Text style={agendaFormStyles.errorMessage}>
-                  {getErrorMessage(formErrors.quantidadeClassificados)}
-                </Text>
-              )}
               {candidatosDisponiveis !== undefined && candidatosDisponiveis >= 0 && (
                 <Text style={agendaFormStyles.candidatosDisponiveis}>
                   Candidatos disponíveis: {candidatosDisponiveis}
+                </Text>
+              )}
+              {formErrors.quantidadeClassificados && (
+                <Text style={agendaFormStyles.errorMessage}>
+                  {getErrorMessage(formErrors.quantidadeClassificados)}
                 </Text>
               )}
             </Form.Item>
