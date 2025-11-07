@@ -71,16 +71,18 @@ export interface PermissionContextGuardProps {
   );
 
   
-  if (!can(permissaoDeExibirATELA)) {        
-    if (redirectTo ) {      
-      navigate(redirectTo);
-    } else {           
-      navigate('/403');
-    }
-  }
+
 
   if (isLoading && !isError) {
     return  <LoadingContainer data-testid="@loading-element"><Spin size="large" spinning/></LoadingContainer>   
+  }
+
+  if (!can(permissaoDeExibirATELA) && !isLoading && !isError) {        
+    if (redirectTo ) {      
+      navigate(redirectTo);
+    } else {                 
+      navigate('/403');
+    }
   }
 
   return <PermissionContext.Provider value={permissions}>{children}</PermissionContext.Provider>;
