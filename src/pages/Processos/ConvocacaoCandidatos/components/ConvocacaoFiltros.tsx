@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Radio } from "antd";
+import { Row, Col, Radio, Tooltip } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { Controller } from "react-hook-form";
 import { CustomFormItem } from "../../../../components/FormStyle";
@@ -24,6 +24,7 @@ interface ConvocacaoFiltrosProps {
   handleSub: any;
   handleReset: any;
   dayjs: any;
+  canViewProcessoConvocacao: boolean;
 }
 
 const ConvocacaoFiltros: React.FC<ConvocacaoFiltrosProps> = ({
@@ -35,6 +36,7 @@ const ConvocacaoFiltros: React.FC<ConvocacaoFiltrosProps> = ({
   handleSub,
   handleReset,
   dayjs,
+  canViewProcessoConvocacao,
 }) => {
   const onSubmit = (data: IFiltroProcessos) => {
     handleSub(data);
@@ -152,13 +154,18 @@ const ConvocacaoFiltros: React.FC<ConvocacaoFiltrosProps> = ({
         </Col>
         <Col xs={24} md={10}>
           <SearchButtonContainer>
+            <Tooltip title={!canViewProcessoConvocacao?"Você não possui permissão para essa ação":"Limpar filtros"} arrow={true} >      
             <ClearButton
               size="large"
               onClick={handleReset}
+              disabled={!canViewProcessoConvocacao}
             >
               Limpar filtros
             </ClearButton>
+            </Tooltip>
+            <Tooltip title={!canViewProcessoConvocacao?"Você não possui permissão para essa ação":"Buscar processos"} arrow={true} >
             <SearchButton
+              disabled={!canViewProcessoConvocacao}
               size="large"
               type="primary"
               icon={<SearchOutlined />}
@@ -166,6 +173,7 @@ const ConvocacaoFiltros: React.FC<ConvocacaoFiltrosProps> = ({
             >
               Buscar
             </SearchButton>
+            </Tooltip>
           </SearchButtonContainer>
         </Col>
       </Row>

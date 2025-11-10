@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Row, Col, Select, Button, Typography, Space } from "antd";
+import { Row, Col, Select, Button, Typography, Space, Tooltip } from "antd";
 import { Controller } from "react-hook-form";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -50,12 +50,15 @@ import { useNavigate } from "react-router-dom";
 interface HabilitadosProps {
   onShowLayoutPadrao: () => void;
   onShowHistorico: () => void;
-
+  canViewHistoricoHabilitados: boolean;
+  canImportarHabilitados: boolean;
 }
 
 const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
     onShowLayoutPadrao,
     onShowHistorico,
+    canViewHistoricoHabilitados,
+    canImportarHabilitados
 }) => {
   const {
     control,
@@ -134,7 +137,9 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                 help={formErrors.arquivo?.message}                
                 labelCol={{ span: 24 }}
               >
+                
                 <StyledUpload
+                  disabled={!canImportarHabilitados}
                   beforeUpload={(file) => {
                     handleFileUpload(file);
                     return false;
@@ -144,6 +149,7 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                   showUploadList={false}
                   multiple={false}
                 >
+                  <Tooltip title={!canImportarHabilitados?"Você não possui permissão para essa ação":"Selecionar arquivo"} arrow={true} >
                   <UploadArea style={{ height: "64px" }} status={formErrors.arquivo ? "error" : undefined}>
                   <GrupoEsquerda>
                   <CloudUploadOutlined style={{ fontSize: 38, color: "#838383" }} />
@@ -162,7 +168,10 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                       Selecionar
                     </Button>
                   </UploadArea>
+                  </Tooltip>
+
                 </StyledUpload>
+                
               </FormItem>
             )}
           />
@@ -173,13 +182,16 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
 
     </TabContentContainer>
     <ActionButtonsContainer>
-    <Button type="primary" ghost size="large" onClick={onShowHistorico}>
+      <Tooltip title={!canViewHistoricoHabilitados?"Você não possui permissão para essa ação":"Histórico"} arrow={true} >
+    <Button type="primary" ghost size="large" onClick={onShowHistorico} disabled={!canViewHistoricoHabilitados}>
       Histórico
     </Button>        
-
-    <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)}>
+    </Tooltip>
+    <Tooltip title={!canImportarHabilitados?"Você não possui permissão para essa ação":"Importar"} arrow={true} >
+    <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)} disabled={!canImportarHabilitados}>
     Importar
     </Button>
+    </Tooltip>
   </ActionButtonsContainer>
   </>
   );

@@ -9,6 +9,7 @@ import {
   Upload,
   Input,
   message,
+  Tooltip,
 } from "antd";
 import type { UploadProps } from "antd";
 import { Button } from "antd";
@@ -30,6 +31,7 @@ import styled from "styled-components";
 
 import { useGerenciamentoVagas } from "./hooks/useGerenciamentoVagas";
 import type { IInclusaoVagasEscolasPayload } from "./hooks/types";
+import { useGetPermissions } from "../../routes/PermissionContextGuard";
 
 
 const { Text } = Typography;
@@ -37,8 +39,10 @@ const { Text } = Typography;
 const GerenciamentoVagasTela: React.FC = () => {
   const { token } = theme.useToken();
   const { Dragger } = Upload;
-  
-  // Estado para controlar o modal de incluir escolas
+  const { can } = useGetPermissions();
+  const canAddImportacaoArquivoVagas = can("add_importacaoarquivovagas");
+  const canAddProcessoConvocacao = can("add_processoconvocacao");
+  // Estado para controlar o modal de incluir escolas 
   const [modalIncluirEscolasVisible, setModalIncluirEscolasVisible] = useState(false);
   
   const {
@@ -55,8 +59,7 @@ const GerenciamentoVagasTela: React.FC = () => {
     concursoIsLoading,
     handleSelectCargo,
     optionsDres,
-    isLoadingVagasEscolas,
-    isFetchingVagasEscolas,
+    isLoadingVagasEscolas,    
     vagasEscolasData,
     setVagasEscolasData,
     handleBuscarVagas,
@@ -150,7 +153,10 @@ const GerenciamentoVagasTela: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Gerenciamento de vagas"
         buttons={
-          <Button type="primary" size="large" variant="outlined" icon={<UserSwitchOutlined />}>Nova convocação</Button>
+          <Tooltip title={!canAddProcessoConvocacao?"Você não possui permissão para essa ação":"Nova convocação"} arrow={true} >
+          <Button 
+          type="primary" size="large" variant="outlined" icon={<UserSwitchOutlined />} disabled={!canAddProcessoConvocacao} onClick={() => navigate("/processos/convocacao/dados-processo/criar")}>Nova convocação</Button>
+          </Tooltip>
         }
       >
         <Card
@@ -313,21 +319,30 @@ const GerenciamentoVagasTela: React.FC = () => {
                 <Controller
                   control={control}
                   name="arquivo"
-                  render={() => (
+                   render={() => (
                     <CustomFormItem
+                    
                       labelCol={{ span: 24 }}
                     >
                       <Text strong style={{ display: "block", marginBottom: 8 }}>Importar vagas</Text>
-                      <Dragger {...draggerProps}>
+                      
+                      
+                        <Dragger disabled={!canAddImportacaoArquivoVagas} {...draggerProps}>
+                        
+                      
                       <p className="ant-upload-drag-icon">
                           <CloudUploadIcon style={{ fontSize: "4.5rem", color: "#032B68" }} />
                       </p>
                         <p className="ant-upload-text">Clique ou arraste o arquivo para esta área</p>
                         <p className="ant-upload-hint" style={{ color: '#727679' }}>Apenas 1 arquivo CSV</p>
-                        <PrimaryButton style={{ marginTop: 12 }}>Selecionar arquivo</PrimaryButton>
+                        <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Selecionar arquivo"} arrow={true} > 
+                        <PrimaryButton disabled={!canAddImportacaoArquivoVagas} style={{ marginTop: 12 }}>Selecionar arquivo</PrimaryButton>
+                        </Tooltip>
                       </Dragger>
                       <ActionButtonsContainer>
-                        <PrimaryButton onClick={handleSubmit(handleEnviarForm)}>Importar</PrimaryButton>
+                      <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Importar vagas"} arrow={true} > 
+                        <PrimaryButton disabled={!canAddImportacaoArquivoVagas} onClick={handleSubmit(handleEnviarForm)}>Importar</PrimaryButton>
+                        </Tooltip>
                       </ActionButtonsContainer>
                     </CustomFormItem>
                     )}

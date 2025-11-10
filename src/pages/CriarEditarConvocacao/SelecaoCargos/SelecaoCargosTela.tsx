@@ -38,6 +38,7 @@ import {
   processInfoStyles
 } from "./styles";
 import dayjs from "dayjs";
+import { useGetPermissions } from "../../../routes/PermissionContextGuard";
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -46,6 +47,9 @@ const { Option } = Select;
 const SelecaoCargos: React.FC = () => {
   const { token } = theme.useToken();
   const navigate = useNavigate();
+  const { can } = useGetPermissions();
+  const canChangeProcessoConvocacao = can("change_processoconvocacao");
+  const canAddImportacaoArquivoVagas = can("add_importacaoarquivovagas");
 
   const {
     processoConvocacaoData,
@@ -149,14 +153,17 @@ const SelecaoCargos: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
         buttons={
+          <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
           <Button
             color="primary"
             variant="outlined"
             icon={<UserSwitchOutlined />}
+            disabled={!canAddImportacaoArquivoVagas}
             onClick={() => navigate('/processos/gerenciamento-vagas')}
           >
             Gerenciamento de vagas
           </Button>
+          </Tooltip>
         }
       >
         <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
@@ -401,6 +408,8 @@ const SelecaoCargos: React.FC = () => {
             steps={steps}
             next={next}
             prev={prev}
+             canSalvarEAvancar={canChangeProcessoConvocacao}
+            canVoltar={canChangeProcessoConvocacao}
             onCancel={cancel}
           />
         </StyledCardWithoutBorder>

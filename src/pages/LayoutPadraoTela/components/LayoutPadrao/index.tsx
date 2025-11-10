@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Typography, Button } from "antd";
+import { Table, Typography, Button, Tooltip } from "antd";
 import { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from "./styles";
 import { API } from "../../../../services";
 import { useQuery } from "@tanstack/react-query";
@@ -54,9 +54,10 @@ interface LayoutPadraoProps {
   onVoltar: () => void;
   dataSource: ILayout[],
   title: string,
+  canExportar: boolean,
 }
 
-const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ loading,tipo, onVoltar, dataSource, title }) => {
+const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ loading,tipo, onVoltar, dataSource, title, canExportar }) => {
 
 
   const { refetch: refetchDownload, isFetching: isDownloading } = useQuery({
@@ -110,14 +111,17 @@ const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ loading,tipo, onVoltar, dat
         >
           Voltar
         </Button>
+        <Tooltip title={!canExportar?"Você não possui permissão para essa ação":"Exportar"} arrow={true} >
         <Button
           type="primary"
           size="large"
           onClick={handleSalvarArquivo}
           loading={isDownloading}
+          disabled={!canExportar}
         >
           Exportar
         </Button>
+        </Tooltip>
       </ButtonContainer>
     </div>
   );

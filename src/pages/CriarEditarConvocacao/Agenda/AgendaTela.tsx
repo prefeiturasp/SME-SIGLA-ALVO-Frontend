@@ -7,6 +7,7 @@ import {
   Row,
   Col,
   Divider,
+  Tooltip,
   theme,
 } from "antd";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
@@ -27,6 +28,7 @@ import {
 import dayjs from "dayjs";
 import AgendaForm from "./components/AgendaForm";
 import AgendaTabela from "./components/AgendaTabela";
+import { useGetPermissions } from "../../../routes/PermissionContextGuard";
 import { StyledCardWithoutBorder } from "../../../components/EstilosCompartilhados";
 
 const { Text } = Typography;
@@ -34,7 +36,9 @@ const { Text } = Typography;
 const AgendaTela: React.FC = () => {
   const { token } = theme.useToken();
   const navigate = useNavigate();
-
+  const { can } = useGetPermissions();
+  const canAddImportacaoArquivoVagas = can("add_importacaoarquivovagas");
+  const canChangeProcessoConvocacao = can("change_processoconvocacao");
   const {
     processoConvocacaoData,
     cargosAdicionados,
@@ -148,14 +152,18 @@ const AgendaTela: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
         buttons={
+          <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
+
           <Button
             color="primary"
             variant="outlined"
             icon={<UserSwitchOutlined />}
+            disabled={!canAddImportacaoArquivoVagas}
             onClick={() => navigate('/processos/gerenciamento-vagas')}
           >
             Gerenciamento de vagas
           </Button>
+          </Tooltip>
         }
       >
         <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
@@ -276,7 +284,9 @@ const AgendaTela: React.FC = () => {
             steps={steps}
             next={next}
             prev={prev}
-            onCancel={() => console.log("cancelado!")}
+            onCancel={() => navigate(`/processos/convocacao`)}
+            canSalvarEAvancar={canChangeProcessoConvocacao}
+            canVoltar={canChangeProcessoConvocacao}
           />
         </StyledCardWithoutBorder>
       </BaseTela>

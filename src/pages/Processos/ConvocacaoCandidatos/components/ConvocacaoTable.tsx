@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import type { IProcessoConvocacao } from "../../../../services/resources/convocacao/IConvocacao";
 import { CaretUpOutlined, CaretDownOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 
-import { Button, Space } from "antd";
+import { Button, Space, Tooltip } from "antd";
 import { StyledTable } from "../../../../components/EstilosCompartilhados";
 import { useNavigate } from "react-router-dom";
 import {
@@ -28,9 +28,13 @@ import { deleteIcon } from "../../../../components/EstilosCompartilhados";
 
 interface ConvocacaoTableProps extends TableProps<IProcessoConvocacao> {
   data: IProcessoConvocacao[];
+  canChangeProcessoConvocacao: boolean;
+  canDeleteProcessoConvocacao: boolean;
+  canViewDetailsProcessoConvocacao: boolean;
+  canFinalizeProcessoConvocacao: boolean;
 }
 
-const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
+const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProcessoConvocacao, canDeleteProcessoConvocacao, canViewDetailsProcessoConvocacao, canFinalizeProcessoConvocacao, ...rest }) => {
   const navigate = useNavigate();
   
   const handleEdit = (editData: IProcessoConvocacao) => {    
@@ -238,7 +242,8 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
         return (
           <Space size="small">
             {!isFinalizado ? (
-              <Button
+                <Tooltip title={!canChangeProcessoConvocacao?"Você não possui permissão para essa ação":"Editar processo"} arrow={true} >
+                <Button
                 type={"link"}
                 icon={
                   <EditOutlined 
@@ -246,21 +251,29 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
                   />
                 }
                 onClick={() => handleEdit(record)}
+                disabled={!canChangeProcessoConvocacao}
               />
+              </Tooltip>
             ) : (
+              
+              <Tooltip title={!canChangeProcessoConvocacao?"Você não possui permissão para essa ação":"Editar processo"} arrow={true} >
               <Button
                 type={"link"}
                 style={hiddenButton}
+                disabled={!canChangeProcessoConvocacao}
                 icon={
                   <EditOutlined 
                     style={editIcon}
                   />
                 }
               />
+              </Tooltip>
             )}
 
+          <Tooltip title={!canViewDetailsProcessoConvocacao?"Você não possui permissão para essa ação":"Visualizar processo"} arrow={true} >
             <Button
               type={"link"}
+              disabled={!canViewDetailsProcessoConvocacao}              
               icon={
                 <EyeOutlined 
                   style={viewIcon}
@@ -268,8 +281,10 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
               }
               onClick={() => handleView(record)}
             />
+            </Tooltip>
 
             {!isFinalizado ? (
+              <Tooltip title={!canDeleteProcessoConvocacao?"Você não possui permissão para essa ação":"Excluir processo"} arrow={true} >
               <Button
                 type={"link"}
                 icon={
@@ -277,9 +292,12 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
                     style={deleteIcon}
                   />
                 }
+                disabled={!canDeleteProcessoConvocacao}
                 onClick={() => console.log("delete", record)}
               />
+              </Tooltip>
             ) : (
+              <Tooltip title={!canDeleteProcessoConvocacao?"Você não possui permissão para essa ação":"Excluir processo"} arrow={true} >
               <Button
                 type={"link"}
                 style={hiddenButton}
@@ -289,9 +307,11 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
                   />
                 }
               />
+              </Tooltip>
             )}
 
             {!isFinalizado && (
+              <Tooltip title={!canFinalizeProcessoConvocacao?"Você não possui permissão para essa ação":"Finalizar processo"} arrow={true} >
               <Button
                 style={finalizarButton}
                 onMouseEnter={(e) => {
@@ -301,9 +321,11 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, ...rest }) => {
                   Object.assign(e.currentTarget.style, finalizarButtonLeave);
                 }}
                 onClick={() => console.log(record)}
+                disabled={!canFinalizeProcessoConvocacao}
               >
                 Finalizar Processo
               </Button>
+              </Tooltip>
             )}
           </Space>
         );
