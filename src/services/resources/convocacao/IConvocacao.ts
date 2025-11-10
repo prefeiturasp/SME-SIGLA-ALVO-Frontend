@@ -132,6 +132,7 @@ export interface IConvocacaoFiltros {
 }
 
 export interface ICargoProcesso {
+  uuid?: string;
   nome: string;
   cargo_uuid: string;
   vagas: number;

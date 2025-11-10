@@ -8,7 +8,7 @@ import {
 } from '../../Processos/NovaConvocacaoCandidatos/styles';
 import { modalStyles, modalInlineStyles, GlobalStyles } from './styles';
 import { Table } from 'antd';
-import { useCandidatos } from './hooks/useCandidatos';
+import { useGetCandidatos } from './hooks/useGetCandidatos';
 import { useGetVagasPorProcessoECargo } from './hooks/useGetVagasPorProcessoECargo';
 
 const { Title, Text } = Typography;
@@ -24,6 +24,7 @@ interface BuscarCandidatosModalProps {
   processoUuid?: string;
   cargoEmEdicao?: { geral: number; pcd: number; nna: number } | null;
   onCandidatosSelecionados?: (quantidade: number, quantidadesIndividuais: { geral: number; pcd: number; nna: number }, vagas: number) => void;
+  onCandidatosUuidsChange?: (uuids: string[]) => void;
 }
 
 const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
@@ -35,7 +36,8 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   cargoCodigo,
   processoUuid,
   cargoEmEdicao = null,
-  onCandidatosSelecionados
+  onCandidatosSelecionados,
+  onCandidatosUuidsChange
 }) => {
   const [tipoConvocacao, setTipoConvocacao] = useState<'calculada' | 'digitadas'>('digitadas');
   const [autorizacoesDigitadas, setAutorizacoesDigitadas] = useState({
@@ -44,7 +46,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     nna: 0
   });
   const [mostrarTabelaCandidatos, setMostrarTabelaCandidatos] = useState(false);
-  const [parametrosBusca, setParametrosBusca] = useState<{ geral: number; pcd: number; nna: number; concurso_uuid: string } | undefined>(undefined);
+  const [parametrosBusca, setParametrosBusca] = useState<{ geral: number; pcd: number; nna: number; concurso_uuid: string; codigo_cargo: string } | undefined>(undefined);
 
   // Hook para buscar vagas dinamicamente
   const { vagasIsLoading, totalVagas } = useGetVagasPorProcessoECargo(
@@ -83,7 +85,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     }
   }, [visible, cargoEmEdicao]);
 
-  const { candidatosData, candidatosIsLoading } = useCandidatos(mostrarTabelaCandidatos, parametrosBusca);
+  const { candidatosData, candidatosIsLoading, fetchCandidatosNow } = useGetCandidatos(mostrarTabelaCandidatos, parametrosBusca);
 
   const candidatos = mostrarTabelaCandidatos && candidatosData ? 
     (Array.isArray(candidatosData) ? candidatosData : candidatosData.results) : [];
@@ -93,6 +95,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const isTotalExcedido = totalAutorizacoes > totalVagas && totalVagas > 0;
   const isAdicionarDisabilitado = !isTotalValido || isTotalExcedido;
   
+  // UUIDs notificados via onSuccess do hook useGetCandidatos
 
   // Configuração das colunas da tabela
   const columns: ColumnsType<any> = [
@@ -196,7 +199,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     }));
   };
 
-  const handleBuscar = () => {
+  const handleBuscar = async () => {
     const somatorio = autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
     
     if (somatorio === 0) {
@@ -209,33 +212,50 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       return;
     }
 
-    setParametrosBusca({
+    const novosParametros = {
       geral: autorizacoesDigitadas.geral,
       pcd: autorizacoesDigitadas.def,
       nna: autorizacoesDigitadas.nna,
-      concurso_uuid: concursoValue || ""
-    });
+      concurso_uuid: concursoValue || "",
+      codigo_cargo: cargoCodigo || ""
+    };
+    setParametrosBusca(novosParametros);
     setMostrarTabelaCandidatos(true);
+    try {
+      const data = await fetchCandidatosNow({
+        geral: novosParametros.geral,
+        pcd: novosParametros.pcd,
+        nna: novosParametros.nna,
+        concurso_uuid: novosParametros.concurso_uuid
+      });
+      const list = Array.isArray(data) ? data : (data?.results || []);
+      const uuids = list
+        .map((item: any) => item?.candidato?.uuid || item?.uuid)
+        .filter((id: any) => typeof id === 'string');
+      if (onCandidatosUuidsChange) onCandidatosUuidsChange(uuids);
+    } catch (e) {
+      // ignore
+    }
   };
 
   const handleSelecionar = () => {
     const quantidadeCandidatos = autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
-    
+
     if (quantidadeCandidatos > totalVagas && totalVagas > 0) {
       message.error('Total de vagas excedido');
       return;
     }
-    
+
     const quantidadesIndividuais = {
       geral: autorizacoesDigitadas.geral,
       pcd: autorizacoesDigitadas.def,
       nna: autorizacoesDigitadas.nna
     };
-    
+
     if (onCandidatosSelecionados) {
       onCandidatosSelecionados(quantidadeCandidatos, quantidadesIndividuais, totalVagas);
     }
-    
+
     onClose();
   };
 

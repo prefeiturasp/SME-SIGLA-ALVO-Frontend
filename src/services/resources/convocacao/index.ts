@@ -16,6 +16,11 @@ export const URL = {
   getCargosPorConcurso: (concursoUuid: string) => `/api/v1/cargos/concurso/${concursoUuid}/`,
   getCargosProcesso: (processoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/`,
   postCargosProcesso: (processoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/`,
+  patchCargoProcesso: (processoUuid: string, cargoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/${cargoUuid}/`,
+  deleteCargoProcesso: (processoUuid: string, cargoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/${cargoUuid}/`,
+  createSample: () => `/api/v1/samples/`,
+  editSample: (id: number) => `/api/v1/samples/${id}/`,
+  deleteSample: (id: number) => `/api/v1/samples/${id}/`,
 };
 
 
@@ -295,6 +300,53 @@ export const postCargosProcesso = (
   const response = appAxiosProcessoConvocacao
     .post<any>(URL.postCargosProcesso(processoUuid), payload, {
       signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+/**
+ * Atualiza (PATCH) um cargo específico de um processo de convocação
+ */
+export const patchCargoProcesso = (
+  processoUuid: string,
+  cargoUuid: string,
+  payload: Partial<ICargoProcesso>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .patch(URL.patchCargoProcesso(processoUuid, cargoUuid), payload, {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+/**
+ * Exclui um cargo específico de um processo de convocação
+ */
+export const deleteCargoProcesso = (
+  processoUuid: string,
+  cargoUuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .delete(URL.deleteCargoProcesso(processoUuid, cargoUuid), {
+      signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })
     .then((response) => response.data);

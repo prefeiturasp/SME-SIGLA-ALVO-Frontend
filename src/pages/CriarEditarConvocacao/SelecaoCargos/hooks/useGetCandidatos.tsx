@@ -1,8 +1,8 @@
-// src/pages/CriarEditarConvocacao/SelecaoCargos/hooks/useCandidatos.tsx
+// src/pages/CriarEditarConvocacao/SelecaoCargos/hooks/useGetCandidatos.tsx
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../../services";
 
-export const useCandidatos = (
+export const useGetCandidatos = (
   buscarCandidatos: boolean = false,
   parametros?: { geral: number; pcd: number; nna: number, concurso_uuid: string }
 ) => {
@@ -24,5 +24,9 @@ export const useCandidatos = (
   return {
     candidatosData: candidatosData,
     candidatosIsLoading,
+    fetchCandidatosNow: (params: { geral: number; pcd: number; nna: number, concurso_uuid: string }) =>
+      API.Candidatos.getCandidatosHabilitados(params).response,
   };
 };
+
+
