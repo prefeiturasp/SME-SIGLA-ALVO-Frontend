@@ -174,9 +174,22 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
       expandable={{
         expandedRowRender: (record: any) => {
           const periodosDoCargo = record.periodos || [];
+          const formResetKey = editingKey === null
+            ? periodosDoCargo
+                .map((periodo: PeriodoItem) =>
+                  [
+                    periodo.id,
+                    periodo.horaInicio ?? '',
+                    periodo.horaFim ?? '',
+                    periodo.classificacao ?? '',
+                  ].join('-')
+                )
+                .join('|')
+            : 'editing';
           
           return (
             <AgendaTabelaExpandida
+              key={formResetKey}
               periodosList={periodosDoCargo}
               handleRemoverPeriodo={handleRemoverPeriodo}
               editingKey={editingKey}
@@ -255,7 +268,19 @@ const AgendaTabelaExpandida: React.FC<{
   };
 
   const salvarAgendaItemTabela = (key: number, periodoDataItem: PeriodoItem) => {
-    const values = getValues(key.toString());
+    // Obter valores do formulário usando os caminhos completos
+    const formKey = key.toString();
+    const horaInicio = getValues(`${formKey}.horaInicio` as any);
+    const horaFim = getValues(`${formKey}.horaFim` as any);
+    const classificacao = getValues(`${formKey}.classificacao` as any);
+    
+    // Montar objeto com os valores obtidos
+    const values = {
+      horaInicio: horaInicio || periodoDataItem.horaInicio || '',
+      horaFim: horaFim || periodoDataItem.horaFim || '',
+      classificacao: classificacao || periodoDataItem.classificacao || 1,
+    };
+    
     const result = saveEdit(key, periodoDataItem, values);
     
     if (!result.success) {

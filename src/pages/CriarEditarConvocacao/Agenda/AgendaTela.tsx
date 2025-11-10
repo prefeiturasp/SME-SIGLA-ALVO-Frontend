@@ -65,7 +65,8 @@ const AgendaTela: React.FC = () => {
     calcularIntervaloClassificacao,
     verificarConflitoTempoReal,
     cargoParaExpandir,
-    limparExpansao, 
+    limparExpansao,
+    salvarAgendasNoBackend,
     uuid,
   } = useAgenda();
 
@@ -109,9 +110,12 @@ const AgendaTela: React.FC = () => {
     },
   ] as TitleItem[];
 
-  const current = 2; // Step 3 - Agenda
-  const next = () => {
-    navigate(`/processos/convocacao/editar/${uuid}/resumo`);    
+  const current = 2;
+  const next = async () => {
+    const sucesso = await salvarAgendasNoBackend();
+      if (sucesso) {
+        navigate(`/processos/convocacao/editar/${uuid}/resumo`);
+      }
   };
 
   const prev = () => {
@@ -140,7 +144,6 @@ const AgendaTela: React.FC = () => {
 
   const contentStyle: React.CSSProperties = agendaTelaStyles.contentStyle;
 
-  // Função para lidar com o clique no botão Agendar
   const handleAgendarClick = (cargoUuid: string) => {
     handleAgendarCargo(cargoUuid);
   };
