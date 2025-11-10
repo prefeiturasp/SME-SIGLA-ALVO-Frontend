@@ -76,7 +76,7 @@ export const appAxiosImportaArquivos = axios.create({
 addAuthInterceptor(appAxiosImportaArquivos);
 
 export const appAxiosAdminUsuarios = axios.create({
-  baseURL: getEnv("ADMIN_USUARIOS_API_URL", "http://localhost:8000"),
+  baseURL: getEnv("ADMIN_USUARIOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-admin-usuarios"),
 });
 addAuthInterceptor(appAxiosAdminUsuarios);
 
@@ -86,6 +86,6 @@ export const appAxiosEscolhas = axios.create({
 addAuthInterceptor(appAxiosEscolhas);
 
 export const appAxiosAgenda = axios.create({
-  baseURL: getEnv("AGENDA_API_URL", "http://localhost:8006"),
+  baseURL: getEnv("AGENDA_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-agenda"),
 });
 addAuthInterceptor(appAxiosAgenda);
