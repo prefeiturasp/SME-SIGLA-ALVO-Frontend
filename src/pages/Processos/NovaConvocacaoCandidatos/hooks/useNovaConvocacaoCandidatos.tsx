@@ -120,7 +120,6 @@ export const useNovaConvocacaoCandidatos = () => {
   };
 
   const handleSub = async (data: FormFields): Promise<IProcessoConvocacao|boolean> => {
-    console.log("Processo de convocação ssss");
 
     if (
       !data.concurso ||
