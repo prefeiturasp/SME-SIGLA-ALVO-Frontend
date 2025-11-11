@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { useGetProcessosConvocacaoPorUUID } from "./useGetProcessosConvocacaoPorUUID";
 import { useGetConcursoByUuid } from "./useGetConcursosPorUuid";
 import { useGetCargo } from "./useGetCargo";
+import { useDeleteCargoProcesso } from "./useDeleteCargoProcesso";
+import { usePatchConvocarCandidatosHabilitados, usePatchDesconvocarCandidatosHabilitados } from "./usePatchConvocarCandidatosHabilitados";
 import { usePostCargo } from "./usePostCargo";
 
 export type CargosDisponiveisOption = {
@@ -12,12 +14,13 @@ export type CargosDisponiveisOption = {
 };
 
 export type CargoAdicionado = {
-  uuid: string;
-  nome: string;
+  cargo_uuid: string;
+  uuid?: string;
+  cargo_nome: string;
   vagas: number;
-  geral: number;
-  pcd: number;
-  nna: number;
+  candidatos_geral: number;
+  candidatos_pcd: number;
+  candidatos_nna: number;
   totalCandidatos: number;
 };
 
@@ -44,13 +47,16 @@ export const useSelecaoCargo = () => {
     !!uuid && !!processoConvocacaoData && !processoConvocacaoIsLoading
   );
   const postCargoMutation = usePostCargo();
+  const deleteCargoMutation = useDeleteCargoProcesso();
+  const patchCandidatosHabilitadosConvocadosMutation = usePatchConvocarCandidatosHabilitados();
+  const patchCandidatosHabilitadosDesconvocadosMutation = usePatchDesconvocarCandidatosHabilitados();
 
   // Função para calcular informações de vagas
   const calcularVagasInfo = (cargos: CargoAdicionado[]) => {
     // Totais por categoria
-    const totalGeral = cargos.reduce((acc, cargo) => acc + cargo.geral, 0);
-    const totalPcd = cargos.reduce((acc, cargo) => acc + cargo.pcd, 0);
-    const totalNna = cargos.reduce((acc, cargo) => acc + cargo.nna, 0);
+    const totalGeral = cargos.reduce((acc, cargo) => acc + cargo.candidatos_geral, 0);
+    const totalPcd = cargos.reduce((acc, cargo) => acc + cargo.candidatos_pcd, 0);
+    const totalNna = cargos.reduce((acc, cargo) => acc + cargo.candidatos_nna, 0);
 
     return {
       totalGeral,
@@ -63,12 +69,13 @@ export const useSelecaoCargo = () => {
   const cargosIniciais = useMemo(() => {
     if (cargosData && cargosData.length > 0) {
       return cargosData.map((cargo: any) => ({
-        uuid: cargo.cargo_uuid,
-        nome: cargo.nome,
+        cargo_uuid: cargo.cargo_uuid,
+        uuid: cargo.uuid,
+        cargo_nome: cargo.cargo_nome,
         vagas: cargo.vagas || 0,
-        geral: cargo.geral || 0,
-        pcd: cargo.pcd || 0,
-        nna: cargo.nna || 0,
+        candidatos_geral: cargo.candidatos_geral || 0,
+        candidatos_pcd: cargo.candidatos_pcd || 0,
+        candidatos_nna: cargo.candidatos_nna || 0,
         totalCandidatos: cargo.total_candidatos || 0,
       }));
     } else if (cargosData && cargosData.length === 0) {
@@ -129,12 +136,12 @@ export const useSelecaoCargo = () => {
       const cargoInfo = cargosDisponiveis.find(c => c.value === cargoSelecionado);
       if (cargoInfo) {
         const novoCargo: CargoAdicionado = {
-          uuid: cargoSelecionado,
-          nome: cargoInfo.label,
+          cargo_uuid: cargoSelecionado,
+          cargo_nome: cargoInfo.label,
           vagas: vagas,
-          geral: quantidadesIndividuais.geral,
-          pcd: quantidadesIndividuais.pcd,
-          nna: quantidadesIndividuais.nna,
+          candidatos_geral: quantidadesIndividuais.geral,
+          candidatos_pcd: quantidadesIndividuais.pcd,
+          candidatos_nna: quantidadesIndividuais.nna,
           totalCandidatos: quantidade
         };
         
@@ -174,7 +181,7 @@ export const useSelecaoCargo = () => {
     setModalSelecionarCandidatosVisible(true);
   };
 
-  const handleExcluirCargo = (cargoUuid: string) => {
+  const handleExcluirCargo = (cargoUuid: string, candidatoUuids?: string[], cargoDataUuid?: string) => {
     setCargosAdicionados(prev => {
       const updated = prev.filter(c => c.uuid !== cargoUuid);
       
@@ -190,6 +197,17 @@ export const useSelecaoCargo = () => {
       
       return updated;
     });
+
+    // Chamar DELETE no backend quando houver uuid de registro
+    if (uuid && cargoUuid) {
+      deleteCargoMutation.mutate({ processoUuid: uuid, cargoUuid });
+    }
+
+    const cargoInfo = cargosDisponiveis.find(c => c.value === cargoDataUuid);
+    patchCandidatosHabilitadosDesconvocadosMutation.mutateAsync({
+      codigo_cargo: cargoInfo?.codigo || "",
+      processo_uuid: uuid || processoConvocacaoData?.uuid || "",
+    });
   };
 // Função para salvar cargos no backend
   const salvarCargosNoBackend = async (): Promise<boolean> => {
@@ -198,23 +216,66 @@ export const useSelecaoCargo = () => {
     }
 
     try {
+      // Verificar se houve alteração ou inclusão de novos cargos
+      const houveMudanca = cargosAdicionados.some((cargoAtual) => {
+        // Novo cargo (sem uuid do registro no backend)
+        if (!cargoAtual.uuid) return true;
+        // Buscar original pelo uuid (registro do backend)
+        const original = cargosIniciaisRef.current.find((c) => c.uuid === cargoAtual.uuid);
+        if (!original) return true;
+        // Comparar campos relevantes
+        return (
+          original.cargo_uuid !== cargoAtual.cargo_uuid ||
+          original.cargo_nome !== cargoAtual.cargo_nome ||
+          original.vagas !== cargoAtual.vagas ||
+          original.candidatos_geral !== cargoAtual.candidatos_geral ||
+          original.candidatos_pcd !== cargoAtual.candidatos_pcd ||
+          original.candidatos_nna !== cargoAtual.candidatos_nna ||
+          original.totalCandidatos !== cargoAtual.totalCandidatos
+        );
+      });
+
+      if (!houveMudanca) {
+        return true;
+      }
+
       const payload = cargosAdicionados.map(cargo => ({
-        nome: cargo.nome,
-        cargo_uuid: cargo.uuid,
+        ...(cargo.uuid ? { uuid: cargo.uuid } : {}),
+        cargo_nome: cargo.cargo_nome,
+        cargo_uuid: cargo.cargo_uuid,
         vagas: cargo.vagas,
-        geral: cargo.geral,
-        pcd: cargo.pcd,
-        nna: cargo.nna,
+        candidatos_geral: cargo.candidatos_geral,
+        candidatos_pcd: cargo.candidatos_pcd,
+        candidatos_nna: cargo.candidatos_nna,
         total_candidatos: cargo.totalCandidatos,
       }));
 
-      await postCargoMutation.mutateAsync({ processoUuid: uuid, payload });
+      await postCargoMutation.mutateAsync({ processoUuid: uuid, payload: payload as any });
       return true;
     } catch (error: any) {
       console.error('Erro ao salvar cargos:', error);
       return false;
     }
   };
+
+  // Convocar candidatos habilitados (bulk patch)
+    const convocarCandidatosHabilitados = async (candidatoUuids?: string[], foiConvocado: boolean = true): Promise<boolean> => {
+      try {
+        const concursoUuid = processoConvocacaoData?.concurso_uuid || "";
+        const processoUuid = uuid || processoConvocacaoData?.uuid || "";
+        if (!concursoUuid || (candidatoUuids && candidatoUuids.length === 0)) return true;
+        await patchCandidatosHabilitadosConvocadosMutation.mutateAsync({
+          concurso_uuid: concursoUuid,
+          processo_uuid: processoUuid,
+          foi_convocado: foiConvocado,
+          candidatos: candidatoUuids || [],
+        });
+        return true;
+      } catch (error) {
+        console.error('Erro ao convocar candidatos habilitados:', error);
+        return false;
+      }
+    };
 
 
   return {
@@ -235,6 +296,7 @@ export const useSelecaoCargo = () => {
     handleEditarCargo,
     handleExcluirCargo,
     salvarCargosNoBackend,
+    convocarCandidatosHabilitados,
     salvandoCargos: postCargoMutation.isPending,
     carregarCargos,
     uuid

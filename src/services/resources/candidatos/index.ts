@@ -7,6 +7,8 @@ import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 export const URL = {
   getCandidatos: () => `/api/v1/candidatos/`,
   getCandidatosHabilitados: () => `/api/v1/habilitados/`,
+  patchCandidatosHabilitadosConvocados: () => `/api/v1/habilitados/convocar/`,
+  patchCandidatosHabilitadosDesconvocados: () => `/api/v1/habilitados/desconvocar/`,
 };
 
 // TODO adicionar JWT no header Authorization
@@ -31,12 +33,12 @@ export const getCandidatos = (
 
 // TODO adicionar JWT no header Authorization
 export const getCandidatosHabilitados = (
-  params: { geral: number; pcd: number; nna: number },
+  params: { geral: number; pcd: number; nna: number; concurso_uuid?: string },
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
-  const response = appAxiosCandidatos    
+  const response = appAxiosCandidatos
     .get<PaginatedResponse<ICandidato>>(URL.getCandidatosHabilitados(), {
       params,
       paramsSerializer: queryParamsSerializer,
@@ -50,3 +52,43 @@ export const getCandidatosHabilitados = (
     abort,
   };
 };
+
+// TODO adicionar JWT no header Authorization
+export const patchCandidatosHabilitadosConvocados = (
+  payload: { concurso_uuid: string; processo_uuid: string; candidatos: string[]; foi_convocado: boolean },
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .patch(URL.patchCandidatosHabilitadosConvocados(), payload, {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+export const patchCandidatosHabilitadosDesconvocados = (
+  payload: { codigo_cargo: string; processo_uuid: string; },
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .patch(URL.patchCandidatosHabilitadosDesconvocados(), payload, {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+

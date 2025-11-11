@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Steps,
@@ -68,10 +68,11 @@ const SelecaoCargos: React.FC = () => {
     handleExcluirCargo,
     salvarCargosNoBackend,
     salvandoCargos,
+    convocarCandidatosHabilitados,
     uuid,
   } = useSelecaoCargo();
-
-
+  // Guardar UUIDs dos candidatos buscados no modal
+  const [candidatosUuids, setCandidatosUuids] = useState<string[]>([]);
   const isEdit = false;
   const breadcrumbItems = [
     {
@@ -117,6 +118,7 @@ const SelecaoCargos: React.FC = () => {
   const next = async () => {
     const sucesso = await salvarCargosNoBackend();
     if (sucesso) {
+      await convocarCandidatosHabilitados(candidatosUuids, true);
       navigate(`/processos/convocacao/editar/${uuid}/agenda`);
     }
   };
@@ -321,7 +323,7 @@ const SelecaoCargos: React.FC = () => {
               <Table
                 dataSource={cargosAdicionados.map((cargo, index) => ({
                   key: index,
-                  cargo: cargo.nome,
+                  cargo_nome: cargo.cargo_nome,
                   quantidadeVagas: cargo.vagas,
                   autorizacoes: 0,
                   candidatos: cargo.totalCandidatos,
@@ -331,8 +333,8 @@ const SelecaoCargos: React.FC = () => {
                 columns={[
                   {
                     title: <span style={commonStyles.tableHeader}>Cargo</span>,
-                    dataIndex: 'cargo',
-                    key: 'cargo',
+                    dataIndex: 'cargo_nome',
+                    key: 'cargo_nome',
                     align: 'center' as const,
                   },
                   {
@@ -374,7 +376,7 @@ const SelecaoCargos: React.FC = () => {
                           <Button
                             type="link"
                             icon={<DeleteOutlined style={commonStyles.deleteIcon} />}
-                            onClick={() => handleExcluirCargo(record.uuid)}
+                            onClick={() => handleExcluirCargo(record.uuid, candidatosUuids, record.cargoData.cargo_uuid)}
                           />
                         </Tooltip>
                       </div>
@@ -424,11 +426,12 @@ const SelecaoCargos: React.FC = () => {
             cargoCodigo={cargosDisponiveis.find(c => c.value === cargoSelecionado)?.codigo}
             processoUuid={processoConvocacaoData?.uuid}
             cargoEmEdicao={ultimoCargoSelecionado ? {
-              geral: ultimoCargoSelecionado.geral,
-              pcd: ultimoCargoSelecionado.pcd,
-              nna: ultimoCargoSelecionado.nna
+              geral: ultimoCargoSelecionado.candidatos_geral,
+              pcd: ultimoCargoSelecionado.candidatos_pcd,
+              nna: ultimoCargoSelecionado.candidatos_nna
             } : null}
             onCandidatosSelecionados={handleCandidatosSelecionados}
+            onCandidatosUuidsChange={setCandidatosUuids}
           />
         )}
       </BaseTela>
