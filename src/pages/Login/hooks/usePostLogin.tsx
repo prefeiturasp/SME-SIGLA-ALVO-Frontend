@@ -6,10 +6,10 @@ export const usePostLogin = () => {
 
   return useMutation({
     mutationFn: (payload: ILoginRequest) => postLogin(payload).response,
-    onSuccess: (data) => {
+    onSuccess: (data, payload) => {
       // Salvar token no localStorage
       localStorage.setItem("TOKEN", data.token);
-      localStorage.setItem("USUARIO", JSON.stringify(data.usuario));
+      localStorage.setItem("USUARIO", payload.usuario);
       
     },
     onError: (error: any) => {
