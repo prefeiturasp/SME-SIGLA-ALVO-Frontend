@@ -5,6 +5,7 @@ export interface ILoginRequest {
 
 export interface ILoginResponse {
   token: string;
+  login: string;
   usuario: {
     id: string;
     nome: string;

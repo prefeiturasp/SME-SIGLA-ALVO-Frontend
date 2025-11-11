@@ -924,11 +924,11 @@ export const useAgenda = () => {
 
       const cargosConvertidos: CargoAdicionado[] = cargos.map((cargo: any) => ({
         uuid: cargo.cargo_uuid,
-        nome: cargo.nome,
+        nome: cargo.cargo_nome,
         vagas: cargo.vagas || 0,
-        geral: cargo.geral || 0,
-        pcd: cargo.pcd || 0,
-        nna: cargo.nna || 0,
+        geral: cargo.candidatos_geral || 0,
+        pcd: cargo.candidatos_pcd || 0,
+        nna: cargo.candidatos_nna || 0,
         totalCandidatos: cargo.total_candidatos || 0,
       }));
 

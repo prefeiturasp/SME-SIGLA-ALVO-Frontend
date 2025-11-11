@@ -9,7 +9,7 @@ export const usePostLogin = () => {
     onSuccess: (data) => {
       // Salvar token no localStorage
       localStorage.setItem("TOKEN", data.token);
-      localStorage.setItem("USUARIO", JSON.stringify(data.usuario));
+      localStorage.setItem("USUARIO", data.login);
       
     },
     onError: (error: any) => {
