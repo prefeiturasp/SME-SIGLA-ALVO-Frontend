@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { DashboardTela } from "../pages/Dashboard/DashboardTela";
 import ProtectedRoute from "./AuthGuard";
 
@@ -24,15 +24,10 @@ import PermissionContextGuard from "./PermissionContextGuard";
 import ForbiddenTela from "../pages/Forbidden/ForbiddenTela";
 
 
-
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <ProtectedRoute>
-        <HomeTela />
-      </ProtectedRoute>
-    ),
+    element: <Navigate to="/processos/convocacao" replace />,
     errorElement: <RouteError />,
   },
   {
