@@ -16,6 +16,7 @@ export interface IAgenda {
   hora_convocacao_fim?: string | null; 
   criado_em: string;
   atualizado_em: string;
+  candidatos_uuids?: string[]; // opcional: pode vir no agendasData
 }
 
 export interface IAgendaCreate {
@@ -24,6 +25,7 @@ export interface IAgendaCreate {
   processo_convocacao_nome: string;
   cargo_uuid: string;
   cargo_nome: string;
+  cargo_codigo?: string;
   data_escolha?: string;
   modalidade?: 'Presencial' | 'Online' | null;
   escolha_em?: string | null;
@@ -33,6 +35,7 @@ export interface IAgendaCreate {
   retardatario?: boolean | null;
   hora_convocacao_inicio?: string | null;
   hora_convocacao_fim?: string | null;
+  candidatos_uuids?: string[]; // fatia de candidatos atribuída a esta agenda
 }
 
 export interface IAgendaFilters {
