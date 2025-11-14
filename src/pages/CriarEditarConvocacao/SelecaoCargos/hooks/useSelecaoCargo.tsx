@@ -17,6 +17,7 @@ export type CargoAdicionado = {
   cargo_uuid: string;
   uuid?: string;
   cargo_nome: string;
+  cargo_codigo?: string;
   vagas: number;
   candidatos_geral: number;
   candidatos_pcd: number;
@@ -138,6 +139,7 @@ export const useSelecaoCargo = () => {
         const novoCargo: CargoAdicionado = {
           cargo_uuid: cargoSelecionado,
           cargo_nome: cargoInfo.label,
+          cargo_codigo: cargoInfo.codigo,
           vagas: vagas,
           candidatos_geral: quantidadesIndividuais.geral,
           candidatos_pcd: quantidadesIndividuais.pcd,
@@ -181,7 +183,7 @@ export const useSelecaoCargo = () => {
     setModalSelecionarCandidatosVisible(true);
   };
 
-  const handleExcluirCargo = (cargoUuid: string, candidatoUuids?: string[], cargoDataUuid?: string) => {
+  const handleExcluirCargo = (cargoUuid: string, _candidatoUuids?: string[], cargoDataUuid?: string) => {
     setCargosAdicionados(prev => {
       const updated = prev.filter(c => c.uuid !== cargoUuid);
       
@@ -210,7 +212,7 @@ export const useSelecaoCargo = () => {
     });
   };
 // Função para salvar cargos no backend
-  const salvarCargosNoBackend = async (): Promise<boolean> => {
+  const salvarCargosNoBackend = async (candidatoUuids?: string[]): Promise<boolean> => {
     if (!uuid || cargosAdicionados.length === 0) {
       return true;
     }
@@ -243,11 +245,13 @@ export const useSelecaoCargo = () => {
         ...(cargo.uuid ? { uuid: cargo.uuid } : {}),
         cargo_nome: cargo.cargo_nome,
         cargo_uuid: cargo.cargo_uuid,
+        cargo_codigo: cargo.cargo_codigo || (cargosDisponiveis.find(cd => cd.value === cargo.cargo_uuid)?.codigo) || undefined,
         vagas: cargo.vagas,
         candidatos_geral: cargo.candidatos_geral,
         candidatos_pcd: cargo.candidatos_pcd,
         candidatos_nna: cargo.candidatos_nna,
         total_candidatos: cargo.totalCandidatos,
+        ...(candidatoUuids && candidatoUuids.length > 0 ? { candidatos_uuids: candidatoUuids } : {}),
       }));
 
       await postCargoMutation.mutateAsync({ processoUuid: uuid, payload: payload as any });

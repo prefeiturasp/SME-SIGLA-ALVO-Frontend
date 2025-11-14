@@ -67,7 +67,6 @@ const SelecaoCargos: React.FC = () => {
     handleEditarCargo,
     handleExcluirCargo,
     salvarCargosNoBackend,
-    salvandoCargos,
     convocarCandidatosHabilitados,
     uuid,
   } = useSelecaoCargo();
@@ -116,7 +115,7 @@ const SelecaoCargos: React.FC = () => {
   const current=1;
  
   const next = async () => {
-    const sucesso = await salvarCargosNoBackend();
+    const sucesso = await salvarCargosNoBackend(candidatosUuids);
     if (sucesso) {
       await convocarCandidatosHabilitados(candidatosUuids, true);
       navigate(`/processos/convocacao/editar/${uuid}/agenda`);
