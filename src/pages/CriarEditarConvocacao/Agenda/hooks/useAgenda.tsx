@@ -16,11 +16,13 @@ import { App } from "antd";
 export type CargoAdicionado = {
   uuid: string;
   nome: string;
+  cargo_codigo?: string;
   vagas: number;
   geral: number;
   pcd: number;
   nna: number;
   totalCandidatos: number;
+  candidatos_uuids?: string[];
 };
 
 export type VagasInfo = {
@@ -69,6 +71,7 @@ export const useAgenda = () => {
   const [agendaAberto, setAgendaAberto] = useState<{
     cargoUuid: string;
     cargo: CargoAdicionado;
+    cargo_codigo: string;
   } | null>(null);
 
   // Estados para controlar os períodos e sessões da agenda
@@ -83,15 +86,21 @@ export const useAgenda = () => {
   // Estados para controle de API
   const [agendasLoading, setAgendasLoading] = useState(false);
   const { notification } = App.useApp();
-  
-  // Hook para criar agendas
   const postAgendaMutation = usePostAgenda();
-  
-  // Hook para deletar agendas
   const deleteAgendaMutation = useDeleteAgenda();
 
   const { processoConvocacaoData, processoConvocacaoIsLoading } = useGetProcessosConvocacaoPorUUID(uuid!);
   const { concursoData, concursoIsLoading } = useGetConcursoByUuid(processoConvocacaoData?.concurso_uuid || '');
+  const { agendasData, agendasIsLoading } = useGetAgendas(
+    uuid && processoConvocacaoData
+      ? {
+          pagination: { page: 1, page_size: 100 },
+          filters: {
+            processo_convocacao_uuid: uuid,
+          },
+        }
+      : undefined
+  );
 
   const mapAgendaToPeriodoItem = useCallback((agenda: IAgenda): PeriodoItem => {
     const dataEscolhaOriginal = agenda.escolha_em ? dayjs(agenda.escolha_em) : null;
@@ -145,7 +154,14 @@ export const useAgenda = () => {
     };
   }, []);
 
-  const mapPeriodoItemToAgendaCreate = (periodo: PeriodoItem, processoUuid: string, processoNome: string): IAgendaCreate => {
+  const mapPeriodoItemToAgendaCreate = (
+    periodo: PeriodoItem,
+    processoUuid: string,
+    processoNome: string,
+    _index?: number,
+    candidatosSlice?: string[],
+    cargoCodigo?: string
+  ): IAgendaCreate => {
     let escolhaEm: string | null = null;
     if (periodo.dataEscolhaOriginal) {
       escolhaEm = dayjs(periodo.dataEscolhaOriginal).format('YYYY-MM-DD');
@@ -170,13 +186,13 @@ export const useAgenda = () => {
       horaConvocacaoInicio = `${periodo.horaInicio}:00`;
       horaConvocacaoFim = `${periodo.horaFim}:00`;
     }
-
     return {
       ...(periodo.uuid && { uuid: periodo.uuid }),
       processo_convocacao_uuid: processoUuid,
       processo_convocacao_nome: processoNome,
       cargo_uuid: periodo.cargoUuid || '',
       cargo_nome: periodo.cargo,
+      cargo_codigo: cargoCodigo,
       data_escolha: dayjs().toISOString(),
       modalidade: (periodo.tipoEscolha || periodo.modalidade) as 'Presencial' | 'Online' | null,
       escolha_em: escolhaEm,
@@ -186,6 +202,7 @@ export const useAgenda = () => {
       retardatario: periodo.isRetardatario || false,
       hora_convocacao_inicio: horaConvocacaoInicio,
       hora_convocacao_fim: horaConvocacaoFim,
+      candidatos_uuids: candidatosSlice ? candidatosSlice as string[] : [],
     };
   };
 
@@ -382,7 +399,7 @@ export const useAgenda = () => {
     const invervaloSessao = watchedFields.horaFim.diff(watchedFields.horaInicio, 'hour');
     for (let i = 0; i < numeroSessoes; i++) {
       const numeroSessaoAtual = i + 1;
-      
+
       // Determinar o nome da sessão
       let nomeSessao;
       if (watchedFields.tipoEscolha === "Online") {
@@ -392,7 +409,7 @@ export const useAgenda = () => {
       } else {
         nomeSessao = `Sessão ${numeroSessaoAtual}`;
       }
-      
+
       // Determinar a quantidade de classificados para esta sessão
       let quantidadeClassificados;
       if (isRetardatario) {
@@ -400,7 +417,7 @@ export const useAgenda = () => {
       } else {
         quantidadeClassificados = quantidadesPorSessao[i];
       }
-      
+
       // Calcular horário baseado no tipo e número da sessão
       let horario: string;
       if (watchedFields.tipoEscolha === "Presencial") {
@@ -438,7 +455,7 @@ export const useAgenda = () => {
     }
     setPeriodosList(prev => {
       const novaLista = [...prev, ...novosPeriodos];
-      
+
       // Agrupar por cargo e depois ordenar cronologicamente dentro de cada grupo
       const periodosAgrupados = novaLista.reduce((grupos, periodo) => {
         const cargo = periodo.cargo;
@@ -454,22 +471,22 @@ export const useAgenda = () => {
         periodosAgrupados[cargo].sort((a: PeriodoItem, b: PeriodoItem) => {
           const dataA = a.dataEscolhaOriginal;
           const dataB = b.dataEscolhaOriginal;
-          
+
           if (dataA && dataB) {
             const comparacaoData = dataA.diff(dataB, 'day');
             if (comparacaoData !== 0) {
               return comparacaoData;
             }
-            
+
             // Se as datas forem iguais, ordena por horário
             const horaA = a.horaInicioOriginal;
             const horaB = b.horaInicioOriginal;
-            
+
             if (horaA && horaB) {
               return horaA.diff(horaB, 'minute');
             }
           }
-          
+
           return 0;
         });
       });
@@ -512,19 +529,12 @@ export const useAgenda = () => {
     if (!isRetardatario) {
       setContadorSessao(prev => prev + numeroSessoes);
     }
-    
-    // Limpar campos após adicionar
     handleReset();
     setIsRetardatario(false);
-    
-    // Definir qual cargo deve ser expandido na tabela
     setCargoParaExpandir(nomeCargo);
-    
-    // Fechar o card de agenda após adicionar período
     setAgendaAberto(null);
   };
 
-  // Função para salvar todas as agendas no backend
   const salvarAgendasNoBackend = async (): Promise<boolean> => {
     if (!uuid || !processoConvocacaoData || periodosList.length === 0) {
       return true;
@@ -532,17 +542,41 @@ export const useAgenda = () => {
 
     try {
       setAgendasLoading(true);
-      const todasAgendas: IAgendaCreate[] = periodosList.map(periodo => 
-        mapPeriodoItemToAgendaCreate(
+      // Fonte de candidatos por cargo (a partir dos cargos do processo)
+      const candidatosPorCargo: Record<string, { lista: string[]; offset: number }> = {};
+      cargosAdicionados.forEach(cargo => {
+        const key = cargo.uuid || cargo.nome;
+        candidatosPorCargo[key] = {
+          lista: (cargo.candidatos_uuids || []).slice(),
+          offset: 0,
+        };
+      });
+
+      const todasAgendas: IAgendaCreate[] = periodosList.map((periodo, index) => {
+        const cargoKey = periodo.cargoUuid || periodo.cargo;
+        const fonte = candidatosPorCargo[cargoKey];
+        const quantidade = periodo.classificacao || 0;
+        const cargoCodigo =
+          (cargosAdicionados.find(c => c.uuid === periodo.cargoUuid)?.cargo_codigo) ||
+          (cargosAdicionados.find(c => c.nome === periodo.cargo)?.cargo_codigo);
+        let slice: string[] = [];
+        if (fonte && quantidade > 0) {
+          const inicio = fonte.offset;
+          const fimExclusivo = inicio + quantidade;
+          slice = fonte.lista.slice(inicio, fimExclusivo);
+          fonte.offset = fimExclusivo;
+        }
+        return mapPeriodoItemToAgendaCreate(
           periodo,
           uuid,
-          processoConvocacaoData.concurso_nome || 'Processo de Convocação'
-        )
-      );
+          processoConvocacaoData.concurso_nome || 'Processo de Convocação',
+          index,
+          slice,
+          cargoCodigo
+        );
+      });
 
       const resultados: IAgenda[] = await postAgendaMutation.mutateAsync(todasAgendas);
-      
-      // Atualizar os períodos com os UUIDs retornados do backend
       setPeriodosList(prev => {
         return prev.map((periodo, index) => {
           if (periodo.uuid) {
@@ -684,38 +718,30 @@ export const useAgenda = () => {
 
     setPeriodosList(prev => {
       const periodosRestantes = prev.filter(periodo => periodo.id !== id);
-      
       const sessoesPresenciais = periodosRestantes.filter(p => !p.isRetardatario && p.tipoEscolha === "Presencial");
       const sessoesOnline = periodosRestantes.filter(p => !p.isRetardatario && p.tipoEscolha === "Online");
       const retardatarios = periodosRestantes.filter(p => p.isRetardatario);
-      
       const sessoesPresenciaisReordenadas = sessoesPresenciais.map((periodo, index) => ({
         ...periodo,
         numeroSessao: index + 1,
         sessao: `Sessão ${index + 1}`
       }));
-      
       const sessoesOnlineReordenadas = sessoesOnline.map((periodo, index) => ({
         ...periodo,
         numeroSessao: index + 1,
         sessao: `Sessão ${index + 1}`
       }));
-      
       const periodosComSessaoReordenada = [...sessoesPresenciaisReordenadas, ...sessoesOnlineReordenadas, ...retardatarios];
-      
       const periodosOrdenados = periodosComSessaoReordenada.sort((a, b) => {
         const dataA = a.dataEscolhaOriginal;
         const dataB = b.dataEscolhaOriginal;
-        
         if (dataA && dataB) {
           const comparacaoData = dataA.diff(dataB, 'day');
           if (comparacaoData !== 0) {
             return comparacaoData;
           }
-          
           const horaA = a.horaInicioOriginal;
           const horaB = b.horaInicioOriginal;
-          
           if (horaA && horaB) {
             return horaA.diff(horaB, 'minute');
           }
@@ -921,15 +947,16 @@ export const useAgenda = () => {
 
     try {
       const cargos = await getCargosProcesso(uuid).response;
-
       const cargosConvertidos: CargoAdicionado[] = cargos.map((cargo: any) => ({
         uuid: cargo.cargo_uuid,
         nome: cargo.cargo_nome,
+        cargo_codigo: cargo.cargo_codigo || cargo.codigo_cargo || cargo.codigo || undefined,
         vagas: cargo.vagas || 0,
         geral: cargo.candidatos_geral || 0,
         pcd: cargo.candidatos_pcd || 0,
         nna: cargo.candidatos_nna || 0,
         totalCandidatos: cargo.total_candidatos || 0,
+        candidatos_uuids: cargo.candidatos_uuids || [],
       }));
 
       setCargosAdicionados(cargosConvertidos);
@@ -949,18 +976,6 @@ export const useAgenda = () => {
       setVagasInfo({ totalGeral: 0, totalPcd: 0, totalNna: 0 });
     }
   };
-
-  // Hook para buscar agendas do backend
-  const { agendasData, agendasIsLoading } = useGetAgendas(
-    uuid && processoConvocacaoData
-      ? {
-          pagination: { page: 1, page_size: 100 },
-          filters: {
-            processo_convocacao_uuid: uuid,
-          },
-        }
-      : undefined
-  );
 
   // Carregar dados quando o componente montar e processoConvocacaoData estiver disponível (sem useEffect)
   const carregarStepAnteriorState = useRef<{
@@ -1063,7 +1078,8 @@ export const useAgenda = () => {
       // Sempre abre o card (sobrescreve o anterior se houver)
       setAgendaAberto({
         cargoUuid,
-        cargo
+        cargo,
+        cargo_codigo: cargo.cargo_codigo || ''
       });
       
       // Definir automaticamente o cargo no formulário

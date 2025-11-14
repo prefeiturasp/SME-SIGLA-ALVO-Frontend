@@ -135,6 +135,7 @@ export interface ICargoProcesso {
   uuid?: string;
   nome: string;
   cargo_uuid: string;
+  codigo_cargo?: string;
   vagas: number;
   geral: number;
   pcd: number;
