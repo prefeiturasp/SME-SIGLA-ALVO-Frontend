@@ -279,7 +279,7 @@ const SelecaoCargos: React.FC = () => {
           {cargosAdicionados.length > 0 && (
             <>
               
-              <Row gutter={0} justify="start" align="top">
+              <Row gutter={0} justify="start" align="top" style={{ marginTop: 20 }}>
                 <Col xs={24} md={12} style={inlineStyles.colNoPadding}>
                   <Row gutter={0} justify="start">
                     <Col style={inlineStyles.colNoPadding}>
@@ -409,7 +409,7 @@ const SelecaoCargos: React.FC = () => {
             steps={steps}
             next={next}
             prev={prev}
-             canSalvarEAvancar={canChangeProcessoConvocacao}
+             canSalvarEAvancar={canChangeProcessoConvocacao && cargosAdicionados.length > 0}
             canVoltar={canChangeProcessoConvocacao}
             onCancel={cancel}
           />

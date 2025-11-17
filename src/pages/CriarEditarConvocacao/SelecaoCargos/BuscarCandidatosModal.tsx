@@ -3,8 +3,7 @@ import { Modal, Typography, Button, message, Spin, Radio, Divider } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
 import { 
-  ModalTitle, 
-  ButtonContainer
+  ModalTitle
 } from '../../Processos/NovaConvocacaoCandidatos/styles';
 import { modalStyles, modalInlineStyles, GlobalStyles } from './styles';
 import { Table } from 'antd';
@@ -93,7 +92,8 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const totalAutorizacoes = autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
   const isTotalValido = totalAutorizacoes > 0;
   const isTotalExcedido = totalAutorizacoes > totalVagas && totalVagas > 0;
-  const isAdicionarDisabilitado = !isTotalValido || isTotalExcedido;
+  const hasResultadosBusca = mostrarTabelaCandidatos && !candidatosIsLoading && candidatos.length > 0;
+  const isAdicionarDisabilitado = !isTotalValido || isTotalExcedido || !hasResultadosBusca;
   
   // UUIDs notificados via onSuccess do hook useGetCandidatos
 
@@ -478,7 +478,12 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
             </div>
           )}
           
-          <Divider style={modalInlineStyles.finalDivider} />
+          <Divider
+            style={{
+              ...modalInlineStyles.finalDivider,
+              ...(mostrarTabelaCandidatos ? {} : { marginTop: 12 }),
+            }}
+          />
 
           <div style={modalInlineStyles.finalButtonsContainer}>
             <Button
