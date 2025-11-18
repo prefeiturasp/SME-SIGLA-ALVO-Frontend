@@ -1,6 +1,13 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosEscolhas } from "../../axios";
-import type { IEscolhasFiltro, IDREsResponse, IEscolasResponse, IBuscarDREsParams, IBuscarEscolasParams } from "./IEscolhas";
+import type {
+  IEscolhasFiltro,
+  IDREsResponse,
+  IEscolasResponse,
+  IBuscarDREsParams,
+  IBuscarEscolasParams,
+  ISalvarEscolhaPayload,
+} from "./IEscolhas";
 import type { IListRequest } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 import type {  IVagasResponse } from "../convocacao/IConvocacao";
@@ -11,6 +18,8 @@ export const URL = {
   patchVagasEscolasUtilizadas: () => `/api/v1/vagas-escolas/utilizadas/`,
   getDREs: () => `/api/v1/dres/`,
   getEscolas: () => `/api/v1/escolas/`,
+  postBuscarEscolhasPorCandidatos: () => `/api/v1/escolhas/busca/`,
+  postEscolhas: () => `/api/v1/escolhas/`,
   postInclusaoVagasEscolas: () => `/api/v1/vagas-escolas/inclusao/`,
 };
 
@@ -27,6 +36,25 @@ export const getVagasEscolas = (
       params: { ...pagination, ...filters, ...rest, ...params },      
       paramsSerializer: queryParamsSerializer,
       signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+export const postBuscarEscolhasPorCandidatos = (
+  candidatoUuids: string[],
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosEscolhas
+    .post(URL.postBuscarEscolhasPorCandidatos(), { candidato_uuid: candidatoUuids }, {
+      signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })
     .then((response) => response.data);
@@ -117,3 +145,21 @@ export const postInclusaoVagasEscolas = (
       abort,
     };
   };
+
+export const postEscolha = (
+  payload: ISalvarEscolhaPayload,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosEscolhas
+    .post(URL.postEscolhas(), payload, {
+      signal: axiosRequestConfig?.signal ?? signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};

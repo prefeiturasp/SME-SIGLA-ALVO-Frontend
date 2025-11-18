@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosCandidatos } from "../../axios";
-import type { ICandidato } from "./ICandidatos";
+import type { ICandidato, IBuscarPorUuidsPayload, IBuscarPorUuidsResponse } from "./ICandidatos";
 import type { PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
@@ -9,6 +9,7 @@ export const URL = {
   getCandidatosHabilitados: () => `/api/v1/habilitados/`,
   patchCandidatosHabilitadosConvocados: () => `/api/v1/habilitados/convocar/`,
   patchCandidatosHabilitadosDesconvocados: () => `/api/v1/habilitados/desconvocar/`,
+  postBuscarPorUuids: () => `/api/v1/habilitados/buscar-por-uuids/`,
 };
 
 // TODO adicionar JWT no header Authorization
@@ -81,6 +82,26 @@ export const patchCandidatosHabilitadosDesconvocados = (
 
   const response = appAxiosCandidatos
     .patch(URL.patchCandidatosHabilitadosDesconvocados(), payload, {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const postBuscarPorUuids = (
+  payload: IBuscarPorUuidsPayload,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .post<IBuscarPorUuidsResponse>(URL.postBuscarPorUuids(), payload, {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })
