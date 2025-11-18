@@ -15,6 +15,7 @@ import EsqueceuSenhaSucesso from "../pages/Login/EsqueceuSenhaSucesso";
 import NovaSenhaTela from "../pages/Login/NovaSenhaTela";
 import RouteError from "./RouteError";
 import GerenciamentoVagasTela from "../pages/GerenciamentoVagas/GerenciamentoVagasTela";
+import EscolhaCandidatosTela from "../pages/EscolhaCandidatos/EscolhaCandidatosTela";
 
 import DadosDoProcesso from "../pages/CriarEditarConvocacao/DadosDoProcesso";
 import SelecaoCargosTela from "../pages/CriarEditarConvocacao/SelecaoCargos/SelecaoCargosTela";
@@ -72,6 +73,17 @@ const router = createBrowserRouter([
     ),
     errorElement: <RouteError />,
   },  
+  {
+    path: "/processos/escolha-candidato/",
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="processoconvocacao,convocacao,candidato,importacaoarquivovagas" permissaoDeExibirATELA="view_processoconvocacao">
+          <EscolhaCandidatosTela />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
   {
     path: "/processos/convocacao/dados-processo/criar",
     element: (

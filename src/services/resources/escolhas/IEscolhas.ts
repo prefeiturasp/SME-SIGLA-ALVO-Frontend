@@ -16,6 +16,29 @@ export interface IEscolhasFiltro {
   cargo_codigo: string;
 }
 
+export interface IEscolhaCandidato {
+  uuid: string;
+  candidato_uuid: string;
+  situacao: string;
+  tipo_vaga: string;
+  e_retardatario: boolean;
+  vaga_escola_uuid: string;
+  criado_em: string;
+  atualizado_em: string;
+}
+
+export type SituacaoEscolha = "escolha" | "nao-escolha" | "reconvocacao";
+
+export type TipoVagaEscolha = "definitiva" | "precaria";
+
+export interface ISalvarEscolhaPayload {
+  candidato_uuid: string;
+  situacao: SituacaoEscolha;
+  vaga_escola_uuid: string;
+  tipo_vaga: TipoVagaEscolha;
+  e_retardatario: boolean;
+}
+
 // Interfaces para integração com MS-Escolhas
 export interface IDRE {
   uuid: string;

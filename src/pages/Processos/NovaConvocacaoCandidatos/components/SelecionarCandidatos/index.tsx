@@ -113,7 +113,6 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
       nna: autorizacoesDigitadas.nna,
       concurso_uuid: concursoValue
     });
-    console.log("concursoValue", concursoValue);
     setMostrarTabelaCandidatos(true);
   };
 

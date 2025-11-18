@@ -108,6 +108,8 @@ export interface IVaga {
 export interface IVagasResponse {
   vagas: IVaga[];
   total_vagas: number;
+  total_vagas_definitivas?: number;
+  total_vagas_precarias?: number;
   dres: IDre[];
 }
 
