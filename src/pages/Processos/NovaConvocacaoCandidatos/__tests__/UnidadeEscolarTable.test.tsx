@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider as SCThemeProvider } from 'styled-components';
 import { theme as appTheme } from '../../../../theme';
-import UnidadeEscolarTable from '../../../GerenciamentoVagas/components/UnidadeEscolarTable';
+import UnidadeEscolarTable from '../components/UnidadeEscolarTable';
 
 const originData = [
   {

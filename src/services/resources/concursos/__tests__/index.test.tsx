@@ -10,7 +10,7 @@ jest.mock('../../../axios', () => ({
 jest.mock('../../../../utils/queryParamsSerializer', () => jest.fn());
 
 import { appAxiosConcursos } from '../../../axios';
-import { getConcursos, URL } from '../index';
+import { getConcursos, getConcursoByUuid, URL } from '../index';
 import type { PaginatedResponse } from '../../../../types/IListRequest';
 import type { IConcurso } from '../IConcursos';
 import queryParamsSerializer from '../../../../utils/queryParamsSerializer';
@@ -25,8 +25,11 @@ describe('Concursos Service', () => {
   });
 
   describe('URL', () => {
-    it('deve retornar a URL correta para getConcursos', () => {
+    it('deve retornar URLs corretas para todas as rotas', () => {
       expect(URL.getConcursos()).toBe('/api/v1/concursos/?formato=select');
+      expect(URL.getConcursoByUuid('uuid-123')).toBe(
+        '/api/v1/concursos/uuid-123/'
+      );
     });
   });
 
@@ -147,13 +150,100 @@ describe('Concursos Service', () => {
     });
   });
 
+  describe('getConcursoByUuid', () => {
+    const mockConcursoData: IConcurso = {
+      label: 'Concurso Teste',
+      value: 'CT001',
+      cargos: [],
+    };
+
+    beforeEach(() => {
+      mockAxios.get.mockResolvedValue({ data: mockConcursoData });
+    });
+
+    it('deve fazer uma requisição GET com o uuid correto', async () => {
+      const uuid = 'uuid-123';
+      const { response } = getConcursoByUuid(uuid);
+
+      await expect(response).resolves.toEqual(mockConcursoData);
+
+      expect(mockAxios.get).toHaveBeenCalledWith(
+        URL.getConcursoByUuid(uuid),
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
+      );
+    });
+
+    it('deve retornar um objeto com response e abort', () => {
+      const result = getConcursoByUuid('uuid-123');
+
+      expect(result).toHaveProperty('response');
+      expect(result).toHaveProperty('abort');
+      expect(typeof result.abort).toBe('function');
+    });
+
+    it('deve permitir a passagem de configurações adicionais do axios', async () => {
+      const uuid = 'uuid-123';
+      const additionalConfig = {
+        timeout: 5000,
+        headers: { 'Custom-Header': 'value' },
+      };
+
+      const { response } = getConcursoByUuid(uuid, additionalConfig);
+
+      await response;
+
+      expect(mockAxios.get).toHaveBeenCalledWith(
+        URL.getConcursoByUuid(uuid),
+        expect.objectContaining({
+          timeout: 5000,
+          headers: { 'Custom-Header': 'value' },
+          signal: expect.any(AbortSignal),
+        })
+      );
+    });
+
+    it('deve lidar com erro na requisição', async () => {
+      const error = new Error('Network error');
+      mockAxios.get.mockRejectedValueOnce(error);
+
+      const { response } = getConcursoByUuid('uuid-123');
+
+      await expect(response).rejects.toThrow('Network error');
+    });
+
+    it('deve incluir um signal na requisição', () => {
+      getConcursoByUuid('uuid-123');
+
+      const callConfig = mockAxios.get.mock.calls[0][1];
+      expect(callConfig?.signal).toBeDefined();
+    });
+
+    it('deve retornar a estrutura de resposta correta', async () => {
+      const { response } = getConcursoByUuid('uuid-123');
+      const result = await response;
+
+      expect(result).toEqual(mockConcursoData);
+      expect(result).toHaveProperty('label');
+      expect(result).toHaveProperty('value');
+      expect(result).toHaveProperty('cargos');
+    });
+
+    it('deve expor função abort', () => {
+      const { abort } = getConcursoByUuid('uuid-123');
+
+      expect(typeof abort).toBe('function');
+    });
+  });
+
   describe('queryParamsSerializer integration', () => {
     it('deve usar o queryParamsSerializer fornecido', () => {
       getConcursos();
       expect(mockAxios.get).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          paramsSerializer: queryParamsSerializer
+          paramsSerializer: queryParamsSerializer,
         })
       );
     });
