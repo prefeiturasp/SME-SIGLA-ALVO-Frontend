@@ -34,8 +34,8 @@ export type TipoVagaEscolha = "definitiva" | "precaria";
 export interface ISalvarEscolhaPayload {
   candidato_uuid: string;
   situacao: SituacaoEscolha;
-  vaga_escola_uuid: string;
-  tipo_vaga: TipoVagaEscolha;
+  vaga_escola_uuid: string | null;
+  tipo_vaga: TipoVagaEscolha | null;
   e_retardatario: boolean;
 }
 

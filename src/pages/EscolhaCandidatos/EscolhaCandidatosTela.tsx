@@ -114,7 +114,9 @@ const formatAgendaOptionLabel = (agenda: IAgenda): string => {
     sessaoFallback?.[1]
   );
 
-  return `${formattedDate} - ${horaInicio} às ${horaFim}`;
+  const cargoNome = agenda.cargo_nome || "Cargo não informado";
+
+  return `${formattedDate} - ${horaInicio} às ${horaFim} - ${cargoNome}`;
 };
 
 const filterOptionByLabel = (input: string, option?: DefaultOptionType) => {
