@@ -9,10 +9,10 @@ import type {
   IImportacaoVagasForm, 
   IImportacaoVagasPayload
 } from '../types';
-import { API } from '../../../../../../services';
+import { API } from '../../../../../services';
 
 // Mock da API
-jest.mock('../../../../../../services', () => ({
+jest.mock('../../../../../services', () => ({
   API: {
     ImportacaoDados: {
       postImportacaoArquivosVagas: jest.fn(),

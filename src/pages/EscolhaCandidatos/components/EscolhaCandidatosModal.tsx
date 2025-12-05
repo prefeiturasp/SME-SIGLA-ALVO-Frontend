@@ -339,17 +339,25 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       return;
     }
 
-    if (!modalUnidadeEscolar) {
+    // Validação apenas quando a situação for "escolha"
+    if (modalSituacao === "escolha" && !modalUnidadeEscolar) {
       message.warning("Selecione a unidade escolar para salvar a escolha.");
       return;
     }
 
+    // Quando não for "escolha", enviar null para os campos não visíveis
     const payload: ISalvarEscolhaPayload = {
       candidato_uuid: context.candidatoUuid,
       situacao: modalSituacao,
-      vaga_escola_uuid: modalUnidadeEscolar,
-      tipo_vaga: modalTipoVaga,
-      e_retardatario: modalRetardatario,
+      vaga_escola_uuid: modalSituacao === "escolha" 
+        ? (modalUnidadeEscolar || null) 
+        : null,
+      tipo_vaga: modalSituacao === "escolha" 
+        ? modalTipoVaga 
+        : null,
+      e_retardatario: modalSituacao === "escolha" 
+        ? modalRetardatario 
+        : false,
     };
 
     try {
@@ -411,7 +419,10 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
             type="primary"
             onClick={handleSalvarEscolha}
             loading={salvarEscolhaIsPending}
-            disabled={salvarEscolhaIsPending || !modalUnidadeEscolar}
+            disabled={
+              salvarEscolhaIsPending || 
+              (modalSituacao === "escolha" && !modalUnidadeEscolar)
+            }
           >
             Salvar
           </ModalSaveButton>
@@ -482,74 +493,78 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
           </ModalRadioGroup>
         </ModalSection>
 
-        <ModalSection>
-          <ModalFieldsRow gutter={[24, 16]}>
-            <Col xs={24} md={12}>
-              <ModalFieldLabel>DRE</ModalFieldLabel>
-              <ModalSelect
-                value={modalDre}
-                placeholder="Selecione a DRE"
-                onChange={(value) =>
-                  handleModalDreChange(value as string | undefined)
-                }
-                options={dreOptions}
-                allowClear
-                loading={vagasIsLoading}
-                disabled={vagasIsLoading || !cargoCodigoNumericoParam}
-                showSearch
-                optionFilterProp="label"
-                filterOption={filterOptionByLabel}
-              />
-            </Col>
-            <Col xs={24} md={12}>
-              <ModalFieldLabel>Unidade escolar</ModalFieldLabel>
-              <ModalSelect
-                value={modalUnidadeEscolar}
-                placeholder="Selecione a unidade escolar"
-                onChange={(value) =>
-                  setModalUnidadeEscolar(value as string | undefined)
-                }
-                options={escolaOptions}
-                allowClear
-                disabled={!modalDreCodigo}
-                loading={escolasQuery.isLoading}
-                showSearch
-                optionFilterProp="label"
-                filterOption={filterOptionByLabel}
-              />
-            </Col>
-          </ModalFieldsRow>
-        </ModalSection>
+        {modalSituacao === "escolha" && (
+          <>
+            <ModalSection>
+              <ModalFieldsRow gutter={[24, 16]}>
+                <Col xs={24} md={12}>
+                  <ModalFieldLabel>DRE</ModalFieldLabel>
+                  <ModalSelect
+                    value={modalDre}
+                    placeholder="Selecione a DRE"
+                    onChange={(value) =>
+                      handleModalDreChange(value as string | undefined)
+                    }
+                    options={dreOptions}
+                    allowClear
+                    loading={vagasIsLoading}
+                    disabled={vagasIsLoading || !cargoCodigoNumericoParam}
+                    showSearch
+                    optionFilterProp="label"
+                    filterOption={filterOptionByLabel}
+                  />
+                </Col>
+                <Col xs={24} md={12}>
+                  <ModalFieldLabel>Unidade escolar</ModalFieldLabel>
+                  <ModalSelect
+                    value={modalUnidadeEscolar}
+                    placeholder="Selecione a unidade escolar"
+                    onChange={(value) =>
+                      setModalUnidadeEscolar(value as string | undefined)
+                    }
+                    options={escolaOptions}
+                    allowClear
+                    disabled={!modalDreCodigo}
+                    loading={escolasQuery.isLoading}
+                    showSearch
+                    optionFilterProp="label"
+                    filterOption={filterOptionByLabel}
+                  />
+                </Col>
+              </ModalFieldsRow>
+            </ModalSection>
 
-        <ModalSection>
-          <ModalFieldsRow gutter={[24, 16]}>
-            <Col xs={24} md={12}>
-              <ModalFieldLabel>Tipo de vaga</ModalFieldLabel>
-              <ModalRadioGroup
-                value={modalTipoVaga}
-                onChange={(event) =>
-                  setModalTipoVaga(
-                    event.target.value as "precaria" | "definitiva"
-                  )
-                }
-              >
-                <ModalRadio value="precaria">Precária</ModalRadio>
-                <ModalRadio value="definitiva">Definitiva</ModalRadio>
-              </ModalRadioGroup>
-            </Col>
-            <Col xs={24} md={12}>
-              <ModalFieldLabel>Retardatário</ModalFieldLabel>
-              <ModalCheckbox
-                checked={modalRetardatario}
-                onChange={(event) =>
-                  setModalRetardatario(event.target.checked)
-                }
-              >
-                Sim
-              </ModalCheckbox>
-            </Col>
-          </ModalFieldsRow>
-        </ModalSection>
+            <ModalSection>
+              <ModalFieldsRow gutter={[24, 16]}>
+                <Col xs={24} md={12}>
+                  <ModalFieldLabel>Tipo de vaga</ModalFieldLabel>
+                  <ModalRadioGroup
+                    value={modalTipoVaga}
+                    onChange={(event) =>
+                      setModalTipoVaga(
+                        event.target.value as "precaria" | "definitiva"
+                      )
+                    }
+                  >
+                    <ModalRadio value="precaria">Precária</ModalRadio>
+                    <ModalRadio value="definitiva">Definitiva</ModalRadio>
+                  </ModalRadioGroup>
+                </Col>
+                <Col xs={24} md={12}>
+                  <ModalFieldLabel>Retardatário</ModalFieldLabel>
+                  <ModalCheckbox
+                    checked={modalRetardatario}
+                    onChange={(event) =>
+                      setModalRetardatario(event.target.checked)
+                    }
+                  >
+                    Sim
+                  </ModalCheckbox>
+                </Col>
+              </ModalFieldsRow>
+            </ModalSection>
+          </>
+        )}
       </ModalWrapper>
     </Modal>
   );
