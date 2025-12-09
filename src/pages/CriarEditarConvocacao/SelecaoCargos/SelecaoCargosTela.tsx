@@ -424,6 +424,7 @@ const SelecaoCargos: React.FC = () => {
             cargo={cargosDisponiveis.find(c => c.value === cargoSelecionado)?.label || "Cargo"}
             cargoCodigo={cargosDisponiveis.find(c => c.value === cargoSelecionado)?.codigo}
             processoUuid={processoConvocacaoData?.uuid}
+            tipoEscolha={processoConvocacaoData?.tipo_escolha}
             cargoEmEdicao={ultimoCargoSelecionado ? {
               geral: ultimoCargoSelecionado.candidatos_geral,
               pcd: ultimoCargoSelecionado.candidatos_pcd,
