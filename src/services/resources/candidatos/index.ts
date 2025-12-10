@@ -7,6 +7,9 @@ import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 export const URL = {
   getCandidatos: () => `/api/v1/candidatos/`,
   getCandidatosHabilitados: () => `/api/v1/habilitados/`,
+  getCandidatosHabilitadosReposicao: () => `/api/v1/habilitados/reposicao/`,
+  getCandidatosHabilitadosReconvocacao: () => `/api/v1/habilitados/reconvocacao/`,
+  getCandidatosHabilitadosCalculados: () => `/api/v1/habilitados/calculados/`,
   patchCandidatosHabilitadosConvocados: () => `/api/v1/habilitados/convocar/`,
   patchCandidatosHabilitadosDesconvocados: () => `/api/v1/habilitados/desconvocar/`,
   postBuscarPorUuids: () => `/api/v1/habilitados/buscar-por-uuids/`,
@@ -41,6 +44,72 @@ export const getCandidatosHabilitados = (
 
   const response = appAxiosCandidatos
     .get<PaginatedResponse<ICandidato>>(URL.getCandidatosHabilitados(), {
+      params,
+      paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getCandidatosHabilitadosReposicao = (
+  params: { concurso_uuid: string; quantidade: number },
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .get<ICandidato[]>(URL.getCandidatosHabilitadosReposicao(), {
+      params,
+      paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getCandidatosHabilitadosReconvocacao = (
+  params: { concurso_uuid: string; geral?: number; pcd?: number; nna?: number; codigo_cargo?: string },
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .get<ICandidato[]>(URL.getCandidatosHabilitadosReconvocacao(), {
+      params,
+      paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getCandidatosHabilitadosCalculados = (
+  params: { concurso_uuid: string; quantidade: number; codigo_cargo?: string },
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .get<ICandidato[]>(URL.getCandidatosHabilitadosCalculados(), {
       params,
       paramsSerializer: queryParamsSerializer,
       signal,
