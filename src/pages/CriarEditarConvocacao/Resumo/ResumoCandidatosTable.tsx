@@ -1,27 +1,23 @@
 import React from "react";
 import type { ColumnsType, TableProps } from "antd/es/table";
-import dayjs from "dayjs";
-
-import { CustomTitle, TextSubTituloCinza, TextTituloCinza } from "../../../components/EstilosCompartilhados";
-const { Text } = Typography;
+import { Typography } from "antd";
 
 import { StyledTable } from "../../../components/EstilosCompartilhados";
-import { Button, Row, Typography } from "antd";
 import type { ICandidatosClassificados } from "../../../services/resources/agenda/IAgenda";
 
+const { Text } = Typography;
 
 interface ResumoCandidatosTableProps extends TableProps<ICandidatosClassificados> {
   data: ICandidatosClassificados[];
 }
-const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, title, ...rest }) => {
 
+const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, title, ...rest }) => {
   const columns: ColumnsType<ICandidatosClassificados> = [
     {
       title: "Qtd. Candidatos",
       dataIndex: "qtd_candidatos",
       key: "qtd_candidatos",
     },
-
     {
       title: "Classificação",
       dataIndex: "classificacao",
@@ -36,7 +32,6 @@ const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, tit
       title: "Sessão",
       dataIndex: "sessao",
       key: "sessao",
-
     },
     {
       title: "Horário",
@@ -45,11 +40,8 @@ const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, tit
     },
   ];
 
-
   return (
     <>
-
- 
       <StyledTable
         columns={columns}
         dataSource={data}
@@ -62,3 +54,4 @@ const ResumoCandidatosTable: React.FC<ResumoCandidatosTableProps> = ({ data, tit
 };
 
 export default ResumoCandidatosTable;
+

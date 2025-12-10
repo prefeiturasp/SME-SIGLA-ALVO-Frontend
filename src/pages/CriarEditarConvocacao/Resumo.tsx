@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Button, Collapse, Steps, theme, Tooltip, Typography } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,13 +7,13 @@ import { UserSwitchOutlined } from "@ant-design/icons";
 import { StepActions } from "./components/StepActions";
 import { items, steps } from "./components/StepsNames";
 import { StyledCardWithoutBorder } from "../../components/EstilosCompartilhados";
-import ResumoDoProcesso from "./components/ResumoDoProcesso";
-import ResumoCandidatosTable from "./components/ResumoCandidatosTable";
-import { useAgenda } from "../../hooks/useAgenda";
+import ResumoDoProcesso from "./Resumo/ResumoDoProcesso";
+import ResumoAgendaTabela from "./Resumo/ResumoAgendaTabela";
 import useConvocacaoById from "../Processos/ConvocacaoCandidatos/hooks/useConvocacaoById";
-import { usePatchProcessoConvocacao } from "../Processos/NovaConvocacaoCandidatos/hooks/usePatchProcessoConvocacao";
-import type { IAgenda, ICandidatosClassificados } from "../../services/resources/agenda/IAgenda";
+import { useGetAgendas } from "./Agenda/hooks/useGetAgendas";
+import type { IAgenda } from "../../services/resources/agenda/IAgenda";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
+import { resumoStyles } from "./Resumo/styles";
 
 const { Text } = Typography;
 
@@ -26,29 +26,74 @@ const Resumo: React.FC = () => {
   const { uuid } = useParams<{ uuid: string }>();
   const navigate = useNavigate();
 
-  const { agendaData, agendaIsLoading } = useAgenda(uuid as string);
-  const totalPorAgenda = Array.isArray(agendaData)
-  ? agendaData?.map((agenda: IAgenda) =>
-      Array.isArray(agenda?.candidatos_classificados)
-        ? agenda.candidatos_classificados.reduce(
-            (acc: number, candidato: ICandidatosClassificados) => acc + (candidato?.qtd_candidatos ?? 0),
-            0
-          )
-        : 0
-    )
-  : [];
+  // Buscar agendas do backend
+  const { agendasData, agendasIsLoading } = useGetAgendas(
+    uuid
+      ? {
+          pagination: { page: 1, page_size: 1000 },
+          filters: {
+            processo_convocacao_uuid: uuid,
+          },
+        }
+      : undefined,
+    { enabled: !!uuid }
+  );
 
-  
+  // Agrupar agendas por cargo
+  const agendasPorCargo = useMemo(() => {
+    if (!agendasData?.results) return [];
+
+    const agrupadas: Record<string, IAgenda[]> = {};
+
+    agendasData.results.forEach((agenda: IAgenda) => {
+      const cargoKey = agenda.cargo_uuid || agenda.cargo_nome;
+      if (!agrupadas[cargoKey]) {
+        agrupadas[cargoKey] = [];
+      }
+      agrupadas[cargoKey].push(agenda);
+    });
+
+    // Ordenar agendas dentro de cada cargo por data e horário
+    Object.keys(agrupadas).forEach((cargoKey) => {
+      agrupadas[cargoKey].sort((a, b) => {
+        // Ordenar por data
+        const dataA = a.escolha_em || a.data_escolha;
+        const dataB = b.escolha_em || b.data_escolha;
+        if (dataA !== dataB) {
+          return new Date(dataA).getTime() - new Date(dataB).getTime();
+        }
+
+        // Se as datas forem iguais, ordena por horário
+        const horaA = a.hora_convocacao_inicio;
+        const horaB = b.hora_convocacao_inicio;
+        if (horaA && horaB) {
+          return horaA.localeCompare(horaB);
+        }
+
+        return 0;
+      });
+    });
+
+    return Object.entries(agrupadas).map(([cargoKey, agendas]) => ({
+      cargoKey,
+      cargoNome: agendas[0]?.cargo_nome || "Cargo desconhecido",
+      agendas,
+      totalCandidatos: agendas.reduce(
+        (sum, agenda) => sum + (agenda.classificacao || 0),
+        0
+      ),
+    }));
+  }, [agendasData]);
+
   const { processoConvocacaoData, processoConvocacaoIsLoading } =
     useConvocacaoById(uuid as string);
-  const patchProcessoConvocacaoMutation = usePatchProcessoConvocacao();
 
   const breadcrumbItems = [
     {
       title: (
         <Text
           strong
-          style={{ cursor: "pointer" }}
+          style={resumoStyles.breadcrumbItem}
           onClick={() => navigate("/")}
         >
           Home
@@ -59,7 +104,7 @@ const Resumo: React.FC = () => {
       title: (
         <Text
           strong
-          style={{ cursor: "pointer" }}
+          style={resumoStyles.breadcrumbItem}
           onClick={() => navigate("/processos")}
         >
           Processos
@@ -70,7 +115,7 @@ const Resumo: React.FC = () => {
       title: (
         <Text
           strong
-          style={{ cursor: "pointer" }}
+          style={resumoStyles.breadcrumbItem}
           onClick={() => navigate("/processos/convocacao")}
         >
           Convocação de candidatos
@@ -113,9 +158,7 @@ const Resumo: React.FC = () => {
       >
         <StyledCardWithoutBorder
           title={
-            <Text
-              style={{ fontWeight: "400", color: token.colorTextSecondary }}
-            >
+            <Text style={resumoStyles.cardTitle(token)}>
               Processo de convocação de candidatos
             </Text>
           }
@@ -125,7 +168,7 @@ const Resumo: React.FC = () => {
         </StyledCardWithoutBorder>
 
         <StyledCardWithoutBorder
-          style={{ marginTop: "1.25rem" }}
+          style={resumoStyles.cardWithMarginTop}
           title={steps[current].title}
           variant="borderless"
         >
@@ -138,32 +181,40 @@ const Resumo: React.FC = () => {
         </StyledCardWithoutBorder>
 
         <StyledCardWithoutBorder
-          style={{ marginTop: "1.25rem" }}
+          style={resumoStyles.cardWithMarginTop}
           variant="borderless"
         >
+          {agendasPorCargo.length > 0 ? (
             <Collapse
               size="large"
-              defaultActiveKey={['0']}
-              items={agendaData?.map((agenda: IAgenda, index: number) => (
-                 {
-                  key: index,
-                  label: <>{agenda.cargo_nome}   -   {totalPorAgenda[index] } Vagas no total</>,
-                  children: (
-                    <ResumoCandidatosTable
-                      loading={agendaIsLoading}
-                      data={agenda?.candidatos_classificados || []}
-                    />
-                  )
-                }
-              )) || []}
+              items={agendasPorCargo.map((grupo, index) => ({
+                key: index.toString(),
+                label: (
+                  <Text style={resumoStyles.collapseLabel}>
+                    {grupo.cargoNome} - {grupo.totalCandidatos} candidatos no total
+                  </Text>
+                ),
+                children: (
+                  <ResumoAgendaTabela
+                    agendas={grupo.agendas}
+                    loading={agendasIsLoading}
+                  />
+                ),
+              }))}
             />
-          
+          ) : (
+            <div style={resumoStyles.emptyAgendasMessage}>
+              {agendasIsLoading
+                ? "Carregando agendas..."
+                : "Nenhuma agenda foi criada ainda. Retorne ao step anterior para criar agendas."}
+            </div>
+          )}
 
           <StepActions
             current={current}
             steps={steps}
             next={next}
-            prev={prev} 
+            prev={prev}
             onCancel={() => navigate(`/processos/convocacao`)}
             canSalvarEAvancar={canChangeProcessoConvocacao}
             canVoltar={canChangeProcessoConvocacao}
