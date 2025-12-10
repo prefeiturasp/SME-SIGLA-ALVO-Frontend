@@ -3,6 +3,7 @@ import { Table } from "antd";
 import dayjs from "dayjs";
 import type { IAgenda } from "../../../services/resources/agenda/IAgenda";
 import { ResumoTableStyles, resumoAgendaTabelaStyles } from "./styles";
+import { agendaTabelaStyles } from "../Agenda/styles";
 
 interface ResumoAgendaTabelaProps {
   agendas: IAgenda[];
