@@ -37,7 +37,7 @@ export const useGetEscolhasPorCandidatos = ({
       return escolhasData;
     }
 
-    return escolhasData.results ?? [];
+    return escolhasData?.results ?? [];
   }, [escolhasData]);
 
   return {

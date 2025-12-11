@@ -880,10 +880,18 @@ const EscolhaCandidatosTela: React.FC = () => {
           ? escolha.e_retardatario
           : Boolean(candidateAny?.e_retardatario ?? rawAny?.e_retardatario);
 
+      const categoriaEfetivaRaw = rawAny?.categoria_efetiva as string | undefined;
+      const categoriaEfetivaVal =
+        typeof categoriaEfetivaRaw === "string" &&
+        (categoriaEfetivaRaw === "PCD" || categoriaEfetivaRaw === "NNA")
+          ? categoriaEfetivaRaw
+          : undefined;
+
       return {
         uuid,
         nome,
         cargo: cargoNome,
+        ...(categoriaEfetivaVal ? { categoriaEfetiva: categoriaEfetivaVal } : {}),
         classificacao: classificacaoGeral,
         situacao: situacaoLabel,
         situacaoCodigo,
@@ -1164,9 +1172,7 @@ const EscolhaCandidatosTela: React.FC = () => {
       current: 1,
       pageSize: prev.pageSize,
     }));
-    console.log("teste1");
     setHasSearched(true);
-    console.log("teste2");
     setRefreshToken((prev) => prev + 1);
   }, [cargoCodigo, selectedAgenda, selectedProcesso]);
 

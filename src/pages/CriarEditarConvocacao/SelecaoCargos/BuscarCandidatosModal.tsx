@@ -207,9 +207,9 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   // Processar UUIDs quando os dados calculados chegarem
   useEffect(() => {
     if (isNovaAutorizacao && tipoConvocacao === 'calculada' && candidatosCalculadosData && !candidatosCalculadosIsLoading && onCandidatosUuidsChange) {
-      const list = Array.isArray(candidatosCalculadosData) ? candidatosCalculadosData : [];
+      const list = Array.isArray(candidatosCalculadosData.results) ? candidatosCalculadosData.results : [];
       const uuids = list
-        .map((item: any) => item?.candidato?.uuid || item?.uuid)
+        .map((item: any) => item?.uuid)
         .filter((id: any) => typeof id === 'string');
       onCandidatosUuidsChange(uuids);
     }
