@@ -181,6 +181,19 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     }));
   }, [vagasData?.dres]);
 
+  // Lista de escolas filtradas por DRE com estrutura { uuid, escola }
+  const escolasPorDre = useMemo(() => {
+    if (!vagasData?.vagas || !Array.isArray(vagasData.vagas) || !modalDreCodigo) {
+      return [];
+    }
+    return vagasData.vagas
+      .filter((vaga: any) => vaga?.escola?.dre?.codigo === modalDreCodigo)
+      .map((vaga: any) => ({
+        value: vaga.uuid,
+        label: vaga?.escola?.nome_oficial || '',
+      }));
+  }, [vagasData?.vagas, modalDreCodigo]);
+
   const syncedModalDre = useMemo(() => {
     if (!visible) {
       return modalDre;
@@ -225,56 +238,6 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     });
   }
 
-  const escolasQuery = useQuery<IEscolasResponse>({
-    queryKey: ["modal-escolas", modalDreCodigo],
-    queryFn: ({ signal }) =>
-      API.Escolhas.getEscolas(
-        { dre__codigo: modalDreCodigo!, page_size: 200 },
-        { signal }
-      ).response,
-    enabled:
-      visible && Boolean(modalDreCodigo && modalDreCodigo.length),
-    staleTime: 1000 * 60 * 2,
-    retry: 0,
-  });
-
-  const escolaOptions = useMemo(
-    () =>
-      (escolasQuery.data?.results ?? []).map((escola) => ({
-        value: escola.uuid,
-        label: escola.nome_oficial,
-        raw: escola,
-      })),
-    [escolasQuery.data?.results]
-  );
-
-  const validatedUnidadeEscolar = useMemo(() => {
-    if (!visible) {
-      return undefined;
-    }
-
-    if (
-      modalUnidadeEscolar &&
-      escolaOptions.every((option) => option.value !== modalUnidadeEscolar)
-    ) {
-      return undefined;
-    }
-
-    return modalUnidadeEscolar;
-  }, [visible, modalUnidadeEscolar, escolaOptions]);
-
-  const syncModalUnidadeEscolarCallback = useCallback(() => {
-    if (validatedUnidadeEscolar !== modalUnidadeEscolar) {
-      setModalUnidadeEscolar(validatedUnidadeEscolar);
-    }
-  }, [validatedUnidadeEscolar, modalUnidadeEscolar]);
-
-  const needsModalUnidadeEscolarSync = validatedUnidadeEscolar !== modalUnidadeEscolar;
-  if (needsModalUnidadeEscolarSync) {
-    requestAnimationFrame(() => {
-      syncModalUnidadeEscolarCallback();
-    });
-  }
 
   const vagasTotals = vagasData as
     | (IVagasResponse & {
@@ -522,10 +485,9 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                     onChange={(value) =>
                       setModalUnidadeEscolar(value as string | undefined)
                     }
-                    options={escolaOptions}
+                    options={escolasPorDre}
                     allowClear
                     disabled={!modalDreCodigo}
-                    loading={escolasQuery.isLoading}
                     showSearch
                     optionFilterProp="label"
                     filterOption={filterOptionByLabel}
@@ -549,17 +511,6 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                     <ModalRadio value="precaria">Precária</ModalRadio>
                     <ModalRadio value="definitiva">Definitiva</ModalRadio>
                   </ModalRadioGroup>
-                </Col>
-                <Col xs={24} md={12}>
-                  <ModalFieldLabel>Retardatário</ModalFieldLabel>
-                  <ModalCheckbox
-                    checked={modalRetardatario}
-                    onChange={(event) =>
-                      setModalRetardatario(event.target.checked)
-                    }
-                  >
-                    Sim
-                  </ModalCheckbox>
                 </Col>
               </ModalFieldsRow>
             </ModalSection>

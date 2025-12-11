@@ -171,6 +171,7 @@ export const postBuscarPorUuids = (
 
   const response = appAxiosCandidatos
     .post<IBuscarPorUuidsResponse>(URL.postBuscarPorUuids(), payload, {
+      params: { order_by: "ranking_escolha", ...(axiosRequestConfig?.params as any) },
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })
