@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, Typography, Button, message, Spin, Radio, Divider } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
@@ -182,6 +182,30 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const candidatos = mostrarTabelaCandidatos && candidatosDataFinal ? 
     (Array.isArray(candidatosDataFinal) ? candidatosDataFinal : candidatosDataFinal.results) : [];
 
+  // Calcular contagens por categoria_efetiva dos candidatos retornados
+  const contagensPorCategoria = useMemo(() => {
+    if (!candidatos || candidatos.length === 0) {
+      return { geral: 0, pcd: 0, nna: 0 };
+    }
+    
+    let geral = 0;
+    let pcd = 0;
+    let nna = 0;
+    
+    candidatos.forEach((candidato: any) => {
+      const categoria = candidato?.categoria_efetiva;
+      if (categoria === 'GERAL' || !categoria) {
+        geral++;
+      } else if (categoria === 'NNA') {
+        nna++;
+      } else if (categoria === 'PCD') {
+        pcd++;
+      }
+    });
+    
+    return { geral, pcd, nna };
+  }, [candidatos]);
+
   // Processar UUIDs quando os dados de reposição chegarem
   useEffect(() => {
     if (isReposicao && candidatosReposicaoData && !candidatosReposicaoIsLoading && onCandidatosUuidsChange) {
@@ -207,9 +231,9 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   // Processar UUIDs quando os dados calculados chegarem
   useEffect(() => {
     if (isNovaAutorizacao && tipoConvocacao === 'calculada' && candidatosCalculadosData && !candidatosCalculadosIsLoading && onCandidatosUuidsChange) {
-      const list = Array.isArray(candidatosCalculadosData) ? candidatosCalculadosData : [];
+      const list = Array.isArray(candidatosCalculadosData.results) ? candidatosCalculadosData.results : [];
       const uuids = list
-        .map((item: any) => item?.candidato?.uuid || item?.uuid)
+        .map((item: any) => item?.uuid)
         .filter((id: any) => typeof id === 'string');
       onCandidatosUuidsChange(uuids);
     }
@@ -445,24 +469,19 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       return;
     }
 
-    // Para Reposição e Nova Autorização, as quantidades individuais serão todas 0, pois não há distinção
-    const quantidadesIndividuais = isReposicao
+    // Para Reposição, Reconvocação e Nova Autorização, usar as contagens reais baseadas em categoria_efetiva
+    // Para outros casos (digitadas), usar os valores digitados
+    const quantidadesIndividuais = isReposicao || isReconvocacao || (isNovaAutorizacao && tipoConvocacao === 'calculada')
       ? {
-          geral: quantidadeReposicao,
-          pcd: 0,
-          nna: 0
+          geral: contagensPorCategoria.geral,
+          pcd: contagensPorCategoria.pcd,
+          nna: contagensPorCategoria.nna
         }
-      : isNovaAutorizacao
-        ? {
-            geral: quantidadeNovaAutorizacao,
-            pcd: 0,
-            nna: 0
-          }
-        : {
-            geral: autorizacoesDigitadas.geral,
-            pcd: autorizacoesDigitadas.def,
-            nna: autorizacoesDigitadas.nna
-          };
+      : {
+          geral: autorizacoesDigitadas.geral,
+          pcd: autorizacoesDigitadas.def,
+          nna: autorizacoesDigitadas.nna
+        };
 
     if (onCandidatosSelecionados) {
       onCandidatosSelecionados(quantidadeCandidatos, quantidadesIndividuais, totalVagas);

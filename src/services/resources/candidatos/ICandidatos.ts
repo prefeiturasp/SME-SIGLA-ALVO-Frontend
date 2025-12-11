@@ -3,6 +3,7 @@ export interface ICandidato {
   classificacao_geral: number;
   classificacao_especial: number;
   classificacao_nna: number;
+  categoria_efetiva?: 'GERAL' | 'NNA' | 'PCD';
   [key: string]: any; // Permite campos adicionais do ConcursoCandidatoSerializer
 }
 
