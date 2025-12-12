@@ -1112,6 +1112,11 @@ export const useAgenda = () => {
     setAgendaAberto(null);
   };
 
+  // Função para verificar se há pelo menos 1 período de agenda adicionado
+  const temPeriodosAgenda = () => {
+    return periodosList.length > 0;
+  };
+
 
   return {
     processoConvocacaoData,
@@ -1158,5 +1163,6 @@ export const useAgenda = () => {
     agendasLoading,
     salvarAgendasNoBackend,
     uuid,
+    temPeriodosAgenda,
   };
 };

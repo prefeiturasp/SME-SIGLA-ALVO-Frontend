@@ -229,7 +229,7 @@ export const PrimaryButton = styled(Button)`
   border-color: #002c8c !important;
   color: #ffffff !important;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: #87ceeb !important;
     border-color: #87ceeb !important;
     color: #002c8c !important;
@@ -239,6 +239,20 @@ export const PrimaryButton = styled(Button)`
     background-color: #002c8c !important;
     border-color: #002c8c !important;
     color: #ffffff !important;
+  }
+
+  &:disabled,
+  &.ant-btn-disabled {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+    border-color: #d9d9d9 !important;
+    color: rgba(0, 0, 0, 0.25) !important;
+    cursor: not-allowed !important;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04) !important;
+      border-color: #d9d9d9 !important;
+      color: rgba(0, 0, 0, 0.25) !important;
+    }
   }
 `;
 

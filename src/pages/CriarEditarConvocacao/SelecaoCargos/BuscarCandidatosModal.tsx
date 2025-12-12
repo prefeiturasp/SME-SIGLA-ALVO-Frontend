@@ -182,6 +182,32 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const candidatos = mostrarTabelaCandidatos && candidatosDataFinal ? 
     (Array.isArray(candidatosDataFinal) ? candidatosDataFinal : candidatosDataFinal.results) : [];
 
+  // Função para mapear categoria_efetiva para exibição
+  const mapearCategoriaEfetiva = (categoria?: string): string => {
+    if (!categoria || categoria === 'GERAL') {
+      return 'Geral';
+    } else if (categoria === 'NNA') {
+      return 'NNA';
+    } else if (categoria === 'PCD') {
+      return 'PcD';
+    }
+    return 'Geral'; // fallback
+  };
+
+  // Função para formatar nome do candidato com categoria
+  const formatarNomeCandidato = (nome: string, categoria?: string): string => {
+    if (!nome) return '';
+    
+    if (!categoria || categoria === 'GERAL') {
+      return nome;
+    } else if (categoria === 'NNA') {
+      return `${nome} (NNA)`;
+    } else if (categoria === 'PCD') {
+      return `${nome} (PcD)`;
+    }
+    return nome; // fallback
+  };
+
   // Calcular contagens por categoria_efetiva dos candidatos retornados
   const contagensPorCategoria = useMemo(() => {
     if (!candidatos || candidatos.length === 0) {
@@ -260,11 +286,15 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
           Convocado Por
         </div>
       ),
-      dataIndex: 'convocado_por',
-      key: 'convocado_por',
+      dataIndex: 'categoria_efetiva',
+      key: 'categoria_efetiva',
       width: '20%',
-      sorter: (a: any, b: any) => (a.convocado_por || 'COGEP').localeCompare(b.convocado_por || 'COGEP'),
-      render: () => 'COGEP',
+      sorter: (a: any, b: any) => {
+        const categoriaA = mapearCategoriaEfetiva(a?.categoria_efetiva);
+        const categoriaB = mapearCategoriaEfetiva(b?.categoria_efetiva);
+        return categoriaA.localeCompare(categoriaB);
+      },
+      render: (_: any, record: any) => mapearCategoriaEfetiva(record?.categoria_efetiva),
     },
     {
       title: (
@@ -276,6 +306,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       key: 'nome',
       width: '20%',
       sorter: (a: any, b: any) => (a.candidato?.nome || '').localeCompare(b.candidato?.nome || ''),
+      render: (nome: string, record: any) => formatarNomeCandidato(nome, record?.categoria_efetiva),
     },
     {
       title: (
