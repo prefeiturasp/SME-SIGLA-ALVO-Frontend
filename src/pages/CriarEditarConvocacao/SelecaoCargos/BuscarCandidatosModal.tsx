@@ -59,9 +59,9 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const [mostrarTabelaCandidatos, setMostrarTabelaCandidatos] = useState(false);
   const [parametrosBusca, setParametrosBusca] = useState<{ geral: number; pcd: number; nna: number; concurso_uuid: string; codigo_cargo: string } | undefined>(undefined);
   // Parâmetros para busca de reposição
-  const [parametrosBuscaReposicao, setParametrosBuscaReposicao] = useState<{ concurso_uuid: string; quantidade: number } | undefined>(undefined);
+  const [parametrosBuscaReposicao, setParametrosBuscaReposicao] = useState<{ concurso_uuid: string; geral?: number; pcd?: number; nna?: number; codigo_cargo?: string } | undefined>(undefined);
   // Parâmetros para busca de reconvocação
-  const [parametrosBuscaReconvocacao, setParametrosBuscaReconvocacao] = useState<{ concurso_uuid: string; geral?: number; pcd?: number; nna?: number; codigo_cargo?: string } | undefined>(undefined);
+  const [parametrosBuscaReconvocacao, setParametrosBuscaReconvocacao] = useState<{ concurso_uuid: string; quantidade: number } | undefined>(undefined);
   // Parâmetros para busca de candidatos calculados (Nova Autorização)
   const [parametrosBuscaCalculados, setParametrosBuscaCalculados] = useState<{ concurso_uuid: string; quantidade: number; codigo_cargo?: string } | undefined>(undefined);
 
@@ -387,12 +387,12 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
 
   const handleBuscar = async () => {
     // Para Reposição, usar quantidadeReposicao; para Nova Autorização, usar quantidadeNovaAutorizacao; caso contrário, usar a soma dos campos individuais
-    const somatorio = isReposicao 
+    const somatorio = isReconvocacao
       ? quantidadeReposicao 
       : isNovaAutorizacao
         ? quantidadeNovaAutorizacao
         : autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
-    
+
     if (somatorio === 0) {
       message.error('Preencha pelo menos um campo de autorização');
       return;
@@ -404,25 +404,28 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     }
 
     if (isReposicao) {
-      // Buscar candidatos de reposição
+      // Invertido: tratar como reconvocação
       if (!concursoValue) {
         message.error('Concurso não informado');
         return;
       }
 
+      // const novosParametrosReconvocacao = {
       const novosParametrosReposicao = {
         concurso_uuid: concursoValue,
-        quantidade: quantidadeReposicao
+        geral: autorizacoesDigitadas.geral > 0 ? autorizacoesDigitadas.geral : 0,
+        pcd: autorizacoesDigitadas.def > 0 ? autorizacoesDigitadas.def : 0,
+        nna: autorizacoesDigitadas.nna > 0 ? autorizacoesDigitadas.nna : 0,
+        codigo_cargo: cargoCodigo || undefined
       };
       setParametrosBuscaReposicao(novosParametrosReposicao);
       setMostrarTabelaCandidatos(true);
-      // O hook useGetCandidatosReposicao fará o request automaticamente
-      // Não precisamos chamar fetchCandidatosReposicaoNow manualmente
+      // O hook useGetCandidatosReconvocacao fará o request automaticamente
       return;
     }
 
     if (isReconvocacao) {
-      // Buscar candidatos de reconvocação
+      // Invertido: tratar como reposição
       if (!concursoValue) {
         message.error('Concurso não informado');
         return;
@@ -430,14 +433,11 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
 
       const novosParametrosReconvocacao = {
         concurso_uuid: concursoValue,
-        geral: autorizacoesDigitadas.geral > 0 ? autorizacoesDigitadas.geral : undefined,
-        pcd: autorizacoesDigitadas.def > 0 ? autorizacoesDigitadas.def : undefined,
-        nna: autorizacoesDigitadas.nna > 0 ? autorizacoesDigitadas.nna : undefined,
-        codigo_cargo: cargoCodigo || undefined
+        quantidade: quantidadeReposicao
       };
       setParametrosBuscaReconvocacao(novosParametrosReconvocacao);
       setMostrarTabelaCandidatos(true);
-      // O hook useGetCandidatosReconvocacao fará o request automaticamente
+      // O hook useGetCandidatosReposicao fará o request automaticamente
       return;
     }
 
@@ -593,7 +593,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
               <span className="modal-section-label">Autorizações Digitadas:</span>
             </div>
             <div style={modalInlineStyles.inputsContainer}>
-              {isReposicao ? (
+              {isReconvocacao ? (
                 // Para Reposição: apenas um campo numérico único
                 <div style={modalStyles.actionButtonContainer}>
                   <input
