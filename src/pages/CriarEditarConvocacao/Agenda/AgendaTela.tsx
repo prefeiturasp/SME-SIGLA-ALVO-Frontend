@@ -68,6 +68,7 @@ const AgendaTela: React.FC = () => {
     limparExpansao,
     salvarAgendasNoBackend,
     uuid,
+    temPeriodosAgenda,
   } = useAgenda();
 
   const isEdit = false;
@@ -290,6 +291,7 @@ const AgendaTela: React.FC = () => {
             onCancel={() => navigate(`/processos/convocacao`)}
             canSalvarEAvancar={canChangeProcessoConvocacao}
             canVoltar={canChangeProcessoConvocacao}
+            temPeriodosAgenda={temPeriodosAgenda()}
           />
         </StyledCardWithoutBorder>
       </BaseTela>
