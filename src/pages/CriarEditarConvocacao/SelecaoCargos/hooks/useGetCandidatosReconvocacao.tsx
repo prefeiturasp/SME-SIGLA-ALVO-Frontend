@@ -4,7 +4,7 @@ import { API } from "../../../../services";
 
 export const useGetCandidatosReconvocacao = (
   buscarCandidatos: boolean = false,
-  parametros?: { concurso_uuid: string; geral?: number; pcd?: number; nna?: number; codigo_cargo?: string }
+  parametros?: { concurso_uuid: string; quantidade: number }
 ) => {
   const { data: candidatosData, isLoading: candidatosIsLoading } = useQuery({
     queryKey: parametros 
