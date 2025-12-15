@@ -59,7 +59,7 @@ export const getCandidatosHabilitados = (
 
 // TODO adicionar JWT no header Authorization
 export const getCandidatosHabilitadosReposicao = (
-  params: { concurso_uuid: string; quantidade: number },
+  params: { concurso_uuid: string; geral?: number; pcd?: number; nna?: number; codigo_cargo?: string },
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();

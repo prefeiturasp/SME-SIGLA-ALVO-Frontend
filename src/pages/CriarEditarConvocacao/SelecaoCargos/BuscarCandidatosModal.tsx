@@ -98,7 +98,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       setParametrosBuscaReconvocacao(undefined);
     } else if (cargoEmEdicao) {
       // Preencher campos quando estiver editando
-      if (isReposicao) {
+      if (isReconvocacao) {
         // Para reposição, usar a soma total
         const total = cargoEmEdicao.geral + cargoEmEdicao.pcd + cargoEmEdicao.nna;
         setQuantidadeReposicao(total);
@@ -266,7 +266,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   }, [isNovaAutorizacao, tipoConvocacao, candidatosCalculadosData, candidatosCalculadosIsLoading, onCandidatosUuidsChange]);
 
   // Calcular total baseado no tipo de escolha
-  const totalAutorizacoes = isReposicao 
+  const totalAutorizacoes = isReconvocacao 
     ? quantidadeReposicao 
     : isNovaAutorizacao
       ? quantidadeNovaAutorizacao
@@ -275,8 +275,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const isTotalExcedido = totalAutorizacoes > totalVagas && totalVagas > 0;
   const hasResultadosBusca = mostrarTabelaCandidatos && !candidatosIsLoadingFinal && candidatos.length > 0;
   const isAdicionarDisabilitado = !isTotalValido || isTotalExcedido || !hasResultadosBusca;
-  
-  // UUIDs notificados via onSuccess do hook useGetCandidatos
 
   // Configuração das colunas da tabela
   const columns: ColumnsType<any> = [
@@ -485,11 +483,12 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     } catch (e) {
       // ignore
     }
+    
   };
 
   const handleSelecionar = () => {
     // Para Reposição, usar quantidadeReposicao; para Nova Autorização, usar quantidadeNovaAutorizacao; caso contrário, usar a soma dos campos individuais
-    const quantidadeCandidatos = isReposicao 
+    const quantidadeCandidatos = isReconvocacao
       ? quantidadeReposicao 
       : isNovaAutorizacao
         ? quantidadeNovaAutorizacao
