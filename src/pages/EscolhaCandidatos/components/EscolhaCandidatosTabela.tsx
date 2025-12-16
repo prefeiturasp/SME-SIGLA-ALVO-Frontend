@@ -77,6 +77,11 @@ const EscolhaCandidatosTabela: React.FC<EscolhaCandidatosTabelaProps> = ({
         key: "cargo",
       },
       {
+        title: "Tipo de Vaga",
+        dataIndex: "categoriaEfetiva",
+        key: "categoriaEfetiva",
+      },
+      {
         title: "Classificação",
         dataIndex: "classificacao",
         key: "classificacao",
@@ -151,6 +156,13 @@ const EscolhaCandidatosTabela: React.FC<EscolhaCandidatosTabelaProps> = ({
       key: "cargo_nome",
       render: (_: unknown, record: Record<string, any>) =>
         record.cargo_nome ?? record.cargo?.nome ?? selectedAgendaData?.cargo_nome ?? "—",
+    },
+    {
+      title: "Tipo de Vaga",
+      dataIndex: "categoriaEfetiva",
+      key: "categoriaEfetiva",
+      render: (_: unknown, record: Record<string, any>) =>
+        record.categoriaEfetiva ?? "—",
     },
     {
       title: "Classificação",
@@ -366,6 +378,8 @@ const EscolhaCandidatosTabela: React.FC<EscolhaCandidatosTabelaProps> = ({
       pagination={{
         current: pagination.current,
         pageSize: pagination.pageSize,
+        showSizeChanger: true,
+        showQuickJumper: false,
         total: tablePaginationTotal,
         showTotal: (total, range) =>
           `Mostrando ${range[0]}-${range[1]} de ${total} candidato(s)`,

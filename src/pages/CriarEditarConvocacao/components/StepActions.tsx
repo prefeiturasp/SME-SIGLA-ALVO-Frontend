@@ -15,6 +15,7 @@ interface StepActionsProps {
   loading?: boolean;
   canSalvarEAvancar: boolean;
   canVoltar: boolean;
+  temPeriodosAgenda?: boolean;
 }
 
 export const StepActions: React.FC<StepActionsProps> = ({
@@ -26,6 +27,7 @@ export const StepActions: React.FC<StepActionsProps> = ({
   loading,
   canSalvarEAvancar,
   canVoltar,
+  temPeriodosAgenda = true,
 }) => {
   return (
     <div style={{ marginTop: 24 }}>
@@ -70,6 +72,8 @@ export const StepActions: React.FC<StepActionsProps> = ({
               title={
                 !canSalvarEAvancar
                   ? "Você não possui permissão para essa ação"
+                  : !temPeriodosAgenda
+                  ? "Adicione pelo menos um período de agenda para continuar"
                   : "Salvar e avançar"
               }
               arrow={true}
@@ -81,7 +85,7 @@ export const StepActions: React.FC<StepActionsProps> = ({
                 style={{ margin: "0 8px" }}
                 onClick={next}
                 loading={loading}
-                disabled={!canSalvarEAvancar}
+                disabled={!canSalvarEAvancar || !temPeriodosAgenda}
               >
                 Salvar e avançar
               </PrimaryButton>

@@ -108,8 +108,6 @@ export interface IVaga {
 export interface IVagasResponse {
   vagas: IVaga[];
   total_vagas: number;
-  total_vagas_definitivas?: number;
-  total_vagas_precarias?: number;
   dres: IDre[];
 }
 
@@ -137,7 +135,6 @@ export interface ICargoProcesso {
   uuid?: string;
   nome: string;
   cargo_uuid: string;
-  codigo_cargo?: string;
   vagas: number;
   geral: number;
   pcd: number;

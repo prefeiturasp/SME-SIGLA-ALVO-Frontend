@@ -880,10 +880,18 @@ const EscolhaCandidatosTela: React.FC = () => {
           ? escolha.e_retardatario
           : Boolean(candidateAny?.e_retardatario ?? rawAny?.e_retardatario);
 
+      const categoriaEfetivaRaw = rawAny?.categoria_efetiva as string | undefined;
+      const categoriaEfetivaVal =
+        typeof categoriaEfetivaRaw === "string" &&
+        (categoriaEfetivaRaw === "PCD" || categoriaEfetivaRaw === "NNA")
+          ? categoriaEfetivaRaw
+          : undefined;
+
       return {
         uuid,
         nome,
         cargo: cargoNome,
+        ...(categoriaEfetivaVal ? { categoriaEfetiva: categoriaEfetivaVal } : {}),
         classificacao: classificacaoGeral,
         situacao: situacaoLabel,
         situacaoCodigo,
@@ -1008,78 +1016,35 @@ const EscolhaCandidatosTela: React.FC = () => {
       return { totalAmpla: 0, totalPcd: 0, totalNna: 0 };
     }
 
-    const counts: { ampla: number; pcd: number; nna: number } = {
-      ampla: 0,
-      pcd: 0,
-      nna: 0,
-    };
+    let geral = 0;
+    let pcd = 0;
+    let nna = 0;
 
-    normalizedCandidatos.forEach(({ uuid, candidate, raw }) => {
-      const escolha = escolhaPorCandidato.get(uuid);
-
-      const tokens = [
-        escolha?.situacao,
-        escolha?.tipo_vaga,
-        candidate?.tipo_vaga,
-        candidate?.tipo_lista,
-        candidate?.tipo_cota,
-        candidate?.categoria,
-        raw?.tipo_vaga,
-        raw?.tipo_lista,
-        raw?.tipo_cota,
-        raw?.categoria,
-      ]
-        .map((value) => (typeof value === "string" ? value.toLowerCase() : ""))
-        .filter(Boolean)
-        .join(" ");
-
-      let categoria: "ampla" | "pcd" | "nna" = "ampla";
-
-      if (tokens.includes("nna")) {
-        categoria = "nna";
-      } else if (
-        tokens.includes("pcd") ||
-        tokens.includes("p.c.d") ||
-        tokens.includes("def") ||
-        tokens.includes("deficien")
-      ) {
-        categoria = "pcd";
-      } else if (tokens.includes("ampla") || tokens.includes("geral")) {
-        categoria = "ampla";
+    normalizedCandidatos.forEach(({ raw }) => {
+      // Buscar categoria_efetiva diretamente do objeto raw (que vem do backend)
+      // Mesma lógica do BuscarCandidatosModal
+      const categoria = (raw as any)?.categoria_efetiva;
+      
+      if (categoria === 'GERAL' || !categoria) {
+        geral++;
+      } else if (categoria === 'NNA') {
+        nna++;
+      } else if (categoria === 'PCD') {
+        pcd++;
       }
-
-      if (categoria === "ampla") {
-        const classificacaoPcd = parsePositiveNumber(
-          candidate?.classificacao_pcd ??
-            candidate?.classificacao_especial ??
-            raw?.classificacao_pcd ??
-            raw?.classificacao_especial
-        );
-
-        if (classificacaoPcd) {
-          categoria = "pcd";
-        } else {
-          const classificacaoNna = parsePositiveNumber(
-            candidate?.classificacao_nna ?? raw?.classificacao_nna
-          );
-          if (classificacaoNna) {
-            categoria = "nna";
-          }
-        }
-      }
-
-      counts[categoria] += 1;
     });
 
     return {
-      totalAmpla: counts.ampla,
-      totalPcd: counts.pcd,
-      totalNna: counts.nna,
+      totalAmpla: geral,
+      totalPcd: pcd,
+      totalNna: nna,
     };
-  }, [escolhaPorCandidato, hasSearched, normalizedCandidatos]);
+  }, [hasSearched, normalizedCandidatos]);
 
+  // Priorizar candidateTotals quando houver candidatos carregados (já filtrados pela agenda selecionada)
+  // Usar cargoTotals apenas como fallback quando não houver candidatos carregados
   const { totalAmpla, totalPcd, totalNna } =
-    cargoTotals ?? candidateTotals;
+    (hasSearched && normalizedCandidatos.length > 0) ? candidateTotals : (cargoTotals ?? candidateTotals);
 
   const isFetchingEscolhas = escolhasIsLoading || escolhasIsFetching;
   const isCardsLoading = isFetchingCandidatos || isFetchingEscolhas;
@@ -1164,9 +1129,7 @@ const EscolhaCandidatosTela: React.FC = () => {
       current: 1,
       pageSize: prev.pageSize,
     }));
-    console.log("teste1");
     setHasSearched(true);
-    console.log("teste2");
     setRefreshToken((prev) => prev + 1);
   }, [cargoCodigo, selectedAgenda, selectedProcesso]);
 

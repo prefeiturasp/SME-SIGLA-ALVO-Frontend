@@ -177,14 +177,16 @@ export const useAgenda = () => {
     let horaConvocacaoInicio: string | null = null;
     let horaConvocacaoFim: string | null = null;
     
-    if (periodo.horaInicioOriginal) {
-      horaConvocacaoInicio = dayjs(periodo.horaInicioOriginal).format('HH:mm:ss');
-      if (periodo.horaFimOriginal) {
-        horaConvocacaoFim = dayjs(periodo.horaFimOriginal).format('HH:mm:ss');
-      }
-    } else if (periodo.horaInicio && periodo.horaFim) {
+    // Priorizar horaInicio/horaFim (strings) quando existirem, pois são os valores calculados corretos
+    // Se não existirem, usar horaInicioOriginal/horaFimOriginal (dayjs objects)
+    if (periodo.horaInicio && periodo.horaFim) {
+      // horaInicio e horaFim são strings no formato "HH:mm"
       horaConvocacaoInicio = `${periodo.horaInicio}:00`;
       horaConvocacaoFim = `${periodo.horaFim}:00`;
+    } else if (periodo.horaInicioOriginal && periodo.horaFimOriginal) {
+      // horaInicioOriginal e horaFimOriginal são objetos dayjs
+      horaConvocacaoInicio = dayjs(periodo.horaInicioOriginal).format('HH:mm:ss');
+      horaConvocacaoFim = dayjs(periodo.horaFimOriginal).format('HH:mm:ss');
     }
     return {
       ...(periodo.uuid && { uuid: periodo.uuid }),
@@ -395,8 +397,6 @@ export const useAgenda = () => {
     // Criar múltiplas entradas baseado no número de sessões
     const novosPeriodos: PeriodoItem[] = [];
     const numeroSessoes = watchedFields.sessao || 1;
-
-    const invervaloSessao = watchedFields.horaFim.diff(watchedFields.horaInicio, 'hour');
     for (let i = 0; i < numeroSessoes; i++) {
       const numeroSessaoAtual = i + 1;
 
@@ -420,11 +420,31 @@ export const useAgenda = () => {
 
       // Calcular horário baseado no tipo e número da sessão
       let horario: string;
+      let horaInicioCalculada: string | undefined;
+      let horaFimCalculada: string | undefined;
+      let horaInicioOriginalCalculada: any;
+      let horaFimOriginalCalculada: any;
+      
       if (watchedFields.tipoEscolha === "Presencial") {
+        // Calcular horários específicos para esta sessão
         if (numeroSessaoAtual === 1) {
-          horario = `${watchedFields.horaInicio?.format('HH:mm')} às ${watchedFields.horaFim?.format('HH:mm')}`;
+          horaInicioCalculada = watchedFields.horaInicio?.format('HH:mm');
+          horaFimCalculada = watchedFields.horaFim?.format('HH:mm');
+          horaInicioOriginalCalculada = watchedFields.horaInicio;
+          horaFimOriginalCalculada = watchedFields.horaFim;
+          horario = `${horaInicioCalculada} às ${horaFimCalculada}`;
         } else {
-          horario = calcularHorariosSessoes(watchedFields.horaInicio, watchedFields.horaFim, numeroSessaoAtual);
+          // Calcular horários para sessões subsequentes
+          // Usar clone() para não modificar os objetos dayjs originais
+          const diffMinutos = watchedFields.horaFim.diff(watchedFields.horaInicio, 'minute');
+          const inicioSessao = watchedFields.horaFim.clone().add((numeroSessaoAtual - 2) * diffMinutos, 'minute');
+          const fimSessao = inicioSessao.clone().add(diffMinutos, 'minute');
+          
+          horaInicioCalculada = inicioSessao.format('HH:mm');
+          horaFimCalculada = fimSessao.format('HH:mm');
+          horaInicioOriginalCalculada = inicioSessao;
+          horaFimOriginalCalculada = fimSessao;
+          horario = `${horaInicioCalculada} às ${horaFimCalculada}`;
         }
       } else {
         horario = "Online";
@@ -441,10 +461,10 @@ export const useAgenda = () => {
         isRetardatario: isRetardatario,
         numeroSessao: isRetardatario ? undefined : numeroSessaoAtual,
         horario: horario,
-        horaInicioOriginal: watchedFields.horaInicio,
-        horaFimOriginal: watchedFields.horaFim,
-        horaInicio: watchedFields.horaInicio?.add(i * invervaloSessao, 'hour').format('HH:mm'),
-        horaFim: watchedFields.horaFim?.add(i * invervaloSessao, 'hour').format('HH:mm'), 
+        horaInicioOriginal: horaInicioOriginalCalculada,
+        horaFimOriginal: horaFimOriginalCalculada,
+        horaInicio: horaInicioCalculada,
+        horaFim: horaFimCalculada,
         tipoEscolha: watchedFields.tipoEscolha,
         modalidade: watchedFields.tipoEscolha as 'Presencial' | 'Online' | null,
         processoConvocacaoUuid: uuid,
@@ -1092,6 +1112,11 @@ export const useAgenda = () => {
     setAgendaAberto(null);
   };
 
+  // Função para verificar se há pelo menos 1 período de agenda adicionado
+  const temPeriodosAgenda = () => {
+    return periodosList.length > 0;
+  };
+
 
   return {
     processoConvocacaoData,
@@ -1138,5 +1163,6 @@ export const useAgenda = () => {
     agendasLoading,
     salvarAgendasNoBackend,
     uuid,
+    temPeriodosAgenda,
   };
 };
