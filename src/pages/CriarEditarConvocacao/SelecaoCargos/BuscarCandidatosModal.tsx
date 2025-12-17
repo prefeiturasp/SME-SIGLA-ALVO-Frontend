@@ -487,20 +487,15 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   };
 
   const handleSelecionar = () => {
-    // Para Reposição, usar quantidadeReposicao; para Nova Autorização, usar quantidadeNovaAutorizacao; caso contrário, usar a soma dos campos individuais
-    const quantidadeCandidatos = isReconvocacao
-      ? quantidadeReposicao 
-      : isNovaAutorizacao
-        ? quantidadeNovaAutorizacao
-        : autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
+    const quantidadeCandidatos = (isReposicao || isReconvocacao || (isNovaAutorizacao && tipoConvocacao === 'calculada'))
+      ? candidatos.length
+      : autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
 
     if (quantidadeCandidatos > totalVagas && totalVagas > 0) {
       message.error('Total de vagas excedido');
       return;
     }
 
-    // Para Reposição, Reconvocação e Nova Autorização, usar as contagens reais baseadas em categoria_efetiva
-    // Para outros casos (digitadas), usar os valores digitados
     const quantidadesIndividuais = isReposicao || isReconvocacao || (isNovaAutorizacao && tipoConvocacao === 'calculada')
       ? {
           geral: contagensPorCategoria.geral,
