@@ -9,8 +9,9 @@ export const usePostLogin = () => {
     onSuccess: (data) => {
       // Salvar token no localStorage
       localStorage.setItem("TOKEN", data.token);
-      localStorage.setItem("USUARIO", data.login);
-      
+      // USUARIO deve vir do login; se não vier, usa o codigoRf
+      const usuario = data.login ?? data.codigoRf;
+      localStorage.setItem("USUARIO", usuario);
     },
     onError: (error: any) => {
       console.error("Erro no login:", error);
