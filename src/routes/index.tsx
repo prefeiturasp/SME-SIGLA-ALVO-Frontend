@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
 import { DashboardTela } from "../pages/Dashboard/DashboardTela";
 import ProtectedRoute from "./AuthGuard";
 
-import { HomeTela } from "../pages/Home/HomeTela";
 import ConvocacaoCandidatosTela from "../pages/Processos/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
 import ImportacaoDadosTela from "../pages/ImportacaoDados/ImportacaoDadosTela";
 import ImportacaoDados2 from "../pages/Processos/ImportacaoDados/ImportacaoDados2";
@@ -16,6 +15,7 @@ import NovaSenhaTela from "../pages/Login/NovaSenhaTela";
 import RouteError from "./RouteError";
 import GerenciamentoVagasTela from "../pages/GerenciamentoVagas/GerenciamentoVagasTela";
 import EscolhaCandidatosTela from "../pages/EscolhaCandidatos/EscolhaCandidatosTela";
+import PermissaoUsuarioTela from "../pages/Gerenciar/PermissaoUsuario/PermissaoUsuarioTela";
 
 import DadosDoProcesso from "../pages/CriarEditarConvocacao/DadosDoProcesso";
 import SelecaoCargosTela from "../pages/CriarEditarConvocacao/SelecaoCargos/SelecaoCargosTela";
@@ -73,6 +73,15 @@ const router = createBrowserRouter([
     ),
     errorElement: <RouteError />,
   },  
+  {
+    path: "/gerenciar/permissao-usuario",
+    element: (
+      <ProtectedRoute>
+        <PermissaoUsuarioTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
   {
     path: "/processos/escolha-candidato/",
     element: (
