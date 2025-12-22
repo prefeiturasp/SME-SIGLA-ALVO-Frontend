@@ -58,6 +58,10 @@ const PermissaoUsuarioTela: React.FC = () => {
   const [gruposOptions, setGruposOptions] = React.useState<Array<{ value: string; label: string }>>(
     []
   );
+  const [pagination, setPagination] = React.useState({
+    current: 1,
+    pageSize: 10,
+  });
 
   const breadcrumbItems = [
     {
@@ -91,6 +95,7 @@ const PermissaoUsuarioTela: React.FC = () => {
 
   const handleReset = () => {
     reset();
+    setPagination({ current: 1, pageSize: 10 });
     void handleSub({ login_rf: "", nome: "", permissao_tipo: undefined });
   };
 
@@ -99,6 +104,8 @@ const PermissaoUsuarioTela: React.FC = () => {
     const nome = values?.nome?.trim?.() || undefined;
     const permissao = values?.permissao_tipo || undefined;
 
+    // Resetar paginação ao fazer nova busca
+    setPagination({ current: 1, pageSize: pagination.pageSize });
     setUsuariosLoading(true);
     setUsuariosError(null);
     try {
@@ -394,8 +401,8 @@ const PermissaoUsuarioTela: React.FC = () => {
             onView={(row: IPermissaoUsuarioRow) => openModal("view", row)}
             onToggleAtivacao={onToggleAtivacao}
             pagination={{
-              current: 1,
-              pageSize: 10,
+              current: pagination.current,
+              pageSize: pagination.pageSize,
               defaultPageSize: 10,
               position: ["bottomLeft"],
               total: usuariosTotal,
@@ -405,7 +412,14 @@ const PermissaoUsuarioTela: React.FC = () => {
                 </span>
               ),
             }}
-            onChange={() => undefined}
+            onChange={(paginationConfig) => {
+              if (paginationConfig.current !== undefined) {
+                setPagination({
+                  current: paginationConfig.current,
+                  pageSize: paginationConfig.pageSize || pagination.pageSize,
+                });
+              }
+            }}
           />
         </TableContainer>
       </BaseTela>
