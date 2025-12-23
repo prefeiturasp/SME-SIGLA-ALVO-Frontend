@@ -116,7 +116,10 @@ const formatAgendaOptionLabel = (agenda: IAgenda): string => {
 
   const cargoNome = agenda.cargo_nome || "Cargo não informado";
 
-  return `${formattedDate} - ${horaInicio} às ${horaFim} - ${cargoNome}`;
+  // Adicionar "Retardatários" no final se for retardatário
+  const sufixoRetardatario = agenda.retardatario ? " - Retardatários" : "";
+
+  return `${formattedDate} - ${horaInicio} às ${horaFim} - ${cargoNome}${sufixoRetardatario}`;
 };
 
 const filterOptionByLabel = (input: string, option?: DefaultOptionType) => {

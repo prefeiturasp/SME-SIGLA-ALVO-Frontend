@@ -242,17 +242,99 @@ export const useAgenda = () => {
     reset,
     watch,
     setValue,
+    trigger,
     formState: { errors: formErrors },
   } = useForm<IAgendaFields>({
     defaultValues,
-    resolver: yupResolver(useAgendaSchema(getMaxCandidatosDisponiveis)) as Resolver<IAgendaFields>,
+    resolver: yupResolver(useAgendaSchema(
+      getMaxCandidatosDisponiveis, 
+      () => isRetardatario,
+      () => {
+        // Função que será chamada durante a validação
+        // Usa watch() para obter os valores atuais do formulário
+        const currentValues = watch();
+        if (!isRetardatario || currentValues.tipoEscolha !== "Presencial") {
+          return true;
+        }
+        if (!currentValues.horaInicio || !currentValues.escolhaEm) {
+          return true;
+        }
+        const nomeCargo = agendaAberto?.cargo.nome || '';
+        const dataEscolhaFormatada = currentValues.escolhaEm?.format('DD/MM/YYYY');
+        const horaInicioRetardatario = currentValues.horaInicio;
+        const outrasAgendas = periodosList.filter(periodo => 
+          periodo.cargo === nomeCargo &&
+          !periodo.isRetardatario &&
+          periodo.dataEscolha === dataEscolhaFormatada &&
+          periodo.tipoEscolha === "Presencial" &&
+          periodo.horaFim
+        );
+        if (outrasAgendas.length === 0) {
+          return true;
+        }
+        const toMinutes = (time: string | any) => {
+          if (!time) return 0;
+          if (typeof time === 'string') {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+          }
+          // Se for dayjs
+          if (time && typeof time.hour === 'function') {
+            return time.hour() * 60 + time.minute();
+          }
+          return 0;
+        };
+        const horaInicioRetardatarioMin = toMinutes(horaInicioRetardatario);
+        const todasAgendasValidas = outrasAgendas.every(agenda => {
+          const horaFimAgendaMin = toMinutes(agenda.horaFim);
+          return horaInicioRetardatarioMin >= horaFimAgendaMin;
+        });
+        return todasAgendasValidas;
+      }
+    )) as Resolver<IAgendaFields>,
     reValidateMode: "onChange",
-    mode: "all",
+    mode: "onChange",
     shouldFocusError: false,
   });
 
   // Observar valores dos campos
   const watchedFields = watch();
+
+  // Função para verificar se o horário do retardatário é depois de todas as outras agendas
+  const verificarHorarioRetardatario = (): boolean => {
+    if (!isRetardatario || watchedFields.tipoEscolha !== "Presencial") {
+      return true;
+    }
+    if (!watchedFields.horaInicio || !watchedFields.escolhaEm) {
+      return true;
+    }
+    const nomeCargo = agendaAberto?.cargo.nome || '';
+    const dataEscolhaFormatada = watchedFields.escolhaEm?.format('DD/MM/YYYY');
+    const horaInicioRetardatario = watchedFields.horaInicio;
+    const outrasAgendas = periodosList.filter(periodo => 
+      periodo.cargo === nomeCargo &&
+      !periodo.isRetardatario &&
+      periodo.dataEscolha === dataEscolhaFormatada &&
+      periodo.tipoEscolha === "Presencial" &&
+      periodo.horaFim
+    );
+    if (outrasAgendas.length === 0) {
+      return true;
+    }
+    const toMinutes = (time: string | any) => {
+      if (!time) return 0;
+      if (typeof time === 'string') {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
+      }
+      return time.hour() * 60 + time.minute();
+    };
+    const horaInicioRetardatarioMin = toMinutes(horaInicioRetardatario);
+    return outrasAgendas.every(agenda => {
+      const horaFimAgendaMin = toMinutes(agenda.horaFim);
+      return horaInicioRetardatarioMin >= horaFimAgendaMin;
+    });
+  };
 
   // Função para calcular informações de vagas
   const calcularVagasInfo = (cargos: CargoAdicionado[]) => {
@@ -321,6 +403,7 @@ export const useAgenda = () => {
     return true;
   };
 
+
   // Função para verificar se todos os campos da agenda estão preenchidos
   const isAgendaComplete = () => {
     // Verificar se há um cargo selecionado (agendaAberto)
@@ -334,7 +417,9 @@ export const useAgenda = () => {
       
       // Se for Presencial, também precisa dos horários
       if (watchedFields.tipoEscolha === "Presencial") {
-        return camposBasicos && watchedFields.horaInicio && watchedFields.horaFim;
+        const temHorarios = watchedFields.horaInicio && watchedFields.horaFim;
+        const horarioValido = verificarHorarioRetardatario();
+        return camposBasicos && temHorarios && horarioValido;
       }
       
       // Se for Online, não precisa dos horários
@@ -359,6 +444,11 @@ export const useAgenda = () => {
 
   // Função para verificar se o botão "Adicionar período" deve estar habilitado
   const isBotaoAdicionarHabilitado = () => {
+    // Verificar se há erros de validação
+    const hasErrors = Object.keys(formErrors).length > 0;
+    if (hasErrors) {
+      return false;
+    }
     return isAgendaComplete() && isQuantidadeValida();
   };
 
@@ -396,7 +486,13 @@ export const useAgenda = () => {
 
     // Criar múltiplas entradas baseado no número de sessões
     const novosPeriodos: PeriodoItem[] = [];
-    const numeroSessoes = watchedFields.sessao || 1;
+    const numeroSessoes = isRetardatario ? 1 : (watchedFields.sessao || 1);
+    
+    // Contar quantos períodos retardatários já existem para este cargo
+    const periodosRetardatariosExistentes = periodosList.filter(
+      p => p.cargo === nomeCargo && p.isRetardatario
+    ).length;
+    
     for (let i = 0; i < numeroSessoes; i++) {
       const numeroSessaoAtual = i + 1;
 
@@ -405,7 +501,9 @@ export const useAgenda = () => {
       if (watchedFields.tipoEscolha === "Online") {
         nomeSessao = `Sessão ${numeroSessaoAtual}`;
       } else if (isRetardatario) {
-        nomeSessao = "Retardatário";
+        // Garantir nome único para retardatários
+        const numeroRetardatario = periodosRetardatariosExistentes + 1;
+        nomeSessao = numeroRetardatario === 1 ? "Retardatário" : `Retardatário ${numeroRetardatario}`;
       } else {
         nomeSessao = `Sessão ${numeroSessaoAtual}`;
       }
@@ -413,7 +511,8 @@ export const useAgenda = () => {
       // Determinar a quantidade de classificados para esta sessão
       let quantidadeClassificados;
       if (isRetardatario) {
-        quantidadeClassificados = 0;
+        // Quando for retardatário, usar o total de candidatos do cargo
+        quantidadeClassificados = agendaAberto?.cargo.totalCandidatos || 0;
       } else {
         quantidadeClassificados = quantidadesPorSessao[i];
       }
@@ -580,7 +679,12 @@ export const useAgenda = () => {
           (cargosAdicionados.find(c => c.uuid === periodo.cargoUuid)?.cargo_codigo) ||
           (cargosAdicionados.find(c => c.nome === periodo.cargo)?.cargo_codigo);
         let slice: string[] = [];
-        if (fonte && quantidade > 0) {
+        if (periodo.isRetardatario) {
+          // Se for retardatário, passar todos os candidatos do cargo
+          if (fonte) {
+            slice = fonte.lista.slice();
+          }
+        } else if (fonte && quantidade > 0) {
           const inicio = fonte.offset;
           const fimExclusivo = inicio + quantidade;
           slice = fonte.lista.slice(inicio, fimExclusivo);
@@ -1135,6 +1239,7 @@ export const useAgenda = () => {
     formErrors,
     watch,
     setValue,
+    trigger,
     dayjs,
     isRetardatario,
     setIsRetardatario,

@@ -69,6 +69,8 @@ const AgendaTela: React.FC = () => {
     salvarAgendasNoBackend,
     uuid,
     temPeriodosAgenda,
+    setValue,
+    trigger,
   } = useAgenda();
 
   const isEdit = false;
@@ -263,6 +265,9 @@ const AgendaTela: React.FC = () => {
           isBotaoAdicionarHabilitado={isBotaoAdicionarHabilitado}
           handleAdicionarPeriodo={handleAdicionarPeriodo}
           candidatosDisponiveis={agendaAberto ? agendaAberto.cargo.totalCandidatos - periodosList.filter(p => p.cargo === agendaAberto.cargo.nome).reduce((total, periodo) => total + (periodo.classificacao || 0), 0) : undefined}
+          setValue={setValue}
+          totalCandidatos={agendaAberto ? agendaAberto.cargo.totalCandidatos : undefined}
+          trigger={trigger}
         />
 
             {/* Tabela de Agenda */}

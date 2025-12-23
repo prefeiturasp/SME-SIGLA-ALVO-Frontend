@@ -31,6 +31,9 @@ interface AgendaFormProps {
   isBotaoAdicionarHabilitado: () => boolean;
   handleAdicionarPeriodo: () => void;
   candidatosDisponiveis?: number;
+  setValue: (name: string, value: any) => void;
+  totalCandidatos?: number;
+  trigger: (name?: string | string[]) => Promise<boolean>;
 }
 
 const AgendaForm: React.FC<AgendaFormProps> = ({
@@ -45,6 +48,9 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
   isBotaoAdicionarHabilitado,
   handleAdicionarPeriodo,
   candidatosDisponiveis,
+  setValue,
+  totalCandidatos,
+  trigger,
 }) => {
   if (!agendaAberto) return null;
 
@@ -115,7 +121,14 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
               <Form.Item label="Retardatário?" style={agendaFormStyles.formItemNoMargin}>
                 <Checkbox
                   checked={isRetardatario}
-                  onChange={(e) => setIsRetardatario(e.target.checked)}
+                  onChange={(e) => {
+                    setIsRetardatario(e.target.checked);
+                    if (e.target.checked) {
+                      // Limpar valores dos campos quando marcado como retardatário
+                      setValue('quantidadeClassificados', null);
+                      setValue('sessao', null);
+                    }
+                  }}
                   style={agendaFormStyles.retardatarioCheckbox}
                 >
                   Sim
@@ -209,7 +222,9 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
               />
               {candidatosDisponiveis !== undefined && candidatosDisponiveis >= 0 && (
                 <Text style={agendaFormStyles.candidatosDisponiveis}>
-                  Candidatos disponíveis: {candidatosDisponiveis}
+                  {isRetardatario && totalCandidatos !== undefined
+                    ? `Total de candidatos: ${totalCandidatos}`
+                    : `Candidatos disponíveis: ${candidatosDisponiveis}`}
                 </Text>
               )}
               {formErrors.quantidadeClassificados && (
@@ -261,10 +276,14 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                           placeholder={["Início", "Fim"]}
                           style={agendaFormStyles.timePickerRange}
                           format="HH:mm"
-                          onChange={(times) => {
+                          onChange={async (times) => {
                             if (times && times.length === 2) {
                               field.onChange(times[0]);
                               fieldFim.onChange(times[1]);
+                              // Disparar validação quando o horário mudar, especialmente para retardatário
+                              if (isRetardatario) {
+                                await trigger(['horaInicio', 'horaFim']);
+                              }
                             } else {
                               field.onChange(null);
                               fieldFim.onChange(null);
