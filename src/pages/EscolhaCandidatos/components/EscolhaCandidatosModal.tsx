@@ -1,13 +1,12 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Col, Modal, Spin, message } from "antd";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import type { DefaultOptionType } from "antd/es/select";
 import type {
   ISalvarEscolhaPayload,
   SituacaoEscolha,
   TipoVagaEscolha,
 } from "../../../services/resources/escolhas/IEscolhas";
-import type { IEscolasResponse } from "../../../services/resources/escolhas/IEscolhas";
 import type { IVagasResponse } from "../../../services/resources/convocacao/IConvocacao";
 import type { EscolhaCandidatosModalProps } from "../hooks/types";
 import { API } from "../../../services";
@@ -30,7 +29,6 @@ import {
   ModalFieldLabel,
   ModalSelect,
   ModalRadio,
-  ModalCheckbox,
   ModalSaveButton,
   ModalCancelButton,
 } from "../styles";
@@ -74,6 +72,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   visible,
   context,
   selectedProcesso,
+  selectedConcursoUuid,
   selectedAgendaData,
   cargoCodigoNumericoParam,
   onClose,
@@ -321,6 +320,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       e_retardatario: modalSituacao === "escolha" 
         ? modalRetardatario 
         : false,
+      concurso_uuid: selectedConcursoUuid,
     };
 
     try {
@@ -363,6 +363,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     onClose,
     onSuccess,
     salvarEscolhaMutateAsync,
+    selectedConcursoUuid,
   ]);
 
   return (
