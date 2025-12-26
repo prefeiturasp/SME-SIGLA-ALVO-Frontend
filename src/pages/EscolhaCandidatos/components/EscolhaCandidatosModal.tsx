@@ -416,8 +416,8 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     try {
       await salvarEscolhaMutateAsync(payload);
       
-      // Sincronizar agendas após salvar a escolha
-      if (selectedProcesso && selectedAgendaData && modalSituacao === "escolha") {
+      // Sincronizar agendas após salvar a escolha (para escolha, reconvocação e não escolha)
+      if (selectedProcesso && selectedAgendaData) {
         await sincronizarAgendas(
           context.candidatoUuid,
           selectedProcesso,
