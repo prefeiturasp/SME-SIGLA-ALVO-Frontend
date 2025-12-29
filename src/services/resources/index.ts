@@ -6,3 +6,4 @@ export * as ImportacaoDados from "./importacaoDados";
 export * as Escolhas from "./escolhas";
 export * as Agenda from "./agenda";
 export * as Permissoes from "./permissoes";
+export * as Relatorios from "./relatorios";

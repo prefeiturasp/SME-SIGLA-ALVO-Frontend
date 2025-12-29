@@ -127,7 +127,12 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
       key: "relatorios",
       icon: <RelatoriosIcon />,
       label: "Relatórios",
-      onClick: () => handleMenuClick("relatorios", "Relatórios"),
+      onClick: () => {
+        setIsSidePanelOpen(false);
+        setSelectedMenuKey("");
+        setSelectedMenuTitle("");
+        navigate("/relatorios");
+      },
     },
     {
       key: "gerenciar",
@@ -163,11 +168,7 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
           },
         ];
       case "relatorios":
-        return [
-          { key: "relatorio1", label: "Relatório A" },
-          { key: "relatorio2", label: "Relatório B" },
-          { key: "relatorio3", label: "Relatório C" },
-        ];
+        return [];
       case "gerenciar":
         return [
           { key: "concursos", label: "Concursos" },
