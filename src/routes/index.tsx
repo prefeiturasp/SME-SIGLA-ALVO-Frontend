@@ -23,12 +23,22 @@ import Agenda from "../pages/CriarEditarConvocacao/Agenda";
 import Resumo from "../pages/CriarEditarConvocacao/Resumo";
 import PermissionContextGuard from "./PermissionContextGuard";
 import ForbiddenTela from "../pages/Forbidden/ForbiddenTela";
+import RelatoriosTela from "../pages/Relatorios/RelatoriosTela";
 
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Navigate to="/processos/convocacao" replace />,
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/relatorios",
+    element: (
+      <ProtectedRoute>
+        <RelatoriosTela />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
   {
