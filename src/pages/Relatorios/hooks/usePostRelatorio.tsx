@@ -12,7 +12,7 @@ export const usePostRelatorio = () => {
     mutationFn: async ({ payload, formato }) => {
       const fmt = typeof formato === "string" ? formato.toLowerCase() : undefined;
       const shouldBeBlob =
-        fmt === "pdf" || fmt === "xls" || fmt === "xlsx" || fmt === "csv";
+        fmt === "pdf" || fmt === "xls" || fmt === "xlsx" || fmt === "csv" || fmt === "docx" || fmt === "doc";
       const axiosConfig = shouldBeBlob ? ({ responseType: "blob" } as const) : undefined;
       return await API.Relatorios.postRelatorio(payload, formato, axiosConfig).response;
     },

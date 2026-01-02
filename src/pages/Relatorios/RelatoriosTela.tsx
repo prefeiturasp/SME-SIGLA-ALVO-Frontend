@@ -1,8 +1,9 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Col, Row, Radio, Select, Table, Typography, Card, Collapse, Modal, Spin, message } from "antd";
 import type { RadioChangeEvent } from "antd";
-import { EyeOutlined, FileExcelOutlined, FilePdfOutlined } from "@ant-design/icons";
-import BaseTela from "../Base/BaseTela";
+import { EyeOutlined, FileExcelOutlined, FilePdfOutlined, FileWordOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useRelatorios } from "./hooks/useRelatorios";
 import QuillEditor from "./components/QuillEditor";
 import { usePostRelatorio } from "./hooks/usePostRelatorio";
@@ -14,16 +15,30 @@ type RelatorioLinha = {
   tipo: string;
 };
 
+const { Text } = Typography;
+
 const RelatoriosTela: React.FC = () => {
+  const navigate = useNavigate();
   const [tipoRelatorio, setTipoRelatorio] = useState<RelatorioTipo>("EM_ANDAMENTO");
   const [filtroSelect, setFiltroSelect] = useState<string | undefined>(undefined);
   const [cabecalhoHtml, setCabecalhoHtml] = useState<string>("");
 
   const breadcrumbItems = useMemo(
     () => [
+      {
+        title: (
+          <Text
+            strong
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          >
+            Home
+          </Text>
+        ),
+      },
       { title: "Relatórios" },
-    ],
-    []
+    ] as TitleItem[],
+    [navigate]
   );
 
   const { processosConvocacaoOptions, processosConvocacaoOptionsIsLoading } = useRelatorios();
@@ -33,10 +48,12 @@ const RelatoriosTela: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
   const [previewText, setPreviewText] = useState<string | undefined>(undefined);
   const [previewHtml, setPreviewHtml] = useState<string | undefined>(undefined);
+  const [previewRelatorioTipo, setPreviewRelatorioTipo] = useState<string | undefined>(undefined);
 
   const dataSource: RelatorioLinha[] = useMemo(
     () => [
       { key: "LAUDA_VAGAS", tipo: "Lauda de vagas" },
+      { key: "RELACAO_VAGAS", tipo: "Relação de Vagas" },
     ],
     []
   );
@@ -52,6 +69,7 @@ const RelatoriosTela: React.FC = () => {
     setPreviewUrl(undefined);
     setPreviewText(undefined);
     setPreviewHtml(undefined);
+    setPreviewRelatorioTipo(undefined);
     setPreviewVisible(false);
   };
 
@@ -78,6 +96,7 @@ const RelatoriosTela: React.FC = () => {
 
     try {
       const result = await postRelatorio(payload, "html");
+      setPreviewRelatorioTipo(record.key);
       if (result instanceof Blob) {
         const url = URL.createObjectURL(result);
         setPreviewUrl(url);
@@ -94,7 +113,7 @@ const RelatoriosTela: React.FC = () => {
     }
   }, [buildPayload, filtroSelect, postRelatorio]);
 
-  const handleExport = useCallback(async (record: RelatorioLinha, formato: "xls" | "pdf") => {
+  const handleExport = useCallback(async (record: RelatorioLinha, formato: "xls" | "pdf" | "docx") => {
     if (!filtroSelect) {
       message.warning("Selecione um processo para exportar o relatório.");
       return;
@@ -112,23 +131,37 @@ const RelatoriosTela: React.FC = () => {
       if (result instanceof Blob) {
         blob = result;
       } else if (typeof result === "string") {
-        const type =
-          formato === "pdf"
-            ? "application/pdf"
-            : "application/vnd.ms-excel";
+        let type: string;
+        if (formato === "pdf") {
+          type = "application/pdf";
+        } else if (formato === "docx") {
+          type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        } else {
+          type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        }
         blob = new Blob([result], { type });
       } else {
-        blob = new Blob([JSON.stringify(result ?? {}, null, 2)], {
-          type:
-            formato === "pdf"
-              ? "application/pdf"
-              : "application/vnd.ms-excel",
-        });
+        let type: string;
+        if (formato === "pdf") {
+          type = "application/pdf";
+        } else if (formato === "docx") {
+          type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        } else {
+          type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        }
+        blob = new Blob([JSON.stringify(result ?? {}, null, 2)], { type });
       }
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      const ext = formato === "pdf" ? "pdf" : "xls";
+      let ext: string;
+      if (formato === "pdf") {
+        ext = "pdf";
+      } else if (formato === "docx") {
+        ext = "docx";
+      } else {
+        ext = "xlsx";
+      }
       a.href = url;
       a.download = `${record.key.toLowerCase()}-${Date.now()}.${ext}`;
       document.body.appendChild(a);
@@ -139,6 +172,11 @@ const RelatoriosTela: React.FC = () => {
       message.error("Não foi possível exportar o relatório.");
     }
   }, [buildPayload, filtroSelect, postRelatorio]);
+
+  const getExportFormats = useCallback((recordKey: string): ("xls" | "pdf" | "docx")[] => {
+    // Ambos os relatórios têm Excel, PDF e Word
+    return ["xls", "pdf", "docx"];
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -162,21 +200,37 @@ const RelatoriosTela: React.FC = () => {
         title: "Exportar",
         key: "exportar",
         align: "center" as const,
-        render: (_: any, record: RelatorioLinha) => (
-          <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-            <FileExcelOutlined
-              style={{ fontSize: 18, color: "#08979C", cursor: "pointer" }}
-              onClick={() => handleExport(record, "xls")}
-            />
-            <FilePdfOutlined
-              style={{ fontSize: 18, color: "#C41D7F", cursor: "pointer" }}
-              onClick={() => handleExport(record, "pdf")}
-            />
-          </div>
-        ),
+        render: (_: any, record: RelatorioLinha) => {
+          const formats = getExportFormats(record.key);
+          return (
+            <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+              {formats.includes("xls") && (
+                <FileExcelOutlined
+                  style={{ fontSize: 18, color: "#08979C", cursor: "pointer" }}
+                  onClick={() => handleExport(record, "xls")}
+                  title="Exportar para Excel"
+                />
+              )}
+              {formats.includes("pdf") && (
+                <FilePdfOutlined
+                  style={{ fontSize: 18, color: "#C41D7F", cursor: "pointer" }}
+                  onClick={() => handleExport(record, "pdf")}
+                  title="Exportar para PDF"
+                />
+              )}
+              {formats.includes("docx") && (
+                <FileWordOutlined
+                  style={{ fontSize: 18, color: "#2B579A", cursor: "pointer" }}
+                  onClick={() => handleExport(record, "docx")}
+                  title="Exportar para Word"
+                />
+              )}
+            </div>
+          );
+        },
       },
     ],
-    [handleExport, handleVisualizar]
+    [handleExport, handleVisualizar, getExportFormats]
   );
 
   return (
@@ -244,7 +298,7 @@ const RelatoriosTela: React.FC = () => {
         onCancel={handleClosePreview}
         footer={null}
         title="Visualização do relatório"
-        width={900}
+        width={previewRelatorioTipo === "RELACAO_VAGAS" ? 1400 : 900}
         styles={{ body: { padding: 0 } }}
       >
         {previewUrl ? (
