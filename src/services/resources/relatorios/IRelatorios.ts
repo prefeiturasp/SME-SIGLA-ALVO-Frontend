@@ -3,6 +3,6 @@ export interface IRelatorioPayload {
   [key: string]: unknown;
 }
 
-export type FormatoRelatorio = "pdf" | "csv" | "xlsx" | string | undefined;
+export type FormatoRelatorio = "pdf" | "csv" | "xlsx" | "docx" | "doc" | "xls" | "html" | string | undefined;
 
 
