@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
 import { DashboardTela } from "../pages/Dashboard/DashboardTela";
 import ProtectedRoute from "./AuthGuard";
 
-import { HomeTela } from "../pages/Home/HomeTela";
 import ConvocacaoCandidatosTela from "../pages/Processos/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
 import ImportacaoDadosTela from "../pages/ImportacaoDados/ImportacaoDadosTela";
 import ImportacaoDados2 from "../pages/Processos/ImportacaoDados/ImportacaoDados2";
@@ -16,6 +15,7 @@ import NovaSenhaTela from "../pages/Login/NovaSenhaTela";
 import RouteError from "./RouteError";
 import GerenciamentoVagasTela from "../pages/GerenciamentoVagas/GerenciamentoVagasTela";
 import EscolhaCandidatosTela from "../pages/EscolhaCandidatos/EscolhaCandidatosTela";
+import PermissaoUsuarioTela from "../pages/Gerenciar/PermissaoUsuario/PermissaoUsuarioTela";
 
 import DadosDoProcesso from "../pages/CriarEditarConvocacao/DadosDoProcesso";
 import SelecaoCargosTela from "../pages/CriarEditarConvocacao/SelecaoCargos/SelecaoCargosTela";
@@ -23,12 +23,22 @@ import Agenda from "../pages/CriarEditarConvocacao/Agenda";
 import Resumo from "../pages/CriarEditarConvocacao/Resumo";
 import PermissionContextGuard from "./PermissionContextGuard";
 import ForbiddenTela from "../pages/Forbidden/ForbiddenTela";
+import RelatoriosTela from "../pages/Relatorios/RelatoriosTela";
 
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Navigate to="/processos/convocacao" replace />,
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/relatorios",
+    element: (
+      <ProtectedRoute>
+        <RelatoriosTela />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
   {
@@ -73,6 +83,15 @@ const router = createBrowserRouter([
     ),
     errorElement: <RouteError />,
   },  
+  {
+    path: "/gerenciar/permissao-usuario",
+    element: (
+      <ProtectedRoute>
+        <PermissaoUsuarioTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
   {
     path: "/processos/escolha-candidato/",
     element: (

@@ -1,17 +1,17 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Col, Modal, Spin, message } from "antd";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { DefaultOptionType } from "antd/es/select";
 import type {
   ISalvarEscolhaPayload,
   SituacaoEscolha,
   TipoVagaEscolha,
 } from "../../../services/resources/escolhas/IEscolhas";
-import type { IEscolasResponse } from "../../../services/resources/escolhas/IEscolhas";
 import type { IVagasResponse } from "../../../services/resources/convocacao/IConvocacao";
 import type { EscolhaCandidatosModalProps } from "../hooks/types";
 import { API } from "../../../services";
 import { useGetVagasPorProcessoECargo } from "../../CriarEditarConvocacao/SelecaoCargos/hooks/useGetVagasPorProcessoECargo";
+import type { IAgenda } from "../../../services/resources/agenda/IAgenda";
 import {
   ModalButtonContainer,
   modalInlineStyles,
@@ -30,7 +30,6 @@ import {
   ModalFieldLabel,
   ModalSelect,
   ModalRadio,
-  ModalCheckbox,
   ModalSaveButton,
   ModalCancelButton,
 } from "../styles";
@@ -74,6 +73,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   visible,
   context,
   selectedProcesso,
+  selectedConcursoUuid,
   selectedAgendaData,
   cargoCodigoNumericoParam,
   onClose,
@@ -286,6 +286,8 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     [dreOptions]
   );
 
+  const queryClient = useQueryClient();
+
   const salvarEscolhaMutation = useMutation<
     unknown,
     unknown,
@@ -295,6 +297,93 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   });
   const { mutateAsync: salvarEscolhaMutateAsync, isPending: salvarEscolhaIsPending } =
     salvarEscolhaMutation;
+
+  // Função para sincronizar agendas após salvar escolha
+  const sincronizarAgendas = useCallback(async (
+    candidatoUuid: string,
+    processoUuid?: string,
+    agendaAtual?: IAgenda
+  ) => {
+    if (!processoUuid || !agendaAtual) {
+      return;
+    }
+
+    try {
+      // Buscar todas as agendas do processo
+      const todasAgendas = await API.Agenda.getAgendas({
+        pagination: { page: 1, page_size: 100 },
+        filters: { processo_convocacao_uuid: processoUuid },
+      }).response;
+
+      const agendasList: IAgenda[] = Array.isArray(todasAgendas)
+        ? todasAgendas
+        : todasAgendas?.results || [];
+
+      // Filtrar apenas agendas do mesmo cargo
+      const agendasMesmoCargo = agendasList.filter(
+        (agenda) => agenda.cargo_uuid === agendaAtual.cargo_uuid
+      );
+
+      const isAgendaRetardatario = agendaAtual.retardatario === true;
+
+      if (isAgendaRetardatario) {
+        // Caso 1: Escolha feita na agenda de retardatários
+        // Encontrar a agenda normal que contém o candidato
+        const agendaNormalComCandidato = agendasMesmoCargo.find(
+          (agenda) =>
+            !agenda.retardatario &&
+            agenda.candidatos_uuids?.includes(candidatoUuid)
+        );
+
+        // Atualizar a escolha na agenda normal (se encontrada)
+        if (agendaNormalComCandidato) {
+          // A escolha já foi salva, então apenas precisamos garantir que está atualizada
+          // O backend já deve ter atualizado a escolha, mas podemos invalidar a query
+          queryClient.invalidateQueries({
+            queryKey: ["postEscolhasPorCandidatos"],
+          });
+        }
+
+        // Remover candidato da agenda de retardatários
+        const candidatosAtualizados = (agendaAtual.candidatos_uuids || []).filter(
+          (uuid) => uuid !== candidatoUuid
+        );
+
+        await API.Agenda.patchAgenda(agendaAtual.uuid, {
+          candidatos_uuids: candidatosAtualizados,
+        }).response;
+      } else {
+        // Caso 2: Escolha feita em agenda normal
+        // Encontrar e atualizar a agenda de retardatários
+        const agendaRetardatarios = agendasMesmoCargo.find(
+          (agenda) => agenda.retardatario === true
+        );
+
+        if (agendaRetardatarios && agendaRetardatarios.candidatos_uuids?.includes(candidatoUuid)) {
+          // Remover candidato da agenda de retardatários
+          const candidatosAtualizados = (agendaRetardatarios.candidatos_uuids || []).filter(
+            (uuid) => uuid !== candidatoUuid
+          );
+
+          await API.Agenda.patchAgenda(agendaRetardatarios.uuid, {
+            candidatos_uuids: candidatosAtualizados,
+          }).response;
+        }
+      }
+
+      // Invalidar queries de agendas para atualizar a UI
+      queryClient.invalidateQueries({
+        queryKey: ["getAgendasPorProcessoConvocacao"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["getAgendas"],
+      });
+    } catch (error) {
+      console.error("Erro ao sincronizar agendas:", error);
+      // Não mostrar erro ao usuário aqui, pois a escolha já foi salva
+      // Apenas logar o erro
+    }
+  }, [queryClient]);
 
   const handleSalvarEscolha = useCallback(async () => {
     if (!context?.candidatoUuid) {
@@ -321,10 +410,21 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       e_retardatario: modalSituacao === "escolha" 
         ? modalRetardatario 
         : false,
+      concurso_uuid: selectedConcursoUuid,
     };
 
     try {
       await salvarEscolhaMutateAsync(payload);
+      
+      // Sincronizar agendas após salvar a escolha (para escolha, reconvocação e não escolha)
+      if (selectedProcesso && selectedAgendaData) {
+        await sincronizarAgendas(
+          context.candidatoUuid,
+          selectedProcesso,
+          selectedAgendaData
+        );
+      }
+      
       message.success("Escolha salva com sucesso.");
       onClose();
       onSuccess();
@@ -363,6 +463,10 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     onClose,
     onSuccess,
     salvarEscolhaMutateAsync,
+    selectedConcursoUuid,
+    selectedProcesso,
+    selectedAgendaData,
+    sincronizarAgendas,
   ]);
 
   return (

@@ -20,7 +20,11 @@ export interface IAgendaFields {
 }
 
 // Schema de validação para os campos da Agenda seguindo o padrão do projeto
-const useAgendaSchema = (getMaxCandidatos?: () => number | undefined) => {
+const useAgendaSchema = (
+  getMaxCandidatos?: () => number | undefined,
+  isRetardatario?: () => boolean,
+  verificarHorarioRetardatario?: () => boolean
+) => {
   return yup.object({
     tipoEscolha: yup
       .string()
@@ -128,10 +132,33 @@ const useAgendaSchema = (getMaxCandidatos?: () => number | undefined) => {
     
     quantidadeClassificados: yup
       .number()
-      .required("Quantidade de Classificados é obrigatória")
-      .min(1, "Quantidade deve ser maior que 0")
-      .integer("Quantidade deve ser um número inteiro")
+      .nullable()
+      .test("required-if-not-retardatario", "Quantidade de Classificados é obrigatória", function(value) {
+        const isRetardatarioValue = isRetardatario?.();
+        if (isRetardatarioValue) {
+          return true; // Não é obrigatório quando é retardatário
+        }
+        return value !== null && value !== undefined;
+      })
+      .test("min-value", "Quantidade deve ser maior que 0", function(value) {
+        const isRetardatarioValue = isRetardatario?.();
+        if (isRetardatarioValue || value === null || value === undefined) {
+          return true;
+        }
+        return value >= 1;
+      })
+      .test("integer", "Quantidade deve ser um número inteiro", function(value) {
+        const isRetardatarioValue = isRetardatario?.();
+        if (isRetardatarioValue || value === null || value === undefined) {
+          return true;
+        }
+        return Number.isInteger(value);
+      })
       .test("max-candidatos", function(value) {
+        const isRetardatarioValue = isRetardatario?.();
+        if (isRetardatarioValue || value === null || value === undefined) {
+          return true;
+        }
         const maxCandidatos = getMaxCandidatos?.();
         
         // Se não há candidatos disponíveis (maxCandidatos é 0 ou undefined/null)
@@ -152,9 +179,28 @@ const useAgendaSchema = (getMaxCandidatos?: () => number | undefined) => {
     
     sessao: yup
       .number()
-      .required("Sessão é obrigatória")
-      .min(1, "Sessão deve ser maior que 0")
-      .integer("Sessão deve ser um número inteiro"),
+      .nullable()
+      .test("required-if-not-retardatario", "Sessão é obrigatória", function(value) {
+        const isRetardatarioValue = isRetardatario?.();
+        if (isRetardatarioValue) {
+          return true; // Não é obrigatório quando é retardatário
+        }
+        return value !== null && value !== undefined;
+      })
+      .test("min-value", "Sessão deve ser maior que 0", function(value) {
+        const isRetardatarioValue = isRetardatario?.();
+        if (isRetardatarioValue || value === null || value === undefined) {
+          return true;
+        }
+        return value >= 1;
+      })
+      .test("integer", "Sessão deve ser um número inteiro", function(value) {
+        const isRetardatarioValue = isRetardatario?.();
+        if (isRetardatarioValue || value === null || value === undefined) {
+          return true;
+        }
+        return Number.isInteger(value);
+      }),
     
     horaInicio: yup
       .mixed()
@@ -164,6 +210,19 @@ const useAgendaSchema = (getMaxCandidatos?: () => number | undefined) => {
           .required("Horário de início obrigatório")
           .test("is-valid-time", "Hora de início inválida", (value) => {
             return value && dayjs(value as any).isValid();
+          })
+          .test("retardatario-deve-ser-ultimo", "O horário do retardatário deve ser depois de todas as outras agendas", function(value) {
+            const isRetardatarioValue = isRetardatario?.();
+            if (!isRetardatarioValue || !value) {
+              return true;
+            }
+            const horarioValido = verificarHorarioRetardatario?.();
+            if (horarioValido === false) {
+              return this.createError({
+                message: "O horário do retardatário deve ser depois de todas as outras agendas do mesmo cargo"
+              });
+            }
+            return true;
           }),
         otherwise: (schema) => schema.notRequired(),
       }),

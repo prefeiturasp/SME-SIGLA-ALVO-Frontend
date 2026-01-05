@@ -320,7 +320,7 @@ const AgendaTabelaExpandida: React.FC<{
           </div>
         ) : (
           <div>
-            {record.isRetardatario ? '-' : record.classificacao}
+            {record.isRetardatario ? record.classificacao : record.classificacao}
           </div>
         );
       },

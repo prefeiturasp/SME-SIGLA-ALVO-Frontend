@@ -116,7 +116,10 @@ const formatAgendaOptionLabel = (agenda: IAgenda): string => {
 
   const cargoNome = agenda.cargo_nome || "Cargo não informado";
 
-  return `${formattedDate} - ${horaInicio} às ${horaFim} - ${cargoNome}`;
+  // Adicionar "Retardatários" no final se for retardatário
+  const sufixoRetardatario = agenda.retardatario ? " - Retardatários" : "";
+
+  return `${formattedDate} - ${horaInicio} às ${horaFim} - ${cargoNome}${sufixoRetardatario}`;
 };
 
 const filterOptionByLabel = (input: string, option?: DefaultOptionType) => {
@@ -246,6 +249,7 @@ const EscolhaCandidatosTela: React.FC = () => {
   const navigate = useNavigate();
   const [selectedProcesso, setSelectedProcesso] = useState<string>();
   const [selectedAgenda, setSelectedAgenda] = useState<string>();
+  const [selectedConcursoUuid, setSelectedConcursoUuid] = useState<string>();
   const [hasSearched, setHasSearched] = useState(false);
   const [refreshToken, setRefreshToken] = useState(0);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
@@ -424,6 +428,10 @@ const EscolhaCandidatosTela: React.FC = () => {
         .map((option) => ({
           value: option.value,
           label: option.label,
+          // manter campo adicional vindo do backend
+          ...(option as any)?.concurso_uuid
+            ? { concurso_uuid: (option as any).concurso_uuid }
+            : {},
         })),
     [processosConvocacaoOptions]
   );
@@ -1088,16 +1096,41 @@ const EscolhaCandidatosTela: React.FC = () => {
   const tableLoading =
     isFetchingCandidatos || escolhasIsLoading || escolhasIsFetching;
 
-  const handleProcessoChange = useCallback((value?: string) => {
-    setSelectedProcesso(value);
-    setSelectedAgenda(undefined);
-    setHasSearched(false);
-    setRefreshToken(0);
-    setPagination((prev) => ({
-      current: 1,
-      pageSize: prev.pageSize,
-    }));
-  }, []);
+  const handleProcessoChange = useCallback(
+    (value?: string, option?: DefaultOptionType | DefaultOptionType[] | null) => {
+      setSelectedProcesso(value);
+      setSelectedAgenda(undefined);
+      setHasSearched(false);
+      setRefreshToken(0);
+      // extrair concurso_uuid do option (ou procurar na lista original)
+      if (!value) {
+        setSelectedConcursoUuid(undefined);
+      } else {
+        const singleOption =
+          (Array.isArray(option) ? option[0] : option) as (DefaultOptionType & {
+            concurso_uuid?: string;
+          }) | undefined;
+        const concursoFromOption = singleOption?.concurso_uuid;
+        if (typeof concursoFromOption === "string" && concursoFromOption.trim()) {
+          setSelectedConcursoUuid(concursoFromOption);
+        } else {
+          const found = (processosConvocacaoOptions || []).find(
+            (opt: any) => opt?.value === value
+          ) as { concurso_uuid?: string } | undefined;
+          setSelectedConcursoUuid(
+            typeof found?.concurso_uuid === "string" && found.concurso_uuid.trim()
+              ? found.concurso_uuid
+              : undefined
+          );
+        }
+      }
+      setPagination((prev) => ({
+        current: 1,
+        pageSize: prev.pageSize,
+      }));
+    },
+    [processosConvocacaoOptions]
+  );
 
   const handleAgendaChange = useCallback((value?: string) => {
     setSelectedAgenda(value);
@@ -1213,8 +1246,10 @@ const EscolhaCandidatosTela: React.FC = () => {
                 placeholder="Selecione um processo"
                 allowClear
                 loading={processosConvocacaoOptionsIsLoading}
-                onChange={(value) => handleProcessoChange(value as string | undefined)}
-                onClear={() => handleProcessoChange(undefined)}
+                onChange={(value, option) =>
+                  handleProcessoChange(value as string | undefined, option)
+                }
+                onClear={() => handleProcessoChange(undefined, null)}
                 options={processosOptions}
                 showSearch
                 optionFilterProp="label"
@@ -1388,6 +1423,7 @@ const EscolhaCandidatosTela: React.FC = () => {
       visible={modalEscolhaVisible}
       context={modalEscolhaContext}
       selectedProcesso={selectedProcesso}
+      selectedConcursoUuid={selectedConcursoUuid}
       selectedAgendaData={selectedAgendaData}
       cargoCodigoNumericoParam={cargoCodigoNumericoParam}
       onClose={handleCloseModalEscolha}

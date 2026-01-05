@@ -88,7 +88,11 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
 
     if (path.startsWith("/processos")) {
       return ["processos"];
-    } else if (path.startsWith("/administracao") || path.startsWith("/admin")) {
+    } else if (
+      path.startsWith("/administracao") ||
+      path.startsWith("/admin") ||
+      path.startsWith("/gerenciar")
+    ) {
       return ["gerenciar"];
     } else if (
       path.startsWith("/relatorios") ||
@@ -123,7 +127,12 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
       key: "relatorios",
       icon: <RelatoriosIcon />,
       label: "Relatórios",
-      onClick: () => handleMenuClick("relatorios", "Relatórios"),
+      onClick: () => {
+        setIsSidePanelOpen(false);
+        setSelectedMenuKey("");
+        setSelectedMenuTitle("");
+        navigate("/relatorios");
+      },
     },
     {
       key: "gerenciar",
@@ -159,17 +168,18 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
           },
         ];
       case "relatorios":
-        return [
-          { key: "relatorio1", label: "Relatório A" },
-          { key: "relatorio2", label: "Relatório B" },
-          { key: "relatorio3", label: "Relatório C" },
-        ];
+        return [];
       case "gerenciar":
         return [
           { key: "concursos", label: "Concursos" },
           { key: "escolas", label: "Escolas" },
           { key: "usuarios", label: "Usuários" },
           { key: "configuracoes", label: "Configurações" },
+          {
+            key: "permissao-usuario",
+            label: "Permissão de usuário",
+            onClick: () => navigate("/gerenciar/permissao-usuario"),
+          },
         ];
       default:
         return [];

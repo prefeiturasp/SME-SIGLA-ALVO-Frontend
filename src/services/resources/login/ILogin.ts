@@ -8,7 +8,9 @@ export interface ILoginResponse {
   codigoRf: string;
   usuario: {
     id: string;
-    nome: string;
-    email: string;
+    // Alguns backends retornam `nome`, outros `first_name`
+    nome?: string;
+    first_name?: string;
+    email?: string;
   };
 }

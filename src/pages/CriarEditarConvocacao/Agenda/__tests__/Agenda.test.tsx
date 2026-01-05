@@ -127,6 +127,7 @@ jest.mock('../hooks/useAgenda', () => ({
     limparExpansao: mockLimparExpansao,
     salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
     uuid: 'test-uuid-123',
+    temPeriodosAgenda: () => false,
   })),
 }));
 
@@ -396,6 +397,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -437,6 +439,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -478,6 +481,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -533,6 +537,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -657,6 +662,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -696,6 +702,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -747,6 +754,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -788,6 +796,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -838,6 +847,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -877,6 +887,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -918,6 +929,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -957,6 +969,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -996,6 +1009,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
@@ -1041,6 +1055,7 @@ describe('AgendaTela', () => {
         limparExpansao: mockLimparExpansao,
         salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
         uuid: 'test-uuid-123',
+        temPeriodosAgenda: () => false,
       });
 
       renderWithProviders(<AgendaTela />);
