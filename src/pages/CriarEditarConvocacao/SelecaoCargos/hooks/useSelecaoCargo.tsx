@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useGetProcessosConvocacaoPorUUID } from "./useGetProcessosConvocacaoPorUUID";
 import { useGetConcursoByUuid } from "./useGetConcursosPorUuid";
@@ -23,6 +23,7 @@ export type CargoAdicionado = {
   candidatos_pcd: number;
   candidatos_nna: number;
   totalCandidatos: number;
+  candidatos_uuids?: string[];
 };
 
 export type VagasInfo = {
@@ -78,6 +79,7 @@ export const useSelecaoCargo = () => {
         candidatos_pcd: cargo.candidatos_pcd || 0,
         candidatos_nna: cargo.candidatos_nna || 0,
         totalCandidatos: cargo.total_candidatos || 0,
+        candidatos_uuids: cargo.candidatos_uuids || [],
       }));
     } else if (cargosData && cargosData.length === 0) {
       return [];
@@ -92,17 +94,19 @@ export const useSelecaoCargo = () => {
     return { totalGeral: 0, totalPcd: 0, totalNna: 0 };
   }, [cargosIniciais]);
 
-  // Inicializar estados com valores calculados via useMemo (substitui useEffect)
+  // Inicializar estados com valores calculados via useMemo
   const cargosIniciaisRef = useRef(cargosIniciais);
   const [cargosAdicionados, setCargosAdicionados] = useState<CargoAdicionado[]>(cargosIniciais);
   const [vagasInfo, setVagasInfo] = useState<VagasInfo>(vagasInfoInicial);
 
-  // Atualizar estados quando cargosIniciais mudar (sincronização sem useEffect)
-  if (cargosIniciaisRef.current !== cargosIniciais) {
-    cargosIniciaisRef.current = cargosIniciais;
-    setCargosAdicionados(cargosIniciais);
-    setVagasInfo(vagasInfoInicial);
-  }
+  // Atualizar estados quando cargosIniciais mudar (usando useEffect para evitar loops)
+  useEffect(() => {
+    if (cargosIniciaisRef.current !== cargosIniciais) {
+      cargosIniciaisRef.current = cargosIniciais;
+      setCargosAdicionados(cargosIniciais);
+      setVagasInfo(vagasInfoInicial);
+    }
+  }, [cargosIniciais, vagasInfoInicial]);
 
   // Popular select de cargos quando os dados forem carregados
   useEffect(() => {
@@ -132,40 +136,51 @@ export const useSelecaoCargo = () => {
     setModalSelecionarCandidatosVisible(false);
   };
 
-  const handleCandidatosSelecionados = (quantidade: number, quantidadesIndividuais: { geral: number; pcd: number; nna: number }, vagas: number) => {
+  const handleCandidatosSelecionados = (quantidade: number, quantidadesIndividuais: { geral: number; pcd: number; nna: number }, vagas: number, candidatosUuids: string[] = []) => {
     if (cargoSelecionado) {
       const cargoInfo = cargosDisponiveis.find(c => c.value === cargoSelecionado);
       if (cargoInfo) {
-        const novoCargo: CargoAdicionado = {
-          cargo_uuid: cargoSelecionado,
-          cargo_nome: cargoInfo.label,
-          cargo_codigo: cargoInfo.codigo,
-          vagas: vagas,
-          candidatos_geral: quantidadesIndividuais.geral,
-          candidatos_pcd: quantidadesIndividuais.pcd,
-          candidatos_nna: quantidadesIndividuais.nna,
-          totalCandidatos: quantidade
-        };
-        
         // Verificar se o cargo já existe e atualizar ou adicionar
         setCargosAdicionados(prev => {
-          const existeIndex = prev.findIndex(c => c.uuid === cargoSelecionado);
+          const existeIndex = prev.findIndex(c => c.cargo_uuid === cargoSelecionado);
+          const cargoExistente = existeIndex >= 0 ? prev[existeIndex] : null;
+          
+          
+          const novoCargo: CargoAdicionado = {
+            cargo_uuid: cargoSelecionado,
+            cargo_nome: cargoInfo.label,
+            cargo_codigo: cargoInfo.codigo,
+            vagas: vagas,
+            candidatos_geral: quantidadesIndividuais.geral,
+            candidatos_pcd: quantidadesIndividuais.pcd,
+            candidatos_nna: quantidadesIndividuais.nna,
+            totalCandidatos: quantidade,
+            // Usar os UUIDs passados ou preservar os existentes
+            candidatos_uuids: candidatosUuids.length > 0 ? candidatosUuids : (cargoExistente?.candidatos_uuids || [])
+          };
+          
           let updated;
           if (existeIndex >= 0) {
-            // Atualizar cargo existente
+            // Atualizar cargo existente, mantendo uuid e usando os UUIDs passados ou preservando os existentes
             updated = [...prev];
-            updated[existeIndex] = novoCargo;
+            updated[existeIndex] = {
+              ...novoCargo,
+              uuid: prev[existeIndex].uuid,
+              // Usar os UUIDs passados se houver, senão preservar os existentes
+              candidatos_uuids: candidatosUuids.length > 0 ? candidatosUuids : (prev[existeIndex].candidatos_uuids || [])
+            };
           } else {
             // Adicionar novo cargo
             updated = [...prev, novoCargo];
           }
+          
           
           // Atualizar informações de vagas
           const novasVagasInfo = calcularVagasInfo(updated);
           setVagasInfo(novasVagasInfo);
           
           // Atualizar último cargo selecionado
-          setUltimoCargoSelecionado(novoCargo);
+          setUltimoCargoSelecionado(updated[existeIndex >= 0 ? existeIndex : updated.length - 1]);
           
           return updated;
         });
@@ -177,8 +192,32 @@ export const useSelecaoCargo = () => {
     setModalSelecionarCandidatosVisible(false);
   };
 
+  // Função para atualizar UUIDs de candidatos para um cargo específico
+  const handleCandidatosUuidsChange = useCallback((cargoUuid: string, uuids: string[]) => {
+    setCargosAdicionados(prev => {
+      // Verificar se realmente precisa atualizar (evitar atualizações desnecessárias)
+      const cargoAtual = prev.find(c => c.cargo_uuid === cargoUuid);
+      if (cargoAtual && JSON.stringify(cargoAtual.candidatos_uuids) === JSON.stringify(uuids)) {
+        return prev; // Não há mudança, retornar o mesmo array
+      }
+      
+      const updated = prev.map(cargo => {
+        if (cargo.cargo_uuid === cargoUuid) {
+          console.log('Atualizando UUIDs do cargo:', cargo.cargo_nome, 'de', cargo.candidatos_uuids, 'para', uuids);
+          return {
+            ...cargo,
+            candidatos_uuids: uuids
+          };
+        }
+        return cargo;
+      });
+      
+      return updated;
+    });
+  }, []);
+
   const handleEditarCargo = (cargo: CargoAdicionado) => {
-    setCargoSelecionado(cargo.uuid);
+    setCargoSelecionado(cargo.cargo_uuid);
     setUltimoCargoSelecionado(cargo);
     setModalSelecionarCandidatosVisible(true);
   };
@@ -212,7 +251,7 @@ export const useSelecaoCargo = () => {
     });
   };
 // Função para salvar cargos no backend
-  const salvarCargosNoBackend = async (candidatoUuids?: string[]): Promise<boolean> => {
+  const salvarCargosNoBackend = async (): Promise<boolean> => {
     if (!uuid || cargosAdicionados.length === 0) {
       return true;
     }
@@ -251,9 +290,10 @@ export const useSelecaoCargo = () => {
         candidatos_pcd: cargo.candidatos_pcd,
         candidatos_nna: cargo.candidatos_nna,
         total_candidatos: cargo.totalCandidatos,
-        ...(candidatoUuids && candidatoUuids.length > 0 ? { candidatos_uuids: candidatoUuids } : {}),
-      }));
+        ...(cargo.candidatos_uuids && cargo.candidatos_uuids.length > 0 ? { candidatos_uuids: cargo.candidatos_uuids } : {}),
+      })); 
 
+      // TODO: Descomentar quando a API estiver pronta
       await postCargoMutation.mutateAsync({ processoUuid: uuid, payload: payload as any });
       return true;
     } catch (error: any) {
@@ -301,6 +341,7 @@ export const useSelecaoCargo = () => {
     handleExcluirCargo,
     salvarCargosNoBackend,
     convocarCandidatosHabilitados,
+    handleCandidatosUuidsChange,
     salvandoCargos: postCargoMutation.isPending,
     carregarCargos,
     uuid
