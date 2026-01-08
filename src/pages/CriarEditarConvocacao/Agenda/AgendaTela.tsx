@@ -116,7 +116,7 @@ const AgendaTela: React.FC = () => {
   const current = 2;
   const next = async () => {
     const sucesso = await salvarAgendasNoBackend();
-      if (sucesso) {
+     if (sucesso) {
         navigate(`/processos/convocacao/editar/${uuid}/resumo`);
       }
   };

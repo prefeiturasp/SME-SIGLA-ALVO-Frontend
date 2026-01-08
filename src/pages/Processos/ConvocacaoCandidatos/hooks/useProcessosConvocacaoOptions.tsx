@@ -8,7 +8,7 @@ export const useProcessosConvocacaoOptions = () => {
     queryKey: ["getProcessosConvocacaoOptions"],
     queryFn: ({ signal }) =>
       API.Convocacao.getProcessosConvocacaoOptions({ signal }).response,
-    staleTime: 1000 * 60 * 5,
+    // staleTime: 1000 * 60 * 5,
     retry: 0,
   });
 

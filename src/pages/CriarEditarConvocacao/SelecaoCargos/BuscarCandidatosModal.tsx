@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Modal, Typography, Button, message, Spin, Radio, Divider } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
@@ -23,11 +23,12 @@ interface BuscarCandidatosModalProps {
   concursoValue?: string;
   cargo?: string;
   cargoCodigo?: string;
+  cargoUuid?: string;
   processoUuid?: string;
   tipoEscolha?: string;
   cargoEmEdicao?: { geral: number; pcd: number; nna: number } | null;
-  onCandidatosSelecionados?: (quantidade: number, quantidadesIndividuais: { geral: number; pcd: number; nna: number }, vagas: number) => void;
-  onCandidatosUuidsChange?: (uuids: string[]) => void;
+  onCandidatosSelecionados?: (quantidade: number, quantidadesIndividuais: { geral: number; pcd: number; nna: number }, vagas: number, candidatosUuids: string[]) => void;
+  onCandidatosUuidsChange?: (cargoUuid: string, uuids: string[]) => void;
 }
 
 const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
@@ -37,6 +38,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   concursoValue,
   cargo,
   cargoCodigo,
+  cargoUuid,
   processoUuid,
   tipoEscolha,
   cargoEmEdicao = null,
@@ -64,6 +66,11 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const [parametrosBuscaReconvocacao, setParametrosBuscaReconvocacao] = useState<{ concurso_uuid: string; quantidade: number } | undefined>(undefined);
   // Parâmetros para busca de candidatos calculados (Nova Autorização)
   const [parametrosBuscaCalculados, setParametrosBuscaCalculados] = useState<{ concurso_uuid: string; quantidade: number; codigo_cargo?: string } | undefined>(undefined);
+
+  // Refs para rastrear se já processamos os UUIDs (evitar loops infinitos)
+  const uuidsProcessadosReposicao = useRef<string>('');
+  const uuidsProcessadosReconvocacao = useRef<string>('');
+  const uuidsProcessadosCalculados = useRef<string>('');
 
   // Hook para buscar vagas dinamicamente
   const { vagasIsLoading, totalVagas } = useGetVagasPorProcessoECargo(
@@ -96,6 +103,10 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       setParametrosBusca(undefined);
       setParametrosBuscaReposicao(undefined);
       setParametrosBuscaReconvocacao(undefined);
+      // Resetar refs quando o modal fechar
+      uuidsProcessadosReposicao.current = '';
+      uuidsProcessadosReconvocacao.current = '';
+      uuidsProcessadosCalculados.current = '';
     } else if (cargoEmEdicao) {
       // Preencher campos quando estiver editando
       if (isReconvocacao) {
@@ -234,36 +245,54 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
 
   // Processar UUIDs quando os dados de reposição chegarem
   useEffect(() => {
-    if (isReposicao && candidatosReposicaoData && !candidatosReposicaoIsLoading && onCandidatosUuidsChange) {
+    if (isReposicao && candidatosReposicaoData && !candidatosReposicaoIsLoading && onCandidatosUuidsChange && cargoUuid) {
       const list = Array.isArray(candidatosReposicaoData) ? candidatosReposicaoData : [];
       const uuids = list
         .map((item: any) => item?.candidato?.uuid || item?.uuid)
         .filter((id: any) => typeof id === 'string');
-      onCandidatosUuidsChange(uuids);
+      
+      // Criar uma chave única para verificar se já processamos esses dados
+      const chave = `${cargoUuid}-${JSON.stringify(uuids)}`;
+      if (uuidsProcessadosReposicao.current !== chave) {
+        uuidsProcessadosReposicao.current = chave;
+        onCandidatosUuidsChange(cargoUuid, uuids);
+      }
     }
-  }, [isReposicao, candidatosReposicaoData, candidatosReposicaoIsLoading, onCandidatosUuidsChange]);
+  }, [isReposicao, candidatosReposicaoData, candidatosReposicaoIsLoading, onCandidatosUuidsChange, cargoUuid]);
 
   // Processar UUIDs quando os dados de reconvocação chegarem
   useEffect(() => {
-    if (isReconvocacao && candidatosReconvocacaoData && !candidatosReconvocacaoIsLoading && onCandidatosUuidsChange) {
+    if (isReconvocacao && candidatosReconvocacaoData && !candidatosReconvocacaoIsLoading && onCandidatosUuidsChange && cargoUuid) {
       const list = Array.isArray(candidatosReconvocacaoData) ? candidatosReconvocacaoData : [];
       const uuids = list
         .map((item: any) => item?.candidato?.uuid || item?.uuid)
         .filter((id: any) => typeof id === 'string');
-      onCandidatosUuidsChange(uuids);
+      
+      // Criar uma chave única para verificar se já processamos esses dados
+      const chave = `${cargoUuid}-${JSON.stringify(uuids)}`;
+      if (uuidsProcessadosReconvocacao.current !== chave) {
+        uuidsProcessadosReconvocacao.current = chave;
+        onCandidatosUuidsChange(cargoUuid, uuids);
+      }
     }
-  }, [isReconvocacao, candidatosReconvocacaoData, candidatosReconvocacaoIsLoading, onCandidatosUuidsChange]);
+  }, [isReconvocacao, candidatosReconvocacaoData, candidatosReconvocacaoIsLoading, onCandidatosUuidsChange, cargoUuid]);
 
   // Processar UUIDs quando os dados calculados chegarem
   useEffect(() => {
-    if (isNovaAutorizacao && tipoConvocacao === 'calculada' && candidatosCalculadosData && !candidatosCalculadosIsLoading && onCandidatosUuidsChange) {
-      const list = Array.isArray(candidatosCalculadosData.results) ? candidatosCalculadosData.results : [];
+    if (isNovaAutorizacao && tipoConvocacao === 'calculada' && candidatosCalculadosData && !candidatosCalculadosIsLoading && onCandidatosUuidsChange && cargoUuid) {
+      const list = Array.isArray(candidatosCalculadosData) ? candidatosCalculadosData : (candidatosCalculadosData as any)?.results || [];
       const uuids = list
         .map((item: any) => item?.uuid)
         .filter((id: any) => typeof id === 'string');
-      onCandidatosUuidsChange(uuids);
+      
+      // Criar uma chave única para verificar se já processamos esses dados
+      const chave = `${cargoUuid}-${JSON.stringify(uuids)}`;
+      if (uuidsProcessadosCalculados.current !== chave) {
+        uuidsProcessadosCalculados.current = chave;
+        onCandidatosUuidsChange(cargoUuid, uuids);
+      }
     }
-  }, [isNovaAutorizacao, tipoConvocacao, candidatosCalculadosData, candidatosCalculadosIsLoading, onCandidatosUuidsChange]);
+  }, [isNovaAutorizacao, tipoConvocacao, candidatosCalculadosData, candidatosCalculadosIsLoading, onCandidatosUuidsChange, cargoUuid]);
 
   // Calcular total baseado no tipo de escolha
   const totalAutorizacoes = isReconvocacao 
@@ -479,7 +508,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       const uuids = list
         .map((item: any) => item?.candidato?.uuid || item?.uuid)
         .filter((id: any) => typeof id === 'string');
-      if (onCandidatosUuidsChange) onCandidatosUuidsChange(uuids);
+      if (onCandidatosUuidsChange && cargoUuid) onCandidatosUuidsChange(cargoUuid, uuids);
     } catch (e) {
       // ignore
     }
@@ -508,8 +537,13 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
           nna: autorizacoesDigitadas.nna
         };
 
+    // Extrair UUIDs dos candidatos
+    const candidatosUuids = candidatos
+      .map((item: any) => item?.candidato?.uuid || item?.uuid)
+      .filter((id: any) => typeof id === 'string' && id);
+
     if (onCandidatosSelecionados) {
-      onCandidatosSelecionados(quantidadeCandidatos, quantidadesIndividuais, totalVagas);
+      onCandidatosSelecionados(quantidadeCandidatos, quantidadesIndividuais, totalVagas, candidatosUuids);
     }
 
     onClose();

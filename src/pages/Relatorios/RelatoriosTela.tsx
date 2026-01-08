@@ -54,6 +54,7 @@ const RelatoriosTela: React.FC = () => {
     () => [
       { key: "LAUDA_VAGAS", tipo: "Lauda de vagas" },
       { key: "RELACAO_VAGAS", tipo: "Relação de Vagas" },
+      { key: "NAO_ESCOLHAS", tipo: "Súmula de Não Escolha" },
     ],
     []
   );
@@ -298,7 +299,7 @@ const RelatoriosTela: React.FC = () => {
         onCancel={handleClosePreview}
         footer={null}
         title="Visualização do relatório"
-        width={previewRelatorioTipo === "RELACAO_VAGAS" ? 1400 : 900}
+        width={previewRelatorioTipo === "RELACAO_VAGAS" ? 1400 : previewRelatorioTipo === "NAO_ESCOLHAS" ? 1200 : 900}
         styles={{ body: { padding: 0 } }}
       >
         {previewUrl ? (

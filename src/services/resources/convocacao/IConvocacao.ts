@@ -99,6 +99,8 @@ export interface IVaga {
   vagas_definitivas: number;
   vagas_precarias_utilizadas: number;
   vagas_definitivas_utilizadas: number;
+  vagas_precarias_restantes?: number;
+  vagas_definitivas_restantes?: number;
   status: string;
   escola: IEscola;
   criado_em: string; // ISO date string
