@@ -54,7 +54,9 @@ const RelatoriosTela: React.FC = () => {
     () => [
       { key: "LAUDA_VAGAS", tipo: "Lauda de vagas" },
       { key: "RELACAO_VAGAS", tipo: "Relação de Vagas" },
-      { key: "NAO_ESCOLHAS", tipo: "Súmula de Não Escolha" },
+      { key: "SUMULA_ESCOLHAS", tipo: "Súmula de Escolhas" },
+      { key: "SUMULA_RECONVOCACAO", tipo: "Súmula de Reconvocados" },
+      { key: "SUMULA_NAO_ESCOLHAS", tipo: "Súmula de Não Escolha" },
       { key: "LISTAGEM_ESCOLHAS_DRES", tipo: "Listagem de Escolhas por DREs" },
     ],
     []
