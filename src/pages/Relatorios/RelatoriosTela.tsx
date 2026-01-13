@@ -53,6 +53,7 @@ const RelatoriosTela: React.FC = () => {
   const dataSource: RelatorioLinha[] = useMemo(
     () => [
       { key: "LAUDA_VAGAS", tipo: "Lauda de vagas" },
+      { key: "LAUDA_CONVOCACAO", tipo: "Lauda de Convocação" },
       { key: "RELACAO_VAGAS", tipo: "Relação de Vagas" },
       { key: "SUMULA_ESCOLHAS", tipo: "Súmula de Escolhas" },
       { key: "SUMULA_RECONVOCACAO", tipo: "Súmula de Reconvocados" },
