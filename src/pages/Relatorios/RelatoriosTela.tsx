@@ -1,12 +1,14 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Col, Row, Radio, Select, Table, Typography, Card, Collapse, Modal, Spin, message } from "antd";
+import { Col, Row, Radio, Table, Typography, Card, Collapse, Modal, Spin, message } from "antd";
 import type { RadioChangeEvent } from "antd";
 import { EyeOutlined, FileExcelOutlined, FilePdfOutlined, FileWordOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useRelatorios } from "./hooks/useRelatorios";
 import QuillEditor from "./components/QuillEditor";
+import ListaCandidatosSessaoModal from "./components/ListaCandidatosSessaoModal";
 import { usePostRelatorio } from "./hooks/usePostRelatorio";
+import { FilterSelect, FilterLabel } from "../EscolhaCandidatos/styles";
 
 type RelatorioTipo = "EM_ANDAMENTO" | "FINALIZADO";
 
@@ -48,7 +50,16 @@ const RelatoriosTela: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
   const [previewText, setPreviewText] = useState<string | undefined>(undefined);
   const [previewHtml, setPreviewHtml] = useState<string | undefined>(undefined);
-  const [previewRelatorioTipo, setPreviewRelatorioTipo] = useState<string | undefined>(undefined);
+
+  const [listaModalOpen, setListaModalOpen] = useState(false);
+  const [listaSelectedOption, setListaSelectedOption] = useState<string | undefined>(undefined);
+  const [listaSelectedCandidatosUuids, setListaSelectedCandidatosUuids] = useState<string[] | undefined>(undefined);
+  type PendingListaAction =
+    | { action: "visualizar" }
+    | { action: "export"; formato: "xls" | "pdf" | "docx" };
+  const [pendingListaAction, setPendingListaAction] = useState<
+    ({ record: RelatorioLinha } & PendingListaAction) | null
+  >(null);
 
   const dataSource: RelatorioLinha[] = useMemo(
     () => [
@@ -59,9 +70,13 @@ const RelatoriosTela: React.FC = () => {
       { key: "SUMULA_RECONVOCACAO", tipo: "Súmula de Reconvocados" },
       { key: "SUMULA_NAO_ESCOLHAS", tipo: "Súmula de Não Escolha" },
       { key: "LISTAGEM_ESCOLHAS_DRES", tipo: "Listagem de Escolhas por DREs" },
+<<<<<<< Updated upstream
       { key: "RESULTADO_ESCOLHA_SIM", tipo: "Resultado de Escolha de vagas - Sim" },
       { key: "RESULTADO_ESCOLHA_NAO", tipo: "Resultado de Escolha de vagas - Não" },
       { key: "RESULTADO_ESCOLHA_RECONVOCACAO", tipo: "Resultado de Escolha de vagas - Reconvocação" },
+=======
+      { key: "LISTA_CANDIDATOS_SESSAO", tipo: "Lista de Candidatos por Sessão" },
+>>>>>>> Stashed changes
     ],
     []
   );
@@ -77,20 +92,23 @@ const RelatoriosTela: React.FC = () => {
     setPreviewUrl(undefined);
     setPreviewText(undefined);
     setPreviewHtml(undefined);
-    setPreviewRelatorioTipo(undefined);
     setPreviewVisible(false);
   };
 
   const buildPayload = useCallback((record: RelatorioLinha) => {
-    return {
+    const payload: Record<string, unknown> = {
       processo_uuid: filtroSelect,
       cabecalho: cabecalhoHtml,
       tipo: record.key,
       usuario: localStorage.getItem("USUARIO") ?? "",
-    } as Record<string, unknown>;
-  }, [cabecalhoHtml, filtroSelect]);
+    };
+    if (record.key === "LISTA_CANDIDATOS_SESSAO") {
+      payload.agenda_uuid = listaSelectedOption;
+    }
+    return payload;
+  }, [cabecalhoHtml, filtroSelect, listaSelectedOption]);
 
-  const handleVisualizar = useCallback(async (record: RelatorioLinha) => {
+  const executeVisualizar = useCallback(async (record: RelatorioLinha, overrideAgendaUuid?: string) => {
     if (!filtroSelect) {
       message.warning("Selecione um processo para visualizar o relatório.");
       return;
@@ -101,10 +119,14 @@ const RelatoriosTela: React.FC = () => {
     }
 
     const payload = buildPayload(record);
+    if (record.key === "LISTA_CANDIDATOS_SESSAO") {
+      if (overrideAgendaUuid) {
+        (payload as any).agenda_uuid = overrideAgendaUuid;
+      }
+    }
 
     try {
       const result = await postRelatorio(payload, "html");
-      setPreviewRelatorioTipo(record.key);
       if (result instanceof Blob) {
         const url = URL.createObjectURL(result);
         setPreviewUrl(url);
@@ -121,7 +143,21 @@ const RelatoriosTela: React.FC = () => {
     }
   }, [buildPayload, filtroSelect, postRelatorio]);
 
-  const handleExport = useCallback(async (record: RelatorioLinha, formato: "xls" | "pdf" | "docx") => {
+  const handleVisualizar = useCallback(
+    async (record: RelatorioLinha) => {
+      if (record.key === "LISTA_CANDIDATOS_SESSAO") {
+        setListaSelectedOption(undefined);
+        setListaSelectedCandidatosUuids(undefined);
+        setPendingListaAction({ action: "visualizar", record });
+        setListaModalOpen(true);
+        return;
+      }
+      return executeVisualizar(record);
+    },
+    [executeVisualizar]
+  );
+
+  const executeExport = useCallback(async (record: RelatorioLinha, formato: "xls" | "pdf" | "docx", overrideAgendaUuid?: string) => {
     if (!filtroSelect) {
       message.warning("Selecione um processo para exportar o relatório.");
       return;
@@ -132,6 +168,11 @@ const RelatoriosTela: React.FC = () => {
     }
 
     const payload = buildPayload(record);
+    if (record.key === "LISTA_CANDIDATOS_SESSAO") {
+      if (overrideAgendaUuid) {
+        (payload as any).agenda_uuid = overrideAgendaUuid;
+      }
+    }
 
     try {
       const result = await postRelatorio(payload, formato);
@@ -181,7 +222,40 @@ const RelatoriosTela: React.FC = () => {
     }
   }, [buildPayload, filtroSelect, postRelatorio]);
 
-  const getExportFormats = useCallback((recordKey: string): ("xls" | "pdf" | "docx")[] => {
+  const handleExport = useCallback(
+    async (record: RelatorioLinha, formato: "xls" | "pdf" | "docx") => {
+      if (record.key === "LISTA_CANDIDATOS_SESSAO") {
+        setListaSelectedOption(undefined);
+        setListaSelectedCandidatosUuids(undefined);
+        setPendingListaAction({ action: "export", formato, record });
+        setListaModalOpen(true);
+        return;
+      }
+      return executeExport(record, formato);
+    },
+    [executeExport]
+  );
+
+  const handleListaOk = useCallback(
+    ({ agendaUuid }: { agendaUuid?: string }) => {
+      const pending = pendingListaAction;
+      if (!pending) {
+        setListaModalOpen(false);
+        return;
+      }
+      setListaSelectedOption(agendaUuid);
+      setListaModalOpen(false);
+      setPendingListaAction(null);
+      if (pending.action === "visualizar") {
+        executeVisualizar(pending.record, agendaUuid);
+      } else {
+        executeExport(pending.record, pending.formato, agendaUuid);
+      }
+    },
+    [pendingListaAction, executeExport, executeVisualizar]
+  );
+
+  const getExportFormats = useCallback((_recordKey: string): ("xls" | "pdf" | "docx")[] => {
     // Ambos os relatórios têm Excel, PDF e Word
     return ["xls", "pdf", "docx"];
   }, []);
@@ -247,7 +321,7 @@ const RelatoriosTela: React.FC = () => {
       <Card style={{ border: "none", borderRadius: 12, marginBottom: 16 }}>
         <Row gutter={[16, 12]} align="middle">
           <Col xs={24} md={12}>
-            <Typography.Text strong>Situação</Typography.Text>
+            <FilterLabel>Situação</FilterLabel>
             <div style={{ marginTop: 8 }}>
               <Radio.Group
                 value={tipoRelatorio}
@@ -259,15 +333,15 @@ const RelatoriosTela: React.FC = () => {
             </div>
           </Col>
           <Col xs={24} md={12}>
-            <Typography.Text strong>Processo</Typography.Text>
-            <Select
+            <FilterLabel>Processo</FilterLabel>
+            <FilterSelect
               allowClear
               placeholder="Selecione um processo"
               style={{ width: "100%", marginTop: 8 }}
               value={filtroSelect}
               loading={processosConvocacaoOptionsIsLoading}
               options={processosConvocacaoOptions as any}
-              onChange={(value) => setFiltroSelect(value)}
+              onChange={(value) => setFiltroSelect(value as string | undefined)}
             />
           </Col>
         </Row>
@@ -305,7 +379,6 @@ const RelatoriosTela: React.FC = () => {
         open={previewVisible}
         onCancel={handleClosePreview}
         footer={null}
-        title="Visualização do relatório"
         width={1400}
         styles={{ body: { padding: 0 } }}
       >
@@ -326,6 +399,15 @@ const RelatoriosTela: React.FC = () => {
           </pre>
         )}
       </Modal>
+      <ListaCandidatosSessaoModal
+        open={listaModalOpen}
+        processoUuid={filtroSelect}
+        onOk={handleListaOk}
+        onCancel={() => {
+          setListaModalOpen(false);
+          setPendingListaAction(null);
+        }}
+      />
     </BaseTela>
   );
 };
