@@ -479,7 +479,13 @@ const AgendaTabelaExpandida: React.FC<{
   ];
 
   // Calcular total de candidatos
-  const totalCandidatos = periodosList.reduce((sum, periodo) => sum + (periodo.classificacao || 0), 0);
+  const totalCandidatos = periodosList.reduce((sum, periodo) => {
+    if (periodo?.isRetardatario) {
+      return sum;
+    }
+    const valor = typeof periodo?.classificacao === "number" ? periodo.classificacao : 0;
+    return sum + valor;
+  }, 0);
 
   if (periodosList.length === 0) {
     return (
