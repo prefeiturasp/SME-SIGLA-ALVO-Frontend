@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Col, Modal, Spin, message } from "antd";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { DefaultOptionType } from "antd/es/select";
@@ -181,18 +181,32 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     }));
   }, [vagasData?.dres]);
 
-  // Lista de escolas filtradas por DRE com estrutura { uuid, escola }
+  // Lista de escolas filtradas por DRE com estrutura { uuid, escola, vagas restantes, disabled }
   const escolasPorDre = useMemo(() => {
     if (!vagasData?.vagas || !Array.isArray(vagasData.vagas) || !modalDreCodigo) {
       return [];
     }
     return vagasData.vagas
       .filter((vaga: any) => vaga?.escola?.dre?.codigo === modalDreCodigo)
-      .map((vaga: any) => ({
-        value: vaga.uuid,
-        label: vaga?.escola?.nome_oficial || '',
-      }));
-  }, [vagasData?.vagas, modalDreCodigo]);
+      .map((vaga: any) => {
+        const vagasPrecariasRestantes = vaga.vagas_precarias_restantes ?? 0;
+        const vagasDefinitivasRestantes = vaga.vagas_definitivas_restantes ?? 0;
+        
+        // Desabilita escola se não tem vagas restantes do tipo selecionado
+        const isDisabled = modalTipoVaga === "definitiva" 
+          ? vagasDefinitivasRestantes <= 0
+          : vagasPrecariasRestantes <= 0;
+        
+        return {
+          value: vaga.uuid,
+          label: vaga?.escola?.nome_oficial || '',
+          disabled: isDisabled,
+          vagasPrecariasRestantes,
+          vagasDefinitivasRestantes,
+          vagaData: vaga,
+        };
+      });
+  }, [vagasData?.vagas, modalDreCodigo, modalTipoVaga]);
 
   const syncedModalDre = useMemo(() => {
     if (!visible) {
@@ -246,23 +260,36 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       })
     | undefined;
 
-  const modalVagasDefinitivas = useMemo(
-    () =>
-      formatVacancyValue(
-        vagasTotals?.total_vagas_definitivas ??
-          context?.vagasDefinitivas
-      ),
-    [context?.vagasDefinitivas, vagasTotals?.total_vagas_definitivas]
-  );
+  // Busca a vaga selecionada para obter vagas restantes
+  const vagaSelecionada = useMemo(() => {
+    if (!modalUnidadeEscolar || !vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
+      return null;
+    }
+    return vagasData.vagas.find((vaga: any) => vaga.uuid === modalUnidadeEscolar) || null;
+  }, [modalUnidadeEscolar, vagasData?.vagas]);
 
-  const modalVagasPrecarias = useMemo(
-    () =>
-      formatVacancyValue(
-        vagasTotals?.total_vagas_precarias ??
-          context?.vagasPrecarias
-      ),
-    [context?.vagasPrecarias, vagasTotals?.total_vagas_precarias]
-  );
+  // Atualiza vagas no card: mostra restantes da escola selecionada ou totais gerais
+  const modalVagasDefinitivas = useMemo(() => {
+    // Se uma escola está selecionada, mostra vagas restantes dessa escola
+    if (vagaSelecionada && vagaSelecionada.vagas_definitivas_restantes !== undefined) {
+      return formatVacancyValue(vagaSelecionada.vagas_definitivas_restantes);
+    }
+    // Caso contrário, mostra totais gerais
+    return formatVacancyValue(
+      vagasTotals?.total_vagas_definitivas ?? context?.vagasDefinitivas
+    );
+  }, [vagaSelecionada, context?.vagasDefinitivas, vagasTotals?.total_vagas_definitivas]);
+
+  const modalVagasPrecarias = useMemo(() => {
+    // Se uma escola está selecionada, mostra vagas restantes dessa escola
+    if (vagaSelecionada && vagaSelecionada.vagas_precarias_restantes !== undefined) {
+      return formatVacancyValue(vagaSelecionada.vagas_precarias_restantes);
+    }
+    // Caso contrário, mostra totais gerais
+    return formatVacancyValue(
+      vagasTotals?.total_vagas_precarias ?? context?.vagasPrecarias
+    );
+  }, [vagaSelecionada, context?.vagasPrecarias, vagasTotals?.total_vagas_precarias]);
 
   const modalVagasTotais = useMemo(
     () =>
@@ -271,6 +298,28 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       ),
     [context?.vagas, vagasTotals?.total_vagas]
   );
+
+  // Verifica se deve desabilitar os radios de tipo de vaga baseado na escola selecionada
+  const tipoVagaDisabled = useMemo(() => {
+    if (!vagaSelecionada) {
+      // Se não há escola selecionada, nenhum radio é desabilitado
+      return {
+        precaria: false,
+        definitiva: false,
+      };
+    }
+
+    // Verifica vagas restantes da escola selecionada
+    const vagasDefinitivasRestantes = vagaSelecionada.vagas_definitivas_restantes ?? 0;
+    const vagasPrecariasRestantes = vagaSelecionada.vagas_precarias_restantes ?? 0;
+
+    return {
+      // Desabilita "Precária" se não houver vagas precárias restantes
+      precaria: vagasPrecariasRestantes <= 0,
+      // Desabilita "Definitiva" se não houver vagas definitivas restantes
+      definitiva: vagasDefinitivasRestantes <= 0,
+    };
+  }, [vagaSelecionada]);
 
   const handleModalDreChange = useCallback(
     (value?: string) => {
@@ -285,6 +334,27 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     },
     [dreOptions]
   );
+
+  // Limpa a seleção da escola se ela não tiver vagas do tipo selecionado
+  useEffect(() => {
+    if (!modalUnidadeEscolar || !vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
+      return;
+    }
+    
+    const escolaSelecionada = vagasData.vagas.find(
+      (vaga: any) => vaga.uuid === modalUnidadeEscolar
+    );
+    
+    if (escolaSelecionada) {
+      const temVagas = modalTipoVaga === "definitiva"
+        ? (escolaSelecionada.vagas_definitivas_restantes ?? 0) > 0
+        : (escolaSelecionada.vagas_precarias_restantes ?? 0) > 0;
+      
+      if (!temVagas) {
+        setModalUnidadeEscolar(undefined);
+      }
+    }
+  }, [modalTipoVaga, modalUnidadeEscolar, vagasData?.vagas]);
 
   const queryClient = useQueryClient();
 
@@ -612,8 +682,12 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                       )
                     }
                   >
-                    <ModalRadio value="precaria">Precária</ModalRadio>
-                    <ModalRadio value="definitiva">Definitiva</ModalRadio>
+                    <ModalRadio value="precaria" disabled={tipoVagaDisabled.precaria}>
+                      Precária
+                    </ModalRadio>
+                    <ModalRadio value="definitiva" disabled={tipoVagaDisabled.definitiva}>
+                      Definitiva
+                    </ModalRadio>
                   </ModalRadioGroup>
                 </Col>
               </ModalFieldsRow>

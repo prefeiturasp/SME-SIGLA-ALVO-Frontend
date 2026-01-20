@@ -78,10 +78,14 @@ const Resumo: React.FC = () => {
       cargoKey,
       cargoNome: agendas[0]?.cargo_nome || "Cargo desconhecido",
       agendas,
-      totalCandidatos: agendas.reduce(
-        (sum, agenda) => sum + (agenda.classificacao || 0),
-        0
-      ),
+      totalCandidatos: agendas.reduce((sum, agenda) => {
+        if (agenda?.retardatario) {
+          return sum;
+        }
+        const valor =
+          typeof agenda?.classificacao === "number" ? agenda.classificacao : 0;
+        return sum + valor;
+      }, 0),
     }));
   }, [agendasData]);
 
