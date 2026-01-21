@@ -607,7 +607,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
             </ModalInfoValue>
           </ModalInfoItem>
           <ModalInfoItem>
-            <ModalInfoLabel>Vagas</ModalInfoLabel>
+            <ModalInfoLabel>Vagas Publicadas</ModalInfoLabel>
             <ModalInfoValue>
               {vagasIsLoading ? <Spin size="small" /> : modalVagasTotais}
             </ModalInfoValue>
