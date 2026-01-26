@@ -74,6 +74,7 @@ const RelatoriosTela: React.FC = () => {
       { key: "RESULTADO_ESCOLHA_NAO", tipo: "Resultado de Escolha de vagas - Não" },
       { key: "RESULTADO_ESCOLHA_RECONVOCACAO", tipo: "Resultado de Escolha de vagas - Reconvocação" },
       { key: "LISTA_CANDIDATOS_SESSAO", tipo: "Lista de Candidatos por Sessão" },
+      { key: "ATA_ESCOLHA", tipo: "Ata de Escolha" },
     ],
     []
   );
