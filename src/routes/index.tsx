@@ -16,6 +16,7 @@ import RouteError from "./RouteError";
 import GerenciamentoVagasTela from "../pages/GerenciamentoVagas/GerenciamentoVagasTela";
 import EscolhaCandidatosTela from "../pages/EscolhaCandidatos/EscolhaCandidatosTela";
 import PermissaoUsuarioTela from "../pages/Gerenciar/PermissaoUsuario/PermissaoUsuarioTela";
+import CadastroParametrosTela from "../pages/Gerenciar/Parametros/CadastroParametrosTela";
 
 import DadosDoProcesso from "../pages/CriarEditarConvocacao/DadosDoProcesso";
 import SelecaoCargosTela from "../pages/CriarEditarConvocacao/SelecaoCargos/SelecaoCargosTela";
@@ -88,6 +89,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <PermissaoUsuarioTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/parametrizacao",
+    element: (
+      <ProtectedRoute>
+        <CadastroParametrosTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
