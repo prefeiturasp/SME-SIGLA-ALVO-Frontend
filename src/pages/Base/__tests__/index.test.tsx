@@ -372,9 +372,7 @@ describe('BaseTela Component', () => {
         await user.click(relatoriosMenuItem);
 
         await waitFor(() => {
-          expect(screen.getByText('Relatório A')).toBeInTheDocument();
-          expect(screen.getByText('Relatório B')).toBeInTheDocument();
-          expect(screen.getByText('Relatório C')).toBeInTheDocument();
+          expect(mockNavigate).toHaveBeenCalledWith('/relatorios');
         }, { timeout: 2000 });
       }
     });
@@ -391,10 +389,8 @@ describe('BaseTela Component', () => {
         await user.click(gerenciarMenuItem);
 
         await waitFor(() => {
-          expect(screen.getByText('Concursos')).toBeInTheDocument();
-          expect(screen.getByText('Escolas')).toBeInTheDocument();
-          expect(screen.getByText('Usuários')).toBeInTheDocument();
-          expect(screen.getByText('Configurações')).toBeInTheDocument();
+          expect(screen.getByText('Permissão de usuário')).toBeInTheDocument();
+          expect(screen.getByText('Cadastro de Parâmetros')).toBeInTheDocument();
         }, { timeout: 2000 });
       }
     });
