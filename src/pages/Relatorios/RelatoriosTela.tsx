@@ -1,21 +1,17 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Col, Row, Radio, Table, Typography, Card, Collapse, Modal, Spin, message } from "antd";
+import { Col, Row, Radio, Table, Typography, Card, Modal, Spin, message } from "antd";
 import type { RadioChangeEvent } from "antd";
-import { EyeOutlined, FileExcelOutlined, FilePdfOutlined, FileWordOutlined } from "@ant-design/icons";
+import { EyeOutlined, FileExcelOutlined, FilePdfOutlined, FileWordOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useRelatorios } from "./hooks/useRelatorios";
-import QuillEditor from "./components/QuillEditor";
 import ListaCandidatosSessaoModal from "./components/ListaCandidatosSessaoModal";
 import { usePostRelatorio } from "./hooks/usePostRelatorio";
 import { FilterSelect, FilterLabel } from "../EscolhaCandidatos/styles";
+import PersonalizacaoModal from "./components/PersonalizacaoModal";
+import type { RelatorioLinha } from "../../services/resources/relatorios/IRelatorios";
 
 type RelatorioTipo = "EM_ANDAMENTO" | "FINALIZADO";
-
-type RelatorioLinha = {
-  key: string;
-  tipo: string;
-};
 
 const { Text } = Typography;
 
@@ -23,7 +19,8 @@ const RelatoriosTela: React.FC = () => {
   const navigate = useNavigate();
   const [tipoRelatorio, setTipoRelatorio] = useState<RelatorioTipo>("EM_ANDAMENTO");
   const [filtroSelect, setFiltroSelect] = useState<string | undefined>(undefined);
-  const [cabecalhoHtml, setCabecalhoHtml] = useState<string>("");
+  const [cabecalhoHtml] = useState<string>("");
+  const [processoError, setProcessoError] = useState<string | undefined>(undefined);
 
   const breadcrumbItems = useMemo(
     () => [
@@ -54,6 +51,8 @@ const RelatoriosTela: React.FC = () => {
   const [listaModalOpen, setListaModalOpen] = useState(false);
   const [listaSelectedOption, setListaSelectedOption] = useState<string | undefined>(undefined);
   const [listaSelectedCandidatosUuids, setListaSelectedCandidatosUuids] = useState<string[] | undefined>(undefined);
+  const [personalizacaoModalOpen, setPersonalizacaoModalOpen] = useState(false);
+  const [selectedRelatorioForPersonalizacao, setSelectedRelatorioForPersonalizacao] = useState<RelatorioLinha | null>(null);
   type PendingListaAction =
     | { action: "visualizar" }
     | { action: "export"; formato: "xls" | "pdf" | "docx" };
@@ -108,7 +107,7 @@ const RelatoriosTela: React.FC = () => {
 
   const executeVisualizar = useCallback(async (record: RelatorioLinha, overrideAgendaUuid?: string) => {
     if (!filtroSelect) {
-      message.warning("Selecione um processo para visualizar o relatório.");
+      setProcessoError("Selecione um processo");
       return;
     }
     if (!record?.key) {
@@ -143,6 +142,10 @@ const RelatoriosTela: React.FC = () => {
 
   const handleVisualizar = useCallback(
     async (record: RelatorioLinha) => {
+      if (!filtroSelect) {
+        setProcessoError("Selecione um processo");
+        return;
+      }
       if (record.key === "LISTA_CANDIDATOS_SESSAO") {
         setListaSelectedOption(undefined);
         setListaSelectedCandidatosUuids(undefined);
@@ -152,12 +155,12 @@ const RelatoriosTela: React.FC = () => {
       }
       return executeVisualizar(record);
     },
-    [executeVisualizar]
+    [executeVisualizar, filtroSelect]
   );
 
   const executeExport = useCallback(async (record: RelatorioLinha, formato: "xls" | "pdf" | "docx", overrideAgendaUuid?: string) => {
     if (!filtroSelect) {
-      message.warning("Selecione um processo para exportar o relatório.");
+      setProcessoError("Selecione um processo");
       return;
     }
     if (!record?.key) {
@@ -222,6 +225,10 @@ const RelatoriosTela: React.FC = () => {
 
   const handleExport = useCallback(
     async (record: RelatorioLinha, formato: "xls" | "pdf" | "docx") => {
+      if (!filtroSelect) {
+        setProcessoError("Selecione um processo");
+        return;
+      }
       if (record.key === "LISTA_CANDIDATOS_SESSAO") {
         setListaSelectedOption(undefined);
         setListaSelectedCandidatosUuids(undefined);
@@ -231,7 +238,7 @@ const RelatoriosTela: React.FC = () => {
       }
       return executeExport(record, formato);
     },
-    [executeExport]
+    [executeExport, filtroSelect]
   );
 
   const handleListaOk = useCallback(
@@ -257,6 +264,18 @@ const RelatoriosTela: React.FC = () => {
     // Ambos os relatórios têm Excel, PDF e Word
     return ["xls", "pdf", "docx"];
   }, []);
+
+  const handlePersonalizacao = useCallback(
+    (record: RelatorioLinha) => {
+      if (!filtroSelect) {
+        setProcessoError("Selecione um processo");
+        return;
+      }
+      setSelectedRelatorioForPersonalizacao(record);
+      setPersonalizacaoModalOpen(true);
+    },
+    [filtroSelect]
+  );
 
   const columns = useMemo(
     () => [
@@ -309,8 +328,26 @@ const RelatoriosTela: React.FC = () => {
           );
         },
       },
+      {
+        title: "Personalização",
+        key: "personalizacao",
+        align: "center" as const,
+        render: (_: any, record: RelatorioLinha) => (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+            onClick={() => handlePersonalizacao(record)}
+          >
+            <EditOutlined style={{ color: "#05409A" }} />
+          </div>
+        ),
+      },
     ],
-    [handleExport, handleVisualizar, getExportFormats]
+    [handleExport, handleVisualizar, getExportFormats, handlePersonalizacao]
   );
 
   return (
@@ -339,30 +376,19 @@ const RelatoriosTela: React.FC = () => {
               value={filtroSelect}
               loading={processosConvocacaoOptionsIsLoading}
               options={processosConvocacaoOptions as any}
-              onChange={(value) => setFiltroSelect(value as string | undefined)}
+              onChange={(value) => {
+                setFiltroSelect(value as string | undefined);
+                setProcessoError(undefined);
+              }}
+              status={processoError ? "error" : undefined}
             />
+            {processoError && (
+              <div style={{ color: "#ff4d4f", fontSize: "14px", marginTop: "4px" }}>
+                {processoError}
+              </div>
+            )}
           </Col>
         </Row>
-        {filtroSelect && (
-          <div style={{ marginTop: 12 }}>
-            <Collapse
-              items={[
-                {
-                  key: "obs",
-                  label: "Cabeçalho",
-                  children: (
-                    <QuillEditor
-                      value={cabecalhoHtml}
-                      onChange={setCabecalhoHtml}
-                      placeholder="Digite o cabeçalho do relatório"
-                      height={140}
-                    />
-                  ),
-                },
-              ]}
-            />
-          </div>
-        )}
       </Card>
 
       <Table
@@ -405,6 +431,20 @@ const RelatoriosTela: React.FC = () => {
           setListaModalOpen(false);
           setPendingListaAction(null);
         }}
+      />
+      <PersonalizacaoModal
+        open={personalizacaoModalOpen}
+        onCancel={() => {
+          setPersonalizacaoModalOpen(false);
+          setSelectedRelatorioForPersonalizacao(null);
+        }}
+        selectedRelatorio={selectedRelatorioForPersonalizacao}
+        processoNome={
+          (Array.isArray(processosConvocacaoOptions) 
+            ? (processosConvocacaoOptions as any[]).find((opt: any) => opt.value === filtroSelect)?.label 
+            : undefined) || "—"
+        }
+        processoUuid={filtroSelect || ""}
       />
     </BaseTela>
   );
