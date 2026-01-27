@@ -860,7 +860,13 @@ const EscolhaCandidatosTela: React.FC = () => {
       const rawDre = rawAny?.dre as Record<string, any> | undefined;
       const candidateDre = candidateAny?.dre as Record<string, any> | undefined;
 
+      // Extrair DRE e escola da escolha (vaga_escola) se disponível
+      const escolhaVagaEscola = (escolha as any)?.vaga_escola as Record<string, any> | undefined;
+      const escolhaEscola = escolhaVagaEscola?.escola as Record<string, any> | undefined;
+      const escolhaDre = escolhaEscola?.dre as Record<string, any> | undefined;
+
       const dreUuid =
+        (typeof escolhaDre?.uuid === "string" && escolhaDre.uuid) ||
         (typeof rawAny?.dre_uuid === "string" && rawAny.dre_uuid) ||
         (typeof rawAny?.dreUuid === "string" && rawAny.dreUuid) ||
         (typeof candidateAny?.dre_uuid === "string" && candidateAny.dre_uuid) ||
@@ -870,6 +876,7 @@ const EscolhaCandidatosTela: React.FC = () => {
         undefined;
 
       const dreCodigo =
+        (typeof escolhaDre?.codigo === "string" && escolhaDre.codigo) ||
         (typeof rawAny?.dre_codigo === "string" && rawAny.dre_codigo) ||
         (typeof rawAny?.dreCodigo === "string" && rawAny.dreCodigo) ||
         (typeof candidateAny?.dre_codigo === "string" && candidateAny.dre_codigo) ||
@@ -880,6 +887,7 @@ const EscolhaCandidatosTela: React.FC = () => {
 
       const vagaEscolaUuid =
         (typeof escolha?.vaga_escola_uuid === "string" && escolha.vaga_escola_uuid) ||
+        (typeof escolhaVagaEscola?.uuid === "string" && escolhaVagaEscola.uuid) ||
         (typeof rawAny?.vaga_escola_uuid === "string" && rawAny.vaga_escola_uuid) ||
         undefined;
 

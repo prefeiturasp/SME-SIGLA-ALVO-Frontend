@@ -13,6 +13,8 @@ export const URL = {
   patchCandidatosHabilitadosConvocados: () => `/api/v1/habilitados/convocar/`,
   patchCandidatosHabilitadosDesconvocados: () => `/api/v1/habilitados/desconvocar/`,
   postBuscarPorUuids: () => `/api/v1/habilitados/buscar-por-uuids/`,
+  getParametrizacao: () => `/api/v1/parametrizacao/`,
+  patchParametrizacao: (uuid?: string) => uuid ? `/api/v1/parametrizacao/${uuid}/` : `/api/v1/parametrizacao/`,
 };
 
 // TODO adicionar JWT no header Authorization
@@ -172,6 +174,46 @@ export const postBuscarPorUuids = (
   const response = appAxiosCandidatos
     .post<IBuscarPorUuidsResponse>(URL.postBuscarPorUuids(), payload, {
       params: { order_by: "ranking_escolha", ...(axiosRequestConfig?.params as any) },
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// GET Parametrizacao do MS-Candidatos
+export const getParametrizacaoCandidatos = (
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .get(URL.getParametrizacao(), {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// PATCH Parametrizacao do MS-Candidatos
+export const patchParametrizacaoCandidatos = (
+  payload: Record<string, any>,
+  uuid?: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .patch(URL.patchParametrizacao(uuid), payload, {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })
