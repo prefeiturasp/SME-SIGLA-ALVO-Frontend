@@ -173,6 +173,11 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
       case "gerenciar":
         return [
           {
+            key: "autorizacoes-publicadas",
+            label: "Autorizações publicadas",
+            onClick: () => navigate("/autorizacoes-publicadas"),
+          },
+          {
             key: "permissao-usuario",
             label: "Permissão de usuário",
             onClick: () => navigate("/gerenciar/permissao-usuario"),

@@ -25,6 +25,7 @@ import Resumo from "../pages/CriarEditarConvocacao/Resumo";
 import PermissionContextGuard from "./PermissionContextGuard";
 import ForbiddenTela from "../pages/Forbidden/ForbiddenTela";
 import RelatoriosTela from "../pages/Relatorios/RelatoriosTela";
+import AutorizacoesPublicadasTela from "../pages/AutorizacoesPublicadas/AutorizacoesPublicadasTela";
 
 
 const router = createBrowserRouter([
@@ -38,6 +39,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <RelatoriosTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/autorizacoes-publicadas",
+    element: (
+      <ProtectedRoute>
+        <AutorizacoesPublicadasTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
