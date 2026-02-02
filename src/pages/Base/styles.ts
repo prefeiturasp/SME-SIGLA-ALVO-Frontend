@@ -381,7 +381,7 @@ export const PageContentContainer = styled.div<{
   $bgColor?: string;
   $borderRadius?: number;
 }>`
-  background: ${({ $bgColor }) => $bgColor || "#FAFAFA"};
+  background: ${({ $bgColor }) => ($bgColor === "none" ? "transparent" : $bgColor || "#FAFAFA")};
   min-height: 30vh;
-  border-radius: ${({ $borderRadius }) => $borderRadius || 0}px;]
+  border-radius: ${({ $borderRadius }) => $borderRadius || 0}px;
 `;

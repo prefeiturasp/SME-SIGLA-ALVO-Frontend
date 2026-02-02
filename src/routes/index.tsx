@@ -26,12 +26,17 @@ import PermissionContextGuard from "./PermissionContextGuard";
 import ForbiddenTela from "../pages/Forbidden/ForbiddenTela";
 import RelatoriosTela from "../pages/Relatorios/RelatoriosTela";
 import AutorizacoesPublicadasTela from "../pages/AutorizacoesPublicadas/AutorizacoesPublicadasTela";
+import { HomeTela } from "../pages/Home/HomeTela";
 
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/processos/convocacao" replace />,
+    element: (
+      <ProtectedRoute>
+        <HomeTela />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
   {
