@@ -6,8 +6,8 @@ export const URL = {
   postRelatorios: () => `/api/v1/relatorios/`,
   getParametrizacao: () => `/api/v1/parametrizacao/`,
   patchParametrizacao: (uuid?: string) => uuid ? `/api/v1/parametrizacao/${uuid}/` : `/api/v1/parametrizacao/`,
-  getPersonalizacao: () => `/api/v1/relatorios/personalizacao/`,
-  patchPersonalizacao: (uuid?: string) => uuid ? `/api/v1/relatorios/personalizacao/${uuid}/` : `/api/v1/relatorios/personalizacao/`,
+  getPersonalizacao: () => `/api/v1/personalizacao/`,
+  patchPersonalizacao: (uuid?: string) => uuid ? `/api/v1/personalizacao/${uuid}/` : `/api/v1/personalizacao/`,
 };
 
 /**
@@ -86,7 +86,6 @@ export const patchParametrizacaoRelatorios = (
 
 // GET Personalização do relatório
 export const getPersonalizacaoRelatorio = (
-  processoUuid: string,
   tipoRelatorio: string,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
@@ -95,7 +94,6 @@ export const getPersonalizacaoRelatorio = (
   const response = appAxiosRelatorios
     .get(URL.getPersonalizacao(), {
       params: {
-        processo_uuid: processoUuid,
         tipo: tipoRelatorio,
       },
       signal: axiosRequestConfig?.signal || signal,
@@ -111,13 +109,13 @@ export const getPersonalizacaoRelatorio = (
 
 // PATCH Personalização do relatório
 export const patchPersonalizacaoRelatorio = (
-  processoUuid: string,
   tipoRelatorio: string,
   payload: {
-    usar_cabecalho: boolean;
+    usar_cabecalho_padrao: boolean;
     usar_logotipo: boolean;
     cabecalho: string;
     texto_final: string;
+    cabecalho_capa_ata?: string;
     uuid?: string | null;
   },
   uuid?: string,
@@ -129,9 +127,14 @@ export const patchPersonalizacaoRelatorio = (
     .patch(
       URL.patchPersonalizacao(uuid),
       {
-        processo_uuid: processoUuid,
         tipo: tipoRelatorio,
-        ...payload,
+        usar_cabecalho_padrao: payload.usar_cabecalho_padrao,
+        usar_logotipo: payload.usar_logotipo,
+        cabecalho: payload.cabecalho,
+        texto_final: payload.texto_final,
+        ...(payload.cabecalho_capa_ata !== undefined
+          ? { cabecalho_capa_ata: payload.cabecalho_capa_ata }
+          : {}),
         uuid: payload.uuid !== undefined ? payload.uuid : null,
       },
       {
