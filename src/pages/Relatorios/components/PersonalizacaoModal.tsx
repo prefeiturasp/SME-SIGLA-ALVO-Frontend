@@ -19,6 +19,7 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
   const [usarLogotipo, setUsarLogotipo] = useState(true);
   const [cabecalhoPadraoHtml, setCabecalhoPadraoHtml] = useState<string>("");
   const [textoPadraoFinalHtml, setTextoPadraoFinalHtml] = useState<string>("");
+  const [cabecalhoCapaAtaHtml, setCabecalhoCapaAtaHtml] = useState<string>("");
   const [personalizacaoUuid, setPersonalizacaoUuid] = useState<string | null>(null);
   const [isLoadingPersonalizacao, setIsLoadingPersonalizacao] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -29,6 +30,7 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
     usarLogotipo: true,
     cabecalhoPadraoHtml: "",
     textoPadraoFinalHtml: "",
+    cabecalhoCapaAtaHtml: "",
   });
 
   useEffect(() => {
@@ -45,21 +47,22 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
       setIsLoadingPersonalizacao(true);
       try {
         const personalizacaoData = await getPersonalizacaoRelatorio(
-          processoUuid,
           selectedRelatorio.key
         );
         
         // Armazenar UUID (sempre vem, mesmo que seja null - similar ao logo da parametrização)
         setPersonalizacaoUuid(personalizacaoData?.uuid ?? null);
-        const usarCabecalho = personalizacaoData?.usar_cabecalho ?? false;
+        const usarCabecalho = personalizacaoData?.usar_cabecalho_padrao ?? false;
         const usarLogotipo = personalizacaoData?.usar_logotipo ?? true;
         const cabecalho = personalizacaoData?.cabecalho ?? "";
         const textoFinal = personalizacaoData?.texto_final ?? "";
+        const cabecalhoCapaAta = personalizacaoData?.cabecalho_capa_ata ?? "";
         
         setUsarCabecalhoPadrao(usarCabecalho);
         setUsarLogotipo(usarLogotipo);
         setCabecalhoPadraoHtml(cabecalho);
         setTextoPadraoFinalHtml(textoFinal);
+        setCabecalhoCapaAtaHtml(cabecalhoCapaAta);
         
         // Armazenar valores iniciais para comparação (sempre definir, mesmo se não houver dados)
         setValoresIniciais({
@@ -67,6 +70,7 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
           usarLogotipo: usarLogotipo,
           cabecalhoPadraoHtml: cabecalho,
           textoPadraoFinalHtml: textoFinal,
+          cabecalhoCapaAtaHtml: cabecalhoCapaAta,
         });
       } catch (error) {
         console.error("Erro ao buscar personalização do relatório:", error);
@@ -86,21 +90,25 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
       setUsarLogotipo(true);
       setCabecalhoPadraoHtml("");
       setTextoPadraoFinalHtml("");
+      setCabecalhoCapaAtaHtml("");
       setValoresIniciais({
         usarCabecalhoPadrao: false,
         usarLogotipo: true,
         cabecalhoPadraoHtml: "",
         textoPadraoFinalHtml: "",
+        cabecalhoCapaAtaHtml: "",
       });
     }
   }, [open]);
   
   const hasChanges = () => {
+    const isAtaEscolha = selectedRelatorio?.key === "ATA_ESCOLHA";
     return (
       usarCabecalhoPadrao !== valoresIniciais.usarCabecalhoPadrao ||
       usarLogotipo !== valoresIniciais.usarLogotipo ||
       cabecalhoPadraoHtml !== valoresIniciais.cabecalhoPadraoHtml ||
-      textoPadraoFinalHtml !== valoresIniciais.textoPadraoFinalHtml
+      textoPadraoFinalHtml !== valoresIniciais.textoPadraoFinalHtml ||
+      (isAtaEscolha && cabecalhoCapaAtaHtml !== valoresIniciais.cabecalhoCapaAtaHtml)
     );
   };
 
@@ -121,12 +129,15 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
     setIsSaving(true);
     try {
       await patchPersonalizacaoRelatorio({
-        processoUuid,
         tipoRelatorio: selectedRelatorio.key,
-        usar_cabecalho: usarCabecalhoPadrao,
+        usar_cabecalho_padrao: usarCabecalhoPadrao,
         usar_logotipo: usarLogotipo,
         cabecalho: cabecalhoPadraoHtml,
         texto_final: textoPadraoFinalHtml,
+        // Enviar somente quando for do tipo ATA_ESCOLHA
+        ...(selectedRelatorio.key === "ATA_ESCOLHA"
+          ? { cabecalho_capa_ata: cabecalhoCapaAtaHtml }
+          : {}),
         uuid: personalizacaoUuid ?? null,
       });
 
@@ -205,6 +216,20 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
             </div>
           </div>
         </div>
+        {/* Seção Cabeçalho da capa (somente para ATA_ESCOLHA) */}
+        {selectedRelatorio?.key === "ATA_ESCOLHA" && (
+          <div>
+            <ModalInfoLabel style={{ display: "block", marginBottom: 12, color: "#000000" }}>
+              Cabeçalho da capa (Ata):
+            </ModalInfoLabel>
+            <QuillEditor
+              value={cabecalhoCapaAtaHtml}
+              onChange={setCabecalhoCapaAtaHtml}
+              placeholder="Digite o cabeçalho da capa da ata"
+              height={140}
+            />
+          </div>
+        )}
 
         {/* Seção Cabeçalho padrão */}
         <div>
@@ -227,6 +252,7 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
             height={140}
           />
         </div>
+
       </div>
       </Spin>
     </Modal>
