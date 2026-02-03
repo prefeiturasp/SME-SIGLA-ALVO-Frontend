@@ -21,6 +21,8 @@ export const URL = {
   postBuscarEscolhasPorCandidatos: () => `/api/v1/escolhas/busca/`,
   postEscolhas: () => `/api/v1/escolhas/`,
   postInclusaoVagasEscolas: () => `/api/v1/vagas-escolas/inclusao/`,
+  getParametrizacao: () => `/api/v1/parametrizacao/`,
+  patchParametrizacao: () => `/api/v1/parametrizacao/bulk/`,
 };
 
 // TODO adicionar JWT no header Authorization
@@ -154,6 +156,45 @@ export const postEscolha = (
   const response = appAxiosEscolhas
     .post(URL.postEscolhas(), payload, {
       signal: axiosRequestConfig?.signal ?? signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// GET Parametrizacao do MS-Escolhas
+export const getParametrizacaoEscolhas = (
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosEscolhas
+    .get(URL.getParametrizacao(), {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// PATCH Parametrizacao do MS-Escolhas
+export const patchParametrizacaoEscolhas = (
+  payload: Record<string, any>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosEscolhas
+    .patch(URL.patchParametrizacao(), payload, {
+      signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })
     .then((response) => response.data);

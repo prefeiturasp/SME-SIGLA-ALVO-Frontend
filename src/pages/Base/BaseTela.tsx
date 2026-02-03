@@ -91,7 +91,8 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
     } else if (
       path.startsWith("/administracao") ||
       path.startsWith("/admin") ||
-      path.startsWith("/gerenciar")
+      path.startsWith("/gerenciar") ||
+      path.startsWith("/parametrizacao")
     ) {
       return ["gerenciar"];
     } else if (
@@ -171,14 +172,20 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
         return [];
       case "gerenciar":
         return [
-          { key: "concursos", label: "Concursos" },
-          { key: "escolas", label: "Escolas" },
-          { key: "usuarios", label: "Usuários" },
-          { key: "configuracoes", label: "Configurações" },
+          {
+            key: "autorizacoes-publicadas",
+            label: "Autorizações publicadas",
+            onClick: () => navigate("/autorizacoes-publicadas"),
+          },
           {
             key: "permissao-usuario",
             label: "Permissão de usuário",
             onClick: () => navigate("/gerenciar/permissao-usuario"),
+          },
+          {
+            key: "cadastro-parametros",
+            label: "Cadastro de Parâmetros",
+            onClick: () => navigate("/parametrizacao"),
           },
         ];
       default:

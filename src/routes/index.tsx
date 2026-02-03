@@ -16,6 +16,7 @@ import RouteError from "./RouteError";
 import GerenciamentoVagasTela from "../pages/GerenciamentoVagas/GerenciamentoVagasTela";
 import EscolhaCandidatosTela from "../pages/EscolhaCandidatos/EscolhaCandidatosTela";
 import PermissaoUsuarioTela from "../pages/Gerenciar/PermissaoUsuario/PermissaoUsuarioTela";
+import CadastroParametrosTela from "../pages/Gerenciar/Parametros/CadastroParametrosTela";
 
 import DadosDoProcesso from "../pages/CriarEditarConvocacao/DadosDoProcesso";
 import SelecaoCargosTela from "../pages/CriarEditarConvocacao/SelecaoCargos/SelecaoCargosTela";
@@ -24,12 +25,18 @@ import Resumo from "../pages/CriarEditarConvocacao/Resumo";
 import PermissionContextGuard from "./PermissionContextGuard";
 import ForbiddenTela from "../pages/Forbidden/ForbiddenTela";
 import RelatoriosTela from "../pages/Relatorios/RelatoriosTela";
+import AutorizacoesPublicadasTela from "../pages/AutorizacoesPublicadas/AutorizacoesPublicadasTela";
+import { HomeTela } from "../pages/Home/HomeTela";
 
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/processos/convocacao" replace />,
+    element: (
+      <ProtectedRoute>
+        <HomeTela />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
   {
@@ -37,6 +44,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <RelatoriosTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/autorizacoes-publicadas",
+    element: (
+      <ProtectedRoute>
+        <AutorizacoesPublicadasTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -88,6 +104,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <PermissaoUsuarioTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/parametrizacao",
+    element: (
+      <ProtectedRoute>
+        <CadastroParametrosTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,

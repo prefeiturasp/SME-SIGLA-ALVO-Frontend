@@ -63,7 +63,7 @@ const ListaCandidatosSessaoModal: React.FC<Props> = ({
         <Typography.Text strong>Sessões</Typography.Text>
         <FilterSelect
           allowClear
-          placeholder="Selecione uma opção"
+          placeholder="Todas as sessões"
           style={{ width: "100%", marginTop: 8 }}
           value={selectedAgendaUuid}
           options={agendaOptions}

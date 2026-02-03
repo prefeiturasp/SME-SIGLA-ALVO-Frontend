@@ -138,7 +138,8 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       setModalTipoVaga(initialValues.tipoVaga);
       setModalRetardatario(initialValues.retardatario);
       setModalDre(initialValues.dre);
-      setModalDreCodigo(initialValues.dreCodigo);
+      // Usar dreCodigo do context diretamente se disponível (modo somente leitura)
+      setModalDreCodigo(context?.dreCodigo || initialValues.dreCodigo);
       setModalUnidadeEscolar(initialValues.unidadeEscolar);
       Promise.resolve().then(() => {
         syncPendingRef.current = false;
@@ -169,44 +170,90 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     shouldFetchVagas
   );
 
+  // Verifica se o modal está em modo somente leitura (candidato já tem escolha feita)
+  const isReadOnly = useMemo(() => {
+    return context?.situacaoCodigo !== "pendente";
+  }, [context?.situacaoCodigo]);
+
   const dreOptions = useMemo(() => {
-    if (!vagasData?.dres || !Array.isArray(vagasData.dres)) {
-      return [];
+    const options: Array<{ value: string; label: string; codigo: string; raw: any }> = [];
+    
+    if (vagasData?.dres && Array.isArray(vagasData.dres)) {
+      vagasData.dres.forEach((dre) => {
+        options.push({
+          value: dre.uuid,
+          label: dre.nome,
+          codigo: dre.codigo,
+          raw: dre,
+        });
+      });
     }
-    return vagasData.dres.map((dre) => ({
-      value: dre.uuid,
-      label: dre.nome,
-      codigo: dre.codigo,
-      raw: dre,
-    }));
-  }, [vagasData?.dres]);
+    
+    // Se estiver em modo somente leitura e tiver dreUuid no context mas não estiver nas opções, adicionar
+    if (isReadOnly && context?.dreUuid && context?.dreCodigo) {
+      const exists = options.some((opt) => opt.value === context.dreUuid);
+      if (!exists) {
+        // Tentar encontrar a DRE nas opções por código primeiro
+        const foundByCodigo = options.find((opt) => opt.codigo === context.dreCodigo);
+        if (!foundByCodigo) {
+          // Se não encontrou, adicionar uma opção temporária (será substituída quando os dados carregarem)
+          options.push({
+            value: context.dreUuid,
+            label: `DRE ${context.dreCodigo}`, // Fallback label
+            codigo: context.dreCodigo,
+            raw: { uuid: context.dreUuid, codigo: context.dreCodigo },
+          });
+        }
+      }
+    }
+    
+    return options;
+  }, [vagasData?.dres, isReadOnly, context?.dreUuid, context?.dreCodigo]);
 
   // Lista de escolas filtradas por DRE com estrutura { uuid, escola, vagas restantes, disabled }
   const escolasPorDre = useMemo(() => {
-    if (!vagasData?.vagas || !Array.isArray(vagasData.vagas) || !modalDreCodigo) {
+    if (!vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
       return [];
     }
-    return vagasData.vagas
-      .filter((vaga: any) => vaga?.escola?.dre?.codigo === modalDreCodigo)
-      .map((vaga: any) => {
-        const vagasPrecariasRestantes = vaga.vagas_precarias_restantes ?? 0;
-        const vagasDefinitivasRestantes = vaga.vagas_definitivas_restantes ?? 0;
-        
-        // Desabilita escola se não tem vagas restantes do tipo selecionado
-        const isDisabled = modalTipoVaga === "definitiva" 
-          ? vagasDefinitivasRestantes <= 0
-          : vagasPrecariasRestantes <= 0;
-        
-        return {
-          value: vaga.uuid,
-          label: vaga?.escola?.nome_oficial || '',
-          disabled: isDisabled,
-          vagasPrecariasRestantes,
-          vagasDefinitivasRestantes,
-          vagaData: vaga,
-        };
-      });
-  }, [vagasData?.vagas, modalDreCodigo, modalTipoVaga]);
+    
+    // Se estiver em modo somente leitura e tiver uma escola selecionada, incluir ela mesmo que não esteja na DRE filtrada
+    let escolasFiltradas: any[] = [];
+    
+    if (modalDreCodigo) {
+      escolasFiltradas = vagasData.vagas.filter(
+        (vaga: any) => vaga?.escola?.dre?.codigo === modalDreCodigo
+      );
+    }
+    
+    // Se estiver em modo somente leitura e tiver vagaEscolaUuid, garantir que a escola esteja na lista
+    if (isReadOnly && context?.vagaEscolaUuid && vagasData.vagas.length > 0) {
+      const escolaSelecionada = vagasData.vagas.find(
+        (vaga: any) => vaga.uuid === context.vagaEscolaUuid
+      );
+      if (escolaSelecionada && !escolasFiltradas.some((v: any) => v.uuid === escolaSelecionada.uuid)) {
+        escolasFiltradas.push(escolaSelecionada);
+      }
+    }
+    
+    return escolasFiltradas.map((vaga: any) => {
+      const vagasPrecariasRestantes = vaga.vagas_precarias_restantes ?? 0;
+      const vagasDefinitivasRestantes = vaga.vagas_definitivas_restantes ?? 0;
+      
+      // Desabilita escola se não tem vagas restantes do tipo selecionado (apenas se não estiver em modo somente leitura)
+      const isDisabled = !isReadOnly && (modalTipoVaga === "definitiva" 
+        ? vagasDefinitivasRestantes <= 0
+        : vagasPrecariasRestantes <= 0);
+      
+      return {
+        value: vaga.uuid,
+        label: vaga?.escola?.nome_oficial || '',
+        disabled: isDisabled,
+        vagasPrecariasRestantes,
+        vagasDefinitivasRestantes,
+        vagaData: vaga,
+      };
+    });
+  }, [vagasData?.vagas, modalDreCodigo, modalTipoVaga, isReadOnly, context?.vagaEscolaUuid]);
 
   const syncedModalDre = useMemo(() => {
     if (!visible) {
@@ -232,20 +279,30 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   }
 
   const calculatedDreCodigo = useMemo(() => {
-    if (!visible || !modalDre) {
+    if (!visible) {
+      return undefined;
+    }
+    // Se tiver dreCodigo no context, usar ele diretamente
+    if (context?.dreCodigo) {
+      return context.dreCodigo;
+    }
+    // Caso contrário, buscar nas opções
+    if (!modalDre) {
       return undefined;
     }
     const matchedDre = dreOptions.find((option) => option.value === modalDre);
     return matchedDre?.codigo;
-  }, [visible, modalDre, dreOptions]);
+  }, [visible, modalDre, dreOptions, context?.dreCodigo]);
 
   const syncModalDreCodigoCallback = useCallback(() => {
-    if (calculatedDreCodigo !== modalDreCodigo && visible) {
-      setModalDreCodigo(calculatedDreCodigo);
+    // Priorizar dreCodigo do context se disponível (modo somente leitura)
+    const targetDreCodigo = context?.dreCodigo || calculatedDreCodigo;
+    if (targetDreCodigo !== modalDreCodigo && visible && targetDreCodigo) {
+      setModalDreCodigo(targetDreCodigo);
     }
-  }, [calculatedDreCodigo, modalDreCodigo, visible]);
+  }, [calculatedDreCodigo, modalDreCodigo, visible, context?.dreCodigo]);
 
-  const needsModalDreCodigoSync = calculatedDreCodigo !== modalDreCodigo && visible;
+  const needsModalDreCodigoSync = (context?.dreCodigo || calculatedDreCodigo) !== modalDreCodigo && visible;
   if (needsModalDreCodigoSync) {
     requestAnimationFrame(() => {
       syncModalDreCodigoCallback();
@@ -336,8 +393,9 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   );
 
   // Limpa a seleção da escola se ela não tiver vagas do tipo selecionado
+  // (apenas quando não estiver em modo somente leitura)
   useEffect(() => {
-    if (!modalUnidadeEscolar || !vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
+    if (isReadOnly || !modalUnidadeEscolar || !vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
       return;
     }
     
@@ -354,7 +412,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
         setModalUnidadeEscolar(undefined);
       }
     }
-  }, [modalTipoVaga, modalUnidadeEscolar, vagasData?.vagas]);
+  }, [modalTipoVaga, modalUnidadeEscolar, vagasData?.vagas, isReadOnly]);
 
   const queryClient = useQueryClient();
 
@@ -461,6 +519,11 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       return;
     }
 
+    // Não permitir salvar se estiver em modo somente leitura
+    if (isReadOnly) {
+      return;
+    }
+
     // Validação apenas quando a situação for "escolha"
     if (modalSituacao === "escolha" && !modalUnidadeEscolar) {
       message.warning("Selecione a unidade escolar para salvar a escolha.");
@@ -537,6 +600,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     selectedProcesso,
     selectedAgendaData,
     sincronizarAgendas,
+    isReadOnly,
   ]);
 
   return (
@@ -549,20 +613,22 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
             size="large"
             onClick={onClose}
           >
-            Cancelar
+            {isReadOnly ? "Fechar" : "Cancelar"}
           </ModalCancelButton>
-          <ModalSaveButton
-            size="large"
-            type="primary"
-            onClick={handleSalvarEscolha}
-            loading={salvarEscolhaIsPending}
-            disabled={
-              salvarEscolhaIsPending || 
-              (modalSituacao === "escolha" && !modalUnidadeEscolar)
-            }
-          >
-            Salvar
-          </ModalSaveButton>
+          {!isReadOnly && (
+            <ModalSaveButton
+              size="large"
+              type="primary"
+              onClick={handleSalvarEscolha}
+              loading={salvarEscolhaIsPending}
+              disabled={
+                salvarEscolhaIsPending || 
+                (modalSituacao === "escolha" && !modalUnidadeEscolar)
+              }
+            >
+              Salvar
+            </ModalSaveButton>
+          )}
         </ModalButtonContainer>
       }
       width={900}
@@ -571,7 +637,9 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       title={null}
     >
       <ModalWrapper>
-        <ModalHeading>Efetuar escolha de candidato</ModalHeading>
+        <ModalHeading>
+          {isReadOnly ? "Visualizar escolha de candidato" : "Efetuar escolha de candidato"}
+        </ModalHeading>
 
         <ModalInfoCard>
           <ModalInfoItem>
@@ -623,10 +691,11 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                 event.target.value as "escolha" | "reconvocacao" | "nao-escolha"
               )
             }
+            disabled={isReadOnly}
           >
-            <ModalRadio value="escolha">Escolha</ModalRadio>
-            <ModalRadio value="reconvocacao">Reconvocação</ModalRadio>
-            <ModalRadio value="nao-escolha">Não escolha</ModalRadio>
+            <ModalRadio value="escolha" disabled={isReadOnly}>Escolha</ModalRadio>
+            <ModalRadio value="reconvocacao" disabled={isReadOnly}>Reconvocação</ModalRadio>
+            <ModalRadio value="nao-escolha" disabled={isReadOnly}>Não escolha</ModalRadio>
           </ModalRadioGroup>
         </ModalSection>
 
@@ -645,7 +714,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                     options={dreOptions}
                     allowClear
                     loading={vagasIsLoading}
-                    disabled={vagasIsLoading || !cargoCodigoNumericoParam}
+                    disabled={isReadOnly || vagasIsLoading || !cargoCodigoNumericoParam}
                     showSearch
                     optionFilterProp="label"
                     filterOption={filterOptionByLabel}
@@ -661,7 +730,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                     }
                     options={escolasPorDre}
                     allowClear
-                    disabled={!modalDreCodigo}
+                    disabled={isReadOnly || !modalDreCodigo}
                     showSearch
                     optionFilterProp="label"
                     filterOption={filterOptionByLabel}
@@ -681,11 +750,12 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                         event.target.value as "precaria" | "definitiva"
                       )
                     }
+                    disabled={isReadOnly}
                   >
-                    <ModalRadio value="precaria" disabled={tipoVagaDisabled.precaria}>
+                    <ModalRadio value="precaria" disabled={isReadOnly || tipoVagaDisabled.precaria}>
                       Precária
                     </ModalRadio>
-                    <ModalRadio value="definitiva" disabled={tipoVagaDisabled.definitiva}>
+                    <ModalRadio value="definitiva" disabled={isReadOnly || tipoVagaDisabled.definitiva}>
                       Definitiva
                     </ModalRadio>
                   </ModalRadioGroup>
