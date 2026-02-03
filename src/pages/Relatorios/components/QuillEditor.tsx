@@ -33,6 +33,7 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
         toolbar: [
           [{ header: [1, 2, 3, false] }],
           ["bold", "italic", "underline", "strike"],
+          [{ align: [] }, { align: false }],
           [{ list: "ordered" }, { list: "bullet" }],
           ["link"],
           ["clean"],
