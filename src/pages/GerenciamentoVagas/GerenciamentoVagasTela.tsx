@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Card,
   Row,
@@ -59,7 +59,7 @@ const GerenciamentoVagasTela: React.FC = () => {
     concursoIsLoading,
     handleSelectCargo,
     optionsDres,
-    isLoadingVagasEscolas,    
+    isLoadingVagasEscolas,
     vagasEscolasData,
     setVagasEscolasData,
     handleBuscarVagas,
@@ -85,9 +85,9 @@ const GerenciamentoVagasTela: React.FC = () => {
     setModalIncluirEscolasVisible(false);
   };
   
-    const handleEscolasSelecionadas = (payload: IInclusaoVagasEscolasPayload) => {
-      postInclusaoVagasEscolasMutation.mutate(payload);
-    };
+  const handleEscolasSelecionadas = (payload: any) => {
+    postInclusaoVagasEscolasMutation.mutate(payload as any);
+  };
   
   const draggerProps: UploadProps = {
     name: 'file',
@@ -145,7 +145,12 @@ const GerenciamentoVagasTela: React.FC = () => {
 
     marginTop: 20,
   };
-  const showCargo = Boolean(cargoSelecionado) || ((dadosVagasNasEscolas?.vagas?.length ?? 0) > 0);
+  const showCargo = ((dadosVagasNasEscolas?.vagas?.length ?? 0) > 0);
+  const allowedCargoCodigos = useMemo(() => {
+    const vagas = Array.isArray(dadosVagasNasEscolas?.vagas) ? dadosVagasNasEscolas!.vagas as any[] : [];
+    const codigos = vagas.map((v: any) => Number(v?.cargo_codigo)).filter((n) => Number.isFinite(n));
+    return new Set<number>(codigos);
+  }, [dadosVagasNasEscolas?.vagas]);
   
   return (
     <>
@@ -212,6 +217,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                     <StyledSelect
                       style={{ marginTop: 6 }}
                       placeholder="Selecione o cargo"
+                      value={cargoSelecionado}
                       onChange={(value: unknown) => {
                         handleSelectCargo(value as string | undefined);
                         handleBuscarVagas();
@@ -219,11 +225,15 @@ const GerenciamentoVagasTela: React.FC = () => {
                       loading={concursoIsLoading}
                       allowClear
                     >
-                      {Array.isArray(concursoData?.cargos) && concursoData?.cargos.map((cargo: any) => (
-                        <Select.Option key={cargo.uuid} value={cargo.uuid}>
-                          {cargo.nome}
-                        </Select.Option>
-                      ))}
+                      {Array.isArray(concursoData?.cargos) && concursoData?.cargos.map((cargo: any) => {
+                        const codigoNum = Number(cargo?.codigo);
+                        const isHabilitado = allowedCargoCodigos.has(codigoNum);
+                        return (
+                          <Select.Option key={cargo.uuid} value={cargo.uuid} disabled={!isHabilitado}>
+                            {cargo.nome}
+                          </Select.Option>
+                        );
+                      })}
                     </StyledSelect>
                   </CustomFormItem>
                 </Col>

@@ -4,7 +4,6 @@ import useConvocacao from "../../Processos/ConvocacaoCandidatos/hooks/useConvoca
 import { useGetVagasEscolas } from "./useGetVagasEscolas";
 import { useForm } from "react-hook-form";
 import useListRequest from "../../../hooks/useListRequest";
-import useGetImportacaoArquivosVagas from "./useGetImportacaoArquivosVagas";
 import { usePostImportacaoArquivosVagas } from "./usePostImportacaoArquivosVagas";
 import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
 import { useGetConcursoByUuid } from "./useGetConcursoPorUuid";
@@ -23,6 +22,7 @@ export const useGerenciamentoVagas = () => {
   const [uploadConcluido, setUploadConcluido] = useState<boolean>(false);
   const [cargoSelecionado, setCargoSelecionado] = useState<string | undefined>();
   const [concursoUuid, setConcursoUuid] = useState<string | undefined>();
+  const [podeBuscarConcurso, setPodeBuscarConcurso] = useState<boolean>(false);
   const [vagasEscolasData, setVagasEscolasData] = useState<IVaga[]>([]);
   const [vagasEditadas, setVagasEditadas] = useState<Record<string, { vagas_definitivas_extra?: number|string; vagas_precarias_extra?: number|string }>>({});
   const [selecionadas, setSelecionadas] = useState<IVaga[]>([]);
@@ -35,7 +35,7 @@ export const useGerenciamentoVagas = () => {
     processosConvocacaoData,
     processosConvocacaoIsLoading
   } = useConvocacao(paramsProcessosConvocacao);
-  const { concursoData, concursoIsLoading } = useGetConcursoByUuid(concursoUuid || "");
+  const { concursoData, concursoIsLoading } = useGetConcursoByUuid(podeBuscarConcurso ? (concursoUuid || "") : "");
   const cargoCodigo = (concursoData?.cargos || []).find((c: any) => c.uuid === cargoSelecionado)?.codigo as string | undefined;
   const { 
     dadosVagasNasEscolas,
@@ -47,10 +47,7 @@ export const useGerenciamentoVagas = () => {
     useListRequest({
       pagination: { page: 1, page_size: 10 },
     });
-  const { importacoesArquivosData, importacoesArquivosIsLoading, importacoesArquivosRefetch } = useGetImportacaoArquivosVagas(listRequest);
-  const postImportacaoArquivosVagasMutation = usePostImportacaoArquivosVagas({
-    onSuccess: () => importacoesArquivosRefetch(),
-  });
+  const postImportacaoArquivosVagasMutation = usePostImportacaoArquivosVagas({});
   const postInclusaoVagasEscolasMutation = usePostInclusaoVagasEscolas();
   const {
     control,
@@ -70,6 +67,14 @@ export const useGerenciamentoVagas = () => {
   useEffect(() => {
     if (!isFetchingVagasEscolas && Array.isArray(dadosVagasNasEscolas?.vagas)) {
       setVagasEscolasData(dadosVagasNasEscolas!.vagas as any);
+    }
+  }, [isFetchingVagasEscolas, dadosVagasNasEscolas]);
+  
+  // Habilita buscar concurso somente quando houver vagas retornadas
+  useEffect(() => {
+    if (!isFetchingVagasEscolas) {
+      const hasVagas = Array.isArray(dadosVagasNasEscolas?.vagas) && (dadosVagasNasEscolas!.vagas as any[]).length > 0;
+      setPodeBuscarConcurso(!!hasVagas);
     }
   }, [isFetchingVagasEscolas, dadosVagasNasEscolas]);
   
@@ -100,6 +105,11 @@ export const useGerenciamentoVagas = () => {
   const handleSelectProcessoConvocacao = (value: string | undefined) => {
     setProcessoSelecionado(value);
     setPodeBuscarVagas(Boolean(value));
+    // Ao trocar o processo, limpar cargo selecionado e dados de vagas locais
+    setCargoSelecionado(undefined);
+    setVagasEscolasData([]);
+    // Ao trocar o processo, aguardar resultado de vagas antes de buscar concurso
+    setPodeBuscarConcurso(false);
     const results = (processosConvocacaoData?.results ?? []) as any[];
     const found = results.find((item) => item?.uuid === value);
     setConcursoUuid(found?.concurso_uuid);
@@ -205,8 +215,6 @@ export const useGerenciamentoVagas = () => {
     handleFileUpload,
     handleSelectCargo,
     watch,
-    importacoesArquivosData,
-    importacoesArquivosIsLoading,
     onAntTableChange,
     control,
     handleSubmit,
