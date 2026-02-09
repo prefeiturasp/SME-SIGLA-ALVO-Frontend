@@ -4,6 +4,7 @@ import type { FormatoRelatorio, IRelatorioPayload } from "./IRelatorios";
 
 export const URL = {
   postRelatorios: () => `/api/v1/relatorios/`,
+  getAtaEscolhaCargos: () => `/api/v1/relatorios/ata-escolha-cargos/`,
   getParametrizacao: () => `/api/v1/parametrizacao/`,
   patchParametrizacao: (uuid?: string) => uuid ? `/api/v1/parametrizacao/${uuid}/` : `/api/v1/parametrizacao/`,
   getPersonalizacao: () => `/api/v1/personalizacao/`,
@@ -33,6 +34,22 @@ export const postRelatorio = (
     response,
     abort,
   };
+};
+
+/** GET cargos do processo para Ata de Escolha (modal de seleção) */
+export const getAtaEscolhaCargos = (
+  processoUuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosRelatorios
+    .get(URL.getAtaEscolhaCargos(), {
+      params: { processo_uuid: processoUuid },
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data as { cargos: Array<{ cargo_codigo: string; cargo_nome: string }> });
+  return { response, abort };
 };
 
 // GET Parametrizacao do MS-Relatorios
