@@ -36,21 +36,6 @@ export const postRelatorio = (
   };
 };
 
-/** GET cargos do processo para Ata de Escolha (modal de seleção) */
-export const getAtaEscolhaCargos = (
-  processoUuid: string,
-  axiosRequestConfig?: AxiosRequestConfig
-) => {
-  const { signal, abort } = new AbortController();
-  const response = appAxiosRelatorios
-    .get(URL.getAtaEscolhaCargos(), {
-      params: { processo_uuid: processoUuid },
-      signal: axiosRequestConfig?.signal || signal,
-      ...axiosRequestConfig,
-    })
-    .then((res) => res.data as { cargos: Array<{ cargo_codigo: string; cargo_nome: string }> });
-  return { response, abort };
-};
 
 // GET Parametrizacao do MS-Relatorios
 export const getParametrizacaoRelatorios = (

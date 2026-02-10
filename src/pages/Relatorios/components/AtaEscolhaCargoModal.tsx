@@ -29,11 +29,16 @@ const AtaEscolhaCargoModal: React.FC<Props> = ({
       return;
     }
     setLoading(true);
-    API.Relatorios.getAtaEscolhaCargos(processoUuid)
-      .response.then((data: { cargos: CargoItem[] }) => {
-        setCargos(data?.cargos ?? []);
-        if (data?.cargos?.length === 1) {
-          setSelectedCargoCodigo(data.cargos[0].cargo_codigo);
+    API.Convocacao.getProcessoConvocacaoPorUUID(processoUuid)
+      .response.then((data) => {
+        const cargosProcesso = data?.cargos_processo ?? [];
+        const cargosMapeados: CargoItem[] = cargosProcesso.map((c) => ({
+          cargo_codigo: c.cargo_codigo,
+          cargo_nome: c.cargo_nome,
+        }));
+        setCargos(cargosMapeados);
+        if (cargosMapeados.length === 1) {
+          setSelectedCargoCodigo(cargosMapeados[0].cargo_codigo);
         } else {
           setSelectedCargoCodigo(undefined);
         }

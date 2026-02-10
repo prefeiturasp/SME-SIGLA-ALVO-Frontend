@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosProcessoConvocacao } from "../../axios";
-import type { ISample, IProcessoConvocacao, IPostProcessoConvocacaoPayload, IProcessoConvocacaoResumo, ICargoProcesso } from "./IConvocacao";
+import type { ISample, IProcessoConvocacao, IProcessoConvocacaoDetalhe, IPostProcessoConvocacaoPayload, IProcessoConvocacaoResumo, ICargoProcesso } from "./IConvocacao";
 import type { IBackendWithSubOptions, IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
@@ -57,7 +57,7 @@ export const getProcessoConvocacaoPorUUID = (
   const { signal, abort } = new AbortController();
 
   const response = appAxiosProcessoConvocacao
-    .get<IProcessoConvocacao>(URL.getProcessoConvocacaoPorUUID(uuid), {
+    .get<IProcessoConvocacaoDetalhe>(URL.getProcessoConvocacaoPorUUID(uuid), {
       signal,
       ...axiosRequestConfig,
     })
