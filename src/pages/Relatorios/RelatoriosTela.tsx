@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useRelatorios } from "./hooks/useRelatorios";
 import ListaCandidatosSessaoModal from "./components/ListaCandidatosSessaoModal";
+import AtaEscolhaCargoModal from "./components/AtaEscolhaCargoModal";
 import { usePostRelatorio } from "./hooks/usePostRelatorio";
 import { FilterSelect, FilterLabel } from "../EscolhaCandidatos/styles";
 import PersonalizacaoModal from "./components/PersonalizacaoModal";
@@ -59,6 +60,13 @@ const RelatoriosTela: React.FC = () => {
   const [pendingListaAction, setPendingListaAction] = useState<
     ({ record: RelatorioLinha } & PendingListaAction) | null
   >(null);
+  const [ataCargoModalOpen, setAtaCargoModalOpen] = useState(false);
+  type PendingAtaAction =
+    | { action: "visualizar" }
+    | { action: "export"; formato: "xls" | "pdf" | "docx" };
+  const [pendingAtaAction, setPendingAtaAction] = useState<
+    ({ record: RelatorioLinha } & PendingAtaAction) | null
+  >(null);
 
   const dataSource: RelatorioLinha[] = useMemo(
     () => [
@@ -69,9 +77,7 @@ const RelatoriosTela: React.FC = () => {
       { key: "SUMULA_RECONVOCACAO", tipo: "Súmula de Reconvocados" },
       { key: "SUMULA_NAO_ESCOLHAS", tipo: "Súmula de Não Escolha" },
       { key: "LISTAGEM_ESCOLHAS_DRES", tipo: "Listagem de Escolhas por DREs" },
-      { key: "RESULTADO_ESCOLHA_SIM", tipo: "Resultado de Escolha de vagas - Sim" },
-      { key: "RESULTADO_ESCOLHA_NAO", tipo: "Resultado de Escolha de vagas - Não" },
-      { key: "RESULTADO_ESCOLHA_RECONVOCACAO", tipo: "Resultado de Escolha de vagas - Reconvocação" },
+      { key: "RESULTADO_ESCOLHA", tipo: "Resultado de Escolha de Vagas" },
       { key: "LISTA_CANDIDATOS_SESSAO", tipo: "Lista de Candidatos por Sessão" },
       { key: "ATA_ESCOLHA", tipo: "Ata de Escolha" },
     ],
@@ -92,53 +98,67 @@ const RelatoriosTela: React.FC = () => {
     setPreviewVisible(false);
   };
 
-  const buildPayload = useCallback((record: RelatorioLinha) => {
-    const payload: Record<string, unknown> = {
-      processo_uuid: filtroSelect,
-      cabecalho: cabecalhoHtml,
-      tipo: record.key,
-      usuario: localStorage.getItem("USUARIO") ?? "",
-    };
-    if (record.key === "LISTA_CANDIDATOS_SESSAO") {
-      payload.agenda_uuid = listaSelectedOption;
-    }
-    return payload;
-  }, [cabecalhoHtml, filtroSelect, listaSelectedOption]);
-
-  const executeVisualizar = useCallback(async (record: RelatorioLinha, overrideAgendaUuid?: string) => {
-    if (!filtroSelect) {
-      setProcessoError("Selecione um processo");
-      return;
-    }
-    if (!record?.key) {
-      message.error("Tipo de relatório não identificado.");
-      return;
-    }
-
-    const payload = buildPayload(record);
-    if (record.key === "LISTA_CANDIDATOS_SESSAO") {
-      if (overrideAgendaUuid) {
-        (payload as any).agenda_uuid = overrideAgendaUuid;
+  const buildPayload = useCallback(
+    (
+      record: RelatorioLinha,
+      overrides?: { agenda_uuid?: string; cargo_codigo?: string }
+    ) => {
+      const payload: Record<string, unknown> = {
+        processo_uuid: filtroSelect,
+        cabecalho: cabecalhoHtml,
+        tipo: record.key,
+        usuario: localStorage.getItem("USUARIO") ?? "",
+      };
+      if (record.key === "LISTA_CANDIDATOS_SESSAO") {
+        payload.agenda_uuid = overrides?.agenda_uuid ?? listaSelectedOption;
       }
-    }
-
-    try {
-      const result = await postRelatorio(payload, "html");
-      if (result instanceof Blob) {
-        const url = URL.createObjectURL(result);
-        setPreviewUrl(url);
-        setPreviewVisible(true);
-      } else if (typeof result === "string") {
-        setPreviewHtml(result);
-        setPreviewVisible(true);
-      } else {
-        setPreviewText(JSON.stringify(result, null, 2));
-        setPreviewVisible(true);
+      if (record.key === "ATA_ESCOLHA" && overrides?.cargo_codigo) {
+        payload.cargo_codigo = overrides.cargo_codigo;
       }
-    } catch (err) {
-      message.error("Não foi possível gerar o relatório.");
-    }
-  }, [buildPayload, filtroSelect, postRelatorio]);
+      return payload;
+    },
+    [cabecalhoHtml, filtroSelect, listaSelectedOption]
+  );
+
+  const executeVisualizar = useCallback(
+    async (
+      record: RelatorioLinha,
+      overrideAgendaUuid?: string,
+      overrideCargoCodigo?: string
+    ) => {
+      if (!filtroSelect) {
+        setProcessoError("Selecione um processo");
+        return;
+      }
+      if (!record?.key) {
+        message.error("Tipo de relatório não identificado.");
+        return;
+      }
+
+      const payload = buildPayload(record, {
+        agenda_uuid: overrideAgendaUuid,
+        cargo_codigo: overrideCargoCodigo,
+      });
+
+      try {
+        const result = await postRelatorio(payload, "html");
+        if (result instanceof Blob) {
+          const url = URL.createObjectURL(result);
+          setPreviewUrl(url);
+          setPreviewVisible(true);
+        } else if (typeof result === "string") {
+          setPreviewHtml(result);
+          setPreviewVisible(true);
+        } else {
+          setPreviewText(JSON.stringify(result, null, 2));
+          setPreviewVisible(true);
+        }
+      } catch (err) {
+        message.error("Não foi possível gerar o relatório.");
+      }
+    },
+    [buildPayload, filtroSelect, postRelatorio]
+  );
 
   const handleVisualizar = useCallback(
     async (record: RelatorioLinha) => {
@@ -153,75 +173,86 @@ const RelatoriosTela: React.FC = () => {
         setListaModalOpen(true);
         return;
       }
+      if (record.key === "ATA_ESCOLHA") {
+        setPendingAtaAction({ action: "visualizar", record });
+        setAtaCargoModalOpen(true);
+        return;
+      }
       return executeVisualizar(record);
     },
     [executeVisualizar, filtroSelect]
   );
 
-  const executeExport = useCallback(async (record: RelatorioLinha, formato: "xls" | "pdf" | "docx", overrideAgendaUuid?: string) => {
-    if (!filtroSelect) {
-      setProcessoError("Selecione um processo");
-      return;
-    }
-    if (!record?.key) {
-      message.error("Tipo de relatório não identificado.");
-      return;
-    }
-
-    const payload = buildPayload(record);
-    if (record.key === "LISTA_CANDIDATOS_SESSAO") {
-      if (overrideAgendaUuid) {
-        (payload as any).agenda_uuid = overrideAgendaUuid;
+  const executeExport = useCallback(
+    async (
+      record: RelatorioLinha,
+      formato: "xls" | "pdf" | "docx",
+      overrideAgendaUuid?: string,
+      overrideCargoCodigo?: string
+    ) => {
+      if (!filtroSelect) {
+        setProcessoError("Selecione um processo");
+        return;
       }
-    }
+      if (!record?.key) {
+        message.error("Tipo de relatório não identificado.");
+        return;
+      }
 
-    try {
-      const result = await postRelatorio(payload, formato);
-      let blob: Blob;
-      if (result instanceof Blob) {
-        blob = result;
-      } else if (typeof result === "string") {
-        let type: string;
-        if (formato === "pdf") {
-          type = "application/pdf";
-        } else if (formato === "docx") {
-          type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      const payload = buildPayload(record, {
+        agenda_uuid: overrideAgendaUuid,
+        cargo_codigo: overrideCargoCodigo,
+      });
+
+      try {
+        const result = await postRelatorio(payload, formato);
+        let blob: Blob;
+        if (result instanceof Blob) {
+          blob = result;
+        } else if (typeof result === "string") {
+          let type: string;
+          if (formato === "pdf") {
+            type = "application/pdf";
+          } else if (formato === "docx") {
+            type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+          } else {
+            type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+          }
+          blob = new Blob([result], { type });
         } else {
-          type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+          let type: string;
+          if (formato === "pdf") {
+            type = "application/pdf";
+          } else if (formato === "docx") {
+            type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+          } else {
+            type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+          }
+          blob = new Blob([JSON.stringify(result ?? {}, null, 2)], { type });
         }
-        blob = new Blob([result], { type });
-      } else {
-        let type: string;
-        if (formato === "pdf") {
-          type = "application/pdf";
-        } else if (formato === "docx") {
-          type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-        } else {
-          type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-        }
-        blob = new Blob([JSON.stringify(result ?? {}, null, 2)], { type });
-      }
 
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      let ext: string;
-      if (formato === "pdf") {
-        ext = "pdf";
-      } else if (formato === "docx") {
-        ext = "docx";
-      } else {
-        ext = "xlsx";
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        let ext: string;
+        if (formato === "pdf") {
+          ext = "pdf";
+        } else if (formato === "docx") {
+          ext = "docx";
+        } else {
+          ext = "xlsx";
+        }
+        a.href = url;
+        a.download = `${record.key.toLowerCase()}-${Date.now()}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        message.error("Não foi possível exportar o relatório.");
       }
-      a.href = url;
-      a.download = `${record.key.toLowerCase()}-${Date.now()}.${ext}`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      message.error("Não foi possível exportar o relatório.");
-    }
-  }, [buildPayload, filtroSelect, postRelatorio]);
+    },
+    [buildPayload, filtroSelect, postRelatorio]
+  );
 
   const handleExport = useCallback(
     async (record: RelatorioLinha, formato: "xls" | "pdf" | "docx") => {
@@ -234,6 +265,11 @@ const RelatoriosTela: React.FC = () => {
         setListaSelectedCandidatosUuids(undefined);
         setPendingListaAction({ action: "export", formato, record });
         setListaModalOpen(true);
+        return;
+      }
+      if (record.key === "ATA_ESCOLHA") {
+        setPendingAtaAction({ action: "export", formato, record });
+        setAtaCargoModalOpen(true);
         return;
       }
       return executeExport(record, formato);
@@ -258,6 +294,24 @@ const RelatoriosTela: React.FC = () => {
       }
     },
     [pendingListaAction, executeExport, executeVisualizar]
+  );
+
+  const handleAtaCargoOk = useCallback(
+    ({ cargoCodigo }: { cargoCodigo?: string }) => {
+      const pending = pendingAtaAction;
+      if (!pending) {
+        setAtaCargoModalOpen(false);
+        return;
+      }
+      setAtaCargoModalOpen(false);
+      setPendingAtaAction(null);
+      if (pending.action === "visualizar") {
+        executeVisualizar(pending.record, undefined, cargoCodigo);
+      } else {
+        executeExport(pending.record, pending.formato, undefined, cargoCodigo);
+      }
+    },
+    [pendingAtaAction, executeExport, executeVisualizar]
   );
 
   const getExportFormats = useCallback((_recordKey: string): ("xls" | "pdf" | "docx")[] => {
@@ -430,6 +484,15 @@ const RelatoriosTela: React.FC = () => {
         onCancel={() => {
           setListaModalOpen(false);
           setPendingListaAction(null);
+        }}
+      />
+      <AtaEscolhaCargoModal
+        open={ataCargoModalOpen}
+        processoUuid={filtroSelect}
+        onOk={handleAtaCargoOk}
+        onCancel={() => {
+          setAtaCargoModalOpen(false);
+          setPendingAtaAction(null);
         }}
       />
       <PersonalizacaoModal

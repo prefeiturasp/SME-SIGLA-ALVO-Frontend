@@ -4,6 +4,7 @@ import type { FormatoRelatorio, IRelatorioPayload } from "./IRelatorios";
 
 export const URL = {
   postRelatorios: () => `/api/v1/relatorios/`,
+  getAtaEscolhaCargos: () => `/api/v1/relatorios/ata-escolha-cargos/`,
   getParametrizacao: () => `/api/v1/parametrizacao/`,
   patchParametrizacao: (uuid?: string) => uuid ? `/api/v1/parametrizacao/${uuid}/` : `/api/v1/parametrizacao/`,
   getPersonalizacao: () => `/api/v1/personalizacao/`,
@@ -34,6 +35,7 @@ export const postRelatorio = (
     abort,
   };
 };
+
 
 // GET Parametrizacao do MS-Relatorios
 export const getParametrizacaoRelatorios = (
