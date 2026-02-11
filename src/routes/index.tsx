@@ -7,6 +7,7 @@ import ImportacaoDadosTela from "../pages/ImportacaoDados/ImportacaoDadosTela";
 import ImportacaoDados2 from "../pages/Processos/ImportacaoDados/ImportacaoDados2";
 import LayoutPadraoTela from "../pages/LayoutPadraoTela/LayoutPadraoTela";
 import HistoricoVagasTela from "../pages/HistoricoVagas/HistoricoVagasTela";
+import HistoricoEscolhasTela from "../pages/ImportacaoDados/Escolhas/HistoricoEscolhasTela";
 import NotFoundTela from "../pages/NotFound/NotFoundTela";
 import LoginTela from "../pages/Login/LoginTela";
 import EsqueceuSenhaTela from "../pages/Login/EsqueceuSenhaTela";
@@ -224,6 +225,15 @@ const router = createBrowserRouter([
         <PermissionContextGuard model="importacaoarquivovagas" permissaoDeExibirATELA="view_importacaoarquivovagas">
         <HistoricoVagasTela />
         </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/processos/importacao-dados/historico-escolhas",
+    element: (
+      <ProtectedRoute>
+        <HistoricoEscolhasTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,

@@ -9,6 +9,7 @@ import { useLayoutDownload } from "../../hooks/useLayoutDownload";
 import HistoricoHabilitadosModal from "./Habilitados/components/HistoricoHabilitadosModal";
 import HabilitadosFormTab from "./Habilitados/HabilitadosFormTab";
 import VagasFormTab from "./Vagas/VagasFormTab";
+import EscolhasFormTab from "./Escolhas/EscolhasFormTab";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 
 const { Text } = Typography;
@@ -92,40 +93,53 @@ const ImportacaoDadosTela: React.FC = () => {
         />
       ),
     },
+    {
+      key: "ESCOLHAS",
+      label: "Escolhas",
+      children: (
+        <EscolhasFormTab
+          onShowLayoutPadrao={() => handleShowLayoutPadrao("ESCOLHAS")}
+          canViewHistoricoVagas={canViewHistoricoVagas}
+          canImportarVagas={canAddImportacaoArquivoVagas}
+        />
+      ),
+    },
   ];
 
-  const { handleBaixarArquivo, isDownloading } = useLayoutDownload();
+  const { handleBaixarArquivo } = useLayoutDownload();
 
   return (
     <BaseTela
       breadcrumbItems={breadcrumbItems}
       title="Importação de dados"
       buttons={
-        <ButtonGroup>
-          <Tooltip title={!canViewLayoutArquivoImportacao?"Você não possui permissão para essa ação":"Ver layout padrão"} arrow={true} >
-          <Button
-            disabled={!canViewLayoutArquivoImportacao}
-            size="large"
-            onClick={() => handleShowLayoutPadrao(activeTab)}
-            style={{ color: "#434343" }}
-          >
-            <EyeOutlined style={{ fontSize: 22, color: "#838383" }} /> Ver
-            layout Padrão
-          </Button>
-          </Tooltip>
+        activeTab !== "ESCOLHAS" ? (
+          <ButtonGroup>
+            <Tooltip title={!canViewLayoutArquivoImportacao?"Você não possui permissão para essa ação":"Ver layout padrão"} arrow={true} >
+            <Button
+              disabled={!canViewLayoutArquivoImportacao}
+              size="large"
+              onClick={() => handleShowLayoutPadrao(activeTab)}
+              style={{ color: "#434343" }}
+            >
+              <EyeOutlined style={{ fontSize: 22, color: "#838383" }} /> Ver
+              layout Padrão
+            </Button>
+            </Tooltip>
 
-          <Tooltip title={!canBaixarLayoutArquivoImportacao?"Você não possui permissão para essa ação":"Baixar layout padrão"} arrow={true} > 
-          <Button
-            size="large"
-            onClick={() => handleBaixarArquivo(activeTab)}
-            style={{ color: "#434343" }}
-            disabled={!canBaixarLayoutArquivoImportacao}
-          >
-            <CloudDownloadOutlined style={{ fontSize: 22, color: "#838383" }} />{" "}
-            Baixar layout Padrão
-          </Button>
-          </Tooltip>
-        </ButtonGroup>
+            <Tooltip title={!canBaixarLayoutArquivoImportacao?"Você não possui permissão para essa ação":"Baixar layout padrão"} arrow={true} > 
+            <Button
+              size="large"
+              onClick={() => handleBaixarArquivo(activeTab)}
+              style={{ color: "#434343" }}
+              disabled={!canBaixarLayoutArquivoImportacao}
+            >
+              <CloudDownloadOutlined style={{ fontSize: 22, color: "#838383" }} />{" "}
+              Baixar layout Padrão
+            </Button>
+            </Tooltip>
+          </ButtonGroup>
+        ) : undefined
       }
     >
       <>

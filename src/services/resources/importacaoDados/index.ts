@@ -4,7 +4,10 @@ import type {
   IGetLayout,
   IImportacaoFundacao,
   IUltimasImportacoesVagas,
-  IErroImportacaoResposta
+  IErroImportacaoResposta,
+  IImportacaoEscolhasPayload,
+  IImportacaoEscolhasResponse,
+  IUltimasImportacoesEscolhas
 } from "./IImportacaoArquivos";
 import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
@@ -22,6 +25,10 @@ export const URL = {
   postImportacaoArquivosVagas: () => `/api/v1/importacao-arquivo/vagas/`,
   getErrosVagas: () => `/api/v1/importacao-arquivo/vagas/erros/`,
   getErrosVagasDownload: () => `/api/v1/importacao-arquivo/vagas/erros/download/`,
+  postImportacaoEscolhas: () => `/api/v1/importacao-escolhas/`,
+  getImportacaoEscolhas: () => `/api/v1/importacao-escolhas/`,
+  getErrosEscolhas: () => `/api/v1/importacao-escolhas/erros/`,
+  getErrosEscolhasDownload: () => `/api/v1/importacao-escolhas/erros/download/`,
 };
 
 export const postImportacaoArquivosVagas = (
@@ -251,6 +258,98 @@ export const getErrosVagasDownload = (
   const { signal, abort } = new AbortController();
   const response = appAxiosImportaArquivos
     .get<Blob>(URL.getErrosVagasDownload(), {
+      params: { importacao_uuid, ...params },
+      paramsSerializer: queryParamsSerializer,
+      responseType: 'blob',
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+  return {
+    response,
+    abort,
+  };
+};
+
+// Importação de escolhas
+export const postImportacaoEscolhas = (
+  payload: IImportacaoEscolhasPayload,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosImportaArquivos
+    .post<IImportacaoEscolhasResponse>(URL.postImportacaoEscolhas(), payload, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// Buscar importações de escolhas
+export const getImportacaoEscolhas = (
+  listRequest: IListRequest<unknown>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { pagination, ...rest } = listRequest;
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosImportaArquivos
+    .get<PaginatedResponse<IImportacaoEscolhasResponse>>(URL.getImportacaoEscolhas(), {
+      params: { ...pagination, ...rest },
+      paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// Buscar erros de escolhas
+export const getErrosEscolhas = (
+  importacao_uuid: string,
+  params?: Record<string, any>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosImportaArquivos
+    .get<PaginatedResponse<IErroImportacaoResposta>>(
+      URL.getErrosEscolhas(),
+      {
+        params: { importacao_uuid, ...params },
+        paramsSerializer: queryParamsSerializer,
+        signal,
+        ...axiosRequestConfig,
+      }
+    )
+    .then((response) => response.data);
+  return {
+    response,
+    abort,
+  };
+};
+
+// Download erros de escolhas - retorna Blob
+export const getErrosEscolhasDownload = (
+  importacao_uuid: string,
+  params?: Record<string, any>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosImportaArquivos
+    .get<Blob>(URL.getErrosEscolhasDownload(), {
       params: { importacao_uuid, ...params },
       paramsSerializer: queryParamsSerializer,
       responseType: 'blob',
