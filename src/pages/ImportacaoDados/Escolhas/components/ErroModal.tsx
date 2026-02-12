@@ -26,86 +26,6 @@ const ErroModal: React.FC<ErroModalProps> = ({
   onDownload,
   isDownloading,
 }) => {
-  // Função para formatar erros de forma técnica mas compreensível
-  const formatarErro = (erro: string): string => {
-    if (!erro) return "";
-    
-    // Remover tracebacks e informações de debug muito técnicas
-    let erroFormatado = erro
-      .replace(/Traceback \(most recent call last\):.*?File.*?\n/g, "")
-      .replace(/File ".*?", line \d+, in .*?\n/g, "")
-      .replace(/^\s+/gm, "")
-      .trim();
-    
-    // Mapear termos técnicos para linguagem mais compreensível
-    const traducoes: Record<string, string> = {
-      "DoesNotExist": "não foi encontrado",
-      "MultipleObjectsReturned": "múltiplos registros encontrados",
-      "ValidationError": "Erro de validação",
-      "IntegrityError": "Erro de integridade de dados",
-      "ConnectionError": "Erro de conexão",
-      "Timeout": "Tempo de espera esgotado",
-      "404": "Não encontrado",
-      "400": "Requisição inválida",
-      "500": "Erro interno do servidor",
-      "401": "Não autorizado",
-      "403": "Acesso negado",
-      "API": "serviço externo",
-      "endpoint": "serviço",
-      "request": "requisição",
-      "response": "resposta",
-      "payload": "dados enviados",
-      "uuid": "identificador",
-      "CPF": "CPF",
-      "EOL": "código EOL",
-      "processo_uuid": "identificador do processo",
-      "concurso_uuid": "identificador do concurso",
-      "candidato_uuid": "identificador do candidato",
-    };
-    
-    // Aplicar traduções
-    Object.entries(traducoes).forEach(([tecnico, compreensivel]) => {
-      const regex = new RegExp(tecnico, "gi");
-      erroFormatado = erroFormatado.replace(regex, compreensivel);
-    });
-    
-    // Processar erros separados por " | "
-    const partes = erroFormatado.split(" | ");
-    const partesFormatadas = partes.map((parte) => {
-      // Limpar espaços extras
-      parte = parte.trim();
-      
-      // Se a parte contém ":", formatar como "Campo: Descrição"
-      if (parte.includes(":")) {
-        const [campo, ...descricao] = parte.split(":");
-        const descricaoCompleta = descricao.join(":").trim();
-        
-        // Traduzir nomes de campos comuns
-        const camposTraduzidos: Record<string, string> = {
-          "cpf": "CPF",
-          "codigo_cargo": "Código do cargo",
-          "codigo_eol": "Código EOL da escola",
-          "tipo_vaga": "Tipo de vaga",
-          "situacao": "Situação",
-          "processo_uuid": "Processo de convocação",
-          "concurso_uuid": "Concurso",
-          "candidato_uuid": "Candidato",
-        };
-        
-        const campoFormatado = camposTraduzidos[campo.toLowerCase()] || campo;
-        
-        return `${campoFormatado}: ${descricaoCompleta}`;
-      }
-      
-      return parte;
-    });
-    
-    // Remover partes vazias e duplicadas
-    const partesUnicas = Array.from(new Set(partesFormatadas.filter(p => p.length > 0)));
-    
-    return partesUnicas.join("\n");
-  };
-
   return (
     <Modal
       open={open}
@@ -131,19 +51,14 @@ const ErroModal: React.FC<ErroModalProps> = ({
             <ErroContainer
               dangerouslySetInnerHTML={{
                 __html: importacaoErro?.erros
-                  ? formatarErro(importacaoErro.erros)
-                      .split("\n")
-                      .map((linha: string) => {
-                        // Destacar campos/títulos em negrito
-                        if (linha.includes(":")) {
-                          return linha.replace(
-                            /^([^:]+:)/,
-                            '<strong>$1</strong>'
-                          );
-                        }
-                        return linha;
+                  ? importacaoErro.erros
+                      .split(" | ")
+                      .map((parte: string) => {
+                        return parte.replace(
+                          /^([^:]+:)/,
+                          '<strong>$1</strong>'
+                        );
                       })
-                      .filter((linha: string) => linha.trim().length > 0)
                       .join("<br/>")
                   : "",
               }}

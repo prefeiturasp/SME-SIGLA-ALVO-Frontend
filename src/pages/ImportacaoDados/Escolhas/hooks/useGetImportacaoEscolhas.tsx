@@ -3,7 +3,7 @@ import { API } from "../../../../services";
 import type { IListRequest } from "../../../../types/IListRequest";
 
 
-const useImportacaoArquivosEscolhas = (listRequest: IListRequest<unknown>) => {
+const useGetImportacaoEscolhas = (listRequest: IListRequest<unknown>) => {
   // Query para buscar importações com parâmetros
   const { data: importacoesArquivosData, isLoading: importacoesArquivosIsLoading, refetch: importacoesArquivosRefetch } = useQuery({
     queryKey: ["getImportacaoEscolhas", listRequest],
@@ -23,5 +23,5 @@ const useImportacaoArquivosEscolhas = (listRequest: IListRequest<unknown>) => {
   };
 };
 
-export default useImportacaoArquivosEscolhas;
+export default useGetImportacaoEscolhas;
 

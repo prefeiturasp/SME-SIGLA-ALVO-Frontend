@@ -5,11 +5,10 @@ import type { IImportacaoVagasForm } from "../../Vagas/hooks/types";
 import useListRequest from "../../../../hooks/useListRequest";
 import useConvocacao from "../../../Processos/ConvocacaoCandidatos/hooks/useConvocacao";
 import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { App } from "antd";
-import { API } from "../../../../services";
 import type { IImportacaoEscolhasPayload } from "../../../../services/resources/importacaoDados/IImportacaoArquivos";
-import useImportacaoArquivosEscolhas from "./useImportacaoArquivosEscolhas";
+import useGetImportacaoEscolhas from "./useGetImportacaoEscolhas";
+import usePostImportacaoEscolha from "./usePostImportacaoEscolha";
 
 export const useImportacaoDadosEscolhas = () => {
   const defaultValues = {
@@ -66,29 +65,13 @@ export const useImportacaoDadosEscolhas = () => {
     importacoesArquivosData, 
     importacoesArquivosIsLoading, 
     importacoesArquivosRefetch 
-  } = useImportacaoArquivosEscolhas(listRequestImportacoes);
+  } = useGetImportacaoEscolhas(listRequestImportacoes);
 
   // Mutation para importação de escolhas
-  const importacaoMutation = useMutation({
-    mutationFn: (payload: IImportacaoEscolhasPayload) =>
-      API.ImportacaoDados.postImportacaoEscolhas(payload).response,
-    onSuccess: (data) => {
-      notification.success({
-        message: "Importação Realizada",
-        description: "Importação realizada com sucesso!",
-        placement: "top",
-        duration: 4,
-      });
+  const { importacaoMutation } = usePostImportacaoEscolha({
+    onSuccess: () => {
       reset(defaultValues);
       importacoesArquivosRefetch();
-    },
-    onError: (error: any) => {
-      notification.error({
-        message: "Erro na Importação",
-        description: "Erro na importação. Tente novamente.",
-        placement: "top",
-        duration: 5,
-      });
     },
     onSettled: () => {
       setIsSubmitting(false);
