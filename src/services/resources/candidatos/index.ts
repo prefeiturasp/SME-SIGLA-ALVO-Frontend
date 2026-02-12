@@ -7,6 +7,8 @@ import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 export const URL = {
   getCandidatos: () => `/api/v1/candidatos/`,
   getCandidatosHabilitados: () => `/api/v1/habilitados/`,
+  postHabilitadoEliminar: () => `/api/v1/habilitados/eliminar/`,
+  postReclassificar: () => `/api/v1/habilitados/reclassificar/`,
   getCandidatosHabilitadosReposicao: () => `/api/v1/habilitados/reposicao/`,
   getCandidatosHabilitadosReconvocacao: () => `/api/v1/habilitados/reconvocacao/`,
   getCandidatosHabilitadosCalculados: () => `/api/v1/habilitados/calculados/`,
@@ -37,16 +39,66 @@ export const getCandidatos = (
   };
 };
 
-// TODO adicionar JWT no header Authorization
-export const getCandidatosHabilitados = (
-  params: { geral: number; pcd: number; nna: number; concurso_uuid?: string },
+// POST eliminar habilitado
+export const postHabilitadoEliminar = (
+  payload: { candidato_uuid: string; motivo: string },
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
   const response = appAxiosCandidatos
+    .post(URL.postHabilitadoEliminar(), payload, {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// POST reclassificar candidato
+export const postReclassificarCandidato = (
+  payload: { candidato_uuid: string; desclassificar_de: string; motivo: string },
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .post(URL.postReclassificar(), payload, {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getCandidatosHabilitados = (
+  params?: Record<string, unknown>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  // Remove campos indefinidos/nulos para não poluir a query
+  const safeParams =
+    params && typeof params === "object"
+      ? Object.fromEntries(
+          Object.entries(params).filter(
+            ([, value]) => value !== undefined && value !== null
+          )
+        )
+      : undefined;
+
+  const response = appAxiosCandidatos
     .get<PaginatedResponse<ICandidato>>(URL.getCandidatosHabilitados(), {
-      params,
+      params: safeParams,
       paramsSerializer: queryParamsSerializer,
       signal,
       ...axiosRequestConfig,
