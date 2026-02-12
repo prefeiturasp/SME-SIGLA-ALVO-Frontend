@@ -1,8 +1,8 @@
 // Implementação simples sem react-query e sem useEffect
-import { API } from "../../../services";
-import type { PaginatedResponse } from "../../../types/IListRequest";
-import type { ICargos } from "../../../services/resources/cargos/ICargos";
-import type { IAutorizacaoPublicada } from "../../../services/resources/cargos/IAutorizacaoPublicada";
+import { API } from "../../../../services";
+import type { PaginatedResponse } from "../../../../types/IListRequest";
+import type { ICargos } from "../../../../services/resources/cargos/ICargos";
+import type { IAutorizacaoPublicada } from "../../../../services/resources/cargos/IAutorizacaoPublicada";
 
 // Retorna os dados em caso de sucesso; em caso de erro, retorna um objeto com message
 export const useGetCargosAutorizacoesPublicadas = async (signal?: AbortSignal): Promise<PaginatedResponse<ICargos> | { message: string }> => {

@@ -1,6 +1,6 @@
 import { useGetCargosAutorizacoesPublicadas, useGetAutorizacoesPublicadasPorCargo } from "../../hooks/useGetCargos";
 
-jest.mock("../../../../services", () => {
+jest.mock("../../../../../services", () => {
   return {
     API: {
       Cargos: {
@@ -11,7 +11,7 @@ jest.mock("../../../../services", () => {
   };
 });
 
-const { API } = require("../../../../services");
+const { API } = require("../../../../../services");
 
 describe("hooks/useGetCargos* (async functions)", () => {
   beforeEach(() => {

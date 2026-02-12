@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Button, Card, Col, Input, Row, Table, Typography } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import BaseTela, { type TitleItem } from "../Base/BaseTela";
-import ConfigurarAutorizacaoModal from "./components/ConfigurarAutorizacaoModal";
+import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import { useGetCargosAutorizacoesPublicadas } from "./hooks/useGetCargos";
 
 type Registro = {
@@ -15,6 +14,7 @@ type Registro = {
   totalAutorizacoes: number;
   totalSemEfeito: number;
   escolhasRealizadas: number;
+  saldoAtual: number;
 };
 
 const { Text } = Typography;
@@ -23,10 +23,6 @@ const AutorizacoesPublicadasTela: React.FC = () => {
   const navigate = useNavigate();
   const [busca, setBusca] = useState<string>("");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
-  const [configModalOpen, setConfigModalOpen] = useState(false);
-  const [selectedCargoCodigo, setSelectedCargoCodigo] = useState<number | undefined>(undefined);
-  const [selectedCargo, setSelectedCargo] = useState<string | undefined>(undefined);
-  const [selectedCargoUuid, setSelectedCargoUuid] = useState<string | undefined>(undefined);
   const [rows, setRows] = useState<Registro[]>([]);
   const [cargosLoading, setCargosLoading] = useState<boolean>(false);
   const [refreshToken, setRefreshToken] = useState(0);
@@ -125,10 +121,12 @@ const AutorizacoesPublicadasTela: React.FC = () => {
             style={{ fontSize: 18, color: "#0F59C8", cursor: "pointer" }}
             title="Gerenciar"
             onClick={() => {
-              setSelectedCargoUuid(record?.cargoUuid);
-              setSelectedCargoCodigo(record?.cargoCodigo);
-              setSelectedCargo(record?.cargo);
-              setConfigModalOpen(true);
+              const params = new URLSearchParams({
+                cargoUuid: record?.cargoUuid || "",
+                cargoCodigo: String(record?.cargoCodigo || ""),
+                cargo: record?.cargo || "",
+              });
+              navigate(`/autorizacoes-publicadas-gerenciar?${params.toString()}`);
             }}
           />
         ),
@@ -184,17 +182,6 @@ const AutorizacoesPublicadasTela: React.FC = () => {
           }
         />
       </Card>
-      <ConfigurarAutorizacaoModal
-        open={configModalOpen}
-        cargoUuid={selectedCargoUuid}
-        cargoCodigo={selectedCargoCodigo}
-        cargo={selectedCargo}
-        onCancel={() => {
-          setConfigModalOpen(false);
-          setRefreshToken((prev) => prev + 1);
-        }}
-        onAdd={() => {}}
-      />
     </BaseTela>
   );
 };

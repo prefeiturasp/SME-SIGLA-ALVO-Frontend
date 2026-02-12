@@ -5,25 +5,20 @@ import { MemoryRouter } from "react-router-dom";
 import AutorizacoesPublicadasTela from "../AutorizacoesPublicadasTela";
 
 // Mock BaseTela to simplify layout
-jest.mock("../../Base/BaseTela", () => ({
+jest.mock("../../../Base/BaseTela", () => ({
   __esModule: true,
   default: ({ children }: any) => <div>{children}</div>,
 }));
 
-// Mock ConfigurarAutorizacaoModal
-jest.mock("../components/ConfigurarAutorizacaoModal", () => ({
-  __esModule: true,
-  default: ({ open, onCancel }: any) =>
-    open ? (
-      <div data-testid="config-modal">
-        Config modal open
-        <button data-testid="close-config" onClick={onCancel}>close</button>
-      </div>
-    ) : null,
+// Mock useNavigate
+const mockNavigate = jest.fn();
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: () => mockNavigate,
 }));
 
 // Mock services
-jest.mock("../../../services", () => {
+jest.mock("../../../../services", () => {
   return {
     API: {
       Cargos: {
@@ -80,7 +75,7 @@ describe("AutorizacoesPublicadasTela", () => {
     });
   });
 
-  it("abre o modal de gerenciamento ao clicar no ícone", async () => {
+  it("navega para página de gerenciamento ao clicar no ícone", async () => {
     render(
       <MemoryRouter>
         <AutorizacoesPublicadasTela />
@@ -90,33 +85,14 @@ describe("AutorizacoesPublicadasTela", () => {
     await screen.findByText("Analista de Sistemas");
     const gerenciarButtons = screen.getAllByTitle("Gerenciar");
     fireEvent.click(gerenciarButtons[0]);
-    expect(screen.getByTestId("config-modal")).toBeInTheDocument();
-  });
-
-  it("onCancel do modal fecha e faz novo request", async () => {
-    const { API } = require("../../../services");
-    (API.Cargos.getCargosAutorizacoesPublicadas as jest.Mock).mockClear();
-
-    render(
-      <MemoryRouter>
-        <AutorizacoesPublicadasTela />
-      </MemoryRouter>
-    );
-    // 1ª chamada no mount
-    await screen.findByText("Analista de Sistemas");
-    expect(API.Cargos.getCargosAutorizacoesPublicadas).toHaveBeenCalledTimes(1);
-
-    // abrir modal
-    fireEvent.click(screen.getAllByTitle("Gerenciar")[0]);
-    expect(screen.getByTestId("config-modal")).toBeInTheDocument();
-
-    // onCancel
-    fireEvent.click(screen.getByTestId("close-config"));
-
-    // modal fechado e fetch reexecutado
+    
     await waitFor(() => {
-      expect(screen.queryByTestId("config-modal")).not.toBeInTheDocument();
-      expect(API.Cargos.getCargosAutorizacoesPublicadas).toHaveBeenCalledTimes(2);
+      expect(mockNavigate).toHaveBeenCalledWith(
+        expect.stringContaining("/autorizacoes-publicadas-gerenciar")
+      );
+      expect(mockNavigate).toHaveBeenCalledWith(
+        expect.stringContaining("cargoUuid=1")
+      );
     });
   });
 });

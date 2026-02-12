@@ -1,6 +1,6 @@
 import { useDeleteAutorizacaoPublicada } from "../../hooks/useDeleteAutorizacaoPublicada";
 
-jest.mock("../../../../services", () => {
+jest.mock("../../../../../services", () => {
   return {
     API: {
       Cargos: {
@@ -10,7 +10,7 @@ jest.mock("../../../../services", () => {
   };
 });
 
-const { API } = require("../../../../services");
+const { API } = require("../../../../../services");
 
 describe("hooks/useDeleteAutorizacaoPublicada (async)", () => {
   beforeEach(() => {
