@@ -26,7 +26,8 @@ import Resumo from "../pages/CriarEditarConvocacao/Resumo";
 import PermissionContextGuard from "./PermissionContextGuard";
 import ForbiddenTela from "../pages/Forbidden/ForbiddenTela";
 import RelatoriosTela from "../pages/Relatorios/RelatoriosTela";
-import AutorizacoesPublicadasTela from "../pages/AutorizacoesPublicadas/AutorizacoesPublicadasTela";
+import AutorizacoesPublicadasTela from "../pages/Gerenciar/AutorizacoesPublicadas/AutorizacoesPublicadasTela";
+import AutorizacoesPublicadasGerenciarTela from "../pages/Gerenciar/AutorizacoesPublicadas/AutorizacoesPublicadasGerenciarTela";
 import { HomeTela } from "../pages/Home/HomeTela";
 import EliminacaoReclassificacaoCandidatoTela from "../pages/EliminacaoReclassificacaoCandidato/EliminacaoReclassificacaoCandidatoTela";
 
@@ -55,6 +56,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <AutorizacoesPublicadasTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/autorizacoes-publicadas-gerenciar",
+    element: (
+      <ProtectedRoute>
+        <AutorizacoesPublicadasGerenciarTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,

@@ -1,4 +1,4 @@
-import { API } from "../../../services";
+import { API } from "../../../../services";
 
 // POST simples; retorna dados em sucesso, ou { message } em erro
 export const usePostAutorizacaoPublicada = async (

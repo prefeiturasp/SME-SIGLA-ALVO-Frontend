@@ -1,9 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Button, Modal, Table } from "antd";
+import { Button, Card, Table, Typography } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import AdicionarAutorizacaoModal from "./AdicionarAutorizacaoModal";
-import { useGetAutorizacoesPublicadasPorCargo } from "../hooks/useGetCargos";
-import { useDeleteAutorizacaoPublicada } from "../hooks/useDeleteAutorizacaoPublicada";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import BaseTela, { type TitleItem } from "../../Base/BaseTela";
+import AdicionarAutorizacaoModal from "./components/AdicionarAutorizacaoModal";
+import ConfirmarExclusaoModal from "./components/ConfirmarExclusaoModal";
+import { useGetAutorizacoesPublicadasPorCargo } from "./hooks/useGetCargos";
+import { useDeleteAutorizacaoPublicada } from "./hooks/useDeleteAutorizacaoPublicada";
 
 type ItemRow = {
   key: string;
@@ -16,28 +19,22 @@ type ItemRow = {
   vagasSemEfeito?: boolean;
 };
 
-type Props = {
-  open: boolean;
-  onCancel: () => void;
-  onAdd: () => void;
-  cargoUuid?: string;
-  cargoCodigo?: number;
-  cargo?: string;
-};
+const { Text } = Typography;
 
-const ConfigurarAutorizacaoModal: React.FC<Props> = ({
-  open,
-  onCancel,
-  onAdd,
-  cargoUuid,
-  cargoCodigo,
-  cargo,
-}) => {
+const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const cargoUuid = searchParams.get("cargoUuid") || undefined;
+  const cargoCodigo = searchParams.get("cargoCodigo") || undefined;
+  const cargo = searchParams.get("cargo") || undefined;
+
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   const [addOpen, setAddOpen] = useState(false);
   const [items, setItems] = useState<ItemRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshToken, setRefreshToken] = useState(0);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [autorizacaoParaExcluir, setAutorizacaoParaExcluir] = useState<string | undefined>(undefined);
   const [editContext, setEditContext] = useState<{
     mode: "create" | "edit";
     autorizacaoUuid?: string;
@@ -47,9 +44,44 @@ const ConfigurarAutorizacaoModal: React.FC<Props> = ({
     vagasSemEfeito?: boolean;
   } | null>(null);
 
+  const breadcrumbItems = useMemo(
+    () => [
+      {
+        title: (
+          <Text
+            strong
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          >
+            Home
+          </Text>
+        ),
+      },
+      {
+        title: (
+          <Text
+            strong
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/autorizacoes-publicadas")}
+          >
+            Gestão de Autorizações publicadas
+          </Text>
+        ),
+      },
+      {
+        title: (
+          <Text strong>
+            Gerenciar - Cargo: {cargoCodigo ?? "—"} - {cargo ?? "—"}
+          </Text>
+        ),
+      },
+    ] as TitleItem[],
+    [navigate, cargoCodigo, cargo]
+  );
+
   useEffect(() => {
-    if (!open || !cargoUuid) {
-      if (!open) setItems([]);
+    if (!cargoUuid) {
+      setItems([]);
       return;
     }
     const ctrl = new AbortController();
@@ -85,7 +117,7 @@ const ConfigurarAutorizacaoModal: React.FC<Props> = ({
     };
     void run();
     return () => ctrl.abort();
-  }, [open, cargoUuid, refreshToken]);
+  }, [cargoUuid, refreshToken]);
 
   const columns = useMemo(
     () => [
@@ -152,11 +184,10 @@ const ConfigurarAutorizacaoModal: React.FC<Props> = ({
                 data-testid="delete-btn"
                 style={{ fontSize: 16, color: "#C41D7F", cursor: "pointer" }}
                 title="Excluir"
-                onClick={async () => {
+                onClick={() => {
                   if (!record?.uuid) return;
-                  const ctrl = new AbortController();
-                  await useDeleteAutorizacaoPublicada(record.uuid, ctrl.signal);
-                  setRefreshToken((prev) => prev + 1);
+                  setAutorizacaoParaExcluir(record.uuid);
+                  setDeleteModalOpen(true);
                 }}
               />
             </div>
@@ -168,52 +199,50 @@ const ConfigurarAutorizacaoModal: React.FC<Props> = ({
   );
 
   return (
-    <Modal
-      open={open}
-      onCancel={onCancel}
-      footer={null}
-      title={`Cargo: ${cargoCodigo ?? "—"} - ${cargo ?? "—"}`}
-      width={1200}
+    <BaseTela
+      breadcrumbItems={breadcrumbItems}
+      title={`Gerenciar - Cargo: ${cargoCodigo ?? "—"} - ${cargo ?? "—"}`}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <Table
-          rowKey="key"
-          dataSource={items}
-          columns={columns as any}
-          loading={loading}
-          pagination={{
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: items.length,
-            showSizeChanger: true,
-          }}
-          onChange={(pg) =>
-            setPagination({
-              current: Number(pg.current) || 1,
-              pageSize: Number(pg.pageSize) || 10,
-            })
-          }
-        />
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-          <Button
-            onClick={() => {
-              setRefreshToken((prev) => prev + 1);
-              onCancel();
+      <Card style={{ border: "none", borderRadius: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <Table
+            rowKey="key"
+            dataSource={items}
+            columns={columns as any}
+            loading={loading}
+            pagination={{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: items.length,
+              showSizeChanger: true,
             }}
-          >
-            Voltar
-          </Button>
-          <Button
-            type="primary"
-            onClick={() => {
-              setEditContext({ mode: "create" });
-              setAddOpen(true);
-            }}
-          >
-            Adicionar
-          </Button>
+            onChange={(pg) =>
+              setPagination({
+                current: Number(pg.current) || 1,
+                pageSize: Number(pg.pageSize) || 10,
+              })
+            }
+          />
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+            <Button
+              onClick={() => {
+                navigate("/autorizacoes-publicadas");
+              }}
+            >
+              Voltar
+            </Button>
+            <Button
+              type="primary"
+              onClick={() => {
+                setEditContext({ mode: "create" });
+                setAddOpen(true);
+              }}
+            >
+              Adicionar
+            </Button>
+          </div>
         </div>
-      </div>
+      </Card>
       <AdicionarAutorizacaoModal
         open={addOpen}
         cargo={cargo}
@@ -229,14 +258,27 @@ const ConfigurarAutorizacaoModal: React.FC<Props> = ({
         onCancel={() => setAddOpen(false)}
         onAdd={(_payload) => {
           setAddOpen(false);
-          // Notificar o pai, se necessário
           setRefreshToken((prev) => prev + 1);
-          if (onAdd) onAdd();
         }}
       />
-    </Modal>
+      <ConfirmarExclusaoModal
+        open={deleteModalOpen}
+        onCancel={() => {
+          setDeleteModalOpen(false);
+          setAutorizacaoParaExcluir(undefined);
+        }}
+        onConfirm={async () => {
+          if (!autorizacaoParaExcluir) return;
+          const ctrl = new AbortController();
+          await useDeleteAutorizacaoPublicada(autorizacaoParaExcluir, ctrl.signal);
+          setDeleteModalOpen(false);
+          setAutorizacaoParaExcluir(undefined);
+          setRefreshToken((prev) => prev + 1);
+        }}
+      />
+    </BaseTela>
   );
 };
 
-export default ConfigurarAutorizacaoModal;
+export default AutorizacoesPublicadasGerenciarTela;
 

@@ -1,5 +1,5 @@
-import { API } from "../../../services";
-import type { IAutorizacaoPublicada } from "../../../services/resources/cargos/IAutorizacaoPublicada";
+import { API } from "../../../../services";
+import type { IAutorizacaoPublicada } from "../../../../services/resources/cargos/IAutorizacaoPublicada";
 
 // PATCH simples; retorna dados em sucesso, ou { message } em erro
 export const usePatchAutorizacaoPublicada = async (
