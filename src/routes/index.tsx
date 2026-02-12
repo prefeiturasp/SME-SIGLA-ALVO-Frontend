@@ -27,6 +27,7 @@ import ForbiddenTela from "../pages/Forbidden/ForbiddenTela";
 import RelatoriosTela from "../pages/Relatorios/RelatoriosTela";
 import AutorizacoesPublicadasTela from "../pages/AutorizacoesPublicadas/AutorizacoesPublicadasTela";
 import { HomeTela } from "../pages/Home/HomeTela";
+import EliminacaoReclassificacaoCandidatoTela from "../pages/EliminacaoReclassificacaoCandidato/EliminacaoReclassificacaoCandidatoTela";
 
 
 const router = createBrowserRouter([
@@ -53,6 +54,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <AutorizacoesPublicadasTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/eliminiacao-e-reclassificacao-candidato",
+    element: (
+      <ProtectedRoute>
+        <EliminacaoReclassificacaoCandidatoTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
