@@ -65,7 +65,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   // Parâmetros para busca de reconvocação
   const [parametrosBuscaReconvocacao, setParametrosBuscaReconvocacao] = useState<{ concurso_uuid: string; quantidade: number } | undefined>(undefined);
   // Parâmetros para busca de candidatos calculados (Nova Autorização)
-  const [parametrosBuscaCalculados, setParametrosBuscaCalculados] = useState<{ concurso_uuid: string; quantidade: number; codigo_cargo?: string } | undefined>(undefined);
+  const [parametrosBuscaCalculados, setParametrosBuscaCalculados] = useState<{ concurso_uuid: string; processo_uuid?: string; quantidade: number; codigo_cargo?: string } | undefined>(undefined);
 
   // Refs para rastrear se já processamos os UUIDs (evitar loops infinitos)
   const uuidsProcessadosReposicao = useRef<string>('');
@@ -477,6 +477,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
 
       const novosParametrosCalculados = {
         concurso_uuid: concursoValue,
+        processo_uuid: processoUuid,
         quantidade: quantidadeNovaAutorizacao,
         codigo_cargo: cargoCodigo || undefined
       };
