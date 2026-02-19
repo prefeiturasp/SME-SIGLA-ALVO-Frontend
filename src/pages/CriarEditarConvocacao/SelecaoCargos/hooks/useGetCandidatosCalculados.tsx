@@ -4,7 +4,7 @@ import { API } from "../../../../services";
 
 export const useGetCandidatosCalculados = (
   buscarCandidatos: boolean = false,
-  parametros?: { concurso_uuid: string; quantidade: number; codigo_cargo?: string }
+  parametros?: { concurso_uuid: string; processo_uuid?: string; quantidade: number; codigo_cargo?: string }
 ) => {
   const { data: candidatosData, isLoading: candidatosIsLoading } = useQuery({
     queryKey: parametros 
@@ -24,7 +24,7 @@ export const useGetCandidatosCalculados = (
   return {
     candidatosData: candidatosData,
     candidatosIsLoading,
-    fetchCandidatosNow: (params: { concurso_uuid: string; quantidade: number; codigo_cargo?: string }) =>
+    fetchCandidatosNow: (params: { concurso_uuid: string; processo_uuid?: string; quantidade: number; codigo_cargo?: string }) =>
       API.Candidatos.getCandidatosHabilitadosCalculados(params).response,
   };
 };
