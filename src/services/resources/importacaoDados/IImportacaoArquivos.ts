@@ -63,6 +63,33 @@ export interface ILayoutPadrao {
   results: ILayoutResult[];
 }
 
+export interface IImportacaoEscolhasPayload {
+  processo_uuid: string;
+  processo_id?: number; // Opcional - backend buscará automaticamente se não fornecido
+  concurso_uuid: string;
+}
+
+export interface IImportacaoEscolhasResponse {
+  uuid: string;
+  processo_uuid: string;
+  processo_id: number | null;
+  concurso_uuid: string;
+  dados_prodam: any | null;
+  status: string;
+  criado_em: string;
+  atualizado_em: string;
+  erros?: IErroImportacao[] | null;
+}
+
+export interface IUltimasImportacoesEscolhas {
+  uuid: string;
+  processo_uuid: string;
+  processo_nome?: string; // Será buscado no frontend se não vier do backend
+  criado_em: string;
+  status: string;
+  erros?: IErroImportacao[] | null;
+}
+
 // export interface IConcursoFundacao {
 //   value: string;
 //   label: string;

@@ -7,6 +7,7 @@ import ImportacaoDadosTela from "../pages/ImportacaoDados/ImportacaoDadosTela";
 import ImportacaoDados2 from "../pages/Processos/ImportacaoDados/ImportacaoDados2";
 import LayoutPadraoTela from "../pages/LayoutPadraoTela/LayoutPadraoTela";
 import HistoricoVagasTela from "../pages/HistoricoVagas/HistoricoVagasTela";
+import HistoricoEscolhasTela from "../pages/ImportacaoDados/Escolhas/HistoricoEscolhasTela";
 import NotFoundTela from "../pages/NotFound/NotFoundTela";
 import LoginTela from "../pages/Login/LoginTela";
 import EsqueceuSenhaTela from "../pages/Login/EsqueceuSenhaTela";
@@ -25,8 +26,10 @@ import Resumo from "../pages/CriarEditarConvocacao/Resumo";
 import PermissionContextGuard from "./PermissionContextGuard";
 import ForbiddenTela from "../pages/Forbidden/ForbiddenTela";
 import RelatoriosTela from "../pages/Relatorios/RelatoriosTela";
-import AutorizacoesPublicadasTela from "../pages/AutorizacoesPublicadas/AutorizacoesPublicadasTela";
+import AutorizacoesPublicadasTela from "../pages/Gerenciar/AutorizacoesPublicadas/AutorizacoesPublicadasTela";
+import AutorizacoesPublicadasGerenciarTela from "../pages/Gerenciar/AutorizacoesPublicadas/AutorizacoesPublicadasGerenciarTela";
 import { HomeTela } from "../pages/Home/HomeTela";
+import EliminacaoReclassificacaoCandidatoTela from "../pages/EliminacaoReclassificacaoCandidato/EliminacaoReclassificacaoCandidatoTela";
 
 
 const router = createBrowserRouter([
@@ -53,6 +56,24 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <AutorizacoesPublicadasTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/autorizacoes-publicadas-gerenciar",
+    element: (
+      <ProtectedRoute>
+        <AutorizacoesPublicadasGerenciarTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/eliminiacao-e-reclassificacao-candidato",
+    element: (
+      <ProtectedRoute>
+        <EliminacaoReclassificacaoCandidatoTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -224,6 +245,15 @@ const router = createBrowserRouter([
         <PermissionContextGuard model="importacaoarquivovagas" permissaoDeExibirATELA="view_importacaoarquivovagas">
         <HistoricoVagasTela />
         </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/processos/importacao-dados/historico-escolhas",
+    element: (
+      <ProtectedRoute>
+        <HistoricoEscolhasTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,

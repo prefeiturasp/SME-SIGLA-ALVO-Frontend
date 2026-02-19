@@ -1,3 +1,25 @@
+export interface ICargoProcessoConvocacao {
+  uuid: string;
+  cargo_nome: string;
+  cargo_uuid: string;
+  cargo_codigo: string;
+  processo: string;
+  criado_em?: string;
+  atualizado_em?: string;
+}
+
+export interface IProcessoConvocacaoDetalhe {
+  uuid: string;
+  concurso_uuid: string;
+  concurso_nome: string;
+  descricao: string;
+  tipo_escolha: string;
+  status: string;
+  data_convocacao: string;
+  data_corte_vagas: string;
+  cargos_processo: ICargoProcessoConvocacao[];
+}
+
 export interface IProcessoConvocacao {
 concurso_nome : string;
 concurso_uuid : string;

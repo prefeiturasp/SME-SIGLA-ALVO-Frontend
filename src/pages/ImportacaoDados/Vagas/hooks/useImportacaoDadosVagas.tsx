@@ -5,8 +5,9 @@ import useImportacaoVagasSchema from "./useImportacaoVagasSchema";
 import type { IImportacaoVagasForm, IImportacaoVagasPayload } from "./types";
 import useImportacaoArquivosVagas from "./useImportacaoArquivosVagas";
 import useListRequest from "../../../../hooks/useListRequest";
-import { useProcessosConvocacaoOptions } from "../../../Processos/ConvocacaoCandidatos/hooks/useProcessosConvocacaoOptions";
+import useConvocacao from "../../../Processos/ConvocacaoCandidatos/hooks/useConvocacao";
 import { useLayoutDownload } from "../../../../hooks/useLayoutDownload";
+import { useMemo } from "react";
 
 export const useImportacaoDadosVagas = () => {
 
@@ -40,7 +41,28 @@ export const useImportacaoDadosVagas = () => {
 
   // Query para buscar importações com parâmetros
   const { importacoesArquivosData, importacoesArquivosIsLoading, importacoesArquivosRefetch } = useImportacaoArquivosVagas(listRequest);
-  const { processosConvocacaoOptions, processosConvocacaoOptionsIsLoading } = useProcessosConvocacaoOptions();
+  
+  // Query para buscar processos de convocação com paginação grande (igual à aba de Vagas Escolas)
+  const { listRequest: paramsProcessosConvocacao } = useListRequest<{}>({
+    pagination: { page: 1, page_size: 100 },
+  });
+  const {
+    processosConvocacaoData,
+    processosConvocacaoIsLoading
+  } = useConvocacao(paramsProcessosConvocacao);
+
+  // Transformar os dados de processos em opções para o select
+  const processosConvocacaoOptions = useMemo(() => {
+    if (!processosConvocacaoData?.results) {
+      return [];
+    }
+    return processosConvocacaoData.results.map((processo: any) => ({
+      value: processo.uuid,
+      label: processo.descricao,
+    }));
+  }, [processosConvocacaoData]);
+
+  const processosConvocacaoOptionsIsLoading = processosConvocacaoIsLoading;
 
   // Mutation para post de importação de arquivos
   const postImportacaoArquivosVagasMutation = usePostImportacaoArquivosVagas({

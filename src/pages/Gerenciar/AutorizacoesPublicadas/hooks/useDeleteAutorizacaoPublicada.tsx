@@ -1,4 +1,4 @@
-import { API } from "../../../services";
+import { API } from "../../../../services";
 
 // DELETE simples; retorna sucesso em sucesso, ou { message } em erro
 export const useDeleteAutorizacaoPublicada = async (
