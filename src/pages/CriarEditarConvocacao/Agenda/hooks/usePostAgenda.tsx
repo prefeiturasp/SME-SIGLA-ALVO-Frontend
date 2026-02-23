@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { App } from "antd";
 import { API } from "../../../../services";
-import type { IAgendaCreate } from "../../../../services/resources/agenda/IAgenda";
+import type { IAgendaBulkCreatePayload, IAgendaCreate } from "../../../../services/resources/agenda/IAgenda";
 
 export const usePostAgenda = () => {
   const queryClient = useQueryClient();
   const { notification } = App.useApp();
 
   return useMutation({
-    mutationFn: (payload: IAgendaCreate | IAgendaCreate[]) =>
+    mutationFn: (payload: IAgendaCreate | IAgendaCreate[] | IAgendaBulkCreatePayload) =>
       API.Agenda.postAgenda(payload).response,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["getAgendas"] });
