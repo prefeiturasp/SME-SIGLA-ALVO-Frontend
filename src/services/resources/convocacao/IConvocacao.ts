@@ -165,3 +165,39 @@ export interface ICargoProcesso {
   nna: number;
   total_candidatos: number;
 }
+
+export interface ICartaConvocacaoPayload {
+  processo_uuid: string;
+  processo_nome: string;
+  data: string; 
+}
+
+export interface ICartaConvocacaoResponse {
+  detail: string;
+  historico_uuid: string;
+  processo_uuid: string;
+  processo_nome: string;
+  data: string;
+  quantidade_candidatos: number;
+}
+
+export interface IHistoricoCartaConvocacao {
+  uuid: string;
+  processo_nome: string;
+  processo_uuid: string;
+  data: string;
+  criado_em?: string;
+  quantidade_convocados: number;
+}
+
+export interface ICandidatoCartaConvocacao {
+  nome: string;
+  rf: string;
+  email: string;
+  status: string;
+  conteudo: string;
+}
+
+export interface IHistoricoCartaConvocacaoDetalhe extends IHistoricoCartaConvocacao {
+  candidatos: ICandidatoCartaConvocacao[];
+}

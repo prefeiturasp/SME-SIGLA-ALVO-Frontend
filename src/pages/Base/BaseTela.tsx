@@ -178,6 +178,11 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
             onClick: () => navigate("/autorizacoes-publicadas"),
           },
           {
+            key: "carta-convocacao",
+            label: "Carta de Convocação",
+            onClick: () => navigate("/gerenciar/carta-convocacao"),
+          },
+          {
             key: "eliminacao-reclassificacao",
             label: "Eliminação e Reclassificação de Candidato",
             onClick: () => navigate("/eliminiacao-e-reclassificacao-candidato"),
