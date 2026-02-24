@@ -94,3 +94,5 @@ export const appAxiosRelatorios = axios.create({
     baseURL: getEnv("RELATORIOS_API_URL", "https://hom-api-sigla.sme.prefeitura.sp.gov.br/ms-relatorios"),
 });
 addAuthInterceptor(appAxiosRelatorios);
+
+// Corrigir
