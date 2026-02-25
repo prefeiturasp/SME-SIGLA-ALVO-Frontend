@@ -424,9 +424,12 @@ describe('GerenciamentoVagasTela', () => {
       mockUseGerenciamentoVagas.mockReturnValue(
         createMockData({
           cargoSelecionado: 'cargo-1',
+          dadosVagasNasEscolas: {
+            vagas: [{ cargo_codigo: 100 }],
+          },
           concursoData: {
             cargos: [
-              { uuid: 'cargo-1', nome: 'Professor', codigo: 'P001' },
+              { uuid: 'cargo-1', nome: 'Professor', codigo: 100 },
               { uuid: 'cargo-2', nome: 'Diretor', codigo: 'D001' },
             ],
           },
@@ -455,7 +458,10 @@ describe('GerenciamentoVagasTela', () => {
       mockUseGerenciamentoVagas.mockReturnValue(
         createMockData({
           dadosVagasNasEscolas: {
-            vagas: [{ uuid: 'vaga-1', escola: { nome_oficial: 'Escola 1' } }],
+            vagas: [{ uuid: 'vaga-1', cargo_codigo: 200, escola: { nome_oficial: 'Escola 1' } }],
+          },
+          concursoData: {
+            cargos: [{ uuid: 'cargo-1', nome: 'Professor', codigo: 200 }],
           },
         })
       );

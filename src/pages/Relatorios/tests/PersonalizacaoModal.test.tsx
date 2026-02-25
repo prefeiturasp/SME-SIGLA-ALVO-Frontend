@@ -67,10 +67,11 @@ const defaultProps = {
 
 const createMockData = (overrides = {}) => ({
   uuid: 'uuid-123',
-  usar_cabecalho: false,
+  usar_cabecalho_padrao: false,
   usar_logotipo: true,
   cabecalho: '',
   texto_final: '',
+  cabecalho_capa_ata: '',
   ...overrides,
 });
 
@@ -108,7 +109,7 @@ describe('PersonalizacaoModal', () => {
     it('deve buscar personalização quando modal abre com dados válidos', async () => {
       mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData());
       setupComponent();
-      await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalledWith('processo-uuid-123', 'tipo-relatorio-1'));
+      await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalledWith('tipo-relatorio-1'));
     });
 
     it.each([
@@ -131,7 +132,7 @@ describe('PersonalizacaoModal', () => {
 
     it('deve atualizar estados com dados retornados', async () => {
       mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData({
-        usar_cabecalho: true,
+        usar_cabecalho_padrao: true,
         usar_logotipo: false,
         cabecalho: '<p>Cabeçalho carregado</p>',
         texto_final: '<p>Texto final carregado</p>',
@@ -169,7 +170,7 @@ describe('PersonalizacaoModal', () => {
 
   describe('Reset quando modal fecha', () => {
     it('deve resetar estados quando open muda para false', async () => {
-      mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData({ usar_cabecalho: true, usar_logotipo: false }));
+      mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData({ usar_cabecalho_padrao: true, usar_logotipo: false }));
       const { rerender } = setupComponent();
       await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalled());
       rerender(<PersonalizacaoModal {...defaultProps} open={false} />);
@@ -221,22 +222,22 @@ describe('PersonalizacaoModal', () => {
       {
         name: 'usarCabecalhoPadrao',
         change: (screen: any) => fireEvent.click(screen.getAllByRole('checkbox')[0]),
-        expected: { usar_cabecalho: true, usar_logotipo: true },
+        expected: { usar_cabecalho_padrao: true, usar_logotipo: true },
       },
       {
         name: 'usarLogotipo',
         change: (screen: any) => fireEvent.click(screen.getAllByRole('checkbox')[1]),
-        expected: { usar_cabecalho: false, usar_logotipo: false },
+        expected: { usar_cabecalho_padrao: false, usar_logotipo: false },
       },
       {
         name: 'cabecalhoPadraoHtml',
         change: (screen: any) => fireEvent.change(screen.getByTestId('quill-textarea-cabecalho'), { target: { value: '<p>Novo cabeçalho</p>' } }),
-        expected: { cabecalho: '<p>Novo cabeçalho</p>', usar_cabecalho: false, usar_logotipo: true },
+        expected: { cabecalho: '<p>Novo cabeçalho</p>', usar_cabecalho_padrao: false, usar_logotipo: true },
       },
       {
         name: 'textoPadraoFinalHtml',
         change: (screen: any) => fireEvent.change(screen.getByTestId('quill-textarea-texto-final'), { target: { value: '<p>Novo texto final</p>' } }),
-        expected: { texto_final: '<p>Novo texto final</p>', usar_cabecalho: false, usar_logotipo: true },
+        expected: { texto_final: '<p>Novo texto final</p>', usar_cabecalho_padrao: false, usar_logotipo: true },
       },
     ])('deve atualizar e salvar quando há mudanças em $name', async ({ change, expected }) => {
       mockPatchPersonalizacaoRelatorio.mockResolvedValue(undefined);
@@ -246,11 +247,10 @@ describe('PersonalizacaoModal', () => {
       fireEvent.click(screen.getByText('Salvar'));
       await waitFor(() => {
         expect(mockPatchPersonalizacaoRelatorio).toHaveBeenCalledWith({
-          processoUuid: 'processo-uuid-123',
           tipoRelatorio: 'tipo-relatorio-1',
           cabecalho: expected.cabecalho ?? '',
           texto_final: expected.texto_final ?? '',
-          usar_cabecalho: expected.usar_cabecalho ?? false,
+          usar_cabecalho_padrao: expected.usar_cabecalho_padrao ?? false,
           usar_logotipo: expected.usar_logotipo ?? true,
           uuid: 'uuid-123',
         });
@@ -270,9 +270,8 @@ describe('PersonalizacaoModal', () => {
       fireEvent.click(screen.getByText('Salvar'));
       await waitFor(() => {
         expect(mockPatchPersonalizacaoRelatorio).toHaveBeenCalledWith({
-          processoUuid: 'processo-uuid-123',
           tipoRelatorio: 'tipo-relatorio-1',
-          usar_cabecalho: true,
+          usar_cabecalho_padrao: true,
           usar_logotipo: false,
           cabecalho: '<p>Cabeçalho</p>',
           texto_final: '<p>Texto final</p>',
@@ -376,9 +375,9 @@ describe('Hooks - getPersonalizacaoRelatorio e patchPersonalizacaoRelatorio', ()
         abort: jest.fn(),
       });
 
-      const result = await realGetPersonalizacaoRelatorio('processo-uuid-123', 'tipo-relatorio-1');
+      const result = await realGetPersonalizacaoRelatorio('tipo-relatorio-1');
 
-      expect(mockAPIGetPersonalizacaoRelatorio).toHaveBeenCalledWith('processo-uuid-123', 'tipo-relatorio-1');
+      expect(mockAPIGetPersonalizacaoRelatorio).toHaveBeenCalledWith('tipo-relatorio-1');
       expect(result).toEqual(mockData);
     });
 
@@ -389,16 +388,15 @@ describe('Hooks - getPersonalizacaoRelatorio e patchPersonalizacaoRelatorio', ()
         abort: jest.fn(),
       });
 
-      await expect(realGetPersonalizacaoRelatorio('processo-uuid-123', 'tipo-relatorio-1')).rejects.toThrow('Erro de rede');
-      expect(mockAPIGetPersonalizacaoRelatorio).toHaveBeenCalledWith('processo-uuid-123', 'tipo-relatorio-1');
+      await expect(realGetPersonalizacaoRelatorio('tipo-relatorio-1')).rejects.toThrow('Erro de rede');
+      expect(mockAPIGetPersonalizacaoRelatorio).toHaveBeenCalledWith('tipo-relatorio-1');
     });
   });
 
   describe('patchPersonalizacaoRelatorio', () => {
     const basePayload = {
-      processoUuid: 'processo-uuid-123',
       tipoRelatorio: 'tipo-relatorio-1',
-      usar_cabecalho: true,
+      usar_cabecalho_padrao: true,
       usar_logotipo: false,
       cabecalho: '<p>Cabeçalho</p>',
       texto_final: '<p>Texto final</p>',
@@ -414,10 +412,9 @@ describe('Hooks - getPersonalizacaoRelatorio e patchPersonalizacaoRelatorio', ()
       const result = await realPatchPersonalizacaoRelatorio({ ...basePayload, uuid: 'personalizacao-uuid-123' });
 
       expect(mockAPIPatchPersonalizacaoRelatorio).toHaveBeenCalledWith(
-        'processo-uuid-123',
         'tipo-relatorio-1',
         expect.objectContaining({
-          usar_cabecalho: true,
+          usar_cabecalho_padrao: true,
           usar_logotipo: false,
           cabecalho: '<p>Cabeçalho</p>',
           texto_final: '<p>Texto final</p>',
@@ -440,7 +437,7 @@ describe('Hooks - getPersonalizacaoRelatorio e patchPersonalizacaoRelatorio', ()
 
       const result = await realPatchPersonalizacaoRelatorio({
         ...basePayload,
-        usar_cabecalho: false,
+        usar_cabecalho_padrao: false,
         usar_logotipo: true,
         cabecalho: '',
         texto_final: '',
@@ -448,7 +445,6 @@ describe('Hooks - getPersonalizacaoRelatorio e patchPersonalizacaoRelatorio', ()
       });
 
       expect(mockAPIPatchPersonalizacaoRelatorio).toHaveBeenCalledWith(
-        'processo-uuid-123',
         'tipo-relatorio-1',
         expect.objectContaining({ uuid: null }),
         undefined
