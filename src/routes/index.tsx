@@ -32,6 +32,7 @@ import { HomeTela } from "../pages/Home/HomeTela";
 import EliminacaoReclassificacaoCandidatoTela from "../pages/EliminacaoReclassificacaoCandidato/EliminacaoReclassificacaoCandidatoTela";
 import CartaConvocacaoTela from "../pages/Gerenciar/CartaConvocacao/CartaConvocacaoTela";
 import HistoricoCartaConvocacaoTela from "../pages/Gerenciar/CartaConvocacao/HistoricoCartaConvocacaoTela";
+import PesquisarConcursadosTela from "../pages/Processos/PesquisarConcursados/PesquisarConcursadosTela";
 
 
 const router = createBrowserRouter([
@@ -274,6 +275,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <HistoricoEscolhasTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/processo/pesquisar-concursado",
+    element: (
+      <ProtectedRoute>
+        <PesquisarConcursadosTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,

@@ -6,6 +6,7 @@ import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
   getCandidatos: () => `/api/v1/candidatos/`,
+  getCandidatoByUuid: (uuid: string) => `/api/v1/candidatos/${uuid}/`,
   getCandidatosHabilitados: () => `/api/v1/habilitados/`,
   postHabilitadoEliminar: () => `/api/v1/habilitados/eliminar/`,
   postReclassificar: () => `/api/v1/habilitados/reclassificar/`,
@@ -32,6 +33,74 @@ export const getCandidatos = (
       ...axiosRequestConfig,
     })
     .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+/** Resposta do GET /api/v1/candidatos/{uuid}/ (detalhe do candidato). */
+export interface ICandidatoDetalhe {
+  uuid?: string;
+  nome?: string;
+  cpf?: string;
+  email?: string;
+  telefone?: string;
+  celular?: string;
+  rg?: string;
+  registro_funcional?: string;
+  endereco?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
+  cep?: string;
+  concursos?: Array<{ concurso_uuid?: string; descricao_cargo?: string; [key: string]: unknown }>;
+  [key: string]: unknown;
+}
+
+export const getCandidatoByUuid = (
+  uuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .get<ICandidatoDetalhe>(URL.getCandidatoByUuid(uuid), {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+/** Payload para PATCH /api/v1/candidatos/{uuid}/ (atualização parcial). */
+export interface IPatchCandidatoPayload {
+  email?: string;
+  telefone?: string;
+  celular?: string;
+  [key: string]: unknown;
+}
+
+export const patchCandidatoByUuid = (
+  uuid: string,
+  payload: IPatchCandidatoPayload,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .patch<ICandidatoDetalhe>(URL.getCandidatoByUuid(uuid), payload, {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
 
   return {
     response,

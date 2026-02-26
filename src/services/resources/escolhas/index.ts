@@ -8,7 +8,7 @@ import type {
   IBuscarEscolasParams,
   ISalvarEscolhaPayload,
 } from "./IEscolhas";
-import type { IListRequest } from "../../../types/IListRequest";
+import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 import type {  IVagasResponse } from "../convocacao/IConvocacao";
 import type { IInclusaoVagasEscolasPayload } from "../../../pages/GerenciamentoVagas/hooks/types";
@@ -20,6 +20,8 @@ export const URL = {
   getEscolas: () => `/api/v1/escolas/`,
   postBuscarEscolhasPorCandidatos: () => `/api/v1/escolhas/busca/`,
   postEscolhas: () => `/api/v1/escolhas/`,
+  getBuscarCandidatos: () => `/api/v1/escolhas/buscar-candidatos/`,
+  getEscolhas: () => `/api/v1/escolhas/`,
   postInclusaoVagasEscolas: () => `/api/v1/vagas-escolas/inclusao/`,
   getParametrizacao: () => `/api/v1/parametrizacao/`,
   patchParametrizacao: () => `/api/v1/parametrizacao/bulk/`,
@@ -198,6 +200,136 @@ export const patchParametrizacaoEscolhas = (
       ...axiosRequestConfig,
     })
     .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+/** Params para buscar candidatos (pelo menos um obrigatório). */
+export type IBuscarCandidatosParams = {
+  nome?: string;
+  cpf?: string;
+  rg?: string;
+  registro_funcional?: string;
+};
+
+/** Item de reclassificação retornado pelo MS-Candidatos (ConcursoCandidatoSerializer). */
+export type ReclassificacaoItem = {
+  uuid?: string;
+  desclassificado_de?: string;
+  processo_uuid?: string | null;
+  motivo?: string;
+  executado_por?: string;
+  criado_em?: string | null;
+};
+
+/** Dados de eliminação do candidato no concurso (MS-Candidatos). */
+export type EliminacaoItem = {
+  eliminado?: boolean;
+  eliminado_em?: string | null;
+  eliminado_motivo?: string;
+  eliminado_por?: string;
+  processo_uuid?: string | null;
+  motivo_historico?: string;
+};
+
+/** Resposta do backend: lista de candidatos com concursos (MS-Candidatos). */
+export type CandidatoConcursoItem = {
+  uuid?: string;
+  nome?: string;
+  cpf?: string;
+  rg?: string;
+  registro_funcional?: string;
+  endereco?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
+  cep?: string;
+  telefone?: string;
+  celular?: string;
+  concursos?: Array<{
+    concurso_uuid?: string;
+    concurso_nome?: string;
+    concurso_candidato_uuid?: string;
+    descricao_cargo?: string;
+    codigo_cargo?: string;
+    classificacao?: number | null;
+    classificacao_pcd?: number | null;
+    classificacao_nna?: number | null;
+    categoria_efetiva?: string | null;
+    reclassificacoes?: ReclassificacaoItem[];
+    eliminado?: boolean;
+    eliminado_em?: string | null;
+    eliminado_motivo?: string;
+    eliminado_por?: string;
+  }>;
+};
+
+/** GET buscar candidatos (escolhas/buscar-candidatos -> MS-Candidatos). */
+export const getBuscarCandidatos = (
+  params: IBuscarCandidatosParams,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosEscolhas
+    .get<CandidatoConcursoItem[]>(URL.getBuscarCandidatos(), {
+      params: { ...params },
+      paramsSerializer: queryParamsSerializer,
+      signal: axiosRequestConfig?.signal ?? signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+/** Params para listar escolhas (filtros do EscolhaViewSet). */
+export type IListaEscolhasParams = {
+  candidato_uuid?: string;
+  concurso_uuid?: string;
+  vaga_escola__cargo_codigo?: string;
+};
+
+/** Item de escolha retornado pela listagem (EscolhaListSerializer). */
+export type EscolhaListItem = {
+  uuid?: string;
+  candidato_uuid?: string;
+  situacao?: string;
+  tipo_vaga?: string | null;
+  e_retardatario?: boolean;
+  vaga_escola_uuid?: string | null;
+  vaga_escola?: {
+    uuid?: string;
+    cargo_codigo?: string;
+    cargo_descricao?: string;
+    escola?: { nome_oficial?: string; codigo_eol?: string; dre?: { nome?: string; sigla?: string } };
+  } | null;
+  historico?: Array<{ uuid?: string; situacao_anterior?: string; situacao_nova?: string; criado_em?: string }>;
+  criado_em?: string;
+  atualizado_em?: string;
+};
+
+/** GET listagem de escolhas com filtros (candidato_uuid, concurso_uuid, vaga_escola__cargo_codigo). */
+export const getListaEscolhas = (
+  params: IListaEscolhasParams,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosEscolhas
+    .get<PaginatedResponse<EscolhaListItem>>(URL.getEscolhas(), {
+      params: { page_size: 100, ...params },
+      paramsSerializer: queryParamsSerializer,
+      signal: axiosRequestConfig?.signal ?? signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
 
   return {
     response,
