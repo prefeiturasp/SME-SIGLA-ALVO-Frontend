@@ -6,6 +6,8 @@ import {
   getEscolas,
   postInclusaoVagasEscolas,
   postEscolha,
+  getBuscarCandidatos,
+  getListaEscolhas,
   URL,
 } from '../index';
 import { appAxiosEscolhas } from '../../../axios';
@@ -58,6 +60,10 @@ describe('Escolhas Service', () => {
       expect(URL.postInclusaoVagasEscolas()).toBe(
         '/api/v1/vagas-escolas/inclusao/'
       );
+      expect(URL.getBuscarCandidatos()).toBe(
+        '/api/v1/escolhas/buscar-candidatos/'
+      );
+      expect(URL.getEscolhas()).toBe('/api/v1/escolhas/');
     });
   });
 
@@ -509,6 +515,121 @@ describe('Escolhas Service', () => {
       mockAxios.post.mockResolvedValueOnce({ data: mockResponse });
 
       const { abort } = postEscolha(payload);
+      expect(typeof abort).toBe('function');
+    });
+  });
+
+  describe('getBuscarCandidatos', () => {
+    const params = { nome: 'João', cpf: '12345678901' };
+    const mockCandidatos: Array<{ uuid?: string; nome?: string; cpf?: string; concursos?: unknown[] }> = [
+      { uuid: 'cand-1', nome: 'João Silva', cpf: '12345678901', concursos: [] },
+    ];
+
+    it('deve fazer GET com params nome, cpf, rg, registro_funcional', async () => {
+      mockAxios.get.mockResolvedValueOnce({ data: mockCandidatos });
+
+      const { response } = getBuscarCandidatos(params);
+
+      await expect(response).resolves.toEqual(mockCandidatos);
+      expect(mockAxios.get).toHaveBeenCalledWith(
+        URL.getBuscarCandidatos(),
+        expect.objectContaining({
+          params: { nome: 'João', cpf: '12345678901' },
+          paramsSerializer: queryParamsSerializer,
+          signal: expect.any(AbortSignal),
+        })
+      );
+    });
+
+    it('deve aceitar configurações adicionais do axios', async () => {
+      mockAxios.get.mockResolvedValueOnce({ data: mockCandidatos });
+      const customSignal = new AbortController().signal;
+      const config = { signal: customSignal, timeout: 5000 };
+
+      const { response } = getBuscarCandidatos(params, config);
+      await response;
+
+      expect(mockAxios.get).toHaveBeenCalledWith(
+        URL.getBuscarCandidatos(),
+        expect.objectContaining({
+          params: params,
+          signal: customSignal,
+          timeout: 5000,
+        })
+      );
+    });
+
+    it('deve expor função abort', () => {
+      mockAxios.get.mockResolvedValueOnce({ data: [] });
+      const { abort } = getBuscarCandidatos({ nome: 'x' });
+      expect(typeof abort).toBe('function');
+    });
+
+    it('deve propagar erros da requisição', async () => {
+      mockAxios.get.mockRejectedValueOnce(new Error('502 Bad Gateway'));
+      const { response } = getBuscarCandidatos({ nome: 'x' });
+      await expect(response).rejects.toThrow('502 Bad Gateway');
+    });
+  });
+
+  describe('getListaEscolhas', () => {
+    const params = { candidato_uuid: 'cand-uuid-1', concurso_uuid: 'conc-uuid-1' };
+    const mockLista = {
+      count: 1,
+      next: null,
+      previous: null,
+      page_size: 100,
+      results: [
+        {
+          uuid: 'esc-1',
+          candidato_uuid: 'cand-uuid-1',
+          situacao: 'escolha',
+          historico: [{ situacao_nova: 'escolha', criado_em: '2026-01-01T00:00:00Z' }],
+        },
+      ],
+    };
+
+    it('deve fazer GET com page_size 100 e params de filtro', async () => {
+      mockAxios.get.mockResolvedValueOnce({ data: mockLista });
+
+      const { response } = getListaEscolhas(params);
+
+      await expect(response).resolves.toEqual(mockLista);
+      expect(mockAxios.get).toHaveBeenCalledWith(
+        URL.getEscolhas(),
+        expect.objectContaining({
+          params: expect.objectContaining({
+            page_size: 100,
+            candidato_uuid: 'cand-uuid-1',
+            concurso_uuid: 'conc-uuid-1',
+          }),
+          paramsSerializer: queryParamsSerializer,
+          signal: expect.any(AbortSignal),
+        })
+      );
+    });
+
+    it('deve aceitar vaga_escola__cargo_codigo no params', async () => {
+      mockAxios.get.mockResolvedValueOnce({ data: mockLista });
+      const paramsComCargo = { ...params, vaga_escola__cargo_codigo: '100' };
+
+      const { response } = getListaEscolhas(paramsComCargo);
+      await response;
+
+      expect(mockAxios.get).toHaveBeenCalledWith(
+        URL.getEscolhas(),
+        expect.objectContaining({
+          params: expect.objectContaining({
+            page_size: 100,
+            vaga_escola__cargo_codigo: '100',
+          }),
+        })
+      );
+    });
+
+    it('deve expor função abort', () => {
+      mockAxios.get.mockResolvedValueOnce({ data: { count: 0, results: [] } });
+      const { abort } = getListaEscolhas({});
       expect(typeof abort).toBe('function');
     });
   });

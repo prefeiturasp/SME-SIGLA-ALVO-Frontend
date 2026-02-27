@@ -13,6 +13,8 @@ jest.mock('../../../../utils/queryParamsSerializer', () => jest.fn());
 import { appAxiosCandidatos } from '../../../axios';
 import {
   getCandidatos,
+  getCandidatoByUuid,
+  patchCandidatoByUuid,
   getCandidatosHabilitados,
   patchCandidatosHabilitadosConvocados,
   patchCandidatosHabilitadosDesconvocados,
@@ -72,6 +74,7 @@ describe('Candidatos Service', () => {
   describe('URL', () => {
     it('retorna URLs corretas para todas as rotas', () => {
       expect(URL.getCandidatos()).toBe('/api/v1/candidatos/');
+      expect(URL.getCandidatoByUuid('abc-123')).toBe('/api/v1/candidatos/abc-123/');
       expect(URL.getCandidatosHabilitados()).toBe('/api/v1/habilitados/');
       expect(URL.patchCandidatosHabilitadosConvocados()).toBe(
         '/api/v1/habilitados/convocar/'
@@ -124,6 +127,109 @@ describe('Candidatos Service', () => {
 
       const { response } = getCandidatos();
       await expect(response).rejects.toThrow('Network error');
+    });
+  });
+
+  describe('getCandidatoByUuid', () => {
+    const uuid = 'candidato-uuid-123';
+    const mockDetalhe = {
+      uuid,
+      nome: 'João Silva',
+      cpf: '12345678901',
+      email: 'joao@email.com',
+      rg: '12.345.678-9',
+      registro_funcional: 'RF001',
+    };
+
+    it('faz GET na URL com uuid e retorna os dados', async () => {
+      mockAxios.get.mockResolvedValueOnce({ data: mockDetalhe });
+
+      const { response } = getCandidatoByUuid(uuid);
+
+      await expect(response).resolves.toEqual(mockDetalhe);
+      expect(mockAxios.get).toHaveBeenCalledWith(
+        URL.getCandidatoByUuid(uuid),
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
+      );
+    });
+
+    it('mescla configurações adicionais do axios', async () => {
+      mockAxios.get.mockResolvedValueOnce({ data: mockDetalhe });
+      const customSignal = new AbortController().signal;
+      const config = { signal: customSignal, timeout: 5000 };
+
+      const { response } = getCandidatoByUuid(uuid, config);
+      await response;
+
+      expect(mockAxios.get).toHaveBeenCalledWith(
+        URL.getCandidatoByUuid(uuid),
+        expect.objectContaining({
+          signal: customSignal,
+          timeout: 5000,
+        })
+      );
+    });
+
+    it('expõe função abort', () => {
+      mockAxios.get.mockResolvedValueOnce({ data: mockDetalhe });
+      const { abort } = getCandidatoByUuid(uuid);
+      expect(typeof abort).toBe('function');
+    });
+
+    it('propaga erros da requisição', async () => {
+      mockAxios.get.mockRejectedValueOnce(new Error('Not found'));
+      const { response } = getCandidatoByUuid(uuid);
+      await expect(response).rejects.toThrow('Not found');
+    });
+  });
+
+  describe('patchCandidatoByUuid', () => {
+    const uuid = 'candidato-uuid-456';
+    const payload = { email: 'novo@email.com', telefone: '11999999999' };
+    const mockDetalhe = { uuid, nome: 'Maria', email: payload.email };
+
+    it('faz PATCH com uuid e payload e retorna os dados', async () => {
+      mockAxios.patch.mockResolvedValueOnce({ data: mockDetalhe });
+
+      const { response } = patchCandidatoByUuid(uuid, payload);
+
+      await expect(response).resolves.toEqual(mockDetalhe);
+      expect(mockAxios.patch).toHaveBeenCalledWith(
+        URL.getCandidatoByUuid(uuid),
+        payload,
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
+      );
+    });
+
+    it('mescla configurações adicionais do axios', async () => {
+      mockAxios.patch.mockResolvedValueOnce({ data: mockDetalhe });
+      const customSignal = new AbortController().signal;
+      const config = { signal: customSignal };
+
+      const { response } = patchCandidatoByUuid(uuid, payload, config);
+      await response;
+
+      expect(mockAxios.patch).toHaveBeenCalledWith(
+        URL.getCandidatoByUuid(uuid),
+        payload,
+        expect.objectContaining({ signal: customSignal })
+      );
+    });
+
+    it('expõe função abort', () => {
+      mockAxios.patch.mockResolvedValueOnce({ data: mockDetalhe });
+      const { abort } = patchCandidatoByUuid(uuid, payload);
+      expect(typeof abort).toBe('function');
+    });
+
+    it('propaga erros da requisição', async () => {
+      mockAxios.patch.mockRejectedValueOnce(new Error('Validation error'));
+      const { response } = patchCandidatoByUuid(uuid, payload);
+      await expect(response).rejects.toThrow('Validation error');
     });
   });
 
@@ -431,11 +537,13 @@ describe('Candidatos Service', () => {
       mockAxios.post.mockResolvedValue({ data: {} });
 
       const { abort: abort1 } = getCandidatos();
+      const { abort: abort1b } = getCandidatoByUuid('uuid-1');
       const { abort: abort2 } = getCandidatosHabilitados({
         geral: 10,
         pcd: 5,
         nna: 3,
       });
+      const { abort: abort2b } = patchCandidatoByUuid('uuid-2', { email: 'a@b.com' });
       const { abort: abort3 } = patchCandidatosHabilitadosConvocados({
         concurso_uuid: 'c',
         processo_uuid: 'p',
@@ -449,7 +557,9 @@ describe('Candidatos Service', () => {
       const { abort: abort5 } = postBuscarPorUuids({ uuids: [] });
 
       expect(typeof abort1).toBe('function');
+      expect(typeof abort1b).toBe('function');
       expect(typeof abort2).toBe('function');
+      expect(typeof abort2b).toBe('function');
       expect(typeof abort3).toBe('function');
       expect(typeof abort4).toBe('function');
       expect(typeof abort5).toBe('function');
