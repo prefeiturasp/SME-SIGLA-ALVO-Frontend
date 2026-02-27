@@ -1,6 +1,13 @@
 import axios from "axios";
 import type { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 
+// Em runtime (Docker/Rancher) as URLs vêm de window.__ENV__ (env.js gerado pelo entrypoint); localmente de import.meta.env
+function getBaseUrl(key: string): string | undefined {
+  const w = window as Window & { __ENV__?: Record<string, string> };
+  if (w.__ENV__?.[key]) return w.__ENV__[key];
+  return (import.meta.env as Record<string, string | undefined>)[key];
+}
+
 // URLs que NÃO devem ter o token no header
 const PUBLIC_URLS = [
   '/api/v1/login/',
@@ -44,41 +51,41 @@ const addAuthInterceptor = (axiosInstance: AxiosInstance) => {
 };
 
 export const appAxiosProcessoConvocacao = axios.create({
-  baseURL: import.meta.env.VITE_PROCESSOS_CONVOCACAO_API_URL,
+  baseURL: getBaseUrl("VITE_PROCESSOS_CONVOCACAO_API_URL"),
 });
 addAuthInterceptor(appAxiosProcessoConvocacao);
 
 export const appAxiosConcursos = axios.create({
-  baseURL: import.meta.env.VITE_CONCURSOS_API_URL,
+  baseURL: getBaseUrl("VITE_CONCURSOS_API_URL"),
 });
 addAuthInterceptor(appAxiosConcursos);
 
 export const appAxiosCandidatos = axios.create({
-  baseURL: import.meta.env.VITE_CANDIDATOS_API_URL,
+  baseURL: getBaseUrl("VITE_CANDIDATOS_API_URL"),
 });
 addAuthInterceptor(appAxiosCandidatos);
 
 export const appAxiosImportaArquivos = axios.create({
-  baseURL: import.meta.env.VITE_IMPORTACAO_ARQUIVOS_API_URL,
+  baseURL: getBaseUrl("VITE_IMPORTACAO_ARQUIVOS_API_URL"),
 });
 addAuthInterceptor(appAxiosImportaArquivos);
 
 export const appAxiosAdminUsuarios = axios.create({
-  baseURL: import.meta.env.VITE_ADMIN_USUARIOS_API_URL,
+  baseURL: getBaseUrl("VITE_ADMIN_USUARIOS_API_URL"),
 });
 addAuthInterceptor(appAxiosAdminUsuarios);
 
 export const appAxiosEscolhas = axios.create({
-  baseURL: import.meta.env.VITE_ESCOLHAS_API_URL,
+  baseURL: getBaseUrl("VITE_ESCOLHAS_API_URL"),
 });
 addAuthInterceptor(appAxiosEscolhas);
 
 export const appAxiosAgenda = axios.create({
-  baseURL: import.meta.env.VITE_AGENDA_API_URL,
+  baseURL: getBaseUrl("VITE_AGENDA_API_URL"),
 });
 addAuthInterceptor(appAxiosAgenda);
 
 export const appAxiosRelatorios = axios.create({
-  baseURL: import.meta.env.VITE_RELATORIOS_API_URL,
+  baseURL: getBaseUrl("VITE_RELATORIOS_API_URL"),
 });
 addAuthInterceptor(appAxiosRelatorios);

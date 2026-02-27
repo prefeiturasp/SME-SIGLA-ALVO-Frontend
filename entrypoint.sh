@@ -1,28 +1,27 @@
 #!/bin/sh
-# Replace string in static files
-# sed -i "s/old-text/new-text/g" input.txt
-# Example:
-# docker run  -p 8081:80 \
-#  -e API_URL="http://localhost:8000" \
-#  -e SERVER_NAME="localhost" 
-#  prefeitura_sp/oferta-imoveis:latest
-
-# set -xe
-#   : "${API_URL?Precisa de uma variavel de ambiente API_URL}"
-
-# set -xe
-#   : "${REACT_APP_EDITOR_KEY?Precisa de uma variavel de ambiente REACT_APP_EDITOR_KEY}"
-
 set -xe
-  : "${SERVER_NAME?Precisa de uma variavel de ambiente SERVER_NAME}"
+: "${SERVER_NAME?Precisa de uma variavel de ambiente SERVER_NAME}"
 
-# set -xe
-#   : "${SENTRY_URL?Precisa de uma variavel de ambiente SENTRY_URL}"
+# DEBUG: variáveis de ambiente VITE_*
+echo "DEBUG: VITE_PROCESSOS_CONVOCACAO_API_URL=${VITE_PROCESSOS_CONVOCACAO_API_URL}"
+echo "DEBUG: VITE_CONCURSOS_API_URL=${VITE_CONCURSOS_API_URL}"
+echo "DEBUG: VITE_CANDIDATOS_API_URL=${VITE_CANDIDATOS_API_URL}"
+echo "DEBUG: VITE_IMPORTACAO_ARQUIVOS_API_URL=${VITE_IMPORTACAO_ARQUIVOS_API_URL}"
+echo "DEBUG: VITE_ADMIN_USUARIOS_API_URL=${VITE_ADMIN_USUARIOS_API_URL}"
+echo "DEBUG: VITE_ESCOLHAS_API_URL=${VITE_ESCOLHAS_API_URL}"
+echo "DEBUG: VITE_AGENDA_API_URL=${VITE_AGENDA_API_URL}"
+echo "DEBUG: VITE_RELATORIOS_API_URL=${VITE_RELATORIOS_API_URL}"
 
+envsubst \
+  '${VITE_PROCESSOS_CONVOCACAO_API_URL} ${VITE_CONCURSOS_API_URL} ${VITE_CANDIDATOS_API_URL} ${VITE_IMPORTACAO_ARQUIVOS_API_URL} ${VITE_ADMIN_USUARIOS_API_URL} ${VITE_ESCOLHAS_API_URL} ${VITE_AGENDA_API_URL} ${VITE_RELATORIOS_API_URL}' \
+  < /usr/share/nginx/html/env.js.template \
+  > /tmp/env.js
+mv /tmp/env.js /usr/share/nginx/html/env.js
 
-# sed -i "s,API_URL_REPLACE_ME,$API_URL,g" /usr/share/nginx/html/static/js/main*.js
-# sed -i "s,EDITOR_KEY_REPLACE_ME,$REACT_APP_EDITOR_KEY,g" /usr/share/nginx/html/static/js/main*.js
-# sed -i "s,SENTRY_URL_REPLACE_ME,$SENTRY_URL,g" /usr/share/nginx/html/static/js/main*.js
+echo "DEBUG: env.js content after envsubst:"
+cat /usr/share/nginx/html/env.js
+
+# Nginx: server_name no default.conf
 sed -i "s,SERVER_NAME,$SERVER_NAME,g" /etc/nginx/conf.d/default.conf
 
 exec "$@"
