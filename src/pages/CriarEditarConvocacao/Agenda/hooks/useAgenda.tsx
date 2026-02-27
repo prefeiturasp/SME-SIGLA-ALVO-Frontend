@@ -156,6 +156,8 @@ export const useAgenda = () => {
 
   const mapPeriodoItemToAgendaCreate = (
     periodo: PeriodoItem,
+    processoUuid: string,
+    processoNome: string,
     _index?: number,
     candidatosSlice?: string[],
     cargoCodigo?: string
@@ -188,6 +190,8 @@ export const useAgenda = () => {
     }
     return {
       ...(periodo.uuid && { uuid: periodo.uuid }),
+      processo_convocacao_uuid: processoUuid,
+      processo_convocacao_nome: processoNome,
       cargo_uuid: periodo.cargoUuid || '',
       cargo_nome: periodo.cargo,
       cargo_codigo: cargoCodigo,
@@ -200,9 +204,7 @@ export const useAgenda = () => {
       retardatario: periodo.isRetardatario || false,
       hora_convocacao_inicio: horaConvocacaoInicio,
       hora_convocacao_fim: horaConvocacaoFim,
-      ...(Array.isArray(candidatosSlice) && candidatosSlice.length > 0
-        ? { candidatos_uuids: candidatosSlice as string[] }
-        : {}),
+      candidatos_uuids: candidatosSlice ? candidatosSlice as string[] : [],
     };
   };
 
@@ -659,35 +661,46 @@ export const useAgenda = () => {
 
     try {
       setAgendasLoading(true);
-      // Coletar todos os candidatos de todos os cargos (sem fatiar)
-      const todosCandidatos = Array.from(
-        new Set(
-          cargosAdicionados.flatMap((c) => c.candidatos_uuids || [])
-        )
-      );
+      // Fonte de candidatos por cargo (a partir dos cargos do processo)
+      const candidatosPorCargo: Record<string, { lista: string[]; offset: number }> = {};
+      cargosAdicionados.forEach(cargo => {
+        const key = cargo.uuid || cargo.nome;
+        candidatosPorCargo[key] = {
+          lista: (cargo.candidatos_uuids || []).slice(),
+          offset: 0,
+        };
+      });
 
-      // Mapear agendas sem enviar candidatos fatiados por agenda
       const todasAgendas: IAgendaCreate[] = periodosList.map((periodo, index) => {
+        const cargoKey = periodo.cargoUuid || periodo.cargo;
+        const fonte = candidatosPorCargo[cargoKey];
+        const quantidade = periodo.classificacao || 0;
         const cargoCodigo =
-          cargosAdicionados.find(c => c.uuid === periodo.cargoUuid)?.cargo_codigo ||
-          cargosAdicionados.find(c => c.nome === periodo.cargo)?.cargo_codigo;
+          (cargosAdicionados.find(c => c.uuid === periodo.cargoUuid)?.cargo_codigo) ||
+          (cargosAdicionados.find(c => c.nome === periodo.cargo)?.cargo_codigo);
+        let slice: string[] = [];
+        if (periodo.isRetardatario) {
+          // Se for retardatário, passar todos os candidatos do cargo
+          if (fonte) {
+            slice = fonte.lista.slice();
+          }
+        } else if (fonte && quantidade > 0) {
+          const inicio = fonte.offset;
+          const fimExclusivo = inicio + quantidade;
+          slice = fonte.lista.slice(inicio, fimExclusivo);
+          fonte.offset = fimExclusivo;
+        }
         return mapPeriodoItemToAgendaCreate(
           periodo,
+          uuid,
+          processoConvocacaoData.concurso_nome || 'Processo de Convocação',
           index,
-          undefined,
+          slice,
           cargoCodigo
         );
       });
 
-      // Payload no novo formato: candidatos_uuids (todos) + agendas (lista)
-      const payload = {
-        processo_uuid: uuid,
-        processo_nome: processoConvocacaoData.concurso_nome || 'Processo de Convocação',
-        candidatos_uuids: todosCandidatos,
-        agendas: todasAgendas,
-      };
-
-      const resultados: IAgenda[] = await postAgendaMutation.mutateAsync(payload);
+      const resultados: IAgenda[] = await postAgendaMutation.mutateAsync(todasAgendas);
       setPeriodosList(prev => {
         return prev.map((periodo, index) => {
           if (periodo.uuid) {

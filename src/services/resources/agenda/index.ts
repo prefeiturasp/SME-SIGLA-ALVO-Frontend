@@ -2,7 +2,7 @@ import type { AxiosRequestConfig } from "axios";
 import { appAxiosAgenda } from "../../axios";
 import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
-import type { IAgenda, IAgendaCreate, IAgendaFilters, IAgendaBulkCreatePayload } from "./IAgenda";
+import type { IAgenda, IAgendaCreate, IAgendaFilters } from "./IAgenda";
 
 export const URL = {
   getAgendas: () => `/api/v1/agendas/`,
@@ -64,27 +64,16 @@ export const getAgendaByUuid = (
  * Cria uma ou várias agendas (aceita lista de dicionários)
  */
 export const postAgenda = (
-  payload: IAgendaCreate | IAgendaCreate[] | IAgendaBulkCreatePayload,
+  payload: IAgendaCreate | IAgendaCreate[],
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
-  // Suporta payload em lote ({ candidatos_uuids, agendas }) ou lista simples
-  const isBulk =
-    !Array.isArray(payload) &&
-    payload &&
-    typeof payload === "object" &&
-    Array.isArray((payload as any).agendas) &&
-    Array.isArray((payload as any).candidatos_uuids);
-
-  const body = isBulk
-    ? payload
-    : Array.isArray(payload)
-    ? payload
-    : [payload];
+  // Se não for array, converte para array
+  const payloadArray = Array.isArray(payload) ? payload : [payload];
 
   const response = appAxiosAgenda
-    .post<IAgenda[]>(URL.postAgenda(), body as any, {
+    .post<IAgenda[]>(URL.postAgenda(), payloadArray, {
       signal,
       ...axiosRequestConfig,
     })
