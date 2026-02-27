@@ -5,7 +5,7 @@ pipeline {
         registryCredential = 'jenkins_registry'
         branchname = env.BRANCH_NAME?.toLowerCase() ?: 'main'
         // URL base das APIs em QA (Vite injeta em build time; precisa ser definido antes do npm run build)
-        QA_API_BASE = 'https://qa-api-sigla.sme.prefeitura.sp.gov.br'
+        QA_API_BASE = 'https://qa-sigla.sme.prefeitura.sp.gov.br'
     }
 
     options {
@@ -26,15 +26,16 @@ pipeline {
                 script {
                     // Diretório do frontend: monorepo ou repo só do frontend
                     frontendDir = fileExists('SME-SIGLA-ALVO-Frontend/package.json') ? 'SME-SIGLA-ALVO-Frontend' : '.'
+                    // Paths alinhados aos jobs/serviços no Jenkins e Rancher (sme-alvo-* e sme-locus-*)
                     envContent = """
-VITE_PROCESSOS_CONVOCACAO_API_URL=${env.QA_API_BASE}/ms-processos-convocacao
-VITE_CONCURSOS_API_URL=${env.QA_API_BASE}/ms-processos-concursos
-VITE_CANDIDATOS_API_URL=${env.QA_API_BASE}/ms-candidatos
-VITE_IMPORTACAO_ARQUIVOS_API_URL=${env.QA_API_BASE}/ms-importa-arquivos
-VITE_ADMIN_USUARIOS_API_URL=${env.QA_API_BASE}/ms-admin-usuarios
-VITE_ESCOLHAS_API_URL=${env.QA_API_BASE}/ms-escolha
-VITE_AGENDA_API_URL=${env.QA_API_BASE}/ms-agenda
-VITE_RELATORIOS_API_URL=${env.QA_API_BASE}/ms-relatorios
+VITE_PROCESSOS_CONVOCACAO_API_URL=${env.QA_API_BASE}/sme-alvo-ms-proc-convocacao
+VITE_CONCURSOS_API_URL=${env.QA_API_BASE}/sme-alvo-ms-concursos
+VITE_CANDIDATOS_API_URL=${env.QA_API_BASE}/sme-alvo-ms-candidatos
+VITE_IMPORTACAO_ARQUIVOS_API_URL=${env.QA_API_BASE}/sme-locus-ms-imp-arquivos
+VITE_ADMIN_USUARIOS_API_URL=${env.QA_API_BASE}/sme-locus-ms-admin-usuarios
+VITE_ESCOLHAS_API_URL=${env.QA_API_BASE}/sme-alvo-ms-escolha
+VITE_AGENDA_API_URL=${env.QA_API_BASE}/sme-alvo-ms-agenda
+VITE_RELATORIOS_API_URL=${env.QA_API_BASE}/sme-alvo-ms-relatorios
 """
                     writeFile file: "${frontendDir}/.env", text: envContent.trim()
                 }
