@@ -1,8 +1,7 @@
 /**
- * Testes unitários da tela Pesquisar Concursados (feature/143715-consulta-concursado).
- * Os testes de "renderização e interação" estão em describe.skip pois a renderização
- * completa com antd/styled-components pode ser lenta. Para ativá-los: remova o .skip
- * e opcionalmente aumente testTimeout no Jest.
+ * Testes unitários da tela Pesquisar Concursados.
+ * Bloco "renderização e interação" está em describe.skip (antd/styled-components podem ser lentos).
+ * Para ativar: remova o .skip e, se necessário, aumente testTimeout no Jest.
  */
 import React from "react";
 import { screen, waitFor } from "@testing-library/react";
@@ -18,7 +17,6 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
 }));
-
 
 const mockGetBuscarCandidatos = jest.fn();
 jest.mock("../../../../services/resources/escolhas", () => ({
@@ -86,21 +84,26 @@ jest.mock("../components/HistoricoCandidatoModal", () => ({
     ) : null,
 }));
 
+const MOCK_CANDIDATO = {
+  uuid: "cand-1",
+  nome: "Maria Silva",
+  cpf: "111.222.333-44",
+  rg: "12.345.678-9",
+  registro_funcional: "RF001",
+  concursos: [
+    {
+      concurso_nome: "Concurso Teste",
+      concurso_uuid: "conc-1",
+      concurso_candidato_uuid: "cc-1",
+      descricao_cargo: "Professor",
+      classificacao: 1,
+      classificacao_nna: null,
+      classificacao_pcd: null,
+    },
+  ],
+};
 
 describe("PesquisarConcursadosTela", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockGetBuscarCandidatos.mockImplementation((params: Record<string, string | undefined>) => ({
-      response: Promise.resolve([]),
-      abort: jest.fn(),
-    }));
-  });
-
-  it("deve exportar componente como default", () => {
-    expect(PesquisarConcursadosTela).toBeDefined();
-    expect(typeof PesquisarConcursadosTela).toBe("function");
-  });
-
   const renderComponent = () =>
     renderWithProviders(
       <SCThemeProvider theme={appTheme as never}>
@@ -108,150 +111,101 @@ describe("PesquisarConcursadosTela", () => {
       </SCThemeProvider>
     );
 
-  // Testes de renderização: dependem de antd/styled-components e podem ser lentos.
-  // Para rodar: remova o .skip e aumente testTimeout se necessário.
-  describe.skip("renderização e interação", () => {
-  it("renderiza título Pesquisar Concursados e base tela", () => {
-    renderComponent();
-    expect(screen.getByTestId("page-title")).toHaveTextContent("Pesquisar Concursados");
-    expect(screen.getByTestId("base-tela")).toBeInTheDocument();
-  });
-
-  it("renderiza campos de filtro: Nome, RF, RG, CPF", () => {
-    renderComponent();
-    expect(screen.getByPlaceholderText("Digite o nome")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Digite o RF")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Digite o RG")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Digite o CPF")).toBeInTheDocument();
-  });
-
-  it("renderiza botões Limpar e Filtrar", () => {
-    renderComponent();
-    expect(screen.getByRole("button", { name: /limpar/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /filtrar/i })).toBeInTheDocument();
-  });
-
-  it("botão Filtrar fica desabilitado quando não há filtro preenchido", () => {
-    renderComponent();
-    const btnFiltrar = screen.getByRole("button", { name: /filtrar/i });
-    expect(btnFiltrar).toBeDisabled();
-  });
-
-  it("botão Filtrar fica habilitado ao preencher pelo menos um filtro", async () => {
-    const user = userEvent.setup();
-    renderComponent();
-    await user.type(screen.getByPlaceholderText("Digite o nome"), "João");
-    expect(screen.getByRole("button", { name: /filtrar/i })).not.toBeDisabled();
-  });
-
-  it("botão Filtrar permanece desabilitado quando nenhum filtro está preenchido", () => {
-    renderComponent();
-    const btnFiltrar = screen.getByRole("button", { name: /filtrar/i });
-    expect(btnFiltrar).toBeDisabled();
-  });
-
-  it("ao clicar em Filtrar com nome preenchido chama getBuscarCandidatos e exibe resultados na tabela", async () => {
-    const user = userEvent.setup();
-    const mockCandidatos = [
-      {
-        uuid: "cand-1",
-        nome: "Maria Silva",
-        cpf: "111.222.333-44",
-        rg: "12.345.678-9",
-        registro_funcional: "RF001",
-        concursos: [
-          {
-            concurso_nome: "Concurso Teste",
-            concurso_uuid: "conc-1",
-            concurso_candidato_uuid: "cc-1",
-            descricao_cargo: "Professor",
-            classificacao: 1,
-            classificacao_nna: null,
-            classificacao_pcd: null,
-          },
-        ],
-      },
-    ];
+  beforeEach(() => {
+    jest.clearAllMocks();
     mockGetBuscarCandidatos.mockImplementation(() => ({
-      response: Promise.resolve(mockCandidatos),
+      response: Promise.resolve([]),
       abort: jest.fn(),
     }));
+  });
 
-    renderComponent();
-    await user.type(screen.getByPlaceholderText("Digite o nome"), "Maria");
-    await user.click(screen.getByRole("button", { name: /filtrar/i }));
+  it("exporta componente como default", () => {
+    expect(PesquisarConcursadosTela).toBeDefined();
+    expect(typeof PesquisarConcursadosTela).toBe("function");
+  });
 
-    await waitFor(() => {
-      expect(mockGetBuscarCandidatos).toHaveBeenCalledWith(
-        expect.objectContaining({
-          nome: "Maria",
-          registro_funcional: undefined,
-          rg: undefined,
-          cpf: undefined,
-        })
+  describe.skip("renderização e interação", () => {
+    it("renderiza título, base, filtros (Nome, RF, RG, CPF) e botões Limpar/Filtrar", () => {
+      renderComponent();
+      expect(screen.getByTestId("page-title")).toHaveTextContent("Pesquisar Concursados");
+      expect(screen.getByTestId("base-tela")).toBeInTheDocument();
+      expect(screen.getByPlaceholderText("Digite o nome")).toBeInTheDocument();
+      expect(screen.getByPlaceholderText("Digite o RF")).toBeInTheDocument();
+      expect(screen.getByPlaceholderText("Digite o RG")).toBeInTheDocument();
+      expect(screen.getByPlaceholderText("Digite o CPF")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /limpar/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /filtrar/i })).toBeInTheDocument();
+    });
+
+    it("botão Filtrar está desabilitado sem filtro e habilitado com pelo menos um filtro", async () => {
+      const user = userEvent.setup();
+      renderComponent();
+      const btnFiltrar = screen.getByRole("button", { name: /filtrar/i });
+      expect(btnFiltrar).toBeDisabled();
+      await user.type(screen.getByPlaceholderText("Digite o nome"), "João");
+      expect(btnFiltrar).not.toBeDisabled();
+    });
+
+    it("ao Filtrar com nome preenchido chama getBuscarCandidatos e exibe resultados", async () => {
+      const user = userEvent.setup();
+      mockGetBuscarCandidatos.mockImplementation(() => ({
+        response: Promise.resolve([MOCK_CANDIDATO]),
+        abort: jest.fn(),
+      }));
+      renderComponent();
+      await user.type(screen.getByPlaceholderText("Digite o nome"), "Maria");
+      await user.click(screen.getByRole("button", { name: /filtrar/i }));
+
+      await waitFor(() => {
+        expect(mockGetBuscarCandidatos).toHaveBeenCalledWith(
+          expect.objectContaining({
+            nome: "Maria",
+            registro_funcional: undefined,
+            rg: undefined,
+            cpf: undefined,
+          })
+        );
+      });
+      await waitFor(() => {
+        expect(screen.getByText("Maria Silva")).toBeInTheDocument();
+        expect(screen.getByText("Concurso Teste")).toBeInTheDocument();
+        expect(screen.getByText("Professor")).toBeInTheDocument();
+      });
+    });
+
+    it("ao Limpar zera filtros e tabela", async () => {
+      const user = userEvent.setup();
+      mockGetBuscarCandidatos.mockImplementation(() => ({
+        response: Promise.resolve([{ uuid: "c-1", nome: "João", concursos: [{ concurso_nome: "Conc", concurso_candidato_uuid: "cc1" }] }]),
+        abort: jest.fn(),
+      }));
+      renderComponent();
+      await user.type(screen.getByPlaceholderText("Digite o nome"), "João");
+      await user.click(screen.getByRole("button", { name: /filtrar/i }));
+      await waitFor(() => expect(screen.getByText("João")).toBeInTheDocument());
+
+      await user.click(screen.getByRole("button", { name: /limpar/i }));
+      await waitFor(() => expect(screen.getByPlaceholderText("Digite o nome")).toHaveValue(""));
+      expect(screen.queryByText("João")).not.toBeInTheDocument();
+    });
+
+    it("renderiza tabela com colunas Concurso, Cargo, Candidato, RF, RG, CPF", () => {
+      renderComponent();
+      ["Concurso", "Cargo", "Candidato", "RF", "RG", "CPF"].forEach((col) =>
+        expect(screen.getByText(col)).toBeInTheDocument()
       );
     });
 
-    await waitFor(() => {
-      expect(screen.getByText("Maria Silva")).toBeInTheDocument();
-      expect(screen.getByText("Concurso Teste")).toBeInTheDocument();
-      expect(screen.getByText("Professor")).toBeInTheDocument();
+    it("em erro na busca chama getBuscarCandidatos", async () => {
+      const user = userEvent.setup();
+      mockGetBuscarCandidatos.mockImplementation(() => ({
+        response: Promise.reject(new Error("Erro de rede")),
+        abort: jest.fn(),
+      }));
+      renderComponent();
+      await user.type(screen.getByPlaceholderText("Digite o CPF"), "123");
+      await user.click(screen.getByRole("button", { name: /filtrar/i }));
+      await waitFor(() => expect(mockGetBuscarCandidatos).toHaveBeenCalled());
     });
-  });
-
-  it("ao clicar em Limpar zera filtros e tabela", async () => {
-    const user = userEvent.setup();
-    mockGetBuscarCandidatos.mockImplementation(() => ({
-      response: Promise.resolve([
-        {
-          uuid: "c-1",
-          nome: "João",
-          concursos: [{ concurso_nome: "Conc", concurso_candidato_uuid: "cc1" }],
-        },
-      ]),
-      abort: jest.fn(),
-    }));
-
-    renderComponent();
-    await user.type(screen.getByPlaceholderText("Digite o nome"), "João");
-    await user.click(screen.getByRole("button", { name: /filtrar/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText("João")).toBeInTheDocument();
-    });
-
-    await user.click(screen.getByRole("button", { name: /limpar/i }));
-
-    await waitFor(() => {
-      expect(screen.getByPlaceholderText("Digite o nome")).toHaveValue("");
-    });
-    expect(screen.queryByText("João")).not.toBeInTheDocument();
-  });
-
-  it("renderiza tabela com colunas esperadas", () => {
-    renderComponent();
-    expect(screen.getByText("Concurso")).toBeInTheDocument();
-    expect(screen.getByText("Cargo")).toBeInTheDocument();
-    expect(screen.getByText("Candidato")).toBeInTheDocument();
-    expect(screen.getByText("RF")).toBeInTheDocument();
-    expect(screen.getByText("RG")).toBeInTheDocument();
-    expect(screen.getByText("CPF")).toBeInTheDocument();
-  });
-
-  it("em erro na busca chama getBuscarCandidatos e trata rejeição", async () => {
-    const user = userEvent.setup();
-    mockGetBuscarCandidatos.mockImplementation(() => ({
-      response: Promise.reject(new Error("Erro de rede")),
-      abort: jest.fn(),
-    }));
-
-    renderComponent();
-    await user.type(screen.getByPlaceholderText("Digite o CPF"), "123");
-    await user.click(screen.getByRole("button", { name: /filtrar/i }));
-
-    await waitFor(() => {
-      expect(mockGetBuscarCandidatos).toHaveBeenCalled();
-    });
-  });
   });
 });
