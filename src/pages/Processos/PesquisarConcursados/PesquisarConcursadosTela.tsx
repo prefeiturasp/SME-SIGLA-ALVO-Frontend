@@ -168,12 +168,16 @@ const PesquisarConcursadosTela: React.FC = () => {
   const refetchCandidatos = async () => {
     setLoading(true);
     try {
-      const { response } = getBuscarCandidatos({
-        nome: (filtros.nome ?? "").trim() || undefined,
-        registro_funcional: (filtros.rf ?? "").trim() || undefined,
-        rg: (filtros.rg ?? "").trim() || undefined,
-        cpf: (filtros.cpf ?? "").trim() || undefined,
-      });
+      const nome = (filtros.nome ?? "").trim();
+      const rf = (filtros.rf ?? "").trim();
+      const rg = (filtros.rg ?? "").trim();
+      const cpf = (filtros.cpf ?? "").trim();
+      const params: Record<string, string> = {};
+      if (nome) params.nome = nome;
+      if (rf) params.registro_funcional = rf;
+      if (rg) params.rg = rg;
+      if (cpf) params.cpf = cpf;
+      const { response } = getBuscarCandidatos(params);
       const data = await response;
       setRows(mapResponseToRows(Array.isArray(data) ? data : []));
     } catch (err: unknown) {
@@ -368,6 +372,7 @@ const PesquisarConcursadosTela: React.FC = () => {
           columns={columns}
           dataSource={rows}
           loading={loading}
+          locale={{ emptyText: "Nenhum candidato encontrado" }}
           pagination={{
             current: pagination.current,
             pageSize: pagination.pageSize,
