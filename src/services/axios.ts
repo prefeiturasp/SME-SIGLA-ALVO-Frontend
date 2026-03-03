@@ -1,13 +1,12 @@
 import axios from "axios";
 import type { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 
-const getEnv = (key: string, fallback: string) => {
-  // No Vite, as variáveis de ambiente são acessadas através de import.meta.env
-  // e devem ter o prefixo VITE_
-  const viteKey = `VITE_${key}`;
-  const envValue = import.meta.env[viteKey];
-  return envValue || fallback;
-};
+// Em runtime (Docker/Rancher) as URLs vêm de window.__ENV__ (env.js gerado pelo entrypoint); localmente de import.meta.env
+function getBaseUrl(key: string): string | undefined {
+  const w = window as Window & { __ENV__?: Record<string, string> };
+  if (w.__ENV__?.[key]) return w.__ENV__[key];
+  return (import.meta.env as Record<string, string | undefined>)[key];
+}
 
 // URLs que NÃO devem ter o token no header
 const PUBLIC_URLS = [
@@ -20,15 +19,12 @@ const PUBLIC_URLS = [
 const addAuthInterceptor = (axiosInstance: AxiosInstance) => {
   axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      // Verificar se a URL é pública (não precisa de token)
       const isPublicUrl = PUBLIC_URLS.some(url => config.url?.includes(url));
       
       if (!isPublicUrl) {
-        // Pegar token do localStorage
         const token = localStorage.getItem('TOKEN');
         
         if (token) {
-          // Adicionar token no header Authorization
           config.headers.Authorization = `Bearer ${token}`;
         }
       }
@@ -45,7 +41,6 @@ const addAuthInterceptor = (axiosInstance: AxiosInstance) => {
     (response) => response,
     (error) => {
       if (error.response?.status === 401) {
-        // Token inválido ou expirado - limpar localStorage e redirecionar para login
         localStorage.removeItem('TOKEN');
         localStorage.removeItem('USUARIO');
         window.location.href = '/login';
@@ -56,41 +51,41 @@ const addAuthInterceptor = (axiosInstance: AxiosInstance) => {
 };
 
 export const appAxiosProcessoConvocacao = axios.create({
-  baseURL: getEnv("PROCESSOS_CONVOCACAO_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-convocacao"),
+  baseURL: getBaseUrl("VITE_PROCESSOS_CONVOCACAO_API_URL"),
 });
 addAuthInterceptor(appAxiosProcessoConvocacao);
 
 export const appAxiosConcursos = axios.create({
-  baseURL: getEnv("CONCURSOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos"),
+  baseURL: getBaseUrl("VITE_CONCURSOS_API_URL"),
 });
 addAuthInterceptor(appAxiosConcursos);
 
 export const appAxiosCandidatos = axios.create({
-  baseURL: getEnv("CANDIDATOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos"),
+  baseURL: getBaseUrl("VITE_CANDIDATOS_API_URL"),
 });
 addAuthInterceptor(appAxiosCandidatos);
 
 export const appAxiosImportaArquivos = axios.create({
-  baseURL: getEnv("IMPORTACAO_ARQUIVOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-importa-arquivos"),
+  baseURL: getBaseUrl("VITE_IMPORTACAO_ARQUIVOS_API_URL"),
 });
 addAuthInterceptor(appAxiosImportaArquivos);
 
 export const appAxiosAdminUsuarios = axios.create({
-  baseURL: getEnv("ADMIN_USUARIOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-admin-usuarios"),
+  baseURL: getBaseUrl("VITE_ADMIN_USUARIOS_API_URL"),
 });
 addAuthInterceptor(appAxiosAdminUsuarios);
 
 export const appAxiosEscolhas = axios.create({
-  baseURL: getEnv("ESCOLHAS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-escolha"),
+  baseURL: getBaseUrl("VITE_ESCOLHAS_API_URL"),
 });
 addAuthInterceptor(appAxiosEscolhas);
 
 export const appAxiosAgenda = axios.create({
-  baseURL: getEnv("AGENDA_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-agenda"),
+  baseURL: getBaseUrl("VITE_AGENDA_API_URL"),
 });
 addAuthInterceptor(appAxiosAgenda);
 
 export const appAxiosRelatorios = axios.create({
-    baseURL: getEnv("RELATORIOS_API_URL", "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-relatorios"),
+  baseURL: getBaseUrl("VITE_RELATORIOS_API_URL"),
 });
 addAuthInterceptor(appAxiosRelatorios);

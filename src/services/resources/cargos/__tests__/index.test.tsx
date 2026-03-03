@@ -7,7 +7,7 @@ jest.mock('../../../axios', () => ({
 jest.mock('../../../../utils/queryParamsSerializer', () => jest.fn());
 
 import { appAxiosConcursos } from '../../../axios';
-import { getCargos, URL } from '../index';
+import { getCargosAutorizacoesPublicadas, URL } from '../index';
 import type { PaginatedResponse } from '../../../../types/IListRequest';
 import type { ICargos } from '../ICargos';
 import queryParamsSerializer from '../../../../utils/queryParamsSerializer';
@@ -21,23 +21,7 @@ describe('Cargos Service', () => {
     next: null,
     previous: null,
     page_size: 10,
-    results: [
-      {
-        label: 'Cargo 1',
-        value: 'cargo-uuid-1',
-        cargos: [
-          { label: 'Subcargo 1.1', value: 'subcargo-uuid-1.1' },
-          { label: 'Subcargo 1.2', value: 'subcargo-uuid-1.2' },
-        ],
-      },
-      {
-        label: 'Cargo 2',
-        value: 'cargo-uuid-2',
-        cargos: [
-          { label: 'Subcargo 2.1', value: 'subcargo-uuid-2.1' },
-        ],
-      },
-    ],
+    results: [],
   };
 
   beforeEach(() => {
@@ -46,20 +30,20 @@ describe('Cargos Service', () => {
   });
 
   describe('URL', () => {
-    it('retorna URL correta para getCargos', () => {
-      expect(URL.getCargos()).toBe('/api/v1/cargos/?formato=select');
+    it('retorna URL correta para getCargosAutorizacoesPublicadas', () => {
+      expect(URL.getCargosAutorizacoesPublicadas()).toBe('/api/v1/cargos/autorizacoes-publicadas/');
     });
   });
 
-  describe('getCargos', () => {
+  describe('getCargosAutorizacoesPublicadas', () => {
     it('faz GET sem parâmetros e retorna os dados', async () => {
       mockAxios.get.mockResolvedValueOnce({ data: mockCargosData });
 
-      const { response, abort } = getCargos();
+      const { response, abort } = getCargosAutorizacoesPublicadas();
 
       await expect(response).resolves.toEqual(mockCargosData);
       expect(mockAxios.get).toHaveBeenCalledWith(
-        URL.getCargos(),
+        URL.getCargosAutorizacoesPublicadas(),
         expect.objectContaining({
           paramsSerializer: queryParamsSerializer,
           signal: expect.any(AbortSignal),
@@ -72,11 +56,11 @@ describe('Cargos Service', () => {
       const axiosConfig = { headers: { 'X-Custom': 'value' } };
       mockAxios.get.mockResolvedValueOnce({ data: mockCargosData });
 
-      const { response } = getCargos(axiosConfig);
+      const { response } = getCargosAutorizacoesPublicadas(axiosConfig);
 
       await expect(response).resolves.toEqual(mockCargosData);
       expect(mockAxios.get).toHaveBeenCalledWith(
-        URL.getCargos(),
+        URL.getCargosAutorizacoesPublicadas(),
         expect.objectContaining({
           paramsSerializer: queryParamsSerializer,
           signal: expect.any(AbortSignal),
@@ -88,9 +72,8 @@ describe('Cargos Service', () => {
     it('expõe função abort', () => {
       mockAxios.get.mockResolvedValueOnce({ data: mockCargosData });
 
-      const { abort } = getCargos();
+      const { abort } = getCargosAutorizacoesPublicadas();
       expect(typeof abort).toBe('function');
     });
   });
 });
-

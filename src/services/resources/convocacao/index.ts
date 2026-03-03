@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosProcessoConvocacao } from "../../axios";
-import type { ISample, IProcessoConvocacao, IProcessoConvocacaoDetalhe, IPostProcessoConvocacaoPayload, IProcessoConvocacaoResumo, ICargoProcesso } from "./IConvocacao";
+import type { ISample, IProcessoConvocacao, IProcessoConvocacaoDetalhe, IPostProcessoConvocacaoPayload, IProcessoConvocacaoResumo, ICargoProcesso, ICartaConvocacaoPayload, ICartaConvocacaoResponse, IHistoricoCartaConvocacao, IHistoricoCartaConvocacaoDetalhe } from "./IConvocacao";
 import type { IBackendWithSubOptions, IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
@@ -18,6 +18,9 @@ export const URL = {
   postCargosProcesso: (processoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/`,
   patchCargoProcesso: (processoUuid: string, cargoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/${cargoUuid}/`,
   deleteCargoProcesso: (processoUuid: string, cargoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/${cargoUuid}/`,
+  postCartaConvocacao: () => `/api/v1/carta-convocacao/`,
+  getHistoricoCartaConvocacao: () => `/api/v1/carta-convocacao/`,
+  getDetalheCartaConvocacao: (uuid: string) => `/api/v1/carta-convocacao/${uuid}/`,
   createSample: () => `/api/v1/samples/`,
   editSample: (id: number) => `/api/v1/samples/${id}/`,
   deleteSample: (id: number) => `/api/v1/samples/${id}/`,
@@ -310,9 +313,67 @@ export const postCargosProcesso = (
   };
 };
 
-/**
- * Atualiza (PATCH) um cargo específico de um processo de convocação
- */
+
+export const postCartaConvocacao = (
+  payload: ICartaConvocacaoPayload,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .post<ICartaConvocacaoResponse>(URL.postCartaConvocacao(), payload, {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+export const getHistoricoCartaConvocacao = (
+  listRequest: IListRequest,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { pagination, filters, ...rest } = listRequest;
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .get<PaginatedResponse<IHistoricoCartaConvocacao>>(URL.getHistoricoCartaConvocacao(), {
+      params: { ...pagination, ...filters, ...rest },
+      paramsSerializer: queryParamsSerializer,
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+export const getDetalheCartaConvocacao = (
+  uuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .get<IHistoricoCartaConvocacaoDetalhe>(URL.getDetalheCartaConvocacao(uuid), {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
 export const patchCargoProcesso = (
   processoUuid: string,
   cargoUuid: string,
@@ -334,9 +395,6 @@ export const patchCargoProcesso = (
   };
 };
 
-/**
- * Exclui um cargo específico de um processo de convocação
- */
 export const deleteCargoProcesso = (
   processoUuid: string,
   cargoUuid: string,

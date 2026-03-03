@@ -86,7 +86,7 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
   const getSelectedKeys = () => {
     const path = location.pathname;
 
-    if (path.startsWith("/processos")) {
+    if (path.startsWith("/processos") || path.startsWith("/processo")) {
       return ["processos"];
     } else if (
       path.startsWith("/administracao") ||
@@ -167,6 +167,11 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
             label: "Importação de Dados",
             onClick: () => navigate("/processos/importacao-dados"),
           },
+          {
+            key: "pesquisar-concursados",
+            label: "Pesquisar Concursados",
+            onClick: () => navigate("/processo/pesquisar-concursado"),
+          },
         ];
       case "relatorios":
         return [];
@@ -176,6 +181,11 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
             key: "autorizacoes-publicadas",
             label: "Autorizações publicadas",
             onClick: () => navigate("/autorizacoes-publicadas"),
+          },
+          {
+            key: "carta-convocacao",
+            label: "Carta de Convocação",
+            onClick: () => navigate("/gerenciar/carta-convocacao"),
           },
           {
             key: "eliminacao-reclassificacao",
