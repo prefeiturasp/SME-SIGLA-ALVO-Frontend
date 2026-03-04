@@ -155,6 +155,8 @@ const DetalheCartaConvocacaoModal: React.FC<DetalheCartaConvocacaoModalProps> = 
         }}
         nomeCandidato={candidatoSelecionado?.nome}
         conteudo={candidatoSelecionado?.conteudo ?? ""}
+        status={candidatoSelecionado?.status}
+        statusDetalhe={candidatoSelecionado?.status_detalhe}
       />
     </CustomModal2>
   );

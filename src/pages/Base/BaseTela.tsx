@@ -184,7 +184,7 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
           },
           {
             key: "carta-convocacao",
-            label: "Carta de Convocação",
+            label: "E-mail de Convocação",
             onClick: () => navigate("/gerenciar/carta-convocacao"),
           },
           {
