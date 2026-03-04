@@ -52,7 +52,7 @@ const CartaConvocacaoTela: React.FC = () => {
           </Text>
         ),
       },
-      { title: "Carta de Convocação" },
+      { title: "E-mail de Convocação" },
     ] as TitleItem[],
     [navigate]
   );
@@ -64,7 +64,7 @@ const CartaConvocacaoTela: React.FC = () => {
   return (
     <BaseTela
       breadcrumbItems={breadcrumbItems}
-      title="Carta de Convocação"
+      title="E-mail de Convocação"
     >
       <>
         <TabContentContainer>

@@ -54,7 +54,7 @@ const HistoricoCartaConvocacaoTela: React.FC = () => {
             style={{ cursor: "pointer" }}
             onClick={() => navigate("/gerenciar/carta-convocacao")}
           >
-            Carta de Convocação
+            E-mail de Convocação
           </Text>
         ),
       },
@@ -119,7 +119,7 @@ const HistoricoCartaConvocacaoTela: React.FC = () => {
   return (
     <BaseTela
       breadcrumbItems={breadcrumbItems}
-      title="Histórico - Carta de Convocação"
+      title="Histórico - E-mail de Convocação"
     >
       <TabContentContainer>
         <SectionCard>

@@ -8,6 +8,8 @@ interface ConteudoEmailModalProps {
   onClose: () => void;
   nomeCandidato?: string;
   conteudo: string;
+  status?: string;
+  statusDetalhe?: string;
 }
 
 const ConteudoEmailModal: React.FC<ConteudoEmailModalProps> = ({
@@ -15,10 +17,14 @@ const ConteudoEmailModal: React.FC<ConteudoEmailModalProps> = ({
   onClose,
   nomeCandidato,
   conteudo,
+  status,
+  statusDetalhe,
 }) => {
   const title = nomeCandidato
     ? `E-mail enviado para ${nomeCandidato}`
     : "Conteúdo do e-mail";
+
+  const isErroEmailDuplicado = status === "ERRO" && statusDetalhe;
 
   const conteudoComLogo =
     typeof conteudo === "string"
@@ -42,6 +48,20 @@ const ConteudoEmailModal: React.FC<ConteudoEmailModalProps> = ({
           overflow: hidden;
         }
       `}</style>
+      {isErroEmailDuplicado && (
+        <div
+          style={{
+            marginBottom: 16,
+            padding: 12,
+            background: "#fff2f0",
+            border: "1px solid #ffccc7",
+            borderRadius: 8,
+            color: "#cf1322",
+          }}
+        >
+          {statusDetalhe}
+        </div>
+      )}
       <div
         style={{
           maxHeight: "70vh",
