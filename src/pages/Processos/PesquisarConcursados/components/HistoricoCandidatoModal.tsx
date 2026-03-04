@@ -83,7 +83,7 @@ function buildAlteracoesFromReclassificacao(
         key: r.uuid ?? `recl-${i}`,
         data: formatarDataISO(r.criado_em ?? undefined),
         statusAnterior: de || "—",
-        statusNovo,
+        statusNovo: r.nova_classificacao ?? "—",
         motivo: r.motivo ?? "—",
       },
     });
@@ -164,24 +164,19 @@ function buildHistoricoSituacoes(results: EscolhaListItem[]): HistoricoSituacaoI
 }
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: "Open Sans",
-  fontWeight: 600,
+  fontWeight: 700,
   fontSize: 16,
-  color: "#515151",
 };
 
 const valueStyle: React.CSSProperties = {
-  fontFamily: "Open Sans",
-  fontWeight: 400,
+  fontWeight: 550,
   fontSize: 16,
-  color: "#8C8C8C",
 };
 
 const sectionTitleStyle: React.CSSProperties = {
   fontFamily: "Open Sans",
   fontWeight: 700,
   fontSize: 16,
-  color: "#515151",
   marginTop: 24,
   marginBottom: 12,
 };
@@ -277,15 +272,15 @@ const HistoricoCandidatoModal: React.FC<HistoricoCandidatoModalProps> = ({
     >
       <Row gutter={[32, 24]} style={{ marginTop: 8, marginBottom: 24 }}>
         <Col span={6}>
-          <div style={labelStyle}>Candidato</div>
+          <div style={labelStyle}>Candidato:</div>
           <div style={{ ...valueStyle, marginTop: 12 }}>{nomeCandidato || "—"}</div>
         </Col>
         <Col span={10}>
-          <div style={labelStyle}>Concurso</div>
+          <div style={labelStyle}>Concurso:</div>
           <div style={{ ...valueStyle, marginTop: 12 }}>{concurso || "—"}</div>
         </Col>
         <Col span={8}>
-          <div style={labelStyle}>Cargo</div>
+          <div style={labelStyle}>Cargo:</div>
           <div style={{ ...valueStyle, marginTop: 12 }}>{cargo || "—"}</div>
         </Col>
       </Row>

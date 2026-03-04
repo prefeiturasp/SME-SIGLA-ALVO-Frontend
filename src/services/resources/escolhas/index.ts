@@ -219,6 +219,7 @@ export type IBuscarCandidatosParams = {
 export type ReclassificacaoItem = {
   uuid?: string;
   desclassificado_de?: string;
+  nova_classificacao?: string;
   processo_uuid?: string | null;
   motivo?: string;
   executado_por?: string;
