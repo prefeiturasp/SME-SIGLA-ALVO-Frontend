@@ -24,8 +24,8 @@ jest.mock("../../../../services", () => {
       Cargos: {
         getCargosAutorizacoesPublicadas: jest.fn(() => ({
           response: Promise.resolve([
-            { uuid: "1", nome: "Analista de Sistemas", codigo: 1001, autorizacoes: 10, autorizacoes_sem_efeito: 0, total_escolhas: 4, data_autorizacao_mais_recente: "2026-02-10" },
-            { uuid: "2", nome: "UX/UI Designer", codigo: 1010, autorizacoes: 3, autorizacoes_sem_efeito: 1, total_escolhas: 1, data_autorizacao_mais_recente: "2026-02-15" },
+            { uuid: "1", nome: "Analista de Sistemas", codigo: 1001, autorizacoes: 10, total_escolhas: 4, data_autorizacao_mais_recente: "2026-02-10" },
+            { uuid: "2", nome: "UX/UI Designer", codigo: 1010, autorizacoes: 3, total_escolhas: 1, data_autorizacao_mais_recente: "2026-02-15" },
           ]),
           abort: () => {},
         })),

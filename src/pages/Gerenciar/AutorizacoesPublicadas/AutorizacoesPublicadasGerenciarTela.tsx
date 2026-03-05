@@ -12,11 +12,9 @@ type ItemRow = {
   key: string;
   uuid?: string;
   autorizacoes: number;
-  autorizacoesSemEfeito: number;
   dataCadastro: string;
   observacao: string;
   dataISO?: string | null;
-  vagasSemEfeito?: boolean;
 };
 
 const { Text } = Typography;
@@ -41,7 +39,6 @@ const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
     quantidade?: number;
     dataAutorizacao?: string | null;
     observacao?: string;
-    vagasSemEfeito?: boolean;
   } | null>(null);
 
   const breadcrumbItems = useMemo(
@@ -105,11 +102,9 @@ const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
           key: String(row?.uuid || idx),
           uuid: typeof row?.uuid === "string" ? row.uuid : undefined,
           autorizacoes: Number(row?.autorizacoes) || 0,
-          autorizacoesSemEfeito: Number(row?.autorizacoes_sem_efeito) || 0,
           dataCadastro: formatDate(row?.data_autorizacao),
           observacao: String(row?.observacao || "—"),
           dataISO: (typeof row?.data_autorizacao === "string" ? row.data_autorizacao : null) as string | null,
-          vagasSemEfeito: typeof row?.vagas_sem_efeito === "boolean" ? row.vagas_sem_efeito : undefined,
         }));
         setItems(rows);
       }
@@ -131,20 +126,11 @@ const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
         render: (value: number) => <span style={{ whiteSpace: "nowrap" }}>{value}</span>,
       },
       {
-        title: "Autorizações sem efeito",
-        dataIndex: "autorizacoesSemEfeito",
-        key: "autorizacoesSemEfeito",
-        align: "center" as const,
-        width: 250,
-        ellipsis: true,
-        render: (value: number) => <span style={{ whiteSpace: "nowrap" }}>{value}</span>,
-      },
-      {
         title: "Data de cadastro",
         dataIndex: "dataCadastro",
         key: "dataCadastro",
         align: "center" as const,
-        width: 180,
+        width: 200,
         ellipsis: true,
         render: (value: string) => <span style={{ whiteSpace: "nowrap" }}>{value}</span>,
       },
@@ -152,6 +138,7 @@ const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
         title: "Observação",
         dataIndex: "observacao",
         key: "observacao",
+        width: 280,
         render: (text: string) => (
           <span style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{text}</span>
         ),
@@ -172,10 +159,9 @@ const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
                   setEditContext({
                     mode: "edit",
                     autorizacaoUuid: record?.uuid,
-                    quantidade: record?.vagasSemEfeito ? record?.autorizacoesSemEfeito : record?.autorizacoes,
+                    quantidade: record?.autorizacoes,
                     dataAutorizacao: record?.dataISO || null,
                     observacao: record?.observacao || "",
-                    vagasSemEfeito: record?.vagasSemEfeito ?? false,
                   });
                   setAddOpen(true);
                 }}
@@ -253,7 +239,6 @@ const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
           quantidade: editContext?.quantidade,
           dataAutorizacao: editContext?.dataAutorizacao || undefined,
           observacao: editContext?.observacao,
-          vagasSemEfeito: editContext?.vagasSemEfeito,
         }}
         onCancel={() => setAddOpen(false)}
         onAdd={(_payload) => {
