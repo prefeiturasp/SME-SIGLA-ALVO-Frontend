@@ -1,4 +1,5 @@
 import { Breadcrumb, Col, Row, Tooltip, Typography } from "antd";
+import { SnippetsOutlined } from "@ant-design/icons";
 import type { IProcessoConvocacao } from "../../services/resources/convocacao/IConvocacao";
 import React, { Suspense, useState } from "react";
 import { Layout, theme } from "antd";
@@ -26,7 +27,6 @@ import {
   SidePanelContent,
   SidePanelItem,
   ProcessosIcon,
-  RelatoriosIcon,
   GerenciarIcon,
   SidePanelTitle,
   PageTitle,
@@ -97,9 +97,10 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
       return ["gerenciar"];
     } else if (
       path.startsWith("/relatorios") ||
-      path.startsWith("/relatorio")
+      path.startsWith("/relatorio") ||
+      path.startsWith("/documentos-por-processo")
     ) {
-      return ["relatorios"];
+      return ["documentos-por-processo"];
     }
 
     return [];
@@ -125,15 +126,10 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
       onClick: () => handleMenuClick("processos", "Processos"),
     },
     {
-      key: "relatorios",
-      icon: <RelatoriosIcon />,
-      label: "Relatórios",
-      onClick: () => {
-        setIsSidePanelOpen(false);
-        setSelectedMenuKey("");
-        setSelectedMenuTitle("");
-        navigate("/relatorios");
-      },
+      key: "documentos-por-processo",
+      icon: <SnippetsOutlined style={{ fontSize: "1.03125rem" }} />,
+      label: "Documentos Por Processo",
+      onClick: () => handleMenuClick("documentos-por-processo", "Documentos por Processo"),
     },
     {
       key: "gerenciar",
@@ -173,8 +169,14 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
             onClick: () => navigate("/processo/pesquisar-concursado"),
           },
         ];
-      case "relatorios":
-        return [];
+      case "documentos-por-processo":
+        return [
+          {
+            key: "relatorios",
+            label: "Relatórios",
+            onClick: () => navigate("/relatorios"),
+          },
+        ];
       case "gerenciar":
         return [
           {

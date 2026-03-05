@@ -42,10 +42,8 @@ jest.mock("../../hooks/useGetCargos", () => {
       {
         uuid: "a1",
         autorizacoes: 2,
-        autorizacoes_sem_efeito: 1,
         data_autorizacao: "2026-02-10",
         observacao: "Obs 1",
-        vagas_sem_efeito: false,
       },
     ],
   }));

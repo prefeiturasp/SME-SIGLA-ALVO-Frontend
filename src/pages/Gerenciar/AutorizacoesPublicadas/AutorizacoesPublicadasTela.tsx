@@ -12,7 +12,6 @@ type Registro = {
   cargo: string;
   ultimaAtualizacao: string;
   totalAutorizacoes: number;
-  totalSemEfeito: number;
   escolhasRealizadas: number;
   saldoAtual: number;
 };
@@ -84,7 +83,6 @@ const AutorizacoesPublicadasTela: React.FC = () => {
             cargo: String(cargo?.nome || "—"),
             ultimaAtualizacao: formatDate(dataRecente),
             totalAutorizacoes: Number(cargo?.autorizacoes) || 0,
-            totalSemEfeito: Number(cargo?.autorizacoes_sem_efeito) || 0,
             escolhasRealizadas: cargo?.total_escolhas || 0,
             saldoAtual: saldoAtual > 0 ? saldoAtual : 0,
           };
@@ -109,7 +107,6 @@ const AutorizacoesPublicadasTela: React.FC = () => {
       { title: "Cargo", dataIndex: "cargo", key: "cargo" },
       { title: "Última atualização", dataIndex: "ultimaAtualizacao", key: "ultimaAtualizacao", align: "center" as const },
       { title: "Total autorizações", dataIndex: "totalAutorizacoes", key: "totalAutorizacoes", align: "center" as const },
-      { title: "Total sem efeito", dataIndex: "totalSemEfeito", key: "totalSemEfeito", align: "center" as const },
       { title: "Escolhas realizadas", dataIndex: "escolhasRealizadas", key: "escolhasRealizadas", align: "center" as const },
       { title: "Saldo atual", dataIndex: "saldoAtual", key: "saldoAtual", align: "center" as const },
       {

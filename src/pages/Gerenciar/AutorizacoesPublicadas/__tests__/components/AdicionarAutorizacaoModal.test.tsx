@@ -62,7 +62,6 @@ describe("AdicionarAutorizacaoModal", () => {
           quantidade: 5,
           dataAutorizacao: "2026-02-01",
           observacao: "Original",
-          vagasSemEfeito: false,
         }}
         onCancel={() => {}}
         onAdd={onAdd}
