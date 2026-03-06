@@ -149,7 +149,7 @@ describe('BaseTela Component', () => {
       expect(screen.getByAltText('Prefeitura de São Paulo')).toBeInTheDocument();
       expect(screen.getByTestId('user-avatar')).toBeInTheDocument();
       expect(screen.getAllByText('Processos').length).toBeGreaterThan(0);
-      expect(screen.getByText('Relatórios')).toBeInTheDocument();
+      expect(screen.getByText('Documentos')).toBeInTheDocument();
       expect(screen.getByText('Gerenciar')).toBeInTheDocument();
       expect(screen.getByText('Test Page Title')).toBeInTheDocument();
       expect(screen.getByTestId('test-children')).toBeInTheDocument();
@@ -256,20 +256,20 @@ describe('BaseTela Component', () => {
       expect(screen.getByText('Gerenciar')).toBeInTheDocument();
     });
 
-    it('deve retornar ["relatorios"] quando path começa com /relatorios', () => {
+    it('deve retornar ["documentos-por-processo"] quando path começa com /relatorios', () => {
       mockUseLocation.mockReturnValue({ pathname: '/relatorios/test' });
       const wrapper = createWrapper();
       render(<BaseTela {...defaultProps} />, { wrapper });
 
-      expect(screen.getByText('Relatórios')).toBeInTheDocument();
+      expect(screen.getByText('Documentos')).toBeInTheDocument();
     });
 
-    it('deve retornar ["relatorios"] quando path começa com /relatorio', () => {
+    it('deve retornar ["documentos-por-processo"] quando path começa com /relatorio', () => {
       mockUseLocation.mockReturnValue({ pathname: '/relatorio/test' });
       const wrapper = createWrapper();
       render(<BaseTela {...defaultProps} />, { wrapper });
 
-      expect(screen.getByText('Relatórios')).toBeInTheDocument();
+      expect(screen.getByText('Documentos')).toBeInTheDocument();
     });
 
     it('deve retornar [] quando path não corresponde a nenhum padrão', () => {
@@ -287,7 +287,7 @@ describe('BaseTela Component', () => {
       render(<BaseTela {...defaultProps} />, { wrapper });
 
       expect(screen.getAllByText('Processos').length).toBeGreaterThan(0);
-      expect(screen.getByText('Relatórios')).toBeInTheDocument();
+      expect(screen.getByText('Documentos')).toBeInTheDocument();
       expect(screen.getByText('Gerenciar')).toBeInTheDocument();
     });
 
@@ -360,16 +360,24 @@ describe('BaseTela Component', () => {
       }
     });
 
-    it('deve renderizar submenu de Relatórios corretamente', async () => {
+    it('deve renderizar submenu de Documentos por Processo corretamente', async () => {
       const user = userEvent.setup();
       const wrapper = createWrapper();
       render(<BaseTela {...defaultProps} />, { wrapper });
 
       const menuItems = screen.getAllByTestId('custom-menu-item');
-      const relatoriosMenuItem = menuItems.find(item => item.textContent?.includes('Relatórios'));
+      const documentosMenuItem = menuItems.find(item => item.textContent?.includes('Documentos'));
       
-      if (relatoriosMenuItem) {
-        await user.click(relatoriosMenuItem);
+      expect(documentosMenuItem).toBeTruthy();
+      if (documentosMenuItem) {
+        await user.click(documentosMenuItem);
+
+        await waitFor(() => {
+          expect(screen.getByText('Relatórios')).toBeInTheDocument();
+        }, { timeout: 2000 });
+
+        const relatoriosSubmenuItem = screen.getByText('Relatórios');
+        await user.click(relatoriosSubmenuItem);
 
         await waitFor(() => {
           expect(mockNavigate).toHaveBeenCalledWith('/relatorios');
