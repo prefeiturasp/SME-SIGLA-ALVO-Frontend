@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Button, Collapse, Steps, theme, Tooltip, Typography } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 import { UserSwitchOutlined } from "@ant-design/icons";
 import { StepActions } from "./components/StepActions";
@@ -25,6 +25,7 @@ const Resumo: React.FC = () => {
 
   const { uuid } = useParams<{ uuid: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Buscar agendas do backend
   const { agendasData, agendasIsLoading } = useGetAgendas(
@@ -92,6 +93,16 @@ const Resumo: React.FC = () => {
   const { processoConvocacaoData, processoConvocacaoIsLoading } =
     useConvocacaoById(uuid as string);
 
+  const isStatusFinalizado = (status: string | undefined) => {
+    if (!status) return false;
+    const s = status.toLowerCase();
+    return s.includes("finalizado") || s.includes("finalizada");
+  };
+
+  const isViewOnlyResumo =
+    (location.state as { isViewMode?: boolean } | null)?.isViewMode === true ||
+    (processoConvocacaoData?.status && isStatusFinalizado(processoConvocacaoData.status));
+
   const breadcrumbItems = [
     {
       title: (
@@ -127,7 +138,7 @@ const Resumo: React.FC = () => {
       ),
     },
     {
-      title: "Editar Convocação",
+      title: isViewOnlyResumo ? "Visualizar convocação" : "Editar Convocação",
     },
   ] as TitleItem[];
 
@@ -145,7 +156,7 @@ const Resumo: React.FC = () => {
     <>
       <BaseTela
         breadcrumbItems={breadcrumbItems}
-        title="Nova convocação"
+        title={isViewOnlyResumo ? "Resumo do processo" : "Nova convocação"}
         buttons={
           <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
           <Button
@@ -160,26 +171,32 @@ const Resumo: React.FC = () => {
           </Tooltip>
         }
       >
-        <StyledCardWithoutBorder
-          title={
-            <Text style={resumoStyles.cardTitle(token)}>
-              Processo de convocação de candidatos
-            </Text>
-          }
-          variant="borderless"
-        >
-          <Steps current={current} items={items} />
-        </StyledCardWithoutBorder>
+        {!isViewOnlyResumo && (
+          <StyledCardWithoutBorder
+            title={
+              <Text style={resumoStyles.cardTitle(token)}>
+                Processo de convocação de candidatos
+              </Text>
+            }
+            variant="borderless"
+          >
+            <Steps current={current} items={items} />
+          </StyledCardWithoutBorder>
+        )}
 
         <StyledCardWithoutBorder
           style={resumoStyles.cardWithMarginTop}
-          title={steps[current].title}
+          title={isViewOnlyResumo ? undefined : steps[current].title}
           variant="borderless"
         >
           {processoConvocacaoData && (
             <ResumoDoProcesso
               data={processoConvocacaoData}
               isLoading={processoConvocacaoIsLoading}
+              useBlackText={isViewOnlyResumo}
+              modalidade={
+                agendasData?.results?.[0]?.modalidade ?? undefined
+              }
             />
           )}
         </StyledCardWithoutBorder>
@@ -214,15 +231,23 @@ const Resumo: React.FC = () => {
             </div>
           )}
 
-          <StepActions
-            current={current}
-            steps={steps}
-            next={next}
-            prev={prev}
-            onCancel={() => navigate(`/processos/convocacao`)}
-            canSalvarEAvancar={canChangeProcessoConvocacao}
-            canVoltar={canChangeProcessoConvocacao}
-          />
+          {isViewOnlyResumo ? (
+            <div style={{ marginTop: 24 }}>
+              <Button size="large" onClick={() => navigate("/processos/convocacao")}>
+                Voltar
+              </Button>
+            </div>
+          ) : (
+            <StepActions
+              current={current}
+              steps={steps}
+              next={next}
+              prev={prev}
+              onCancel={() => navigate(`/processos/convocacao`)}
+              canSalvarEAvancar={canChangeProcessoConvocacao}
+              canVoltar={canChangeProcessoConvocacao}
+            />
+          )}
         </StyledCardWithoutBorder>
       </BaseTela>
     </>

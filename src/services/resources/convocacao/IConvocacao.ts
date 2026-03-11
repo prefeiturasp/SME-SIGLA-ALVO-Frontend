@@ -195,6 +195,7 @@ export interface ICandidatoCartaConvocacao {
   rf: string;
   email: string;
   status: string;
+  status_detalhe?: string;
   conteudo: string;
 }
 

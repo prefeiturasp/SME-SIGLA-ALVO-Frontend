@@ -1,10 +1,15 @@
-import { Typography, Row, Col, Button, Tooltip } from "antd";
+import React, { useState, useCallback } from "react";
+import { Typography, Row, Col, Button, Tooltip, App } from "antd";
 import { UsergroupAddOutlined, UserSwitchOutlined } from "@ant-design/icons";
+import { useQueryClient } from "@tanstack/react-query";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import ConvocacaoTable from "./components/ConvocacaoTable";
 import ConvocacaoFiltros from "./components/ConvocacaoFiltros";
+import FinalizarProcessoModal from "./components/FinalizarProcessoModal";
 import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
 import { useNavigate } from "react-router-dom";
+import { API } from "../../../services";
+import type { IProcessoConvocacao } from "../../../services/resources/convocacao/IConvocacao";
 import {
   PageContainer,
   ActionButton,
@@ -19,6 +24,59 @@ const { Text } = Typography;
 
 const ConvocacaoCandidatosTela: React.FC = () => {
   const navigate = useNavigate();
+  const { notification } = App.useApp();
+  const queryClient = useQueryClient();
+  const [finalizandoUuid, setFinalizandoUuid] = useState<string | null>(null);
+  const [modalFinalizarOpen, setModalFinalizarOpen] = useState(false);
+  const [processoParaFinalizar, setProcessoParaFinalizar] = useState<IProcessoConvocacao | null>(null);
+
+  const handleFinalizar = useCallback(
+    async (record: IProcessoConvocacao) => {
+      setFinalizandoUuid(record.uuid);
+      try {
+        await API.Convocacao.postFinalizarProcessoConvocacao(record.uuid).response;
+        notification.success({
+          message: "Processo finalizado com sucesso.",
+          description: "A partir de agora só é permitido a visualização do processo.",
+          placement: "top",
+          duration: 3.5,
+        });
+        await queryClient.invalidateQueries({ queryKey: ["getProcessosConvocacao"] });
+      } catch (error: unknown) {
+        const detail =
+          (error as { response?: { data?: { detail?: string } } })?.response?.data?.detail ??
+          "Não foi possível finalizar o processo. Tente novamente.";
+        notification.error({
+          message: "Erro ao finalizar processo",
+          description: String(detail),
+          placement: "top",
+          duration: 3.5,
+        });
+      } finally {
+        setFinalizandoUuid(null);
+      }
+    },
+    [notification, queryClient]
+  );
+
+  const openModalFinalizar = useCallback((record: IProcessoConvocacao) => {
+    setProcessoParaFinalizar(record);
+    setModalFinalizarOpen(true);
+  }, []);
+
+  const closeModalFinalizar = useCallback(() => {
+    setModalFinalizarOpen(false);
+    setProcessoParaFinalizar(null);
+  }, []);
+
+  const handleConfirmFinalizar = useCallback(async () => {
+    if (!processoParaFinalizar) return;
+    try {
+      await handleFinalizar(processoParaFinalizar);
+    } finally {
+      closeModalFinalizar();
+    }
+  }, [processoParaFinalizar, handleFinalizar, closeModalFinalizar]);
 
   const breadcrumbItems = [
     {
@@ -132,6 +190,8 @@ const ConvocacaoCandidatosTela: React.FC = () => {
                   canViewDetailsProcessoConvocacao
                 }
                 canFinalizeProcessoConvocacao={canFinalizeProcessoConvocacao}
+                onFinalizar={openModalFinalizar}
+                finalizandoUuid={finalizandoUuid}
                 loading={processosConvocacaoIsLoading}
                 data={processosConvocacaoData?.results || []}
                 pagination={{
@@ -151,6 +211,13 @@ const ConvocacaoCandidatosTela: React.FC = () => {
             </TableContainer>
           </Col>
         </Row>
+
+        <FinalizarProcessoModal
+          open={modalFinalizarOpen}
+          confirmLoading={!!finalizandoUuid}
+          onCancel={closeModalFinalizar}
+          onConfirm={handleConfirmFinalizar}
+        />
       </BaseTela>
     </PageContainer>
   );
