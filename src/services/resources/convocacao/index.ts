@@ -11,6 +11,7 @@ export const URL = {
   postProcessoConvocacao: () => `/api/v1/processos-convocacao/`,
   patchProcessoConvocacao: (uuid: string) => `/api/v1/processos-convocacao/${uuid}/`,
   getProcessoConvocacaoById:(uuid: string) => `/api/v1/processos-convocacao/${uuid}/`,
+  postFinalizarProcessoConvocacao: (uuid: string) => `/api/v1/processos-convocacao/${uuid}/finalizar/`,
   getProcessosConvocacaoOptions: () => `/api/v1/processos-convocacao/?formato=select`,
   getCargos: () => `/api/v1/cargos/`,
   getCargosPorConcurso: (concursoUuid: string) => `/api/v1/cargos/concurso/${concursoUuid}/`,
@@ -121,6 +122,29 @@ export const getProcessoConvocacaoById = (
 
   const response = appAxiosProcessoConvocacao
     .get<IProcessoConvocacaoResumo>(URL.getProcessoConvocacaoById(uuid), {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+/**
+ * Finaliza o processo de convocação (POST finalizar).
+ * Backend valida se todos os convocados fizeram escolha; retorna 400 se houver pendente.
+ */
+export const postFinalizarProcessoConvocacao = (
+  uuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .post<IProcessoConvocacao>(URL.postFinalizarProcessoConvocacao(uuid), {}, {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })

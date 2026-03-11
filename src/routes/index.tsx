@@ -215,6 +215,17 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
+    path: "/processos/convocacao/visualizar/:uuid/resumo",
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="processoconvocacao,convocacao,candidato,importacaoarquivovagas" permissaoDeExibirATELA="view_processoconvocacao">
+          <Resumo />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
     path: "/processos/convocacao/editar/:uuid/dados-processo",    
     element: (
       <ProtectedRoute>
