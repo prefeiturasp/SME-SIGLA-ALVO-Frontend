@@ -31,9 +31,11 @@ interface AgendaFormProps {
   isBotaoAdicionarHabilitado: () => boolean;
   handleAdicionarPeriodo: () => void;
   candidatosDisponiveis?: number;
+  candidatosFaltantesCount?: number;
   setValue: (name: string, value: any) => void;
   totalCandidatos?: number;
   trigger: (name?: string | string[]) => Promise<boolean>;
+  hasAgendas: boolean;
 }
 
 const AgendaForm: React.FC<AgendaFormProps> = ({
@@ -48,12 +50,13 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
   isBotaoAdicionarHabilitado,
   handleAdicionarPeriodo,
   candidatosDisponiveis,
+  candidatosFaltantesCount,
   setValue,
   totalCandidatos,
   trigger,
+  hasAgendas,
 }) => {
   if (!agendaAberto) return null;
-
   return (
     <Card
       style={agendaFormStyles.agendaCard}
@@ -90,7 +93,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                 Cargo:
               </Text>
               <Text style={agendaFormStyles.cargoInfoValue}>
-                {agendaAberto.cargo.nome}
+                {agendaAberto?.cargo?.nome || "—"}
               </Text>
             </div>
           </Col>
@@ -103,8 +106,8 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                   <Radio.Group 
                     {...field} 
                     options={[
-                      { label: 'Presencial', value: 'Presencial' },
-                      { label: 'Online', value: 'Online' }
+                      { label: 'Presencial', value: 'PRESENCIAL' },
+                      { label: 'Online', value: 'ONLINE', disabled: hasAgendas }
                     ]}
                   />
                 )}
@@ -117,7 +120,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
             </Form.Item>
           </Col>
           <Col span={6}>
-            {watchedFields.tipoEscolha === "Presencial" ? (
+            {watchedFields.tipoEscolha === "PRESENCIAL" ? (
               <Form.Item label="Retardatário?" style={agendaFormStyles.formItemNoMargin}>
                 <Checkbox
                   checked={isRetardatario}
@@ -154,7 +157,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                 name="escolhaEm"
                 control={control}
                 render={({ field }) => (
-                  watchedFields.tipoEscolha === "Online" ? (
+                  watchedFields.tipoEscolha === "ONLINE" ? (
                     <DatePicker.RangePicker
                       {...field}
                       value={field.value}
@@ -215,16 +218,21 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                     placeholder="Digite a classificação"
                     className="agenda-input"
                     min={1}
-                    disabled={isRetardatario}
+                    disabled={isRetardatario || watchedFields.tipoEscolha === "ONLINE"}
                     status={formErrors.quantidadeClassificados ? 'error' : undefined}
                   />
                 )}
               />
-              {candidatosDisponiveis !== undefined && candidatosDisponiveis >= 0 && (
+              {((typeof candidatosFaltantesCount === "number" && candidatosFaltantesCount >= 0) ||
+                (candidatosDisponiveis !== undefined && candidatosDisponiveis >= 0)) && (
                 <Text style={agendaFormStyles.candidatosDisponiveis}>
                   {isRetardatario && totalCandidatos !== undefined
                     ? `Total de candidatos: ${totalCandidatos}`
-                    : `Candidatos disponíveis: ${candidatosDisponiveis}`}
+                    : `Candidatos disponíveis: ${
+                        typeof candidatosFaltantesCount === "number" && candidatosFaltantesCount >= 0
+                          ? candidatosFaltantesCount
+                          : candidatosDisponiveis
+                      }`}
                 </Text>
               )}
               {formErrors.quantidadeClassificados && (
@@ -245,7 +253,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                     placeholder="Digite a sessão"
                     className="agenda-input"
                     min={1}
-                    disabled={isRetardatario}
+                    disabled={isRetardatario || watchedFields.tipoEscolha === "ONLINE"}
                     status={formErrors.sessao ? 'error' : undefined}
                   />
                 )}
@@ -262,7 +270,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
         {/* Linha com Hora da convocação, Retardatário e Botão Adicionar período */}
         <Row gutter={16} align="middle">
           <Col span={6}>
-            {watchedFields.tipoEscolha === "Presencial" ? (
+            {watchedFields.tipoEscolha === "PRESENCIAL" ? (
               <Form.Item label="*Hora da convocação" style={agendaFormStyles.formItemNoMargin}>
                 <Controller
                   name="horaInicio"

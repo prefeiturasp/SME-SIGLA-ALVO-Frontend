@@ -456,7 +456,11 @@ const EscolhaCandidatosTela: React.FC = () => {
   const agendasOptions = useMemo(
     () =>
       agendasList
-        .filter((agenda) => Boolean(agenda.uuid))
+        .filter(
+          (agenda) =>
+            Boolean(agenda.uuid) &&
+            String((agenda as any)?.modalidade).toUpperCase() === "PRESENCIAL"
+        )
         .map((agenda) => ({
           value: agenda.uuid,
           label: formatAgendaOptionLabel(agenda),

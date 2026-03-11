@@ -365,7 +365,7 @@ const AgendaTabelaExpandida: React.FC<{
         const editing = isEditing(record);
         return editing ? (
           <div style={agendaTabelaStyles.editContainer}>
-            {record.tipoEscolha === "Presencial" ? (
+            {record.tipoEscolha === "PRESENCIAL" ? (
               <>
                 <Controller
                   name={`${record.id}.horaInicio`}
@@ -422,13 +422,28 @@ const AgendaTabelaExpandida: React.FC<{
               </>
             ) : (
               <Typography.Text style={agendaTabelaStyles.onlineText}>
-                Online
+                -
               </Typography.Text>
             )}
           </div>
         ) : (
-          text
+          record.tipoEscolha === "PRESENCIAL"
+            ? `${record.horaInicio ?? "--"} às ${record.horaFim ?? "--"}`
+            : "-"
         );
+      },
+    },
+    {
+      title: 'Modalidade',
+      dataIndex: 'modalidade',
+      key: 'modalidade',
+      align: 'center' as const,
+      width: 50,
+      render: (_: any, record: PeriodoItem) => {
+        const val = record.modalidade || (record.tipoEscolha as any);
+        if (val === 'PRESENCIAL' || val === 'Presencial') return 'Presencial';
+        if (val === 'ONLINE' || val === 'Online') return 'Online';
+        return val || '—';
       },
     },
     {
