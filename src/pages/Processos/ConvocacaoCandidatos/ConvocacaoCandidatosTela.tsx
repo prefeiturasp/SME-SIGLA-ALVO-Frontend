@@ -44,9 +44,9 @@ const ConvocacaoCandidatosTela: React.FC = () => {
     setFinalizandoUuid(processoParaFinalizar.uuid);
     try {
       await postFinalizar.mutateAsync(processoParaFinalizar.uuid);
-      closeModalFinalizar();
     } finally {
       setFinalizandoUuid(null);
+      closeModalFinalizar();
     }
   }, [processoParaFinalizar, postFinalizar, closeModalFinalizar]);
 
