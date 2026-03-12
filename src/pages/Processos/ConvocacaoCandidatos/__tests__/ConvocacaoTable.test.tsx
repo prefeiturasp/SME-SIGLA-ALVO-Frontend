@@ -66,35 +66,37 @@ describe('ConvocacaoTable', () => {
     expect(screen.getByText('10/03/2025')).toBeInTheDocument();
   });
 
-  it('clica Delete e Finalizar e chama console.log', async () => {
+  it('clica Delete e Finalizar e chama handlers', async () => {
     const user = userEvent.setup();
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const onFinalizar = jest.fn();
+    const rowData = makeRow({ uuid: 'uuid-2' });
 
     renderWithTheme(
       <ConvocacaoTable 
-        data={[makeRow({ uuid: 'uuid-2' })]} 
+        data={[rowData]} 
         canChangeProcessoConvocacao={true}
         canDeleteProcessoConvocacao={true}
         canViewDetailsProcessoConvocacao={true}
         canFinalizeProcessoConvocacao={true}
+        onFinalizar={onFinalizar}
       />
     );
 
     const row = screen.getByText('Concurso X').closest('tr') as HTMLElement;
     const buttons = within(row).getAllByRole('button');
 
-    // Encontrar o botão Delete (pode não ser o segundo, então vamos procurar pelo texto)
+    // Encontrar o botão Delete
     const deleteButton = buttons.find(btn => btn.getAttribute('aria-label') === 'Excluir processo' || btn.querySelector('[aria-label="Excluir processo"]'));
     if (deleteButton) {
       await user.click(deleteButton as HTMLElement);
       expect(consoleSpy).toHaveBeenCalledWith('delete', expect.any(Object));
     }
 
-    // Encontrar e clicar no botão Finalizar Processo
+    // Clicar no botão Finalizar Processo (chama onFinalizar com o record)
     const finalizarButton = within(row).getByText('Finalizar Processo');
     await user.click(finalizarButton);
-    
-    expect(consoleSpy).toHaveBeenCalledWith(expect.any(Object));
+    expect(onFinalizar).toHaveBeenCalledWith(rowData);
 
     consoleSpy.mockRestore();
   });
@@ -263,7 +265,7 @@ describe('ConvocacaoTable', () => {
   });
 
   describe('isProcessoFinalizado', () => {
-    it('deve ocultar botão Editar quando processo está finalizado', () => {
+    it('deve desabilitar botão Editar quando processo está finalizado', () => {
       renderWithTheme(
         <ConvocacaoTable 
           data={[makeRow({ status: 'Finalizado' })]} 
@@ -274,21 +276,13 @@ describe('ConvocacaoTable', () => {
         />
       );
 
-      // Quando finalizado, o botão editar não deve estar ativo
       const row = screen.getByText('Concurso X').closest('tr') as HTMLElement;
       const buttons = within(row).getAllByRole('button');
-      
-      // Verificar que não há botão editar clicável (deve estar hidden)
-      const editButton = buttons.find(btn => 
-        btn.querySelector('[aria-label="Editar processo"]') && btn.style.display !== 'none'
-      );
-      // O botão pode estar presente mas com estilo hidden, então apenas verificamos que não navega ao clicar
-      expect(buttons.length).toBeGreaterThan(0);
+      // Ordem: Editar, Visualizar, Excluir, Finalizar
+      expect(buttons[0]).toBeDisabled();
     });
 
-    it('deve ocultar botão Delete quando processo está finalizado', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-
+    it('deve desabilitar botão Delete quando processo está finalizado', () => {
       renderWithTheme(
         <ConvocacaoTable 
           data={[makeRow({ status: 'Finalizada' })]} 
@@ -299,23 +293,13 @@ describe('ConvocacaoTable', () => {
         />
       );
 
-      // Botão delete deve estar hidden (não deve chamar console.log ao tentar clicar)
       const row = screen.getByText('Concurso X').closest('tr') as HTMLElement;
       const buttons = within(row).getAllByRole('button');
-      
-      // Verificar que não há botão delete ativo
-      const deleteButton = buttons.find(btn => 
-        btn.getAttribute('aria-label')?.includes('Excluir') && !btn.hasAttribute('disabled')
-      );
-      expect(deleteButton).toBeFalsy();
-
-      // Verificar que não foi chamado console.log (botão está hidden)
-      expect(consoleSpy).not.toHaveBeenCalledWith('delete', expect.any(Object));
-
-      consoleSpy.mockRestore();
+      // Ordem: Editar, Visualizar, Excluir, Finalizar
+      expect(buttons[2]).toBeDisabled();
     });
 
-    it('não deve exibir botão Finalizar quando processo está finalizado', () => {
+    it('deve exibir botão Finalizar desabilitado quando processo está finalizado', () => {
       renderWithTheme(
         <ConvocacaoTable 
           data={[makeRow({ status: 'Finalizado' })]} 
@@ -326,7 +310,9 @@ describe('ConvocacaoTable', () => {
         />
       );
 
-      expect(screen.queryByText('Finalizar Processo')).not.toBeInTheDocument();
+      const finalizarButton = screen.getByText('Finalizar Processo');
+      expect(finalizarButton).toBeInTheDocument();
+      expect(finalizarButton.closest('button')).toBeDisabled();
     });
   });
 
@@ -566,26 +552,27 @@ describe('ConvocacaoTable', () => {
       expect(screen.getByText('Finalizar Processo')).toBeInTheDocument();
     });
 
-    it('deve chamar console.log ao clicar em Finalizar Processo', async () => {
+    it('deve chamar onFinalizar ao clicar em Finalizar Processo', async () => {
       const user = userEvent.setup();
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const onFinalizar = jest.fn();
+      const row = makeRow({ status: 'Em andamento' });
 
       renderWithTheme(
         <ConvocacaoTable 
-          data={[makeRow({ status: 'Em andamento' })]} 
+          data={[row]} 
           canChangeProcessoConvocacao={true}
           canDeleteProcessoConvocacao={true}
           canViewDetailsProcessoConvocacao={true}
           canFinalizeProcessoConvocacao={true}
+          onFinalizar={onFinalizar}
         />
       );
 
       const finalizarButton = screen.getByText('Finalizar Processo');
       await user.click(finalizarButton);
 
-      expect(consoleSpy).toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
+      expect(onFinalizar).toHaveBeenCalledTimes(1);
+      expect(onFinalizar).toHaveBeenCalledWith(row);
     });
 
     it('deve aplicar hover styles no botão Finalizar', async () => {
