@@ -747,7 +747,6 @@ export const useAgenda = () => {
         candidatos_uuids: todosCandidatos,
         agendas: todasAgendas,
       };
-      console.log("payload", payload);
       const resultados: IAgenda[] = await postAgendaMutation.mutateAsync(payload);
       setPeriodosList(prev => {
         return prev.map((periodo, index) => {
