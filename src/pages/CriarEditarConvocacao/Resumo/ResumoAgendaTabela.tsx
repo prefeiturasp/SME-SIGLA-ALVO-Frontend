@@ -17,6 +17,7 @@ type AgendaItem = {
   dataEscolha: string;
   sessao: string;
   horario: string;
+  modalidade: string;
 };
 
 const ResumoAgendaTabela: React.FC<ResumoAgendaTabelaProps> = ({
@@ -91,7 +92,7 @@ const ResumoAgendaTabela: React.FC<ResumoAgendaTabelaProps> = ({
       // Formatar horário
       let horario: string;
       if (
-        agenda.modalidade === "Presencial" &&
+        agenda.modalidade === "PRESENCIAL" &&
         agenda.hora_convocacao_inicio &&
         agenda.hora_convocacao_fim
       ) {
@@ -103,7 +104,7 @@ const ResumoAgendaTabela: React.FC<ResumoAgendaTabelaProps> = ({
         ).format("HH:mm");
         horario = `${horaInicio} às ${horaFim}`;
       } else {
-        horario = agenda.modalidade === "Online" ? "Online" : "—";
+        horario = "—";
       }
 
       return {
@@ -113,6 +114,7 @@ const ResumoAgendaTabela: React.FC<ResumoAgendaTabelaProps> = ({
         dataEscolha: dataEscolhaFormatada,
         sessao: agenda.sessao || "—",
         horario: horario,
+        modalidade: agenda.modalidade || "—",
       };
     });
   }, [agendas]);
@@ -149,6 +151,13 @@ const ResumoAgendaTabela: React.FC<ResumoAgendaTabelaProps> = ({
       title: "Sessão",
       dataIndex: "sessao",
       key: "sessao",
+      align: "center" as const,
+      width: 50,
+    },
+    {
+      title: "Modalidade",
+      dataIndex: "modalidade",
+      key: "modalidade",
       align: "center" as const,
       width: 50,
     },

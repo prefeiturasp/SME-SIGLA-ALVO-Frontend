@@ -25,11 +25,11 @@ export interface IAgendaCreate {
   // e não em cada agenda individual.
   processo_convocacao_uuid?: string;
   processo_convocacao_nome?: string;
-  cargo_uuid: string;
-  cargo_nome: string;
+  cargo_uuid?: string;
+  cargo_nome?: string;
   cargo_codigo?: string;
   data_escolha?: string;
-  modalidade?: 'Presencial' | 'Online' | null;
+  modalidade?: 'PRESENCIAL' | 'ONLINE' | null;
   escolha_em?: string | null;
   nomeacao_em?: string | null;
   classificacao?: number | null;
@@ -51,6 +51,7 @@ export interface IAgendaFilters {
 export interface IAgendaBulkCreatePayload {
   processo_convocacao_uuid: string;
   processo_convocacao_nome: string;
+  modalidade?: 'PRESENCIAL' | 'ONLINE' | null;
   candidatos_uuids: string[];
   agendas: IAgendaCreate[];
 }
