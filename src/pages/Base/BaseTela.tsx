@@ -164,6 +164,11 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
             onClick: () => navigate("/processos/importacao-dados"),
           },
           {
+            key: "exportacao",
+            label: "Exportação de Dados",
+            onClick: () => navigate("/processos/exportacao-dados"),
+          },
+          {
             key: "pesquisar-concursados",
             label: "Pesquisar Concursados",
             onClick: () => navigate("/processo/pesquisar-concursado"),

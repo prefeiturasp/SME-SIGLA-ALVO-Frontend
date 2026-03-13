@@ -4,6 +4,7 @@ import ProtectedRoute from "./AuthGuard";
 
 import ConvocacaoCandidatosTela from "../pages/Processos/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
 import ImportacaoDadosTela from "../pages/ImportacaoDados/ImportacaoDadosTela";
+import ExportacaoDadosTela from "../pages/ExportacaoDados/ExportacaoDadosTela";
 import ImportacaoDados2 from "../pages/Processos/ImportacaoDados/ImportacaoDados2";
 import LayoutPadraoTela from "../pages/LayoutPadraoTela/LayoutPadraoTela";
 import HistoricoVagasTela from "../pages/HistoricoVagas/HistoricoVagasTela";
@@ -246,6 +247,11 @@ const router = createBrowserRouter([
         </PermissionContextGuard>
       </ProtectedRoute>
     ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/processos/exportacao-dados",
+    element: <ExportacaoDadosTela />,
     errorElement: <RouteError />,
   },
   {
