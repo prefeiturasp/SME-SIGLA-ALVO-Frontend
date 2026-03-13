@@ -7,7 +7,7 @@ jest.mock('antd', () => {
   const actual = jest.requireActual('antd');
   return {
     ...actual,
-    Modal: ({ open, onCancel, children, title, ...props }: any) =>
+    Modal: ({ open, onCancel, children, title, centered, ...props }: any) =>
       open ? (
         <div data-testid="modal" {...props}>
           <div data-testid="modal-title">{title}</div>

@@ -59,13 +59,48 @@ if (!globalThis.IS_REACT_ACT_ENVIRONMENT) {
 
 // Suppress noisy React act warnings that are not actionable in our tests
 const originalConsoleError = console.error;
+const originalConsoleLog = console.log;
+
 console.error = (...args) => {
 	const first = args[0];
 	if (typeof first === 'string') {
 		if (first.includes('not configured to support act') || first.includes('not wrapped in act')) {
 			return;
 		}
+		// Expected errors in PermissaoUsuario tests (simulated API failures)
+		if (first.includes('Falha ao carregar usuários/grupos') || first.includes('Falha ao atualizar permissões') || first.includes('Falha ao atualizar is_active')) {
+			return;
+		}
+		// React warning when non-boolean or unknown props are passed to DOM (antd/styled-components)
+		if (first.includes('for a non-boolean attribute') || first.includes('Invalid attribute name')) {
+			return;
+		}
+		if (first.includes('React does not recognize the') && first.includes('prop on a DOM element')) {
+			return;
+		}
+		// antd compatibility and deprecation warnings
+		if (first.includes('antd: compatible') || first.includes('antd v5 support React')) {
+			return;
+		}
+		if (first.includes('antd: Table') && first.includes('rowKey')) {
+			return;
+		}
+		// DOM nesting (e.g. div inside p from antd Upload.Dragger)
+		if (first.includes('cannot be a descendant of')) {
+			return;
+		}
+		if (first.includes('cannot contain a nested')) {
+			return;
+		}
 	}
 	// @ts-ignore
 	originalConsoleError(...args);
+};
+
+console.log = (...args) => {
+	const first = args[0];
+	if (typeof first === 'string' && first.includes('Filtros processados:')) {
+		return;
+	}
+	originalConsoleLog(...args);
 };

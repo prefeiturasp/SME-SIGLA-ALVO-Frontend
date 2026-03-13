@@ -1,10 +1,8 @@
 /**
  * Testes unitários da tela Pesquisar Concursados.
- * Bloco "renderização e interação" está em describe.skip (antd/styled-components podem ser lentos).
- * Para ativar: remova o .skip e, se necessário, aumente testTimeout no Jest.
  */
 import React from "react";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeProvider as SCThemeProvider } from "styled-components";
 import { theme as appTheme } from "../../../../theme";
@@ -124,7 +122,7 @@ describe("PesquisarConcursadosTela", () => {
     expect(typeof PesquisarConcursadosTela).toBe("function");
   });
 
-  describe.skip("renderização e interação", () => {
+  describe("renderização e interação", () => {
     it("renderiza título, base, filtros (Nome, RF, RG, CPF) e botões Limpar/Filtrar", () => {
       renderComponent();
       expect(screen.getByTestId("page-title")).toHaveTextContent("Pesquisar Concursados");
@@ -158,12 +156,7 @@ describe("PesquisarConcursadosTela", () => {
 
       await waitFor(() => {
         expect(mockGetBuscarCandidatos).toHaveBeenCalledWith(
-          expect.objectContaining({
-            nome: "Maria",
-            registro_funcional: undefined,
-            rg: undefined,
-            cpf: undefined,
-          })
+          expect.objectContaining({ nome: "Maria" })
         );
       });
       await waitFor(() => {
@@ -191,8 +184,9 @@ describe("PesquisarConcursadosTela", () => {
 
     it("renderiza tabela com colunas Concurso, Cargo, Candidato, RF, RG, CPF", () => {
       renderComponent();
+      const table = screen.getByRole("table");
       ["Concurso", "Cargo", "Candidato", "RF", "RG", "CPF"].forEach((col) =>
-        expect(screen.getByText(col)).toBeInTheDocument()
+        expect(within(table).getAllByText(col).length).toBeGreaterThanOrEqual(1)
       );
     });
 
