@@ -65,8 +65,6 @@ export const useProcessosConvocacao = () => {
       processedFilters.data_convocacao_fim = data.data_convocacao_fim;
     }
 
-    console.log('Filtros processados:', processedFilters);
-
     setListRequest((prevState) => ({
       ...prevState,
       page: 1,
