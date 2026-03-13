@@ -7,8 +7,8 @@ export interface IExportacaoVagasPayload {
   cargo_uuid: string;
   concurso_uuid?: string;
   concurso_nome?: string;
-  /** Descrição/nome do processo (enviado pelo front para persistir e usar no nome do arquivo). */
-  descricao_processo?: string;
+  /** Nome do processo (enviado pelo front para persistir e usar no nome do arquivo). */
+  processo_nome?: string;
   /** Nome do cargo (enviado pelo front para persistir e usar no nome do arquivo). */
   cargo_nome?: string;
   /** Código do cargo (vindo de getCargosProcesso); evita chamada à API de convocação no create. */
@@ -23,11 +23,9 @@ export interface IExportacaoVagasListItem {
   cargo_uuid: string;
   concurso_uuid: string | null;
   concurso_nome: string | null;
-  /** Descrição do processo (persistida no create; preenchida pelo backend na listagem quando vazio). */
-  descricao_processo?: string | null;
   /** Nome do cargo (persistido no create; preenchido pelo backend na listagem quando vazio). */
   cargo_nome?: string | null;
-  /** Nome/descrição do processo para exibição (processo_nome = descricao_processo ou fallback). */
+  /** Nome/descrição do processo para exibição. */
   processo_nome?: string | null;
   /** Código do cargo (persistido no create quando enviado pelo front). */
   cargo_codigo?: number | null;
@@ -55,7 +53,6 @@ export interface IExportacaoCandidatosPayload {
   concurso_codigo?: number | string;
   /** Data de criação do concurso (ex.: ISO). */
   concurso_data_criacao?: string;
-  descricao_processo?: string;
   processo_nome?: string;
   cargo_nome?: string;
   cargo_codigo?: number | string;

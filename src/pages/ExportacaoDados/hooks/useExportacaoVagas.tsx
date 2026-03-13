@@ -162,7 +162,7 @@ export function useExportacaoVagas(tipo: ExportacaoTipo) {
   const handleExportar = (data: IExportacaoVagasForm) => {
     if (!data.processo_uuid || !data.cargo_uuid) return;
     const processoSelecionado = processosOptions.find((p) => p.value === data.processo_uuid);
-    const descricao_processo = processoSelecionado?.label;
+    const processo_nome = processoSelecionado?.label;
     const concurso_uuid = processoSelecionado?.concurso_uuid;
     const concurso_nome = processoSelecionado?.concurso_nome;
     const cargoSelecionado = cargosOptions.find((c) => c.value === data.cargo_uuid);
@@ -171,7 +171,7 @@ export function useExportacaoVagas(tipo: ExportacaoTipo) {
     const payload: IExportacaoVagasPayload = {
       processo_uuid: data.processo_uuid,
       cargo_uuid: data.cargo_uuid,
-      ...(descricao_processo && { descricao_processo }),
+      ...(processo_nome && { processo_nome }),
       ...(cargo_nome && { cargo_nome }),
       ...(cargo_codigo != null && cargo_codigo !== undefined && { cargo_codigo }),
       ...(concurso_uuid && { concurso_uuid }),
