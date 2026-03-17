@@ -9,6 +9,7 @@ const mockHandleSubmit = jest.fn((cb) => cb);
 const mockHandleExportar = jest.fn();
 const mockHandleProcessoChange = jest.fn();
 const mockHandleDownload = jest.fn();
+const mockOnAntTableChange = jest.fn();
 
 jest.mock("../../hooks/useExportacaoCandidatos", () => ({
   useExportacaoCandidatos: jest.fn(() => ({
@@ -31,24 +32,37 @@ jest.mock("../../hooks/useExportacaoCandidatos", () => ({
     processoUuid: "proc-1",
     listData: { results: [], count: 0 },
     listLoading: false,
-    listRequest: { page: 1, page_size: 10 },
-    onAntTableChange: jest.fn(),
+    listRequest: { pagination: { page: 1, page_size: 10 } },
+    onAntTableChange: mockOnAntTableChange,
     isCreating: false,
   })),
 }));
 
 jest.mock("react-hook-form", () => ({
-  Controller: ({ children }: any) => <div data-testid="controller-mock">{children}</div>,
+  Controller: ({ render, name }: any) => (
+    <div data-testid={`controller-${name}`}>
+      {render({ field: { value: undefined, onChange: jest.fn() } })}
+    </div>
+  ),
 }));
 
 jest.mock("../../../../components/EstilosCompartilhados", () => ({
   TabContentContainer: ({ children }: any) => (
     <div data-testid="tab-content">{children}</div>
   ),
-  SectionCard: ({ children }: any) => <div>{children}</div>,
-  SectionTitle: ({ children }: any) => <h2>{children}</h2>,
   ActionButtonsContainer: ({ children }: any) => (
     <div data-testid="action-buttons">{children}</div>
+  ),
+  StyledSelect: ({ children, onChange, value, disabled }: any) => (
+    <select
+      aria-label="select"
+      value={value ?? ""}
+      disabled={disabled}
+      onChange={(e) => onChange?.(e.target.value)}
+    >
+      <option value="" />
+      {children}
+    </select>
   ),
   StyledTable: ({ columns, dataSource }: any) => (
     <table data-testid="styled-table">
@@ -91,6 +105,7 @@ jest.mock("antd", () => {
     ...actual,
     Row: ({ children }: any) => <div data-testid="row">{children}</div>,
     Col: ({ children }: any) => <div data-testid="col">{children}</div>,
+    Modal: ({ open, children }: any) => (open ? <div data-testid="modal">{children}</div> : null),
     Button: ({ children, onClick, disabled, ...props }: any) => (
       <button type="button" onClick={onClick} disabled={disabled} {...props}>
         {children}
@@ -123,12 +138,14 @@ describe("ExportacaoCandidatosFormTab", () => {
     renderComponent();
 
     expect(screen.getByTestId("tab-content")).toBeInTheDocument();
-    expect(screen.getByText(/Exportação de candidatos/i)).toBeInTheDocument();
-    expect(screen.getByText(/Processo de convocação/i)).toBeInTheDocument();
-    expect(screen.getByText(/Cargo/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Selecione o processo e o cargo para exportar os candidatos/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Processo de convocação", { selector: "label" })).toBeInTheDocument();
+    expect(screen.getByText("Cargo", { selector: "label" })).toBeInTheDocument();
   });
 
-  it("deve exibir selects de processo e cargo com opções", () => {
+  it("deve renderizar opções de processo e cargo", () => {
     renderComponent();
 
     const processoOptions = screen.getAllByText(/Processo 1|Processo 2/);
@@ -138,11 +155,11 @@ describe("ExportacaoCandidatosFormTab", () => {
     expect(cargoOptions.length).toBeGreaterThan(0);
   });
 
-  it("deve chamar handleProcessoChange ao selecionar processo", async () => {
+  it("deve chamar handleProcessoChange ao mudar processo", async () => {
     const user = userEvent.setup();
     renderComponent();
 
-    const selectProcesso = screen.getAllByRole("combobox")[0];
+    const selectProcesso = screen.getAllByLabelText("select")[0];
     await user.selectOptions(selectProcesso, "proc-2");
 
     expect(mockHandleProcessoChange).toHaveBeenCalledWith("proc-2");
@@ -158,42 +175,16 @@ describe("ExportacaoCandidatosFormTab", () => {
     expect(mockHandleSubmit).toHaveBeenCalledWith(mockHandleExportar);
   });
 
-  it("deve renderizar tabela de histórico quando há dados", () => {
-    (jest.requireMock("../../hooks/useExportacaoCandidatos") as any).useExportacaoCandidatos.mockReturnValue(
-      {
-        control: {},
-        formErrors: {},
-        handleSubmit: mockHandleSubmit,
-        handleExportar: mockHandleExportar,
-        handleProcessoChange: mockHandleProcessoChange,
-        handleDownload: mockHandleDownload,
-        processosOptions: [],
-        processosOptionsLoading: false,
-        cargosOptions: [],
-        cargosOptionsLoading: false,
-        processoUuid: "proc-1",
-        listData: {
-          results: [
-            {
-              uuid: "1",
-              nome_arquivo: "candidatos.csv",
-              criado_em: "2024-01-01",
-              status: "SUCESSO",
-            },
-          ],
-          count: 1,
-        },
-        listLoading: false,
-        listRequest: { page: 1, page_size: 10 },
-        onAntTableChange: jest.fn(),
-        isCreating: false,
-      },
-    );
-
+  it("deve abrir o modal de histórico ao clicar em Histórico", async () => {
+    const user = userEvent.setup();
     renderComponent();
 
+    await user.click(screen.getByText("Histórico"));
+
+    expect(screen.getByTestId("modal")).toBeInTheDocument();
     expect(screen.getByTestId("styled-table")).toBeInTheDocument();
-    expect(screen.getByText("candidatos.csv")).toBeInTheDocument();
+    expect(screen.getByText("Data")).toBeInTheDocument();
+    expect(screen.getByText("Download")).toBeInTheDocument();
   });
 });
 

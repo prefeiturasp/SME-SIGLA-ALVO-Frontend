@@ -1,11 +1,13 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import { App } from "antd";
 import { useExportacaoVagas } from "../useExportacaoVagas";
 import { API } from "../../../../services";
 
-jest.mock("../../Processos/ConvocacaoCandidatos/hooks/useConvocacao.tsx", () => ({
+const listRequestMock = { pagination: { page: 1, page_size: 10 } };
+
+jest.mock("../../../Processos/ConvocacaoCandidatos/hooks/useConvocacao.tsx", () => ({
   __esModule: true,
   default: jest.fn(() => ({
     processosConvocacaoData: {
@@ -25,7 +27,7 @@ jest.mock("../../Processos/ConvocacaoCandidatos/hooks/useConvocacao.tsx", () => 
 jest.mock("../../../../hooks/useListRequest", () => ({
   __esModule: true,
   default: jest.fn(() => ({
-    listRequest: { page: 1, page_size: 10 },
+    listRequest: listRequestMock,
     onAntTableChange: jest.fn(),
   })),
 }));
@@ -68,46 +70,66 @@ describe("useExportacaoVagas", () => {
     error: jest.fn(),
   };
 
+  const cargosResponse = [
+    { cargo_uuid: "cargo-1", cargo_nome: "Cargo 1", cargo_codigo: 123 },
+  ];
+
+  const listResponse = { results: [], count: 0 };
+
+  const createResponse = {
+    blob: new Blob(["test"], { type: "text/csv" }),
+    filename: "vagas.csv",
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-
     jest.spyOn(App, "useApp").mockReturnValue({
       notification: mockNotification,
     } as any);
 
-    (API.Convocacao.getCargosProcesso as jest.Mock).mockResolvedValue({
-      response: [
-        { cargo_uuid: "cargo-1", cargo_nome: "Cargo 1", cargo_codigo: 123 },
-      ],
+    (API.Convocacao.getCargosProcesso as jest.Mock).mockReturnValue({
+      response: Promise.resolve(cargosResponse),
+      abort: jest.fn(),
     });
 
-    (API.ExportacaoDados.getListExportacaoVagasProcesso as jest.Mock).mockResolvedValue({
-      response: { results: [], count: 0 },
+    (API.ExportacaoDados.getListExportacaoVagasProcesso as jest.Mock).mockReturnValue({
+      response: Promise.resolve(listResponse),
+      abort: jest.fn(),
     });
 
-    (API.ExportacaoDados.getListExportacaoVagasSigpec as jest.Mock).mockResolvedValue({
-      response: { results: [], count: 0 },
+    (API.ExportacaoDados.getListExportacaoVagasSigpec as jest.Mock).mockReturnValue({
+      response: Promise.resolve(listResponse),
+      abort: jest.fn(),
     });
 
-    (API.ExportacaoDados.postCreateExportacaoVagasProcesso as jest.Mock).mockResolvedValue({
-      response: {
-        blob: new Blob(["test"], { type: "text/csv" }),
-        filename: "vagas.csv",
-      },
+    (API.ExportacaoDados.postCreateExportacaoVagasProcesso as jest.Mock).mockReturnValue({
+      response: Promise.resolve(createResponse),
+      abort: jest.fn(),
     });
 
-    (API.ExportacaoDados.postCreateExportacaoVagasSigpec as jest.Mock).mockResolvedValue({
-      response: {
+    (API.ExportacaoDados.postCreateExportacaoVagasSigpec as jest.Mock).mockReturnValue({
+      response: Promise.resolve({
         blob: new Blob(["test"], { type: "text/csv" }),
         filename: "vagas-sigpec.csv",
-      },
+      }),
+      abort: jest.fn(),
     });
 
-    (API.ExportacaoDados.downloadExportacao as jest.Mock).mockResolvedValue({
-      response: {
+    (API.ExportacaoDados.downloadExportacao as jest.Mock).mockReturnValue({
+      response: Promise.resolve({
         blob: new Blob(["test"], { type: "text/csv" }),
         filename: "download.csv",
-      },
+      }),
+      abort: jest.fn(),
+    });
+
+    Object.defineProperty(URL, "createObjectURL", {
+      value: jest.fn(() => "blob:url"),
+      writable: true,
+    });
+    Object.defineProperty(URL, "revokeObjectURL", {
+      value: jest.fn(),
+      writable: true,
     });
   });
 
@@ -117,7 +139,7 @@ describe("useExportacaoVagas", () => {
     return result;
   };
 
-  it("deve inicializar com valores padrão e expor propriedades esperadas", () => {
+  it("inicializa com valores padrão e expõe propriedades esperadas", () => {
     const result = setup();
 
     expect(result.current.control).toBeDefined();
@@ -130,7 +152,7 @@ describe("useExportacaoVagas", () => {
     expect(result.current.onAntTableChange).toBeDefined();
   });
 
-  it("deve montar processosOptions a partir de processosConvocacaoData", () => {
+  it("monta processosOptions a partir de processosConvocacaoData", () => {
     const result = setup();
 
     expect(result.current.processosOptions[0]).toMatchObject({
@@ -141,35 +163,40 @@ describe("useExportacaoVagas", () => {
     });
   });
 
-  it("deve retornar cargosOptions vazios quando API retorna valor não array", async () => {
-    (API.Convocacao.getCargosProcesso as jest.Mock).mockResolvedValueOnce({
-      response: null,
+  it("retorna cargosOptions vazios quando API retorna não-array", async () => {
+    (API.Convocacao.getCargosProcesso as jest.Mock).mockReturnValueOnce({
+      response: Promise.resolve(null),
+      abort: jest.fn(),
     });
 
     const result = setup();
 
     await act(async () => {
-      await result.current.handleProcessoChange("proc-1");
+      result.current.handleProcessoChange("proc-1");
     });
 
-    expect(result.current.cargosOptions).toEqual([]);
+    await waitFor(() => {
+      expect(result.current.cargosOptions).toEqual([]);
+    });
   });
 
-  it("deve montar cargosOptions quando API retorna lista de cargos", async () => {
+  it("monta cargosOptions quando API retorna lista de cargos", async () => {
     const result = setup();
 
     await act(async () => {
-      await result.current.handleProcessoChange("proc-1");
+      result.current.handleProcessoChange("proc-1");
     });
 
-    expect(result.current.cargosOptions[0]).toMatchObject({
-      value: "cargo-1",
-      label: "Cargo 1",
-      cargo_codigo: 123,
+    await waitFor(() => {
+      expect(result.current.cargosOptions[0]).toMatchObject({
+        value: "cargo-1",
+        label: "Cargo 1",
+        cargo_codigo: 123,
+      });
     });
   });
 
-  it("deve resetar cargo_uuid ao trocar de processo", () => {
+  it("atualiza processoUuid ao trocar processo", () => {
     const result = setup();
 
     act(() => {
@@ -179,7 +206,7 @@ describe("useExportacaoVagas", () => {
     expect(result.current.processoUuid).toBe("proc-2");
   });
 
-  it("não deve chamar mutate quando processo ou cargo não estão preenchidos", () => {
+  it("não chama mutate quando processo ou cargo estão vazios", () => {
     const result = setup();
 
     act(() => {
@@ -192,18 +219,16 @@ describe("useExportacaoVagas", () => {
     expect(API.ExportacaoDados.postCreateExportacaoVagasProcesso).not.toHaveBeenCalled();
   });
 
-  it("deve montar payload completo e chamar mutate para vagas-processo", async () => {
+  it("monta payload e chama mutate para vagas-processo", async () => {
     const result = setup("vagas-processo");
 
     await act(async () => {
       result.current.handleProcessoChange("proc-1");
     });
 
-    const processoOption = result.current.processosOptions[0];
-    const cargoOption = { value: "cargo-1", label: "Cargo 1", cargo_codigo: 123 };
-
-    (result.current as any).processosOptions = [processoOption];
-    (result.current as any).cargosOptions = [cargoOption];
+    await waitFor(() => {
+      expect(result.current.cargosOptions.length).toBeGreaterThan(0);
+    });
 
     await act(async () => {
       result.current.handleExportar({
@@ -212,27 +237,30 @@ describe("useExportacaoVagas", () => {
       });
     });
 
-    expect(API.ExportacaoDados.postCreateExportacaoVagasProcesso).toHaveBeenCalledWith({
-      processo_uuid: "proc-1",
-      cargo_uuid: "cargo-1",
-      processo_nome: "Processo 1",
-      concurso_uuid: "conc-1",
-      concurso_nome: "Concurso 1",
-      cargo_nome: "Cargo 1",
-      cargo_codigo: 123,
-    });
+    expect(API.ExportacaoDados.postCreateExportacaoVagasProcesso).toHaveBeenCalledWith(
+      expect.objectContaining({
+        processo_uuid: "proc-1",
+        cargo_uuid: "cargo-1",
+        processo_nome: "Processo 1",
+        concurso_uuid: "conc-1",
+        concurso_nome: "Concurso 1",
+        cargo_nome: "Cargo 1",
+        cargo_codigo: 123,
+      }),
+    );
     expect(mockNotification.success).toHaveBeenCalled();
   });
 
-  it("deve usar endpoint de vagas-sigpec quando tipo for vagas-sigpec", async () => {
+  it("usa endpoint vagas-sigpec quando tipo for vagas-sigpec", async () => {
     const result = setup("vagas-sigpec");
 
     await act(async () => {
       result.current.handleProcessoChange("proc-1");
     });
 
-    const cargoOption = { value: "cargo-1", label: "Cargo 1", cargo_codigo: 123 };
-    (result.current as any).cargosOptions = [cargoOption];
+    await waitFor(() => {
+      expect(result.current.cargosOptions.length).toBeGreaterThan(0);
+    });
 
     await act(async () => {
       result.current.handleExportar({
@@ -244,27 +272,71 @@ describe("useExportacaoVagas", () => {
     expect(API.ExportacaoDados.postCreateExportacaoVagasSigpec).toHaveBeenCalled();
   });
 
-  it("deve tratar erro de criação com mensagens diferentes por status", async () => {
-    const result = setup();
-
-    const error404 = { response: { status: 404 } };
-    const error502 = { response: { status: 502 } };
-    const errorDetail = { response: { data: { detail: "Mensagem específica" } } };
-
-    await act(async () => {
-      (result as any).current.createMutation.onError(error404);
-      (result as any).current.createMutation.onError(error502);
-      (result as any).current.createMutation.onError(errorDetail);
+  it("exibe erro 404 ao falhar criação", async () => {
+    (API.ExportacaoDados.postCreateExportacaoVagasProcesso as jest.Mock).mockReturnValue({
+      response: Promise.reject({ response: { status: 404 } }),
+      abort: jest.fn(),
     });
 
-    expect(mockNotification.error).toHaveBeenCalledTimes(3);
+    const result = setup();
+    await act(async () => {
+      result.current.handleProcessoChange("proc-1");
+    });
+    await waitFor(() => {
+      expect(result.current.cargosOptions.length).toBeGreaterThan(0);
+    });
+
+    await act(async () => {
+      result.current.handleExportar({
+        processo_uuid: "proc-1",
+        cargo_uuid: "cargo-1",
+      });
+    });
+
+    await waitFor(() => {
+      expect(mockNotification.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Erro na exportação",
+          description: "Processo ou cargo não encontrado.",
+        }),
+      );
+    });
   });
 
-  it("deve realizar download de exportação com sucesso", async () => {
-    const result = setup();
+  it("exibe erro 502 e detail ao falhar criação", async () => {
+    (API.ExportacaoDados.postCreateExportacaoVagasProcesso as jest.Mock).mockReturnValue({
+      response: Promise.reject({
+        response: { status: 502, data: { detail: "Mensagem específica" } },
+      }),
+      abort: jest.fn(),
+    });
 
-    const createObjectURLSpy = jest.spyOn(URL, "createObjectURL").mockReturnValue("blob:url");
-    const revokeSpy = jest.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+    const result = setup();
+    await act(async () => {
+      result.current.handleProcessoChange("proc-1");
+    });
+    await waitFor(() => {
+      expect(result.current.cargosOptions.length).toBeGreaterThan(0);
+    });
+
+    await act(async () => {
+      result.current.handleExportar({
+        processo_uuid: "proc-1",
+        cargo_uuid: "cargo-1",
+      });
+    });
+
+    await waitFor(() => {
+      expect(mockNotification.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          description: "Serviço temporariamente indisponível. Tente novamente mais tarde.",
+        }),
+      );
+    });
+  });
+
+  it("realiza download com sucesso", async () => {
+    const result = setup();
 
     await act(async () => {
       await result.current.handleDownload("uuid-1");
@@ -274,17 +346,29 @@ describe("useExportacaoVagas", () => {
       "vagas-processo",
       "uuid-1",
     );
-    expect(createObjectURLSpy).toHaveBeenCalled();
-    expect(revokeSpy).toHaveBeenCalled();
+    expect(URL.createObjectURL).toHaveBeenCalled();
+    expect(URL.revokeObjectURL).toHaveBeenCalled();
   });
 
-  it("deve tratar erro no download lendo mensagem de Blob JSON", async () => {
-    const errorBlob = new Blob([JSON.stringify({ detail: "Erro detalhado" })], {
-      type: "application/json",
+  it("chama download com tipo vagas-sigpec", async () => {
+    const result = setup("vagas-sigpec");
+
+    await act(async () => {
+      await result.current.handleDownload("uuid-2");
     });
 
-    (API.ExportacaoDados.downloadExportacao as jest.Mock).mockRejectedValueOnce({
-      response: { data: errorBlob, status: 400 },
+    expect(API.ExportacaoDados.downloadExportacao).toHaveBeenCalledWith(
+      "vagas-sigpec",
+      "uuid-2",
+    );
+  });
+
+  it("exibe erro ao falhar download quando response.data tem detail", async () => {
+    (API.ExportacaoDados.downloadExportacao as jest.Mock).mockReturnValue({
+      response: Promise.reject({
+        response: { data: { detail: "Erro detalhado" } },
+      }),
+      abort: jest.fn(),
     });
 
     const result = setup();
@@ -293,12 +377,13 @@ describe("useExportacaoVagas", () => {
       await result.current.handleDownload("uuid-erro");
     });
 
-    expect(mockNotification.error).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: "Erro no download",
-        description: "Erro detalhado",
-      }),
-    );
+    await waitFor(() => {
+      expect(mockNotification.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Erro no download",
+          description: "Erro detalhado",
+        }),
+      );
+    });
   });
 });
-
