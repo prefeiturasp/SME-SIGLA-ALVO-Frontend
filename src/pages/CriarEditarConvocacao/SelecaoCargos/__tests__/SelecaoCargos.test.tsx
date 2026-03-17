@@ -390,6 +390,37 @@ describe('SelecaoCargos', () => {
       expect(screen.getByText('Descrição:')).toBeInTheDocument();
       expect(screen.getByText('Descrição do processo')).toBeInTheDocument();
     });
+
+    it('deve exibir tipo de escolha formatado para valor não mapeado (ex.: MEGA_ESCOLHA_AVANCADA)', () => {
+      const { useSelecaoCargo } = require('../hooks/useSelecaoCargo');
+      useSelecaoCargo.mockReturnValue({
+        processoConvocacaoData: {
+          ...mockProcessoConvocacaoData,
+          tipo_escolha: 'MEGA_ESCOLHA_AVANCADA',
+        },
+        processoConvocacaoIsLoading: false,
+        cargoSelecionado: undefined,
+        cargosDisponiveis: mockCargosDisponiveis,
+        concursoIsLoading: false,
+        handleCargoChange: mockHandleCargoChange,
+        modalSelecionarCandidatosVisible: false,
+        handleBuscarCandidatos: mockHandleBuscarCandidatos,
+        handleCloseModalSelecionarCandidatos: mockHandleCloseModalSelecionarCandidatos,
+        handleCandidatosSelecionados: mockHandleCandidatosSelecionados,
+        cargosAdicionados: [],
+        ultimoCargoSelecionado: null,
+        vagasInfo: { totalGeral: 0, totalPcd: 0, totalNna: 0 },
+        handleEditarCargo: mockHandleEditarCargo,
+        handleExcluirCargo: mockHandleExcluirCargo,
+        salvarCargosNoBackend: mockSalvarCargosNoBackend,
+        convocarCandidatosHabilitados: mockConvocarCandidatosHabilitados,
+        uuid: 'test-uuid-123',
+      });
+
+      renderWithProviders(<SelecaoCargos />);
+      // Deve converter para "Mega Escolha Avancada"
+      expect(screen.getByText('Mega Escolha Avancada')).toBeInTheDocument();
+    });
   });
 
   describe('Navegação e breadcrumbs', () => {
@@ -514,6 +545,80 @@ describe('SelecaoCargos', () => {
       fireEvent.click(cancelButton);
       
       expect(mockNavigate).toHaveBeenCalledWith('/processos/convocacao/');
+    });
+
+    it('deve deduplicar candidatos antes de convocar no next', async () => {
+      mockSalvarCargosNoBackend.mockResolvedValue(true);
+      mockConvocarCandidatosHabilitados.mockResolvedValue(true);
+      const { useSelecaoCargo } = require('../hooks/useSelecaoCargo');
+      useSelecaoCargo.mockReturnValue({
+        processoConvocacaoData: mockProcessoConvocacaoData,
+        processoConvocacaoIsLoading: false,
+        cargoSelecionado: undefined,
+        cargosDisponiveis: mockCargosDisponiveis,
+        concursoIsLoading: false,
+        handleCargoChange: mockHandleCargoChange,
+        modalSelecionarCandidatosVisible: false,
+        handleBuscarCandidatos: mockHandleBuscarCandidatos,
+        handleCloseModalSelecionarCandidatos: mockHandleCloseModalSelecionarCandidatos,
+        handleCandidatosSelecionados: mockHandleCandidatosSelecionados,
+        cargosAdicionados: [
+          { candidatos_uuids: ['a', 'b', 'a'], uuid: 'u1' },
+          { candidatos_uuids: ['b', 'c'], uuid: 'u2' },
+        ],
+        ultimoCargoSelecionado: null,
+        vagasInfo: mockVagasInfo,
+        handleEditarCargo: mockHandleEditarCargo,
+        handleExcluirCargo: mockHandleExcluirCargo,
+        salvarCargosNoBackend: mockSalvarCargosNoBackend,
+        convocarCandidatosHabilitados: mockConvocarCandidatosHabilitados,
+        uuid: 'test-uuid-123',
+      });
+
+      renderWithProviders(<SelecaoCargos />);
+      fireEvent.click(screen.getByTestId('btn-next'));
+      await waitFor(() => {
+        expect(mockConvocarCandidatosHabilitados).toHaveBeenCalledWith(['a', 'b', 'c'], true);
+      });
+    });
+  });
+
+  describe('Ações de topo e formatação de tipo de escolha', () => {
+    it('deve navegar para Gerenciamento de vagas ao clicar no botão', () => {
+      renderWithProviders(<SelecaoCargos />);
+      const btn = screen.getByText('Gerenciamento de vagas');
+      fireEvent.click(btn);
+      expect(mockNavigate).toHaveBeenCalledWith('/processos/gerenciamento-vagas');
+    });
+
+    it('deve exibir tipo de escolha formatado corretamente para NOVA_AUTORIZACAO', () => {
+      const { useSelecaoCargo } = require('../hooks/useSelecaoCargo');
+      useSelecaoCargo.mockReturnValue({
+        processoConvocacaoData: {
+          ...mockProcessoConvocacaoData,
+          tipo_escolha: 'NOVA_AUTORIZACAO',
+        },
+        processoConvocacaoIsLoading: false,
+        cargoSelecionado: undefined,
+        cargosDisponiveis: mockCargosDisponiveis,
+        concursoIsLoading: false,
+        handleCargoChange: mockHandleCargoChange,
+        modalSelecionarCandidatosVisible: false,
+        handleBuscarCandidatos: mockHandleBuscarCandidatos,
+        handleCloseModalSelecionarCandidatos: mockHandleCloseModalSelecionarCandidatos,
+        handleCandidatosSelecionados: mockHandleCandidatosSelecionados,
+        cargosAdicionados: [],
+        ultimoCargoSelecionado: null,
+        vagasInfo: { totalGeral: 0, totalPcd: 0, totalNna: 0 },
+        handleEditarCargo: mockHandleEditarCargo,
+        handleExcluirCargo: mockHandleExcluirCargo,
+        salvarCargosNoBackend: mockSalvarCargosNoBackend,
+        convocarCandidatosHabilitados: mockConvocarCandidatosHabilitados,
+        uuid: 'test-uuid-123',
+      });
+
+      renderWithProviders(<SelecaoCargos />);
+      expect(screen.getByText('Nova Autorização')).toBeInTheDocument();
     });
   });
 
@@ -832,9 +937,14 @@ describe('SelecaoCargos', () => {
 
       renderWithProviders(<SelecaoCargos />);
       
-      // Os botões estão dentro de Tooltip, então não temos aria-label direto
-      // Vamos verificar que a tabela está sendo renderizada e que os handlers existem
-      expect(mockHandleEditarCargo).toBeDefined();
+      // Clicar no primeiro botão de ação da tabela (Editar)
+      const { container } = renderWithProviders(<SelecaoCargos />);
+      const tableEl = container.querySelector('table');
+      expect(tableEl).toBeInTheDocument();
+      const actionButtons = tableEl!.querySelectorAll('button');
+      expect(actionButtons.length).toBeGreaterThan(0);
+      fireEvent.click(actionButtons[0]);
+      expect(mockHandleEditarCargo).toHaveBeenCalled();
     });
 
     it('deve chamar handleExcluirCargo ao clicar no botão excluir', () => {
@@ -862,9 +972,14 @@ describe('SelecaoCargos', () => {
 
       renderWithProviders(<SelecaoCargos />);
       
-      // Os botões estão dentro de Tooltip, então não temos aria-label direto
-      // Vamos verificar que a tabela está sendo renderizada e que os handlers existem
-      expect(mockHandleExcluirCargo).toBeDefined();
+      // Clicar no segundo botão de ação da tabela (Excluir)
+      const { container } = renderWithProviders(<SelecaoCargos />);
+      const tableEl = container.querySelector('table');
+      expect(tableEl).toBeInTheDocument();
+      const actionButtons = tableEl!.querySelectorAll('button');
+      expect(actionButtons.length).toBeGreaterThan(1);
+      fireEvent.click(actionButtons[1]);
+      expect(mockHandleExcluirCargo).toHaveBeenCalled();
     });
   });
 

@@ -32,7 +32,7 @@ jest.mock("../../Base/BaseTela", () => {
   };
 });
 
-jest.mock("../ImportacaoDados/styles", () => ({
+jest.mock("../../ImportacaoDados/styles", () => ({
   StyledTabs: ({ activeKey, onChange, items }: any) => (
     <div>
       <div data-testid="tabs">

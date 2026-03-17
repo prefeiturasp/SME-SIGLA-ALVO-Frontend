@@ -5,7 +5,7 @@ import { App } from "antd";
 import { useExportacaoVagas } from "../useExportacaoVagas";
 import { API } from "../../../../services";
 
-jest.mock("../../Processos/ConvocacaoCandidatos/hooks/useConvocacao.tsx", () => ({
+jest.mock("../../../Processos/ConvocacaoCandidatos/hooks/useConvocacao.tsx", () => ({
   __esModule: true,
   default: jest.fn(() => ({
     processosConvocacaoData: {
