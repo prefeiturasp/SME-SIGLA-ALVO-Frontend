@@ -1,11 +1,39 @@
 import axios from "axios";
 import type { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 
-// Em runtime (Docker/Rancher) as URLs vêm de window.__ENV__ (env.js gerado pelo entrypoint); localmente de import.meta.env
+// Resolutor seguro de ENV que funciona em browser/Vite e em Jest/Node
+function safeGetEnv(key: string): string | undefined {
+  // 1) process.env (Jest/Node/CI)
+  if (typeof process !== "undefined" && (process as any)?.env?.[key]) {
+    return String((process as any).env[key]);
+  }
+  // 2) globalThis.__VITE_ENV__ (permite injetar em setupTests)
+  const g: any = globalThis as any;
+  if (g?.__VITE_ENV__?.[key]) {
+    return String(g.__VITE_ENV__[key]);
+  }
+  // 3) window.__ENV__ (runtime em produção via env.js)
+  if (typeof window !== "undefined") {
+    const w = window as Window & { __ENV__?: Record<string, string> };
+    if (w.__ENV__?.[key]) return String(w.__ENV__[key]);
+  }
+  // 4) import.meta.env (apenas em Vite/browser) acessado dinamicamente para evitar erro em Jest
+  try {
+    // eslint-disable-next-line no-new-func
+    const viteEnv = new Function(
+      "try { return (typeof import !== 'undefined' && import.meta && import.meta.env) ? import.meta.env : undefined; } catch (e) { return undefined; }"
+    )();
+    if (viteEnv && typeof viteEnv[key] !== "undefined") {
+      return String(viteEnv[key]);
+    }
+  } catch {
+    // ignore
+  }
+  return undefined;
+}
+
 function getBaseUrl(key: string): string | undefined {
-  const w = window as Window & { __ENV__?: Record<string, string> };
-  if (w.__ENV__?.[key]) return w.__ENV__[key];
-  return (import.meta.env as Record<string, string | undefined>)[key];
+  return safeGetEnv(key);
 }
 
 // URLs que NÃO devem ter o token no header
