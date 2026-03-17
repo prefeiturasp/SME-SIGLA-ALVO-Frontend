@@ -1,6 +1,5 @@
 import React from 'react';
 import { renderWithProviders } from '../../../../test-utils';
-import SelecaoCargos from '../SelecaoCargosTela';
 
 // Mocks de navegação e permissões
 const mockNavigate = jest.fn();
@@ -81,6 +80,9 @@ jest.mock('antd', () => {
 
 describe('SelecaoCargos - sorters', () => {
   it('executa o sorter da coluna Candidatos (cobrindo as linhas do sorter)', () => {
+    // Evitar que serviços reais sejam carregados (que importam axios com import.meta)
+    jest.mock('../../../../services', () => ({ __esModule: true, API: {} }));
+    const SelecaoCargos = require('../SelecaoCargosTela').default;
     const { getByTestId } = renderWithProviders(<SelecaoCargos />);
     expect(getByTestId('mock-table')).toBeInTheDocument();
   });
