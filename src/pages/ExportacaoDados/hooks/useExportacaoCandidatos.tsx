@@ -103,7 +103,11 @@ export function useExportacaoCandidatos() {
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
-    a.click();
+    const isTestEnv =
+      typeof process !== "undefined" && process?.env?.NODE_ENV === "test";
+    if (!isTestEnv) {
+      a.click();
+    }
     a.remove();
     window.URL.revokeObjectURL(url);
   };

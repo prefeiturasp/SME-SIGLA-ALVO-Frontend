@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import ExportacaoDadosTela from "../ExportacaoDadosTela";
 
@@ -64,10 +65,14 @@ describe("ExportacaoDadosTela", () => {
   it("deve renderizar título e breadcrumbs", () => {
     renderComponent();
 
-    expect(screen.getByText("Exportação de Dados")).toBeInTheDocument();
-    expect(screen.getByText("Home")).toBeInTheDocument();
-    expect(screen.getByText("Processos")).toBeInTheDocument();
-    expect(screen.getByText("Exportação de Dados")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Exportação de Dados" }),
+    ).toBeInTheDocument();
+
+    const breadcrumb = screen.getByTestId("breadcrumb");
+    expect(breadcrumb).toHaveTextContent("Home");
+    expect(breadcrumb).toHaveTextContent("Processos");
+    expect(breadcrumb).toHaveTextContent("Exportação de Dados");
   });
 
   it("deve iniciar na aba VAGAS_PROCESSO com componente correto", () => {
@@ -77,7 +82,8 @@ describe("ExportacaoDadosTela", () => {
     expect(screen.getByTestId("exportacao-vagas-tab-vagas-processo")).toBeInTheDocument();
   });
 
-  it("deve alternar entre abas e renderizar children corretos", () => {
+  it("deve alternar entre abas e renderizar children corretos", async () => {
+    const user = userEvent.setup();
     renderComponent();
 
     const tabVagasProcesso = screen.getByTestId("tab-VAGAS_PROCESSO");
@@ -89,17 +95,17 @@ describe("ExportacaoDadosTela", () => {
     expect(screen.getByTestId("exportacao-vagas-tab-vagas-processo")).toBeInTheDocument();
 
     // Muda para candidatos
-    tabCandidatosProcesso.click();
+    await user.click(tabCandidatosProcesso);
     expect(screen.getByTestId("active-tab")).toHaveTextContent("CANDIDATOS_PROCESSO");
     expect(screen.getByTestId("exportacao-candidatos-tab")).toBeInTheDocument();
 
     // Muda para vagas SIGPEC
-    tabVagasSigpec.click();
+    await user.click(tabVagasSigpec);
     expect(screen.getByTestId("active-tab")).toHaveTextContent("VAGAS_SIGPEC");
     expect(screen.getByTestId("exportacao-vagas-tab-vagas-sigpec")).toBeInTheDocument();
 
     // Volta para vagas processo
-    tabVagasProcesso.click();
+    await user.click(tabVagasProcesso);
     expect(screen.getByTestId("active-tab")).toHaveTextContent("VAGAS_PROCESSO");
   });
 });
