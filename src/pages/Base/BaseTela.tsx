@@ -128,7 +128,7 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
     {
       key: "documentos-por-processo",
       icon: <SnippetsOutlined style={{ fontSize: "1.03125rem" }} />,
-      label: "Documentos Por Processo",
+      label: "Documentos",
       onClick: () => handleMenuClick("documentos-por-processo", "Documentos por Processo"),
     },
     {
@@ -162,6 +162,11 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
             key: "importacao",
             label: "Importação de Dados",
             onClick: () => navigate("/processos/importacao-dados"),
+          },
+          {
+            key: "exportacao",
+            label: "Exportação de Dados",
+            onClick: () => navigate("/processos/exportacao-dados"),
           },
           {
             key: "pesquisar-concursados",

@@ -29,7 +29,7 @@ const useAgendaSchema = (
     tipoEscolha: yup
       .string()
       .required("Campo obrigatório")
-      .oneOf(["Presencial", "Online"], "Tipo de Escolha deve ser Presencial ou Online"),
+      .oneOf(["PRESENCIAL", "ONLINE"], "Tipo de Escolha deve ser Presencial ou Online"),
     
     cargoAgenda: yup
       .string()
@@ -41,7 +41,7 @@ const useAgendaSchema = (
       .test("is-valid-field", "campo obrigatório", function(value) {
         const { tipoEscolha } = this.parent;
         
-        if (tipoEscolha === "Online") {
+        if (tipoEscolha === "ONLINE") {
           // Para Online, verificar se é um array com 2 datas válidas
           return value && Array.isArray(value) && value.length === 2 && 
                  value.every(date => date && dayjs(date as any).isValid());
@@ -53,7 +53,7 @@ const useAgendaSchema = (
       .test("is-valid-date", "Data de escolha inválida", function(value) {
         const { tipoEscolha } = this.parent;
         
-        if (tipoEscolha === "Online") {
+        if (tipoEscolha === "ONLINE") {
           // Para Online, esperamos um array de datas
           if (!value || !Array.isArray(value) || value.length !== 2) {
             return false;
@@ -71,7 +71,7 @@ const useAgendaSchema = (
         if (!value) return true;
         const today = dayjs().startOf("day");
         
-        if (tipoEscolha === "Online") {
+        if (tipoEscolha === "ONLINE") {
           // Para Online, validar ambas as datas do range
           if (!Array.isArray(value) || value.length !== 2) {
             return false;
@@ -90,7 +90,7 @@ const useAgendaSchema = (
       .test("valid-range", "Data de início deve ser anterior ou igual à data de fim", function(value) {
         const { tipoEscolha } = this.parent;
         
-        if (tipoEscolha === "Online" && Array.isArray(value) && value.length === 2) {
+        if (tipoEscolha === "ONLINE" && Array.isArray(value) && value.length === 2) {
           const [startDate, endDate] = value;
           if (startDate && endDate) {
             const start = dayjs(startDate as any).startOf("day");
@@ -119,7 +119,7 @@ const useAgendaSchema = (
         
         const nomeacaoDate = dayjs(value as any).startOf("day");
         
-        if (tipoEscolha === "Online" && Array.isArray(escolhaEm) && escolhaEm.length === 2) {
+        if (tipoEscolha === "ONLINE" && Array.isArray(escolhaEm) && escolhaEm.length === 2) {
           // Para Online, usar a data de fim do range
           const escolhaDate = dayjs(escolhaEm[1] as any).startOf("day");
           return nomeacaoDate.isSameOrAfter(escolhaDate);
@@ -205,7 +205,7 @@ const useAgendaSchema = (
     horaInicio: yup
       .mixed()
       .when("tipoEscolha", {
-        is: "Presencial",
+        is: "PRESENCIAL",
         then: (schema) => schema
           .required("Horário de início obrigatório")
           .test("is-valid-time", "Hora de início inválida", (value) => {
@@ -230,7 +230,7 @@ const useAgendaSchema = (
     horaFim: yup
       .mixed()
       .when("tipoEscolha", {
-        is: "Presencial",
+        is: "PRESENCIAL",
         then: (schema) => schema
           .required("Horário de fim obrigatório")
           .test("is-valid-time", "Hora de fim inválida", (value) => {

@@ -102,6 +102,7 @@ const mockAgenda = {
   cargo_nome: 'Professor',
   codigo_cargo: '123',
   candidatos_uuids: ['candidato-1', 'candidato-2'],
+  modalidade: 'PRESENCIAL',
 };
 
 const mockCargo = {

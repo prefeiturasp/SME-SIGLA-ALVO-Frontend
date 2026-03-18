@@ -54,19 +54,40 @@ export const statusHeaderContainer = {
   gap: '0.5rem'
 };
 
+// Cores padrão do projeto para ícones de ação
+const ICON_COLOR_GRAY = '#838383';
+const ICON_COLOR_BLUE = '#0F59C8';
+const ICON_COLOR_RED = '#ff4d4f';
+const ICON_COLOR_BLACK = '#000000';
+
 // Estilos para os ícones de ação
 export const editIcon = {
   width: '0.9765625rem',
   height: '0.9765625rem',
-  color: '#838383',
+  color: ICON_COLOR_GRAY,
   fontSize: '0.9765625rem'
 };
+
+export const editIconEnabled = {
+  ...editIcon,
+  color: ICON_COLOR_BLUE
+};
+
+// Verde chamativo para o ícone de visualizar
+const ICON_COLOR_VERDE_LODO = '#16a34a';
 
 export const viewIcon = {
   width: '1.2164474725723267rem',
   height: '0.9095982313156128rem',
-  color: '#838383',
+  color: ICON_COLOR_VERDE_LODO,
   fontSize: '0.9095982313156128rem'
+};
+
+export const deleteIconEnabled = {
+  width: '1.07125rem',
+  height: '1.11625rem',
+  color: ICON_COLOR_RED,
+  fontSize: '1.07125rem'
 };
 
 
@@ -104,6 +125,12 @@ export const finalizarButtonLeave = {
   backgroundColor: '#FFFFFF',
   borderColor: '#0F59C8',
   color: '#0F59C8'
+};
+
+export const finalizarButtonDisabled = {
+  border: '0.0625rem solid #BFBFBF',
+  color: '#BFBFBF',
+  backgroundColor: '#FFFFFF'
 };
 
 // Estilos para o texto vazio da tabela

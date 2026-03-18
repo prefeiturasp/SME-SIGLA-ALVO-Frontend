@@ -110,7 +110,7 @@ describe("CartaConvocacaoTela", () => {
       </MemoryRouter>
     );
     expect(screen.getByTestId("base-tela")).toBeInTheDocument();
-    expect(screen.getByTestId("title")).toHaveTextContent("Carta de Convocação");
+    expect(screen.getByTestId("title")).toHaveTextContent("E-mail de Convocação");
     expect(screen.getByRole("combobox")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Selecione a data")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Histórico/i })).toBeInTheDocument();

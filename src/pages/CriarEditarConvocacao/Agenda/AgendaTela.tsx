@@ -2,6 +2,7 @@ import React from "react";
 import {
   Button,
   Card,
+  Alert,
   Steps,
   Typography,
   Row,
@@ -41,6 +42,7 @@ const AgendaTela: React.FC = () => {
   const canChangeProcessoConvocacao = can("change_processoconvocacao");
   const {
     processoConvocacaoData,
+    candidatosFaltantesCount,
     cargosAdicionados,
     handleAgendarCargo,
     agendaAberto,
@@ -151,6 +153,13 @@ const AgendaTela: React.FC = () => {
     handleAgendarCargo(cargoUuid);
   };
 
+  // Exibir alerta somente quando a primeira agenda for ONLINE e estamos abrindo a segunda
+  const showSecondAfterOnlineAlert =
+    !!agendaAberto &&
+    Array.isArray(periodosList) &&
+    periodosList.length === 1 &&
+    String(periodosList[0]?.tipoEscolha).toUpperCase() === "ONLINE";
+
   return (
     <>
       <GlobalStyles />
@@ -249,7 +258,15 @@ const AgendaTela: React.FC = () => {
         >
 
           <Divider style={inlineStyles.dividerMargin} />
-          
+          {showSecondAfterOnlineAlert && (
+            <Alert
+              message={`Ainda há ${candidatosFaltantesCount ?? 0} candidato(s) faltantes para fazerem a escolha após a importação de escolhas do EOL.`}
+              type="info"
+              showIcon
+              closable
+              style={{ marginBottom: 12 }}
+            />
+          )}
           <div style={{ ...contentStyle, ...inlineStyles.containerWithMarginTop }}>
         {/* Formulário de Agenda */}
         <AgendaForm
@@ -264,10 +281,22 @@ const AgendaTela: React.FC = () => {
           isAgendaComplete={isAgendaComplete}
           isBotaoAdicionarHabilitado={isBotaoAdicionarHabilitado}
           handleAdicionarPeriodo={handleAdicionarPeriodo}
-          candidatosDisponiveis={agendaAberto ? agendaAberto.cargo.totalCandidatos - periodosList.filter(p => p.cargo === agendaAberto.cargo.nome).reduce((total, periodo) => total + (periodo.classificacao || 0), 0) : undefined}
+          candidatosDisponiveis={
+            agendaAberto
+              ? // Se houver candidatos faltantes informados pela API (após agenda ONLINE), usar essa quantidade
+                (typeof candidatosFaltantesCount === "number"
+                  ? candidatosFaltantesCount
+                  : agendaAberto.cargo.totalCandidatos -
+                    periodosList
+                      .filter(p => p.cargo === agendaAberto.cargo.nome)
+                      .reduce((total, periodo) => total + (periodo.classificacao || 0), 0))
+              : undefined
+          }
+          candidatosFaltantesCount={typeof candidatosFaltantesCount === "number" ? candidatosFaltantesCount : undefined}
           setValue={setValue}
           totalCandidatos={agendaAberto ? agendaAberto.cargo.totalCandidatos : undefined}
           trigger={trigger}
+          hasAgendas={periodosList.length > 0}
         />
 
             {/* Tabela de Agenda */}

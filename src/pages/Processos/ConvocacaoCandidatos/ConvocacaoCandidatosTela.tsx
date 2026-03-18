@@ -1,10 +1,14 @@
+import React, { useState, useCallback } from "react";
 import { Typography, Row, Col, Button, Tooltip } from "antd";
 import { UsergroupAddOutlined, UserSwitchOutlined } from "@ant-design/icons";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import ConvocacaoTable from "./components/ConvocacaoTable";
 import ConvocacaoFiltros from "./components/ConvocacaoFiltros";
+import FinalizarProcessoModal from "./components/FinalizarProcessoModal";
 import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
+import { usePostFinalizarProcessoConvocacao } from "./hooks/usePostFinalizarProcessoConvocacao";
 import { useNavigate } from "react-router-dom";
+import type { IProcessoConvocacao } from "../../../services/resources/convocacao/IConvocacao";
 import {
   PageContainer,
   ActionButton,
@@ -19,6 +23,32 @@ const { Text } = Typography;
 
 const ConvocacaoCandidatosTela: React.FC = () => {
   const navigate = useNavigate();
+  const [finalizandoUuid, setFinalizandoUuid] = useState<string | null>(null);
+  const [modalFinalizarOpen, setModalFinalizarOpen] = useState(false);
+  const [processoParaFinalizar, setProcessoParaFinalizar] = useState<IProcessoConvocacao | null>(null);
+
+  const postFinalizar = usePostFinalizarProcessoConvocacao();
+
+  const openModalFinalizar = useCallback((record: IProcessoConvocacao) => {
+    setProcessoParaFinalizar(record);
+    setModalFinalizarOpen(true);
+  }, []);
+
+  const closeModalFinalizar = useCallback(() => {
+    setModalFinalizarOpen(false);
+    setProcessoParaFinalizar(null);
+  }, []);
+
+  const handleConfirmFinalizar = useCallback(async () => {
+    if (!processoParaFinalizar) return;
+    setFinalizandoUuid(processoParaFinalizar.uuid);
+    try {
+      await postFinalizar.mutateAsync(processoParaFinalizar.uuid);
+    } finally {
+      setFinalizandoUuid(null);
+      closeModalFinalizar();
+    }
+  }, [processoParaFinalizar, postFinalizar, closeModalFinalizar]);
 
   const breadcrumbItems = [
     {
@@ -132,6 +162,8 @@ const ConvocacaoCandidatosTela: React.FC = () => {
                   canViewDetailsProcessoConvocacao
                 }
                 canFinalizeProcessoConvocacao={canFinalizeProcessoConvocacao}
+                onFinalizar={openModalFinalizar}
+                finalizandoUuid={finalizandoUuid}
                 loading={processosConvocacaoIsLoading}
                 data={processosConvocacaoData?.results || []}
                 pagination={{
@@ -151,6 +183,13 @@ const ConvocacaoCandidatosTela: React.FC = () => {
             </TableContainer>
           </Col>
         </Row>
+
+        <FinalizarProcessoModal
+          open={modalFinalizarOpen}
+          confirmLoading={!!finalizandoUuid}
+          onCancel={closeModalFinalizar}
+          onConfirm={handleConfirmFinalizar}
+        />
       </BaseTela>
     </PageContainer>
   );

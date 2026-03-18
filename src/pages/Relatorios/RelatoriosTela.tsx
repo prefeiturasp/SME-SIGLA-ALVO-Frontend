@@ -36,6 +36,7 @@ const RelatoriosTela: React.FC = () => {
           </Text>
         ),
       },
+      { title: "Documentos por Processo" },
       { title: "Relatórios" },
     ] as TitleItem[],
     [navigate]

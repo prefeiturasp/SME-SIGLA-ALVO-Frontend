@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useForm, type Resolver } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -46,7 +46,7 @@ export type PeriodoItem = {
   horaFim?: string;
   isRetardatario?: boolean;
   tipoEscolha?: string;
-  modalidade?: 'Presencial' | 'Online' | null;
+  modalidade?: 'PRESENCIAL' | 'ONLINE' | null;
   numeroSessao?: number;
   dataEscolhaOriginal?: any;
   horaInicioOriginal?: any;
@@ -91,17 +91,32 @@ export const useAgenda = () => {
 
   const { processoConvocacaoData, processoConvocacaoIsLoading } = useGetProcessosConvocacaoPorUUID(uuid!);
   const { concursoData, concursoIsLoading } = useGetConcursoByUuid(processoConvocacaoData?.concurso_uuid || '');
-  const { agendasData, agendasIsLoading } = useGetAgendas(
-    uuid && processoConvocacaoData
-      ? {
-          pagination: { page: 1, page_size: 100 },
-          filters: {
-            processo_convocacao_uuid: uuid,
-          },
-        }
-      : undefined
+  // Memorizar o request para estabilizar o objeto e não recriar a cada render
+  const agendasListRequest = useMemo(
+    () =>
+      uuid && processoConvocacaoData
+        ? {
+            pagination: { page: 1, page_size: 100 },
+            filters: { processo_convocacao_uuid: uuid },
+          }
+        : undefined,
+    [uuid, processoConvocacaoData]
   );
+  const { agendasData, agendasIsLoading } = useGetAgendas(agendasListRequest);
+  console.log("agendasData", agendasData);
 
+  // Quando a primeira agenda for ONLINE, a API pode retornar a lista de candidatos faltantes
+  // Preferir a nova chave candidatos_faltantes_uuids; manter compatibilidade com candidatos_uuids_restantes
+  const candidatosFaltantesUuidsList = useMemo(() => {
+    const root: any = agendasData as any;
+    const arr = root?.candidatos_faltantes_uuids ?? root?.candidatos_uuids_restantes;
+    return Array.isArray(arr) ? (arr as string[]) : undefined;
+  }, [agendasData]);
+  const candidatosFaltantesCount = useMemo(
+    () => (Array.isArray(candidatosFaltantesUuidsList) ? candidatosFaltantesUuidsList.length : undefined),
+    [candidatosFaltantesUuidsList]
+  );
+  // logs removidos para evitar repetições em renderizações
   const mapAgendaToPeriodoItem = useCallback((agenda: IAgenda): PeriodoItem => {
     const dataEscolhaOriginal = agenda.escolha_em ? dayjs(agenda.escolha_em) : null;
     const horaInicioOriginal = agenda.hora_convocacao_inicio 
@@ -156,8 +171,6 @@ export const useAgenda = () => {
 
   const mapPeriodoItemToAgendaCreate = (
     periodo: PeriodoItem,
-    processoUuid: string,
-    processoNome: string,
     _index?: number,
     candidatosSlice?: string[],
     cargoCodigo?: string
@@ -188,15 +201,19 @@ export const useAgenda = () => {
       horaConvocacaoInicio = dayjs(periodo.horaInicioOriginal).format('HH:mm:ss');
       horaConvocacaoFim = dayjs(periodo.horaFimOriginal).format('HH:mm:ss');
     }
+    // Mapear tipoEscolha (interno MAIÚSCULO) para modalidade MAIÚSCULA no payload
+    let modalidadeValue: 'PRESENCIAL' | 'ONLINE' | null = null;
+    if (periodo.tipoEscolha === 'PRESENCIAL') modalidadeValue = 'PRESENCIAL';
+    if (periodo.tipoEscolha === 'ONLINE') modalidadeValue = 'ONLINE';
+    if (!modalidadeValue && periodo.modalidade) modalidadeValue = periodo.modalidade;
+
     return {
       ...(periodo.uuid && { uuid: periodo.uuid }),
-      processo_convocacao_uuid: processoUuid,
-      processo_convocacao_nome: processoNome,
       cargo_uuid: periodo.cargoUuid || '',
       cargo_nome: periodo.cargo,
       cargo_codigo: cargoCodigo,
       data_escolha: dayjs().toISOString(),
-      modalidade: (periodo.tipoEscolha || periodo.modalidade) as 'Presencial' | 'Online' | null,
+      modalidade: modalidadeValue,
       escolha_em: escolhaEm,
       nomeacao_em: nomeacaoEm,
       classificacao: periodo.classificacao || null,
@@ -204,7 +221,9 @@ export const useAgenda = () => {
       retardatario: periodo.isRetardatario || false,
       hora_convocacao_inicio: horaConvocacaoInicio,
       hora_convocacao_fim: horaConvocacaoFim,
-      candidatos_uuids: candidatosSlice ? candidatosSlice as string[] : [],
+      ...(Array.isArray(candidatosSlice) && candidatosSlice.length > 0
+        ? { candidatos_uuids: candidatosSlice as string[] }
+        : {}),
     };
   };
 
@@ -231,6 +250,11 @@ export const useAgenda = () => {
   // Função para obter o limite de candidatos disponíveis (total - já classificados)
   const getMaxCandidatosDisponiveis = () => {
     if (!agendaAberto) return undefined;
+    // Se a API informou os candidatos faltantes (após uma agenda ONLINE),
+    // considerar esta quantidade como limite para a próxima agenda PRESENCIAL.
+    if (typeof candidatosFaltantesCount === "number" && candidatosFaltantesCount >= 0) {
+      return candidatosFaltantesCount;
+    }
     const totalCandidatos = agendaAberto.cargo.totalCandidatos;
     const jaClassificados = getCandidatosJaClassificados();
     return totalCandidatos - jaClassificados;
@@ -253,7 +277,7 @@ export const useAgenda = () => {
         // Função que será chamada durante a validação
         // Usa watch() para obter os valores atuais do formulário
         const currentValues = watch();
-        if (!isRetardatario || currentValues.tipoEscolha !== "Presencial") {
+        if (!isRetardatario || currentValues.tipoEscolha !== "PRESENCIAL") {
           return true;
         }
         if (!currentValues.horaInicio || !currentValues.escolhaEm) {
@@ -266,7 +290,7 @@ export const useAgenda = () => {
           periodo.cargo === nomeCargo &&
           !periodo.isRetardatario &&
           periodo.dataEscolha === dataEscolhaFormatada &&
-          periodo.tipoEscolha === "Presencial" &&
+          periodo.tipoEscolha === "PRESENCIAL" &&
           periodo.horaFim
         );
         if (outrasAgendas.length === 0) {
@@ -302,7 +326,7 @@ export const useAgenda = () => {
 
   // Função para verificar se o horário do retardatário é depois de todas as outras agendas
   const verificarHorarioRetardatario = (): boolean => {
-    if (!isRetardatario || watchedFields.tipoEscolha !== "Presencial") {
+    if (!isRetardatario || watchedFields.tipoEscolha !== "PRESENCIAL") {
       return true;
     }
     if (!watchedFields.horaInicio || !watchedFields.escolhaEm) {
@@ -315,7 +339,7 @@ export const useAgenda = () => {
       periodo.cargo === nomeCargo &&
       !periodo.isRetardatario &&
       periodo.dataEscolha === dataEscolhaFormatada &&
-      periodo.tipoEscolha === "Presencial" &&
+      periodo.tipoEscolha === "PRESENCIAL" &&
       periodo.horaFim
     );
     if (outrasAgendas.length === 0) {
@@ -416,7 +440,7 @@ export const useAgenda = () => {
                            watchedFields.nomeacaoEm;
       
       // Se for Presencial, também precisa dos horários
-      if (watchedFields.tipoEscolha === "Presencial") {
+      if (watchedFields.tipoEscolha === "PRESENCIAL") {
         const temHorarios = watchedFields.horaInicio && watchedFields.horaFim;
         const horarioValido = verificarHorarioRetardatario();
         return camposBasicos && temHorarios && horarioValido;
@@ -424,6 +448,14 @@ export const useAgenda = () => {
       
       // Se for Online, não precisa dos horários
       return camposBasicos;
+    }
+    
+    // Para Online (não retardatário): apenas campos básicos são obrigatórios
+    if (watchedFields.tipoEscolha === "ONLINE") {
+      const camposBasicos = watchedFields.tipoEscolha && 
+                            watchedFields.escolhaEm && 
+                            watchedFields.nomeacaoEm;
+      return Boolean(camposBasicos);
     }
     
     // Se retardatário NÃO estiver marcado, todos os campos são obrigatórios (lógica original)
@@ -434,7 +466,7 @@ export const useAgenda = () => {
            watchedFields.sessao;
     
     // Se for Presencial, também precisa dos horários
-    if (watchedFields.tipoEscolha === "Presencial") {
+    if (watchedFields.tipoEscolha === "PRESENCIAL") {
       return camposObrigatorios && watchedFields.horaInicio && watchedFields.horaFim;
     }
     
@@ -474,7 +506,7 @@ export const useAgenda = () => {
     let dataEscolhaFormatada: string;
     let dataEscolhaOriginal: any;
     
-    if (watchedFields.tipoEscolha === "Online" && Array.isArray(watchedFields.escolhaEm)) {
+    if (watchedFields.tipoEscolha === "ONLINE" && Array.isArray(watchedFields.escolhaEm)) {
       const [dataInicio, dataFim] = watchedFields.escolhaEm;
       dataEscolhaFormatada = `${dataInicio?.format('DD/MM/YYYY')} a ${dataFim?.format('DD/MM/YYYY')}`;
       dataEscolhaOriginal = dataInicio;
@@ -486,7 +518,7 @@ export const useAgenda = () => {
 
     // Criar múltiplas entradas baseado no número de sessões
     const novosPeriodos: PeriodoItem[] = [];
-    const numeroSessoes = isRetardatario ? 1 : (watchedFields.sessao || 1);
+    const numeroSessoes = isRetardatario || watchedFields.tipoEscolha === "ONLINE" ? 1 : (watchedFields.sessao || 1);
     
     // Contar quantos períodos retardatários já existem para este cargo
     const periodosRetardatariosExistentes = periodosList.filter(
@@ -498,7 +530,7 @@ export const useAgenda = () => {
 
       // Determinar o nome da sessão
       let nomeSessao;
-      if (watchedFields.tipoEscolha === "Online") {
+      if (watchedFields.tipoEscolha === "ONLINE") {
         nomeSessao = `Sessão ${numeroSessaoAtual}`;
       } else if (isRetardatario) {
         // Garantir nome único para retardatários
@@ -511,7 +543,16 @@ export const useAgenda = () => {
       // Determinar a quantidade de classificados para esta sessão
       let quantidadeClassificados;
       if (isRetardatario) {
-        // Quando for retardatário, usar o total de candidatos do cargo
+        // Para retardatário, priorizar candidatos faltantes (se informados pela API após agenda ONLINE)
+        if (typeof candidatosFaltantesCount === "number") {
+          console.log("candidatosFaltantesCount", candidatosFaltantesCount);
+          quantidadeClassificados = candidatosFaltantesCount;
+        } else {
+          console.log("agendaAberto?.cargo.totalCandidatos", agendaAberto?.cargo.totalCandidatos);
+          quantidadeClassificados = agendaAberto?.cargo.totalCandidatos || 0;
+        }
+      } else if (watchedFields.tipoEscolha === "ONLINE") {
+        // Para ONLINE, usar o total de candidatos do cargo
         quantidadeClassificados = agendaAberto?.cargo.totalCandidatos || 0;
       } else {
         quantidadeClassificados = quantidadesPorSessao[i];
@@ -524,7 +565,7 @@ export const useAgenda = () => {
       let horaInicioOriginalCalculada: any;
       let horaFimOriginalCalculada: any;
       
-      if (watchedFields.tipoEscolha === "Presencial") {
+      if (watchedFields.tipoEscolha === "PRESENCIAL") {
         // Calcular horários específicos para esta sessão
         if (numeroSessaoAtual === 1) {
           horaInicioCalculada = watchedFields.horaInicio?.format('HH:mm');
@@ -565,7 +606,7 @@ export const useAgenda = () => {
         horaInicio: horaInicioCalculada,
         horaFim: horaFimCalculada,
         tipoEscolha: watchedFields.tipoEscolha,
-        modalidade: watchedFields.tipoEscolha as 'Presencial' | 'Online' | null,
+        modalidade: watchedFields.tipoEscolha as 'PRESENCIAL' | 'ONLINE' | null,
         processoConvocacaoUuid: uuid,
         escolhaEm: watchedFields.escolhaEm ? (Array.isArray(watchedFields.escolhaEm) ? watchedFields.escolhaEm[0]?.format('YYYY-MM-DD') : watchedFields.escolhaEm.format('YYYY-MM-DD')) : undefined,
         nomeacaoEm: watchedFields.nomeacaoEm ? watchedFields.nomeacaoEm.format('YYYY-MM-DD') : undefined,
@@ -615,7 +656,7 @@ export const useAgenda = () => {
         let contadorSessaoPresencial = 1;
         let contadorSessaoOnline = 1;
         periodosAgrupados[cargo] = periodosAgrupados[cargo].map((periodo: PeriodoItem) => {
-          if (!periodo.isRetardatario && periodo.tipoEscolha === "Presencial") {
+          if (!periodo.isRetardatario && periodo.tipoEscolha === "PRESENCIAL") {
             const periodoAtualizado = {
               ...periodo,
               numeroSessao: contadorSessaoPresencial,
@@ -623,7 +664,7 @@ export const useAgenda = () => {
             };
             contadorSessaoPresencial++;
             return periodoAtualizado;
-          } else if (!periodo.isRetardatario && periodo.tipoEscolha === "Online") {
+          } else if (!periodo.isRetardatario && periodo.tipoEscolha === "ONLINE") {
             const periodoAtualizado = {
               ...periodo,
               numeroSessao: contadorSessaoOnline,
@@ -661,46 +702,52 @@ export const useAgenda = () => {
 
     try {
       setAgendasLoading(true);
-      // Fonte de candidatos por cargo (a partir dos cargos do processo)
-      const candidatosPorCargo: Record<string, { lista: string[]; offset: number }> = {};
-      cargosAdicionados.forEach(cargo => {
-        const key = cargo.uuid || cargo.nome;
-        candidatosPorCargo[key] = {
-          lista: (cargo.candidatos_uuids || []).slice(),
-          offset: 0,
-        };
-      });
+      // Coletar candidatos: se a API informou faltantes, usar esses; senão, todos os candidatos dos cargos
+      const todosCandidatos = (candidatosFaltantesUuidsList && candidatosFaltantesUuidsList.length > 0)
+        ? candidatosFaltantesUuidsList
+        : Array.from(
+            new Set(
+              cargosAdicionados.flatMap((c) => c.candidatos_uuids || [])
+            )
+          );
 
-      const todasAgendas: IAgendaCreate[] = periodosList.map((periodo, index) => {
-        const cargoKey = periodo.cargoUuid || periodo.cargo;
-        const fonte = candidatosPorCargo[cargoKey];
-        const quantidade = periodo.classificacao || 0;
+      // Considerar apenas períodos ainda não criados (sem UUID) para o POST
+      const periodosParaCriar = periodosList.filter((p) => !p.uuid);
+      if (periodosParaCriar.length === 0) {
+        // Nada novo para criar
+        return true;
+      }
+
+      // Mapear agendas sem enviar candidatos fatiados por agenda
+      const todasAgendas: IAgendaCreate[] = periodosParaCriar.map((periodo, index) => {
         const cargoCodigo =
-          (cargosAdicionados.find(c => c.uuid === periodo.cargoUuid)?.cargo_codigo) ||
-          (cargosAdicionados.find(c => c.nome === periodo.cargo)?.cargo_codigo);
-        let slice: string[] = [];
-        if (periodo.isRetardatario) {
-          // Se for retardatário, passar todos os candidatos do cargo
-          if (fonte) {
-            slice = fonte.lista.slice();
-          }
-        } else if (fonte && quantidade > 0) {
-          const inicio = fonte.offset;
-          const fimExclusivo = inicio + quantidade;
-          slice = fonte.lista.slice(inicio, fimExclusivo);
-          fonte.offset = fimExclusivo;
-        }
+          cargosAdicionados.find(c => c.uuid === periodo.cargoUuid)?.cargo_codigo ||
+          cargosAdicionados.find(c => c.nome === periodo.cargo)?.cargo_codigo;
         return mapPeriodoItemToAgendaCreate(
           periodo,
-          uuid,
-          processoConvocacaoData.concurso_nome || 'Processo de Convocação',
           index,
-          slice,
+          undefined,
           cargoCodigo
         );
       });
 
-      const resultados: IAgenda[] = await postAgendaMutation.mutateAsync(todasAgendas);
+      // Identificar cargo raiz (assumindo criação por um único cargo por vez)
+      const firstPeriodo = periodosParaCriar[0];
+      const cargoUuidRoot = firstPeriodo?.cargoUuid || '';
+      const cargoNomeRoot = firstPeriodo?.cargo || '';
+      const cargoCodigoRoot =
+        cargosAdicionados.find(c => c.uuid === cargoUuidRoot)?.cargo_codigo ||
+        cargosAdicionados.find(c => c.nome === cargoNomeRoot)?.cargo_codigo ||
+        '';
+
+      // Payload no novo formato: processo (na raiz) + candidatos_uuids (todos) + agendas (lista com cargo e modalidade)
+      const payload = {
+        processo_uuid: uuid,
+        processo_nome: processoConvocacaoData.concurso_nome || 'Processo de Convocação',
+        candidatos_uuids: todosCandidatos,
+        agendas: todasAgendas,
+      };
+      const resultados: IAgenda[] = await postAgendaMutation.mutateAsync(payload);
       setPeriodosList(prev => {
         return prev.map((periodo, index) => {
           if (periodo.uuid) {
@@ -842,8 +889,8 @@ export const useAgenda = () => {
 
     setPeriodosList(prev => {
       const periodosRestantes = prev.filter(periodo => periodo.id !== id);
-      const sessoesPresenciais = periodosRestantes.filter(p => !p.isRetardatario && p.tipoEscolha === "Presencial");
-      const sessoesOnline = periodosRestantes.filter(p => !p.isRetardatario && p.tipoEscolha === "Online");
+      const sessoesPresenciais = periodosRestantes.filter(p => !p.isRetardatario && p.tipoEscolha === "PRESENCIAL");
+      const sessoesOnline = periodosRestantes.filter(p => !p.isRetardatario && p.tipoEscolha === "ONLINE");
       const retardatarios = periodosRestantes.filter(p => p.isRetardatario);
       const sessoesPresenciaisReordenadas = sessoesPresenciais.map((periodo, index) => ({
         ...periodo,
@@ -877,7 +924,7 @@ export const useAgenda = () => {
       let contadorSessaoPresencial = 1;
       let contadorSessaoOnline = 1;
       const periodosComSessaoCronologica = periodosOrdenados.map(periodo => {
-        if (!periodo.isRetardatario && periodo.tipoEscolha === "Presencial") {
+        if (!periodo.isRetardatario && periodo.tipoEscolha === "PRESENCIAL") {
           const periodoAtualizado = {
             ...periodo,
             numeroSessao: contadorSessaoPresencial,
@@ -885,7 +932,7 @@ export const useAgenda = () => {
           };
           contadorSessaoPresencial++;
           return periodoAtualizado;
-        } else if (!periodo.isRetardatario && periodo.tipoEscolha === "Online") {
+        } else if (!periodo.isRetardatario && periodo.tipoEscolha === "ONLINE") {
           const periodoAtualizado = {
             ...periodo,
             numeroSessao: contadorSessaoOnline,
@@ -1017,7 +1064,7 @@ export const useAgenda = () => {
   const saveEdit = (key: number, periodoDataItem: PeriodoItem, values: any) => {
     if (values.classificacao) {
       // Se for tipo Presencial, verificar horários
-      if (periodoDataItem?.tipoEscolha === "Presencial") {
+      if (periodoDataItem?.tipoEscolha === "PRESENCIAL") {
         if (!values.horaInicio || !values.horaFim) {
           return { success: false, message: 'Horários são obrigatórios para tipo Presencial.' };
         }
@@ -1032,7 +1079,7 @@ export const useAgenda = () => {
       let horaInicioOriginal: any = null;
       let horaFimOriginal: any = null;
       
-      if (periodoDataItem?.tipoEscolha === "Presencial" && values.horaInicio && values.horaFim) {
+      if (periodoDataItem?.tipoEscolha === "PRESENCIAL" && values.horaInicio && values.horaFim) {
         horarioFormatado = `${values.horaInicio} às ${values.horaFim}`;
         try {
           horaInicioOriginal = dayjs(`2000-01-01 ${values.horaInicio}`);
@@ -1041,7 +1088,7 @@ export const useAgenda = () => {
           console.error('Erro ao criar objetos dayjs:', e);
         }
       } else {
-        horarioFormatado = periodoDataItem?.tipoEscolha === "Online" ? "Online" : (periodoDataItem?.horario || "—");
+        horarioFormatado = periodoDataItem?.tipoEscolha === "ONLINE" ? "Online" : (periodoDataItem?.horario || "—");
       }
       
       const updates = { 
@@ -1269,5 +1316,6 @@ export const useAgenda = () => {
     salvarAgendasNoBackend,
     uuid,
     temPeriodosAgenda,
+    candidatosFaltantesCount,
   };
 };

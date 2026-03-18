@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Checkbox,
   Col,
@@ -424,7 +424,13 @@ const EscolhaCandidatosTela: React.FC = () => {
   const processosOptions = useMemo(
     () =>
       (processosConvocacaoOptions || [])
-        .filter((option) => option?.value && option?.label)
+        .filter(
+          (option) =>
+            option?.value &&
+            option?.label &&
+            (option as { status?: string }).status !== "FINALIZADO" &&
+            (option as { status?: string }).status !== "CANCELADO"
+        )
         .map((option) => ({
           value: option.value,
           label: option.label,
@@ -436,10 +442,25 @@ const EscolhaCandidatosTela: React.FC = () => {
     [processosConvocacaoOptions]
   );
 
+  useEffect(() => {
+    if (
+      selectedProcesso &&
+      processosOptions.length > 0 &&
+      !processosOptions.some((opt) => opt.value === selectedProcesso)
+    ) {
+      setSelectedProcesso(undefined);
+      setSelectedAgenda(undefined);
+    }
+  }, [selectedProcesso, processosOptions]);
+
   const agendasOptions = useMemo(
     () =>
       agendasList
-        .filter((agenda) => Boolean(agenda.uuid))
+        .filter(
+          (agenda) =>
+            Boolean(agenda.uuid) &&
+            String((agenda as any)?.modalidade).toUpperCase() === "PRESENCIAL"
+        )
         .map((agenda) => ({
           value: agenda.uuid,
           label: formatAgendaOptionLabel(agenda),

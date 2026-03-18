@@ -7,39 +7,68 @@ import { resumoDoProcessoStyles } from "./styles";
 
 import type { IProcessoConvocacaoResumo } from "../../../services/resources/convocacao/IConvocacao";
 
-interface ResumoDoProcessoProps {  
+const textColorBlack = { color: "#111111" };
+
+const TIPO_ESCOLHA_LABELS: Record<string, string> = {
+  NOVA_AUTORIZACAO: "Nova Autorização",
+  REPOSICAO: "Reposição",
+  RECONVOCAO: "Reconvocação",
+};
+
+function getTipoEscolhaLabel(value: string | undefined): string {
+  if (!value) return "—";
+  return TIPO_ESCOLHA_LABELS[value] ?? value;
+}
+
+export interface ResumoDoProcessoProps {
   data: IProcessoConvocacaoResumo;
   isLoading: boolean;
+  useBlackText?: boolean;
+  modalidade?: string | null;
 }
 
 const ResumoDoProcesso: React.FC<ResumoDoProcessoProps> = ({
   data,
-  isLoading
+  isLoading,
+  useBlackText = false,
+  modalidade,
 }) => {
-   return (
+  const blackStyle = useBlackText ? textColorBlack : undefined;
+
+  return (
     <Spin spinning={isLoading} tip="Carregando dados do processo..." size="large">
-      <Row gutter={30} >  
+      <Row gutter={30}>
         <Col xs={24} md={24} style={resumoDoProcessoStyles.colWithMargin}>
-          <TextSubHeading>Dados do processo</TextSubHeading>
+          <TextSubHeading style={blackStyle}>
+            Dados do processo
+          </TextSubHeading>
         </Col>
 
         <Col xs={24} md={8}>
-          <TextTituloCinza >Concurso</TextTituloCinza>
-          <TextSubTituloCinza>{data.concurso_nome}</TextSubTituloCinza>        
-          <TextTituloCinza >Data da convocação</TextTituloCinza>        
-          <TextSubTituloCinza>{data.data_convocacao ? dayjs(data.data_convocacao).format('DD/MM/YYYY') : ''}</TextSubTituloCinza>
+          <TextTituloCinza style={blackStyle}>Concurso</TextTituloCinza>
+          <TextSubTituloCinza style={blackStyle}>{data.concurso_nome}</TextSubTituloCinza>
+          <TextTituloCinza style={blackStyle}>Data da convocação</TextTituloCinza>
+          <TextSubTituloCinza style={blackStyle}>
+            {data.data_convocacao ? dayjs(data.data_convocacao).format("DD/MM/YYYY") : ""}
+          </TextSubTituloCinza>
         </Col>
 
         <Col xs={24} md={8}>
-          <TextTituloCinza >Tipo de processo</TextTituloCinza>
-          <TextSubTituloCinza>{data.tipo_escolha}</TextSubTituloCinza>
-          <TextTituloCinza>Data da publicação</TextTituloCinza>        
-          <TextSubTituloCinza >{data.data_corte_vagas ? dayjs(data.data_corte_vagas).format('DD/MM/YYYY') : ''}</TextSubTituloCinza>
+          <TextTituloCinza style={blackStyle}>Tipo de processo</TextTituloCinza>
+          <TextSubTituloCinza style={blackStyle}>{getTipoEscolhaLabel(data.tipo_escolha)}</TextSubTituloCinza>
+          <TextTituloCinza style={blackStyle}>Data da publicação</TextTituloCinza>
+          <TextSubTituloCinza style={blackStyle}>
+            {data.data_corte_vagas ? dayjs(data.data_corte_vagas).format("DD/MM/YYYY") : ""}
+          </TextSubTituloCinza>
         </Col>
 
         <Col xs={24} md={8}>
-          <TextTituloCinza >Título</TextTituloCinza>        
-          <TextSubTituloCinza>{data.descricao}</TextSubTituloCinza>
+          <TextTituloCinza style={blackStyle}>Título</TextTituloCinza>
+          <TextSubTituloCinza style={blackStyle}>{data.descricao}</TextSubTituloCinza>
+          <TextTituloCinza style={blackStyle}>Modalidade</TextTituloCinza>
+          <TextSubTituloCinza style={blackStyle}>
+            {modalidade ?? "—"}
+          </TextSubTituloCinza>
         </Col>
       </Row>
     </Spin>
