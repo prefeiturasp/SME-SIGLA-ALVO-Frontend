@@ -341,16 +341,28 @@ font-size: 18px;
 font-weight: 600;
 `;
 
+export const TextSubHeadingPreto = styled(Text)`
+color:rgb(19, 19, 19);
+font-size: 18px;
+font-weight: 600;
+`;
 
 export const TextTituloCinza = styled(Text)`
 color: rgba(81, 81, 81, 0.80);
 font-size: 14px;
 font-weight: 600;
 line-height: 22px; 
-
 `;
+
+export const TextTitulo = styled(Text)`
+color: rgba(19, 19, 19, 0.8);
+font-size: 14px;
+font-weight: 600;
+line-height: 22px;
+`;
+
 export const TextSubTituloCinza = styled(Paragraph)`
-color: #838383;
+color:rgb(70, 70, 70);
 font-size: 14px;
 font-style: normal;
 font-weight: 400;

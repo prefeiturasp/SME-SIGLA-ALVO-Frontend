@@ -17,6 +17,27 @@ import { resumoStyles } from "./Resumo/styles";
 
 const { Text } = Typography;
 
+function normalizeModalidade(value: any): string | undefined {
+  const s = String(value || "").toLowerCase();
+  if (!s) return undefined;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function formatResumoModalidadeFromResults(results?: any[]): string | undefined {
+  const list = Array.isArray(results) ? results : [];
+  if (list.length === 0) return undefined;
+  if (list.length === 1) {
+    return normalizeModalidade(list[0]?.modalidade);
+  }
+  const first = list[0];
+  const second = list[1];
+  const firstMod = String(first?.modalidade || "").toUpperCase();
+  if (firstMod === "ONLINE") {
+    return `${normalizeModalidade(first?.modalidade)} / ${normalizeModalidade(second?.modalidade)}`;
+  }
+  return normalizeModalidade(first?.modalidade);
+}
+
 const Resumo: React.FC = () => {
   const { can } = useGetPermissions();
   const canChangeProcessoConvocacao = can("change_processoconvocacao");
@@ -53,7 +74,6 @@ const Resumo: React.FC = () => {
       }
       agrupadas[cargoKey].push(agenda);
     });
-
     // Ordenar agendas dentro de cada cargo por data e horário
     Object.keys(agrupadas).forEach((cargoKey) => {
       agrupadas[cargoKey].sort((a, b) => {
@@ -79,14 +99,23 @@ const Resumo: React.FC = () => {
       cargoKey,
       cargoNome: agendas[0]?.cargo_nome || "Cargo desconhecido",
       agendas,
-      totalCandidatos: agendas.reduce((sum, agenda) => {
-        if (agenda?.retardatario) {
-          return sum;
+      totalCandidatos: (() => {
+        const first = agendas[0];
+        const modalidadeFirst = String(first?.modalidade || "").toUpperCase();
+        // Se a primeira agenda for ONLINE, usa a própria classificação da primeira agenda
+        if (modalidadeFirst === "ONLINE") {
+          return typeof first?.classificacao === "number" ? first.classificacao : 0;
         }
-        const valor =
-          typeof agenda?.classificacao === "number" ? agenda.classificacao : 0;
-        return sum + valor;
-      }, 0),
+        // Caso contrário, soma (ignorando retardatário)
+        return agendas.reduce((sum, agenda) => {
+          if (agenda?.retardatario) {
+            return sum;
+          }
+          const valor =
+            typeof agenda?.classificacao === "number" ? agenda.classificacao : 0;
+          return sum + valor;
+        }, 0);
+      })(),
     }));
   }, [agendasData]);
 
@@ -151,7 +180,7 @@ const Resumo: React.FC = () => {
   const prev = () => {
     navigate(`/processos/convocacao/editar/${uuid}/agenda`);
   };
-
+  console.log('agendasPorCargo', agendasPorCargo)
   return (
     <>
       <BaseTela
@@ -194,9 +223,7 @@ const Resumo: React.FC = () => {
               data={processoConvocacaoData}
               isLoading={processoConvocacaoIsLoading}
               useBlackText={isViewOnlyResumo}
-              modalidade={
-                agendasData?.results?.[0]?.modalidade ?? undefined
-              }
+              modalidade={formatResumoModalidadeFromResults((agendasData as any)?.results)}
             />
           )}
         </StyledCardWithoutBorder>
