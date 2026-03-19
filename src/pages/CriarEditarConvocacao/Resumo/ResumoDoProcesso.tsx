@@ -2,7 +2,7 @@ import React from "react";
 import { Row, Col, Spin } from "antd";
 import dayjs from "dayjs";
 
-import { TextSubHeading, TextSubTituloCinza, TextTituloCinza } from "../../../components/EstilosCompartilhados";
+import { TextSubHeadingPreto, TextSubTituloCinza, TextTitulo } from "../../../components/EstilosCompartilhados";
 import { resumoDoProcessoStyles } from "./styles";
 
 import type { IProcessoConvocacaoResumo } from "../../../services/resources/convocacao/IConvocacao";
@@ -39,33 +39,33 @@ const ResumoDoProcesso: React.FC<ResumoDoProcessoProps> = ({
     <Spin spinning={isLoading} tip="Carregando dados do processo..." size="large">
       <Row gutter={30}>
         <Col xs={24} md={24} style={resumoDoProcessoStyles.colWithMargin}>
-          <TextSubHeading style={blackStyle}>
+          <TextSubHeadingPreto style={blackStyle}>
             Dados do processo
-          </TextSubHeading>
+          </TextSubHeadingPreto>
         </Col>
 
         <Col xs={24} md={8}>
-          <TextTituloCinza style={blackStyle}>Concurso</TextTituloCinza>
+          <TextTitulo style={blackStyle}>Concurso</TextTitulo>
           <TextSubTituloCinza style={blackStyle}>{data.concurso_nome}</TextSubTituloCinza>
-          <TextTituloCinza style={blackStyle}>Data da convocação</TextTituloCinza>
+          <TextTitulo style={blackStyle}>Data da convocação</TextTitulo>
           <TextSubTituloCinza style={blackStyle}>
             {data.data_convocacao ? dayjs(data.data_convocacao).format("DD/MM/YYYY") : ""}
           </TextSubTituloCinza>
         </Col>
 
         <Col xs={24} md={8}>
-          <TextTituloCinza style={blackStyle}>Tipo de processo</TextTituloCinza>
+          <TextTitulo style={blackStyle}>Tipo de processo</TextTitulo>
           <TextSubTituloCinza style={blackStyle}>{getTipoEscolhaLabel(data.tipo_escolha)}</TextSubTituloCinza>
-          <TextTituloCinza style={blackStyle}>Data da publicação</TextTituloCinza>
+          <TextTitulo style={blackStyle}>Data da publicação</TextTitulo>
           <TextSubTituloCinza style={blackStyle}>
             {data.data_corte_vagas ? dayjs(data.data_corte_vagas).format("DD/MM/YYYY") : ""}
           </TextSubTituloCinza>
         </Col>
 
         <Col xs={24} md={8}>
-          <TextTituloCinza style={blackStyle}>Título</TextTituloCinza>
+          <TextTitulo style={blackStyle}>Título</TextTitulo>
           <TextSubTituloCinza style={blackStyle}>{data.descricao}</TextSubTituloCinza>
-          <TextTituloCinza style={blackStyle}>Modalidade</TextTituloCinza>
+          <TextTitulo style={blackStyle}>Modalidade</TextTitulo>
           <TextSubTituloCinza style={blackStyle}>
             {modalidade ?? "—"}
           </TextSubTituloCinza>
