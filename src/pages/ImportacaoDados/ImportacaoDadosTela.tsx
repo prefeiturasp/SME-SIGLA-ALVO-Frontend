@@ -6,7 +6,6 @@ import { StyledTabs } from "./styles";
 import { CloudDownloadOutlined, EyeOutlined } from "@ant-design/icons";
 import { ButtonGroup } from "../Processos/ConvocacaoCandidatos/style";
 import { useLayoutDownload } from "../../hooks/useLayoutDownload";
-import HistoricoHabilitadosModal from "./Habilitados/components/HistoricoHabilitadosModal";
 import HabilitadosFormTab from "./Habilitados/HabilitadosFormTab";
 import VagasFormTab from "./Vagas/VagasFormTab";
 import EscolhasFormTab from "./Escolhas/EscolhasFormTab";
@@ -52,17 +51,8 @@ const ImportacaoDadosTela: React.FC = () => {
   const location = useLocation();
   const tipo = location.state?.tipo;
   const [activeTab, setActiveTab] = useState<string>(tipo || "HABILITADOS");
-  const [showHistorico, setShowHistorico] = useState(false);
 
   const navigate = useNavigate();
-
-  const handleShowHistorico = () => {
-    setShowHistorico(true);
-  };
-
-  const handleBackFromHistorico = () => {
-    setShowHistorico(false);
-  };
 
   const handleShowLayoutPadrao = (tipo: string) => {
     navigate(`/processos/importacao-dados/layout-padrao-${tipo}`);
@@ -86,7 +76,6 @@ const ImportacaoDadosTela: React.FC = () => {
       label: "Habilitados",
       children: (
         <HabilitadosFormTab
-          onShowHistorico={handleShowHistorico}
           onShowLayoutPadrao={() => handleShowLayoutPadrao("HABILITADOS")}
           canViewHistoricoHabilitados={canViewHistoricoHabilitados}
           canImportarHabilitados={canAddImportacaoArquivoHabilitados}
@@ -147,11 +136,6 @@ const ImportacaoDadosTela: React.FC = () => {
           activeKey={activeTab}
           onChange={setActiveTab}
           items={tabItems}
-        />
-        <HistoricoHabilitadosModal
-          onVoltar={handleBackFromHistorico}
-          isOpen={showHistorico}
-          onClose={() => setShowHistorico(false)}
         />
       </>
     </BaseTela>
