@@ -74,7 +74,7 @@ const HistoricoVagasTela: React.FC = ({  }) => {
 
        <ActionButtonsContainer> 
        <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
-         <SecondaryButton size="large" onClick={()=>navigate(-1)}>
+         <SecondaryButton size="large" onClick={() => navigate('/processos/importacao-dados', { state: { tipo: 'VAGAS' } })}>
            Voltar
          </SecondaryButton>
        </div>

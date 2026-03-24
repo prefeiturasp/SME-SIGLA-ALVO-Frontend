@@ -10,6 +10,7 @@ import LayoutPadraoTela from "../pages/LayoutPadraoTela/LayoutPadraoTela";
 import HistoricoVagasTela from "../pages/HistoricoVagas/HistoricoVagasTela";
 import HistoricoEscolhasTela from "../pages/ImportacaoDados/Escolhas/HistoricoEscolhasTela";
 import HistoricoHabilitadosTela from "../pages/ImportacaoDados/Habilitados/HistoricoHabilitadosTela";
+import HistoricoLotesTela from "../pages/ImportacaoDados/Lotes/HistoricoLotesTela";
 import NotFoundTela from "../pages/NotFound/NotFoundTela";
 import LoginTela from "../pages/Login/LoginTela";
 import EsqueceuSenhaTela from "../pages/Login/EsqueceuSenhaTela";
@@ -304,6 +305,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <HistoricoEscolhasTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/processos/importacao-dados/historico-lotes",
+    element: (
+      <ProtectedRoute>
+        <HistoricoLotesTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
