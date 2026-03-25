@@ -41,19 +41,19 @@ const HistoricoLotesTela: React.FC = () => {
     useImportacaoDadosLotes();
 
   const [isErroModalOpen, setIsErroModalOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<IImportacaoLotesResponse | null>(null);
+  const [selectedErro, setSelectedErro] = useState<{ mensagem: string; erros: string } | null>(null);
 
   const [isDetalhesModalOpen, setIsDetalhesModalOpen] = useState(false);
   const [selectedDetalhes, setSelectedDetalhes] = useState<IDetalheLoteAtualizado[] | null>(null);
 
   const handleOpenErroModal = (record: IImportacaoLotesResponse) => {
-    setSelectedRecord(record);
+    setSelectedErro(record.erros?.[0] || null);
     setIsErroModalOpen(true);
   };
 
   const handleCloseErroModal = () => {
     setIsErroModalOpen(false);
-    setSelectedRecord(null);
+    setSelectedErro(null);
   };
 
   const handleOpenDetalhesModal = (record: IImportacaoLotesResponse) => {
@@ -180,7 +180,7 @@ const HistoricoLotesTela: React.FC = () => {
         <ErroLotesModal
           open={isErroModalOpen}
           onClose={handleCloseErroModal}
-          erroTexto={selectedRecord?.erros || null}
+          importacaoErro={selectedErro}
         />
 
         <DetalhesLotesModal

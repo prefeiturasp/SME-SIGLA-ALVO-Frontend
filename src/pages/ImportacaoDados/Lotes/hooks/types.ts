@@ -27,7 +27,7 @@ export interface IImportacaoLotesResponse {
   concurso_nome: string | null;
   status: 'PENDENTE' | 'CONCLUIDO' | 'ERRO';
   total_atualizados: number | null;
-  erros: string | null;
+  erros: { mensagem: string; erros: string; criado_em: string }[] | null;
   detalhes: IDetalheLoteAtualizado[] | null;
   criado_em: string;
   atualizado_em: string;
