@@ -22,7 +22,8 @@ const dividirEmTresColunas = <T,>(array: T[]): [T[], T[], T[]] => {
   ];
 };
 
-const AbaTipoUnidade: React.FC = () => {
+const AbaTipoUnidade: React.FC<{ 
+  canAddParametrizacao: boolean }> = ({ canAddParametrizacao }) => {
   const { notification } = App.useApp();
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -181,6 +182,7 @@ const AbaTipoUnidade: React.FC = () => {
           type="primary"
           onClick={handleSalvar}
           loading={isSaving}
+          disabled={!canAddParametrizacao}
         >
           Salvar
         </ModalSaveButton>

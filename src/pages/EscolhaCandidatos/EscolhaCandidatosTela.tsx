@@ -23,6 +23,7 @@ import { useGetCargosPorProcessoConvocacao } from "./hooks/useGetCargosPorProces
 import { useGetCandidatosPorUuid } from "./hooks/useGetCandidatosPorUuid";
 import { useGetEscolhasPorCandidatos } from "./hooks/useGetEscolhasPorCandidatos";
 import { useGetCandidatosUuidsPorProcessoAgenda } from "./hooks/useGetCandidatosUuidsPorProcessoAgenda";
+import { useGetPermissions } from "../../routes/PermissionContextGuard";
 import type { IAgenda } from "../../services/resources/agenda/IAgenda";
 import {
   StyledCardAmpla,
@@ -246,6 +247,9 @@ const isTipoVagaEscolha = (value: unknown): value is TipoVagaEscolha =>
   value === "precaria" || value === "definitiva";
 
 const EscolhaCandidatosTela: React.FC = () => {
+  const { can } = useGetPermissions();
+  const canViewEscolha = can("view_escolha");
+  const canAddEscolha = can("add_escolha");
   const navigate = useNavigate();
   const [selectedProcesso, setSelectedProcesso] = useState<string>();
   const [selectedAgenda, setSelectedAgenda] = useState<string>();
@@ -1457,6 +1461,8 @@ const EscolhaCandidatosTela: React.FC = () => {
       cargoCodigoNumericoParam={cargoCodigoNumericoParam}
       onClose={handleCloseModalEscolha}
       onSuccess={handleModalSuccess}
+      canViewEscolha={canViewEscolha}
+      canAddEscolha={canAddEscolha}
     />
     </>
   );

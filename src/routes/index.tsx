@@ -60,7 +60,9 @@ const router = createBrowserRouter([
     path: "/autorizacoes-publicadas",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="autorizacaopublicada" permissaoDeExibirATELA="view_autorizacaopublicada">
         <AutorizacoesPublicadasTela />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -69,7 +71,9 @@ const router = createBrowserRouter([
     path: "/autorizacoes-publicadas-gerenciar",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="autorizacaopublicada" permissaoDeExibirATELA="view_autorizacaopublicada">
         <AutorizacoesPublicadasGerenciarTela />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -78,7 +82,9 @@ const router = createBrowserRouter([
     path: "/eliminiacao-e-reclassificacao-candidato",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="concursocandidatoreclassificacao,concursocandidatoeliminacao" permissaoDeExibirATELA="view_concursocandidatoreclassificacao">
         <EliminacaoReclassificacaoCandidatoTela />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -87,7 +93,9 @@ const router = createBrowserRouter([
     path: "/gerenciar/carta-convocacao",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="cartaconvocacaocandidato" permissaoDeExibirATELA="view_cartaconvocacaocandidato">
         <CartaConvocacaoTela />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -136,7 +144,7 @@ const router = createBrowserRouter([
     path: "/processos/convocacao",
     element: (
       <ProtectedRoute>
-        <PermissionContextGuard model="processoconvocacao,convocacao,candidato,importacaoarquivovagas" permissaoDeExibirATELA="view_processoconvocacao">
+        <PermissionContextGuard model="processoconvocacao,importacaoarquivovagas" permissaoDeExibirATELA="view_processoconvocacao">
         <ConvocacaoCandidatosTela />
         </PermissionContextGuard>        
       </ProtectedRoute>
@@ -147,7 +155,9 @@ const router = createBrowserRouter([
     path: "/gerenciar/permissao-usuario",
     element: (
       <ProtectedRoute>
+        <PermissionContextGuard model="group" permissaoDeExibirATELA="view_group">
         <PermissaoUsuarioTela />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -156,7 +166,9 @@ const router = createBrowserRouter([
     path: "/parametrizacao",
     element: (
       <ProtectedRoute>
-        <CadastroParametrosTela />
+        <PermissionContextGuard model="parametrizacao" permissaoDeExibirATELA="view_parametrizacao">
+          <CadastroParametrosTela />
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -165,7 +177,7 @@ const router = createBrowserRouter([
     path: "/processos/escolha-candidato/",
     element: (
       <ProtectedRoute>
-        <PermissionContextGuard model="processoconvocacao,convocacao,candidato,importacaoarquivovagas" permissaoDeExibirATELA="view_processoconvocacao">
+        <PermissionContextGuard model="processoconvocacao,escolha" permissaoDeExibirATELA="view_escolha">
           <EscolhaCandidatosTela />
         </PermissionContextGuard>
       </ProtectedRoute>
@@ -243,7 +255,7 @@ const router = createBrowserRouter([
     path: "/processos/importacao-dados",
     element: (
       <ProtectedRoute>
-        <PermissionContextGuard model="layoutarquivoimportacao,importacaoarquivovagas,importacaoarquivohabilitado" permissaoDeExibirATELA="add_importacaoarquivovagas">
+        <PermissionContextGuard model="layoutarquivoimportacao,importacaoarquivovagas,importacaoarquivohabilitado,importacaoescolhas" permissaoDeExibirATELA="view_importacaoarquivovagas">
         <ImportacaoDadosTela />
         </PermissionContextGuard>
       </ProtectedRoute>
@@ -252,7 +264,13 @@ const router = createBrowserRouter([
   },
   {
     path: "/processos/exportacao-dados",
-    element: <ExportacaoDadosTela />,
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="exportacaovagasprocesso,exportacaocandidatosprocesso,exportacaovagassigpec" permissaoDeExibirATELA="view_exportacaovagasprocesso">
+        <ExportacaoDadosTela />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
     errorElement: <RouteError />,
   },
   {
@@ -317,25 +335,6 @@ const router = createBrowserRouter([
     ),
     errorElement: <RouteError />,
   },
-  {
-    path: "/dashboard",
-    element: (
-      <ProtectedRoute>
-        <DashboardTela />
-      </ProtectedRoute>
-    ),
-    errorElement: <RouteError />,
-  },
-  // TODO remover esta rota
-  {
-    path: "/processos/importacao-dados2",
-    element: (
-      <ProtectedRoute>
-        <ImportacaoDados2 />
-      </ProtectedRoute>
-    ),
-    errorElement: <RouteError />,
-  }, 
   {
     path: "*",
     element: <NotFoundTela />,

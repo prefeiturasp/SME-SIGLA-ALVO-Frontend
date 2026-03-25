@@ -23,8 +23,8 @@ interface EscolhasProps {
   canImportarVagas: boolean;
 }
 const EscolhasFormTab: React.FC<EscolhasProps> = ({
-  canViewHistoricoVagas,
-  canImportarVagas,
+  canViewHistoricoEscolhas,
+  canImportarEscolhas,
 }) => {
   const {
     control,
@@ -61,6 +61,7 @@ const EscolhasFormTab: React.FC<EscolhasProps> = ({
                   labelCol={{ span: 24 }}
                 >
                   <StyledSelect
+                    disabled={!canImportarEscolhas}
                     value={field.value}
                     onChange={(value: unknown) =>
                       field.onChange(value as string | undefined)
@@ -95,19 +96,19 @@ const EscolhasFormTab: React.FC<EscolhasProps> = ({
       <ActionButtonsContainer>
         <Tooltip
           title={
-            !canViewHistoricoVagas
+            !canViewHistoricoEscolhas
               ? "Você não possui permissão para essa ação"
               : "Histórico"
           }
           arrow={true}
         >
-          <Button type="primary" ghost size="large" onClick={onShowHistorico} disabled={!canViewHistoricoVagas}>
+          <Button type="primary" ghost size="large" onClick={onShowHistorico} disabled={!canViewHistoricoEscolhas}>
             Histórico
           </Button>
         </Tooltip>
         <Tooltip
           title={
-            !canImportarVagas
+            !canImportarEscolhas
               ? "Você não possui permissão para essa ação"
               : "Importar"
           }
@@ -117,7 +118,7 @@ const EscolhasFormTab: React.FC<EscolhasProps> = ({
             type="primary"
             size="large"
             onClick={handleSubmit(handleEnviarForm)}
-            disabled={!canImportarVagas || isSubmitting}
+            disabled={!canImportarEscolhas || isSubmitting}
             loading={isSubmitting}
           >
             Importar

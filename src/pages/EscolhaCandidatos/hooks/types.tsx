@@ -57,6 +57,8 @@ export interface EscolhaCandidatosModalProps {
   cargoCodigoNumericoParam?: string;
   onClose: () => void;
   onSuccess: () => void;
+  canViewEscolha: boolean;
+  canAddEscolha: boolean;
 }
 
 export interface EscolhaCandidatosTabelaProps {

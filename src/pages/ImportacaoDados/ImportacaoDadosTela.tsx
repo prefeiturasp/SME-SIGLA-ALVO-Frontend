@@ -45,12 +45,14 @@ const ImportacaoDadosTela: React.FC = () => {
   //controla as permissões das abas Habilitados
   const canAddImportacaoArquivoHabilitados = can("add_importacaoarquivohabilitado");
   const canViewHistoricoHabilitados = can("view_importacaoarquivohabilitado");
-  
 
-  
+  //controla as permissões das abas Escolhas
+  const canAddImportacaoArquivoEscolhas = can("add_importacaoescolhas");
+  const canViewHistoricoEscolhas = can("view_importacaoescolhas");
+
   const location = useLocation();
   const tipo = location.state?.tipo;
-  const [activeTab, setActiveTab] = useState<string>(tipo || "HABILITADOS");
+  const [activeTab, setActiveTab] = useState<string>(tipo || "VAGAS");
 
   const navigate = useNavigate();
 
@@ -67,7 +69,7 @@ const ImportacaoDadosTela: React.FC = () => {
         <VagasFormTab
           onShowLayoutPadrao={() => handleShowLayoutPadrao("VAGAS")}
           canViewHistoricoVagas={canViewHistoricoVagas}
-          canImportarVagas={canAddImportacaoArquivoVagas}                 
+          canImportarVagas={canAddImportacaoArquivoVagas}
         />
       ),
     },
@@ -88,8 +90,8 @@ const ImportacaoDadosTela: React.FC = () => {
       children: (
         <EscolhasFormTab
           onShowLayoutPadrao={() => handleShowLayoutPadrao("ESCOLHAS")}
-          canViewHistoricoVagas={canViewHistoricoVagas}
-          canImportarVagas={canAddImportacaoArquivoVagas}
+          canViewHistoricoEscolhas={canViewHistoricoEscolhas}
+          canImportarEscolhas={canAddImportacaoArquivoEscolhas}
         />
       ),
     },
