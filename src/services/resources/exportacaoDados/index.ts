@@ -10,11 +10,15 @@ import type {
   IExportacaoCandidatosListItem,
   IExportacaoCandidatosListFilters,
   ExportacaoTipo,
+  IExportacaoLotePayload,
+  IExportacaoLoteListItem,
+  IExportacaoLoteListFilters,
 } from "./types";
 
 const BASE_VAGAS_PROCESSO = "/api/v1/exportacao/vagas-processo";
 const BASE_VAGAS_SIGPEC = "/api/v1/exportacao/vagas-sigpec";
 const BASE_CANDIDATOS_PROCESSO = "/api/v1/exportacao/candidatos-processo";
+const BASE_LOTE = "/api/v1/exportacao/lote";
 
 export const URL = {
   listVagasProcesso: () => `${BASE_VAGAS_PROCESSO}/`,
@@ -26,6 +30,9 @@ export const URL = {
   listCandidatosProcesso: () => `${BASE_CANDIDATOS_PROCESSO}/`,
   createCandidatosProcesso: () => `${BASE_CANDIDATOS_PROCESSO}/`,
   downloadCandidatosProcesso: (uuid: string) => `${BASE_CANDIDATOS_PROCESSO}/${uuid}/download/`,
+  listLote: () => `${BASE_LOTE}/`,
+  createLote: () => `${BASE_LOTE}/`,
+  downloadLote: (uuid: string) => `${BASE_LOTE}/${uuid}/download/`,
 };
 
 function getDownloadUrl(tipo: ExportacaoTipo, uuid: string): string {
@@ -220,6 +227,70 @@ export const downloadExportacaoCandidatosProcesso = (
   return { response, abort };
 };
 
+export const getListExportacaoLote = (
+  listRequest: IListRequest<IExportacaoLoteListFilters>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { pagination, filters, ...rest } = listRequest;
+  const params = { ...pagination, ...filters, ...rest };
+  const { signal, abort } = new AbortController();
+  const response = appAxiosImportaArquivos
+    .get<PaginatedResponse<IExportacaoLoteListItem>>(URL.listLote(), {
+      params,
+      paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
+  return { response, abort };
+};
+
+export const postCreateExportacaoLote = (
+  payload: IExportacaoLotePayload,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosImportaArquivos
+    .post<Blob>(URL.createLote(), payload, {
+      headers: { "Content-Type": "application/json" },
+      responseType: "blob",
+      validateStatus: (s) => s === 200 || s === 422,
+      signal: axiosRequestConfig?.signal ?? signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => {
+      const blob = res.data;
+      const filename = parseFilenameFromContentDisposition(
+        res.headers["content-disposition"],
+        "exportacao-lote.txt"
+      );
+      return { blob, filename, status: res.status };
+    });
+  return { response, abort };
+};
+
+export const downloadExportacaoLote = (
+  uuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosImportaArquivos
+    .get<Blob>(URL.downloadLote(uuid), {
+      responseType: "blob",
+      signal: axiosRequestConfig?.signal ?? signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => {
+      const blob = res.data;
+      const filename = parseFilenameFromContentDisposition(
+        res.headers["content-disposition"],
+        `exportacao-lote-${uuid}.txt`
+      );
+      return { blob, filename };
+    });
+  return { response, abort };
+};
+
 export type {
   IExportacaoVagasListItem,
   IExportacaoVagasListFilters,
@@ -228,4 +299,7 @@ export type {
   IExportacaoCandidatosListItem,
   IExportacaoCandidatosListFilters,
   ExportacaoTipo,
+  IExportacaoLotePayload,
+  IExportacaoLoteListItem,
+  IExportacaoLoteListFilters,
 };

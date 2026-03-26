@@ -5,6 +5,7 @@ import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { StyledTabs } from "../ImportacaoDados/styles";
 import ExportacaoVagasFormTab from "./components/ExportacaoVagasFormTab";
 import ExportacaoCandidatosFormTab from "./components/ExportacaoCandidatosFormTab";
+import ExportacaoLotesFormTab from "./components/ExportacaoLotesFormTab";
 
 const { Text } = Typography;
 
@@ -41,6 +42,11 @@ const tabItems = [
     key: "VAGAS_SIGPEC",
     label: "Vagas SIGPEC",
     children: <ExportacaoVagasFormTab tipo="vagas-sigpec" />,
+  },
+  {
+    key: "LOTES_SIGPEC",
+    label: "Lotes SIGPEC",
+    children: <ExportacaoLotesFormTab />,
   },
 ];
 

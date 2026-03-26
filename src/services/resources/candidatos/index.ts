@@ -306,6 +306,28 @@ export const postBuscarPorUuids = (
   };
 };
 
+export interface IConcursoCandidatosLote {
+  uuid: string;
+  concurso_uuid: string;
+  concurso_nome: string;
+  criado_em: string;
+}
+
+export const getLotes = (
+  concurso_uuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosCandidatos
+    .get<IConcursoCandidatosLote[]>('/api/v1/lotes/', {
+      params: { concurso_uuid },
+      signal: axiosRequestConfig?.signal ?? signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
+  return { response, abort };
+};
+
 // GET Parametrizacao do MS-Candidatos
 export const getParametrizacaoCandidatos = (
   axiosRequestConfig?: AxiosRequestConfig
