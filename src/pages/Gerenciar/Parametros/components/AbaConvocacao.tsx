@@ -10,7 +10,8 @@ import {
   ErrorMessage,
 } from "../styles";
 
-const AbaConvocacao: React.FC = () => {
+const AbaConvocacao: React.FC<{ 
+  canAddParametrizacao: boolean }> = ({ canAddParametrizacao }) => {
   const { notification } = App.useApp();
   
   // Valores padrão conforme a lei
@@ -196,7 +197,7 @@ const AbaConvocacao: React.FC = () => {
           type="primary"
           onClick={handleSalvar}
           loading={isSaving}
-          disabled={isSomaInvalida}
+          disabled={isSomaInvalida || !canAddParametrizacao}
         >
           Salvar
         </ModalSaveButton>
