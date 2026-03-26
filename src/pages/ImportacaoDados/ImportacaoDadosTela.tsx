@@ -9,6 +9,7 @@ import { useLayoutDownload } from "../../hooks/useLayoutDownload";
 import HabilitadosFormTab from "./Habilitados/HabilitadosFormTab";
 import VagasFormTab from "./Vagas/VagasFormTab";
 import EscolhasFormTab from "./Escolhas/EscolhasFormTab";
+import LotesFormTab from "./Lotes/LotesFormTab";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 
 const { Text } = Typography;
@@ -95,6 +96,11 @@ const ImportacaoDadosTela: React.FC = () => {
         />
       ),
     },
+    {
+      key: "LOTES",
+      label: "Lotes SIGPEC",
+      children: <LotesFormTab />,
+    },
   ];
 
   const { handleBaixarArquivo } = useLayoutDownload();
@@ -104,7 +110,7 @@ const ImportacaoDadosTela: React.FC = () => {
       breadcrumbItems={breadcrumbItems}
       title="Importação de dados"
       buttons={
-        activeTab !== "ESCOLHAS" ? (
+        activeTab !== "ESCOLHAS" && activeTab !== "LOTES" ? (
           <ButtonGroup>
             <Tooltip title={!canViewLayoutArquivoImportacao?"Você não possui permissão para essa ação":"Ver layout padrão"} arrow={true} >
             <Button

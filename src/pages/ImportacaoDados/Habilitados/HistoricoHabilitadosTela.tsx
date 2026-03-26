@@ -160,7 +160,7 @@ const HistoricoHabilitadosTela: React.FC = () => {
               gap: "1rem",
             }}
           >
-            <SecondaryButton size="large" onClick={() => navigate(-1)}>
+            <SecondaryButton size="large" onClick={() => navigate('/processos/importacao-dados', { state: { tipo: 'HABILITADOS' } })}>
               Voltar
             </SecondaryButton>
           </div>
