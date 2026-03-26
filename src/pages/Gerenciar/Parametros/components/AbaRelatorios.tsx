@@ -14,7 +14,8 @@ import {
 
 const { Text } = Typography;
 
-const AbaRelatorios: React.FC = () => {
+const AbaRelatorios: React.FC<{ 
+  canAddParametrizacao: boolean }> = ({ canAddParametrizacao }) => {
   const { notification } = App.useApp();
   
   const [logoFile, setLogoFile] = useState<UploadFile | null>(null);
@@ -241,6 +242,7 @@ const AbaRelatorios: React.FC = () => {
       {/* Botão Salvar */}
       <ButtonContainer>
         <ModalSaveButton
+          disabled={!canAddParametrizacao}
           size="large"
           type="primary"
           onClick={handleSalvar}

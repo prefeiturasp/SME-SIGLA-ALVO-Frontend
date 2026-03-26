@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Card, Row, Col, Typography, Input, Table, Tooltip } from "antd";
+import { Card, Row, Col, Typography, Input, Table, Tooltip, Button } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
@@ -13,6 +13,8 @@ import { Select } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import AlterarSituacaiCandidatoModal from "./components/AlterarSituacaoCandidatoModal";
 import { useGetHablitados } from "./hooks/useGetHablitados";
+import { useGetPermissions } from "../../routes/PermissionContextGuard";
+
 
 type FiltrosForm = {
   concurso?: string;
@@ -44,6 +46,11 @@ type Registro = {
 const { Text } = Typography;
 
 const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
+  const { can } = useGetPermissions();
+  const canViewReclassificacaoCandidato = can("view_concursocandidatoreclassificacao");
+  const canAddReclassificacaoCandidato = can("add_concursocandidatoreclassificacao");
+  console.log('canViewReclassificacaoCandidato', canViewReclassificacaoCandidato);
+  console.log('canAddReclassificacaoCandidato', canAddReclassificacaoCandidato);
   const navigate = useNavigate();
   const breadcrumbItems = useMemo<TitleItem[]>(
     () => [
@@ -156,21 +163,21 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
         render: (_: any, record: Registro) => (
           (() => {
             const isEliminado = String(record?.situacao || "").toLowerCase() === "eliminado";
+            console.log(!canAddReclassificacaoCandidato);
             return (
               <Tooltip title={isEliminado ? "Candidato eliminado" : "Alterar"}>
-                <EditOutlined
-                  style={{
-                    fontSize: 16,
-                    color: isEliminado ? "#BFBFBF" : "#0F59C8",
-                    cursor: isEliminado ? "not-allowed" : "pointer",
-                  }}
+                <Button
+                  type="text"
+                  icon={<EditOutlined />}
+                  disabled={!canAddReclassificacaoCandidato}
                   onClick={() => {
                     if (isEliminado) return;
                     setSelectedRow(record);
                     setModalOpen(true);
                   }}
+                  style={{ padding: 0 }} // opcional, para parecer só o ícone
                 />
-              </Tooltip>
+            </Tooltip>
             );
           })()
         ),

@@ -77,7 +77,12 @@ export interface PermissionContextGuardProps {
     return  <LoadingContainer data-testid="@loading-element"><Spin size="large" spinning/></LoadingContainer>   
   }
 
-  if (!can(permissaoDeExibirATELA) && !isLoading && !isError) {        
+  if (!can(permissaoDeExibirATELA) && !isLoading && !isError) {
+    console.log('redirectTo', redirectTo)
+    console.log('permissaoDeExibirATELA', permissaoDeExibirATELA)
+    console.log('can(permissaoDeExibirATELA)', can(permissaoDeExibirATELA))
+    console.log('isLoading', isLoading)
+    console.log('isError', isError)
     if (redirectTo ) {      
       navigate(redirectTo);
     } else {                 

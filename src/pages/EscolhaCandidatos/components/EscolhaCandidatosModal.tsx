@@ -78,6 +78,8 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   cargoCodigoNumericoParam,
   onClose,
   onSuccess,
+  canViewEscolha,
+  canAddEscolha,
 }) => {
   const [modalSituacao, setModalSituacao] = useState<SituacaoEscolha>("escolha");
   const [modalTipoVaga, setModalTipoVaga] = useState<TipoVagaEscolha>("precaria");
@@ -615,7 +617,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
           >
             {isReadOnly ? "Fechar" : "Cancelar"}
           </ModalCancelButton>
-          {!isReadOnly && (
+          {!isReadOnly && canAddEscolha && (
             <ModalSaveButton
               size="large"
               type="primary"
@@ -714,7 +716,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                     options={dreOptions}
                     allowClear
                     loading={vagasIsLoading}
-                    disabled={isReadOnly || vagasIsLoading || !cargoCodigoNumericoParam}
+                    disabled={!canAddEscolha || isReadOnly || vagasIsLoading || !cargoCodigoNumericoParam}
                     showSearch
                     optionFilterProp="label"
                     filterOption={filterOptionByLabel}

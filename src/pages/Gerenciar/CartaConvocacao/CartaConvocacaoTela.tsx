@@ -18,10 +18,15 @@ import {
   ActionButtonsContainer,
 } from "../../../components/EstilosCompartilhados";
 import { useCartaConvocacao } from "./hooks/useCartaConvocacao";
+import { useGetPermissions } from "../../../routes/PermissionContextGuard";
+
 
 const { Text, Title } = Typography;
 
 const CartaConvocacaoTela: React.FC = () => {
+  const { can } = useGetPermissions();
+  const canViewCartaConvocacao = can("view_cartaconvocacaocandidato");
+  const canAddCartaConvocacao = can("add_cartaconvocacaocandidato");
   const navigate = useNavigate();
   const {
     control,
@@ -68,7 +73,6 @@ const CartaConvocacaoTela: React.FC = () => {
     >
       <>
         <TabContentContainer>
-
           <Row gutter={40} style={{ marginBottom: "1.8125rem" }}>
             <Col xs={24} sm={12}>
               <Controller
@@ -84,6 +88,7 @@ const CartaConvocacaoTela: React.FC = () => {
                     labelCol={{ span: 24 }}
                   >
                     <StyledSelect
+                      disabled={!canAddCartaConvocacao}
                       value={field.value}
                       onChange={(value: unknown) =>
                         field.onChange(value as string | undefined)
@@ -125,6 +130,7 @@ const CartaConvocacaoTela: React.FC = () => {
                     labelCol={{ span: 24 }}
                   >
                     <DatePicker
+                      disabled={!canAddCartaConvocacao}
                       style={{ width: "15rem" }}
                       placeholder="Selecione a data"
                       format="DD/MM/YYYY"
@@ -142,6 +148,7 @@ const CartaConvocacaoTela: React.FC = () => {
             Histórico
           </Button>
           <Button
+            disabled={!canAddCartaConvocacao}
             type="primary"
             size="large"
             onClick={handleSubmit(handleEnviarForm)}

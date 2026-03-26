@@ -6,10 +6,14 @@ import { StyledTabs } from "./styles";
 import AbaRelatorios from "./components/AbaRelatorios";
 import AbaConvocacao from "./components/AbaConvocacao";
 import AbaTipoUnidade from "./components/AbaTipoUnidade";
+import { useGetPermissions } from "../../../routes/PermissionContextGuard";
 
 const { Text } = Typography;
 
 const CadastroParametrosTela: React.FC = () => {
+  const { can } = useGetPermissions();
+  const canViewParametrizacao = can("view_parametrizacao");
+  const canAddParametrizacao = can("add_parametrizacao");
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("RELATORIO");
 
@@ -39,17 +43,17 @@ const CadastroParametrosTela: React.FC = () => {
     {
       key: "RELATORIO",
       label: "Relatório",
-      children: <AbaRelatorios />,
+      children: <AbaRelatorios canAddParametrizacao={canAddParametrizacao} />,
     },
     {
       key: "CONVOCACAO",
       label: "Convocação",
-      children: <AbaConvocacao />,
+      children: <AbaConvocacao canAddParametrizacao={canAddParametrizacao} />,
     },
     {
       key: "TIPOS_UNIDADE",
       label: "Tipos de Unidade",
-      children: <AbaTipoUnidade />,
+      children: <AbaTipoUnidade canAddParametrizacao={canAddParametrizacao} />,
     },
   ];
 

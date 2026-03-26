@@ -16,9 +16,13 @@ const { Title } = Typography;
 
 interface ExportacaoVagasFormTabProps {
   tipo: ExportacaoTipo;
+  canViewExportacaoVagasProcesso: boolean;
+  canAddExportacaoVagasProcesso: boolean;
 }
 
-const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = ({ tipo }) => {
+const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = (
+  { tipo, canViewExportacaoVagasProcesso, canAddExportacaoVagasProcesso}
+) => {
   const [showHistoricoModal, setShowHistoricoModal] = useState(false);
 
   const {
@@ -57,6 +61,7 @@ const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = ({ tipo })
                   labelCol={{ span: 24 }}
                 >
                   <StyledSelect
+                    disabled={!canAddExportacaoVagasProcesso}
                     value={field.value}
                     onChange={(value: unknown) =>
                       handleProcessoChange(value as string | undefined)
@@ -130,6 +135,7 @@ const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = ({ tipo })
           Histórico
         </Button>
         <Button
+          disabled={!canAddExportacaoVagasProcesso}
           type="primary"
           size="large"
           onClick={handleSubmit(handleExportar)}
