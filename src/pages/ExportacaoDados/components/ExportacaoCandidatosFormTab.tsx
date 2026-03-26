@@ -13,7 +13,15 @@ import HistoricoExportacaoCandidatosModal from "./HistoricoExportacaoCandidatosM
 
 const { Title } = Typography;
 
-const ExportacaoCandidatosFormTab: React.FC = () => {
+interface ExportacaoCandidatosFormTabProps {
+  tipo: string;
+  canViewExportacaoCandidatosProcesso: boolean;
+  canAddExportacaoCandidatosProcesso: boolean;
+}
+
+const ExportacaoCandidatosFormTab: React.FC<ExportacaoCandidatosFormTabProps> = (
+  {tipo, canViewExportacaoCandidatosProcesso, canAddExportacaoCandidatosProcesso }  ) => {
+    
   const [showHistoricoModal, setShowHistoricoModal] = useState(false);
 
   const {
@@ -28,7 +36,7 @@ const ExportacaoCandidatosFormTab: React.FC = () => {
     handleProcessoChange,
     handleExportar,
     isCreating,
-  } = useExportacaoCandidatos();
+  } = useExportacaoCandidatos(tipo);
 
   return (
     <>
@@ -52,6 +60,7 @@ const ExportacaoCandidatosFormTab: React.FC = () => {
                   labelCol={{ span: 24 }}
                 >
                   <StyledSelect
+                    disabled={!canAddExportacaoCandidatosProcesso}
                     value={field.value}
                     onChange={(value: unknown) =>
                       handleProcessoChange(value as string | undefined)
@@ -124,6 +133,7 @@ const ExportacaoCandidatosFormTab: React.FC = () => {
           Histórico
         </Button>
         <Button
+          disabled={!canAddExportacaoCandidatosProcesso}
           type="primary"
           size="large"
           onClick={handleSubmit(handleExportar)}

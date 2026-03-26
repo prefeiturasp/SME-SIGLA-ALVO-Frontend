@@ -62,6 +62,7 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                 >
                   <StyledSelect
                     {...field}
+                    disabled={!canImportarHabilitados}
                     placeholder="Selecione o concurso"
                     loading={concursosOptionsIsLoading}
                     allowClear

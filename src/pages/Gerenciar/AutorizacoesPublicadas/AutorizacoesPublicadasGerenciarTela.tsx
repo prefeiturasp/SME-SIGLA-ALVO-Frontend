@@ -7,6 +7,7 @@ import AdicionarAutorizacaoModal from "./components/AdicionarAutorizacaoModal";
 import ConfirmarExclusaoModal from "./components/ConfirmarExclusaoModal";
 import { useGetAutorizacoesPublicadasPorCargo } from "./hooks/useGetCargos";
 import { useDeleteAutorizacaoPublicada } from "./hooks/useDeleteAutorizacaoPublicada";
+import { useGetPermissions } from "../../../routes/PermissionContextGuard";
 
 type ItemRow = {
   key: string;
@@ -20,6 +21,9 @@ type ItemRow = {
 const { Text } = Typography;
 
 const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
+  const { can } = useGetPermissions();
+  const canViewAutorizacoesPublicadas = can("view_autorizacoespublicadas");
+  const canAddAutorizacoesPublicadas = can("add_autorizacoespublicadas");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const cargoUuid = searchParams.get("cargoUuid") || undefined;
@@ -218,6 +222,7 @@ const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
               Voltar
             </Button>
             <Button
+              disabled={!canAddAutorizacoesPublicadas}
               type="primary"
               onClick={() => {
                 setEditContext({ mode: "create" });
