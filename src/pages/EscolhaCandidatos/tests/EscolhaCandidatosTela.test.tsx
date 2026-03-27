@@ -85,6 +85,12 @@ jest.mock('react-router-dom', () => {
   };
 });
 
+jest.mock('../../../routes/PermissionContextGuard', () => ({
+  useGetPermissions: () => ({
+    can: () => true,
+  }),
+}));
+
 // Mock dos hooks
 const mockProcessosOptions = [
   { value: 'processo-1', label: 'Processo 1' },

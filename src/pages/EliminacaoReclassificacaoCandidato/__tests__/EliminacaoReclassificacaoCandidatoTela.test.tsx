@@ -13,6 +13,12 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
 }));
 
+jest.mock("../../../routes/PermissionContextGuard", () => ({
+  useGetPermissions: () => ({
+    can: () => true,
+  }),
+}));
+
 const formState = { useFilterValues: false };
 jest.mock("react-hook-form", () => {
   const actual = jest.requireActual("react-hook-form");

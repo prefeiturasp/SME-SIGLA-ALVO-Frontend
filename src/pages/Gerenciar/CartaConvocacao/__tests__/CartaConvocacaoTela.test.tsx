@@ -15,6 +15,12 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
 }));
 
+jest.mock("../../../../routes/PermissionContextGuard", () => ({
+  useGetPermissions: () => ({
+    can: () => true,
+  }),
+}));
+
 jest.mock("../../../Base/BaseTela", () => ({
   __esModule: true,
   default: ({
