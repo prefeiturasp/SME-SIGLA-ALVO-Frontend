@@ -26,6 +26,7 @@ const ExportacaoLotesFormTab: React.FC = () => {
     lotesOptionsLoading,
     concursoUuid,
     handleConcursoChange,
+    handleLoteChange,
     handleExportar,
     isCreating,
   } = useExportacaoLotes();
@@ -35,7 +36,7 @@ const ExportacaoLotesFormTab: React.FC = () => {
       <TabContentContainer>
         <Row style={{ marginBottom: "1.8125rem" }}>
           <Title level={5} type="secondary" style={{ marginTop: "0" }}>
-            Selecione o concurso e o lote para exportar os dados do SIGPEC
+            Selecione o concurso e o número de lote para exportar os dados do SIGPEC
           </Title>
         </Row>
 
@@ -78,19 +79,20 @@ const ExportacaoLotesFormTab: React.FC = () => {
           <Col xs={24} sm={12}>
             <Controller
               control={control}
-              name="lote_uuid"
+              name="numero_lote"
               render={({ field }) => (
                 <CustomFormItem
-                  label="Lote"
-                  validateStatus={formErrors.lote_uuid ? "error" : undefined}
-                  help={formErrors.lote_uuid?.message}
+                  label="Número do Lote"
+                  validateStatus={formErrors.numero_lote ? "error" : undefined}
+                  help={formErrors.numero_lote?.message}
                   labelCol={{ span: 24 }}
                 >
                   <StyledSelect
                     value={field.value}
-                    onChange={(value: unknown) =>
-                      field.onChange(value as string | undefined)
-                    }
+                    onChange={(value: unknown) => {
+                      field.onChange(value);
+                      handleLoteChange(value as number | undefined);
+                    }}
                     placeholder="Selecione o lote"
                     loading={lotesOptionsLoading}
                     disabled={!concursoUuid}

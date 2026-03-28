@@ -328,6 +328,49 @@ export const getLotes = (
   return { response, abort };
 };
 
+export interface INumeroLote {
+  numero_lote: number;
+  lote_uuid: string;
+}
+
+export interface ICargoLote {
+  codigo_cargo: string;
+  descricao_cargo: string;
+}
+
+export const getNumerosLote = (
+  concurso_uuid: string,
+  codigo_cargo?: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const params: Record<string, string> = { concurso_uuid };
+  if (codigo_cargo) params.codigo_cargo = codigo_cargo;
+  const response = appAxiosCandidatos
+    .get<INumeroLote[]>('/api/v1/habilitados/numeros-lote/', {
+      params,
+      signal: axiosRequestConfig?.signal ?? signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
+  return { response, abort };
+};
+
+export const getCargosLote = (
+  concurso_uuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosCandidatos
+    .get<ICargoLote[]>('/api/v1/habilitados/cargos/', {
+      params: { concurso_uuid },
+      signal: axiosRequestConfig?.signal ?? signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
+  return { response, abort };
+};
+
 // GET Parametrizacao do MS-Candidatos
 export const getParametrizacaoCandidatos = (
   axiosRequestConfig?: AxiosRequestConfig

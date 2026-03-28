@@ -280,14 +280,20 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   // Processar UUIDs quando os dados calculados chegarem
   useEffect(() => {
     if (isNovaAutorizacao && tipoConvocacao === 'calculada' && candidatosCalculadosData && !candidatosCalculadosIsLoading && onCandidatosUuidsChange && cargoUuid) {
+      console.log('Processando candidatos calculados para UUIDs');
       const list = Array.isArray(candidatosCalculadosData) ? candidatosCalculadosData : (candidatosCalculadosData as any)?.results || [];
+      console.log(candidatosCalculadosData);
+      console.log(list);
       const uuids = list
         .map((item: any) => item?.uuid)
         .filter((id: any) => typeof id === 'string');
-      
+      console.log('UUIDs calculados:', uuids);
       // Criar uma chave única para verificar se já processamos esses dados
       const chave = `${cargoUuid}-${JSON.stringify(uuids)}`;
+      console.log('Chave para verificação:', chave);
+      console.log('UUIDs processados:', uuidsProcessadosCalculados.current);
       if (uuidsProcessadosCalculados.current !== chave) {
+
         uuidsProcessadosCalculados.current = chave;
         onCandidatosUuidsChange(cargoUuid, uuids);
       }
@@ -540,7 +546,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
 
     // Extrair UUIDs dos candidatos
     const candidatosUuids = candidatos
-      .map((item: any) => item?.candidato?.uuid || item?.uuid)
+      .map((item: any) =>  item?.uuid || item?.candidato?.uuid)
       .filter((id: any) => typeof id === 'string' && id);
 
     if (onCandidatosSelecionados) {

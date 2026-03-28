@@ -4,7 +4,6 @@ import * as yup from "yup";
 import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { App } from "antd";
-import dayjs from "dayjs";
 import { useConcursos } from "../../../hooks/useConcursos";
 import useListRequest from "../../../hooks/useListRequest";
 import { API } from "../../../services";
@@ -15,12 +14,14 @@ import type {
 
 export interface IExportacaoLotesForm {
   concurso_uuid: string | undefined;
+  numero_lote: number | undefined;
   lote_uuid: string | undefined;
 }
 
 const schema = yup.object({
   concurso_uuid: yup.string().required("Concurso é obrigatório"),
-  lote_uuid: yup.string().required("Lote é obrigatório"),
+  numero_lote: yup.number().required("Lote é obrigatório"),
+  lote_uuid: yup.string().required("Lote UUID é obrigatório"),
 });
 
 export function useExportacaoLotes() {
@@ -29,6 +30,7 @@ export function useExportacaoLotes() {
 
   const defaultValues: IExportacaoLotesForm = {
     concurso_uuid: undefined,
+    numero_lote: undefined,
     lote_uuid: undefined,
   };
 
@@ -63,23 +65,24 @@ export function useExportacaoLotes() {
     }));
   }, [concursosData]);
 
-  const { data: lotesData, isLoading: lotesLoading } = useQuery({
-    queryKey: ["getLotes", concursoUuid],
+  const { data: numerosLoteData, isLoading: numerosLoteLoading } = useQuery({
+    queryKey: ["getNumerosLote", concursoUuid],
     queryFn: ({ signal }) =>
       concursoUuid
-        ? API.Candidatos.getLotes(concursoUuid, { signal }).response
+        ? API.Candidatos.getNumerosLote(concursoUuid, undefined, { signal }).response
         : Promise.resolve([]),
     enabled: !!concursoUuid,
     staleTime: 0,
   });
 
   const lotesOptions = useMemo(() => {
-    if (!Array.isArray(lotesData)) return [];
-    return lotesData.map((l) => ({
-      value: l.uuid,
-      label: dayjs(l.criado_em).format("DD/MM/YYYY HH:mm"),
+    if (!Array.isArray(numerosLoteData)) return [];
+    return numerosLoteData.map((item) => ({
+      value: item.numero_lote,
+      label: `Lote ${item.numero_lote}`,
+      lote_uuid: item.lote_uuid,
     }));
-  }, [lotesData]);
+  }, [numerosLoteData]);
 
   const { data: listData, isLoading: listLoading, refetch: listRefetch } = useQuery({
     queryKey: ["exportacaoLoteList", listRequest],
@@ -108,6 +111,8 @@ export function useExportacaoLotes() {
       API.ExportacaoDados.postCreateExportacaoLote(payload).response,
     onSuccess: ({ blob, filename, status }) => {
       triggerDownload(blob, filename);
+      queryClient.invalidateQueries({ queryKey: ["exportacaoLoteList"] });
+      listRefetch();
       if (status === 422) {
         notification.info({
           message: "Exportação incompleta",
@@ -117,8 +122,6 @@ export function useExportacaoLotes() {
           duration: 5,
         });
       } else {
-        queryClient.invalidateQueries({ queryKey: ["exportacaoLoteList"] });
-        listRefetch();
         notification.success({
           message: "Exportação criada",
           description: "O arquivo está sendo baixado.",
@@ -126,7 +129,6 @@ export function useExportacaoLotes() {
           duration: 3.5,
         });
         reset(defaultValues);
-        setValue("lote_uuid", undefined);
       }
     },
     onError: (error: { response?: { status?: number; data?: Blob | { detail?: string } } }) => {
@@ -156,10 +158,11 @@ export function useExportacaoLotes() {
   });
 
   const handleExportar = (data: IExportacaoLotesForm) => {
-    if (!data.concurso_uuid || !data.lote_uuid) return;
+    if (!data.concurso_uuid || data.numero_lote === undefined || !data.lote_uuid) return;
     const concursoSelecionado = concursosOptions.find((c) => c.value === data.concurso_uuid);
     const payload: IExportacaoLotePayload = {
       concurso_uuid: data.concurso_uuid,
+      numero_lote: data.numero_lote,
       lote_uuid: data.lote_uuid,
       ...(concursoSelecionado?.label && { concurso_nome: concursoSelecionado.label }),
     };
@@ -168,7 +171,20 @@ export function useExportacaoLotes() {
 
   const handleConcursoChange = (value: string | undefined) => {
     setValue("concurso_uuid", value);
+    setValue("numero_lote", undefined);
     setValue("lote_uuid", undefined);
+  };
+
+  const handleLoteChange = (numero_lote: number | undefined) => {
+    setValue("numero_lote", numero_lote);
+    if (numero_lote !== undefined) {
+      const lote = lotesOptions.find((l) => l.value === numero_lote);
+      if (lote) {
+        setValue("lote_uuid", lote.lote_uuid);
+      }
+    } else {
+      setValue("lote_uuid", undefined);
+    }
   };
 
   const handleDownload = async (uuid: string) => {
@@ -210,14 +226,16 @@ export function useExportacaoLotes() {
     concursosOptions,
     concursosOptionsLoading: concursosOptionsIsLoading,
     lotesOptions,
-    lotesOptionsLoading: lotesLoading,
+    lotesOptionsLoading: numerosLoteLoading,
     concursoUuid,
     handleConcursoChange,
+    handleLoteChange,
     handleExportar,
     handleDownload,
     isCreating: createMutation.isPending,
     listData,
     listLoading,
+    listRefetch,
     listRequest,
     onAntTableChange,
   };

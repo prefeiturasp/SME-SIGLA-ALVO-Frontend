@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import { Modal, Typography, Button } from "antd";
+import { Modal, Typography, Button, Tag } from "antd";
 import { CloudDownloadOutlined } from "@ant-design/icons";
 import { StyledTable } from "../../../components/EstilosCompartilhados";
 import { useExportacaoLotes } from "../hooks/useExportacaoLotes";
-import type { IExportacaoLoteListItem } from "../../../services/resources/exportacaoDados/types";
+import type { IExportacaoLoteListItem, StatusExportacaoLote } from "../../../services/resources/exportacaoDados/types";
+
+const STATUS_CONFIG: Record<StatusExportacaoLote, { color: string; label: string }> = {
+  SUCESSO:      { color: "success", label: "Sucesso" },
+  ATENCAO:      { color: "processing", label: "Atenção" },
+  ERRO:         { color: "error", label: "Erro" },
+  PENDENTE:     { color: "default", label: "Pendente" },
+  PROCESSANDO:  { color: "default", label: "Processando" },
+};
 
 interface HistoricoExportacaoLotesModalProps {
   open: boolean;
@@ -22,7 +30,12 @@ const HistoricoExportacaoLotesModal: React.FC<HistoricoExportacaoLotesModalProps
     listRequest,
     onAntTableChange,
     handleDownload,
+    listRefetch,
   } = useExportacaoLotes();
+
+  useEffect(() => {
+    if (open) listRefetch();
+  }, [open]);
 
   const total = listData?.count ?? 0;
   const results = listData?.results ?? [];
@@ -44,12 +57,29 @@ const HistoricoExportacaoLotesModal: React.FC<HistoricoExportacaoLotesModalProps
       render: (nome: string | null | undefined) => nome ?? "—",
     },
     {
-      title: "Lote UUID",
-      dataIndex: "lote_uuid",
-      key: "lote_uuid",
+      title: "Lote",
+      key: "lote",
       align: "center",
-      render: (uuid: string) =>
-        uuid ? `${uuid.substring(0, 8)}...` : "—",
+      render: (_: unknown, record: IExportacaoLoteListItem) => {
+        if (record.numero_lote !== null && record.numero_lote !== undefined) {
+          return `Lote ${record.numero_lote}`;
+        }
+        if (record.lote_uuid) {
+          return `${record.lote_uuid.substring(0, 8)}...`;
+        }
+        return "—";
+      },
+    },
+    {
+      width: "12%",
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      align: "center",
+      render: (statusValue: StatusExportacaoLote) => {
+        const config = STATUS_CONFIG[statusValue] ?? { color: "default", label: statusValue };
+        return <Tag color={config.color}>{config.label}</Tag>;
+      },
     },
     {
       width: "12%",

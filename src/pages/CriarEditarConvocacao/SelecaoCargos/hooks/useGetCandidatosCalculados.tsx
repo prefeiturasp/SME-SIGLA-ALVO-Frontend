@@ -20,7 +20,7 @@ export const useGetCandidatosCalculados = (
     retry: 0,
     enabled: buscarCandidatos && !!parametros, // Só executa quando buscarCandidatos for true e parametros existirem
   });
-
+  console.log("Candidatos calculados:", candidatosData);
   return {
     candidatosData: candidatosData,
     candidatosIsLoading,
