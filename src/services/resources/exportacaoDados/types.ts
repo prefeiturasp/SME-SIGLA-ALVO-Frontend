@@ -82,3 +82,37 @@ export interface IExportacaoCandidatosListFilters {
   search?: string;
   ordering?: string;
 }
+
+/** Payload para criação de exportação de lotes SIGPEC. */
+export interface IExportacaoLotePayload {
+  concurso_uuid: string;
+  concurso_nome?: string;
+  numero_lote?: number;
+  lote_uuid: string;
+  codigo_cargo?: string;
+}
+
+export type StatusExportacaoLote = "SUCESSO" | "ATENCAO" | "ERRO" | "PENDENTE" | "PROCESSANDO";
+
+/** Item da listagem de histórico de exportações de lotes. */
+export interface IExportacaoLoteListItem {
+  uuid: string;
+  criado_em: string;
+  atualizado_em: string;
+  concurso_uuid: string;
+  concurso_nome: string;
+  numero_lote: number | null;
+  codigo_cargo: string | null;
+  lote_uuid: string | null;
+  nome_arquivo: string;
+  status: StatusExportacaoLote;
+}
+
+/** Filtros para listagem de exportações de lotes. */
+export interface IExportacaoLoteListFilters {
+  concurso_uuid?: string;
+  lote_uuid?: string;
+  numero_lote?: number;
+  concurso_nome?: string;
+  ordering?: string;
+}

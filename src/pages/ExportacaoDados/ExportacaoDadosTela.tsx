@@ -5,6 +5,7 @@ import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { StyledTabs } from "../ImportacaoDados/styles";
 import ExportacaoVagasFormTab from "./components/ExportacaoVagasFormTab";
 import ExportacaoCandidatosFormTab from "./components/ExportacaoCandidatosFormTab";
+import ExportacaoLotesFormTab from "./components/ExportacaoLotesFormTab";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 
 
@@ -68,10 +69,15 @@ const ExportacaoDadosTela: React.FC = () => {
       children: (
         <ExportacaoVagasFormTab
           tipo="vagas-sigpec"
-          canViewExportacaoVagasProcesso={canViewExportacaoVagasProcesso}
-          canAddExportacaoVagasProcesso={canAddExportacaoVagasProcesso}
+          canViewExportacaoVagasProcesso={canViewExportacaoVagasSigpec}
+          canAddExportacaoVagasProcesso={canAddExportacaoVagasSigpec}
         />
       ),
+    },
+    {
+      key: "LOTES_SIGPEC",
+      label: "Lotes SIGPEC",
+      children: <ExportacaoLotesFormTab />,
     },
   ], [
     canViewExportacaoVagasProcesso,
@@ -79,7 +85,7 @@ const ExportacaoDadosTela: React.FC = () => {
     canViewExportacaoCandidatosProcesso,
     canAddExportacaoCandidatosProcesso,
     canViewExportacaoVagasSigpec,
-    canAddExportacaoVagasProcesso,
+    canAddExportacaoVagasSigpec,
   ]);
 
   return (

@@ -284,10 +284,10 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       const uuids = list
         .map((item: any) => item?.uuid)
         .filter((id: any) => typeof id === 'string');
-      
       // Criar uma chave única para verificar se já processamos esses dados
       const chave = `${cargoUuid}-${JSON.stringify(uuids)}`;
       if (uuidsProcessadosCalculados.current !== chave) {
+
         uuidsProcessadosCalculados.current = chave;
         onCandidatosUuidsChange(cargoUuid, uuids);
       }
@@ -540,7 +540,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
 
     // Extrair UUIDs dos candidatos
     const candidatosUuids = candidatos
-      .map((item: any) => item?.candidato?.uuid || item?.uuid)
+      .map((item: any) =>  item?.uuid || item?.candidato?.uuid)
       .filter((id: any) => typeof id === 'string' && id);
 
     if (onCandidatosSelecionados) {
