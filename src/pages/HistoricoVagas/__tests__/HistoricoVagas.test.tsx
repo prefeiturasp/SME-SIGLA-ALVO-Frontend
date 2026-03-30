@@ -270,7 +270,7 @@ describe('HistoricoVagasTela', () => {
       const voltarButton = screen.getByText('Voltar');
       fireEvent.click(voltarButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith(-1);
+      expect(mockNavigate).toHaveBeenCalledWith('/processos/importacao-dados', { state: { tipo: 'VAGAS' } });
     });
   });
 

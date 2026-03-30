@@ -12,6 +12,12 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
+jest.mock('../../../../routes/PermissionContextGuard', () => ({
+  useGetPermissions: () => ({
+    can: () => true,
+  }),
+}));
+
 // Mock dos componentes filhos
 jest.mock('../components/AbaRelatorios', () => {
   return function MockAbaRelatorios() {

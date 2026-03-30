@@ -4,6 +4,12 @@ import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import ExportacaoDadosTela from "../ExportacaoDadosTela";
 
+jest.mock("../../../routes/PermissionContextGuard", () => ({
+  useGetPermissions: () => ({
+    can: () => true,
+  }),
+}));
+
 jest.mock("../components/ExportacaoVagasFormTab", () => {
   return function ExportacaoVagasFormTabMock(props: any) {
     return <div data-testid={`exportacao-vagas-tab-${props.tipo}`} />;

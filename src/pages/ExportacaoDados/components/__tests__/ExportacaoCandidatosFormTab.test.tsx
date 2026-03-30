@@ -121,21 +121,28 @@ jest.mock("antd", () => {
   };
 });
 
-const renderComponent = () => {
+const renderComponent = (
+  props?: Partial<React.ComponentProps<typeof ExportacaoCandidatosFormTab>>,
+) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
   return render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <ExportacaoCandidatosFormTab />
+        <ExportacaoCandidatosFormTab {...props} />
       </BrowserRouter>
     </QueryClientProvider>,
   );
 };
 
 describe("ExportacaoCandidatosFormTab", () => {
+  const defaultProps: Partial<React.ComponentProps<typeof ExportacaoCandidatosFormTab>> = {
+    canViewExportacaoCandidatosProcesso: true,
+    canAddExportacaoCandidatosProcesso: true,
+  };
+
   it("deve renderizar estrutura básica da aba", () => {
-    renderComponent();
+    renderComponent(defaultProps);
 
     expect(screen.getByTestId("tab-content")).toBeInTheDocument();
     expect(
@@ -146,7 +153,7 @@ describe("ExportacaoCandidatosFormTab", () => {
   });
 
   it("deve renderizar opções de processo e cargo", () => {
-    renderComponent();
+    renderComponent(defaultProps);
 
     const processoOptions = screen.getAllByText(/Processo 1|Processo 2/);
     const cargoOptions = screen.getAllByText(/Cargo 1|Cargo 2/);
@@ -157,7 +164,7 @@ describe("ExportacaoCandidatosFormTab", () => {
 
   it("deve chamar handleProcessoChange ao mudar processo", async () => {
     const user = userEvent.setup();
-    renderComponent();
+    renderComponent(defaultProps);
 
     const selectProcesso = screen.getAllByLabelText("select")[0];
     await user.selectOptions(selectProcesso, "proc-2");
@@ -167,7 +174,7 @@ describe("ExportacaoCandidatosFormTab", () => {
 
   it("deve chamar handleSubmit(handleExportar) ao clicar em Exportar", async () => {
     const user = userEvent.setup();
-    renderComponent();
+    renderComponent(defaultProps);
 
     const exportarBtn = screen.getByText("Exportar").closest("button")!;
     await user.click(exportarBtn);
@@ -177,7 +184,7 @@ describe("ExportacaoCandidatosFormTab", () => {
 
   it("deve abrir o modal de histórico ao clicar em Histórico", async () => {
     const user = userEvent.setup();
-    renderComponent();
+    renderComponent(defaultProps);
 
     await user.click(screen.getByText("Histórico"));
 
