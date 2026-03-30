@@ -194,19 +194,15 @@ export const useSelecaoCargo = () => {
 
   // Função para atualizar UUIDs de candidatos para um cargo específico
   const handleCandidatosUuidsChange = useCallback((cargoUuid: string, uuids: string[]) => {
-    console.log(uuids)
     setCargosAdicionados(prev => {
       // Verificar se realmente precisa atualizar (evitar atualizações desnecessárias)
       const cargoAtual = prev.find(c => c.cargo_uuid === cargoUuid);
       if (cargoAtual && JSON.stringify(cargoAtual.candidatos_uuids) === JSON.stringify(uuids)) {
-        console.log('UUIDs são os mesmos, não atualizando');
-        console.log(prev);
         return prev; // Não há mudança, retornar o mesmo array
       }
-      
+
       const updated = prev.map(cargo => {
         if (cargo.cargo_uuid === cargoUuid) {
-          console.log('Atualizando UUIDs do cargo:', cargo.cargo_nome, 'de', cargo.candidatos_uuids, 'para', uuids);
           return {
             ...cargo,
             candidatos_uuids: uuids
@@ -308,7 +304,6 @@ export const useSelecaoCargo = () => {
   // Convocar candidatos habilitados (bulk patch)
     const convocarCandidatosHabilitados = async (candidatoUuids?: string[], foiConvocado: boolean = true): Promise<boolean> => {
       try {
-        console.log(candidatoUuids)
         const concursoUuid = processoConvocacaoData?.concurso_uuid || "";
         const processoUuid = uuid || processoConvocacaoData?.uuid || "";
         if (!concursoUuid || (candidatoUuids && candidatoUuids.length === 0)) return true;
