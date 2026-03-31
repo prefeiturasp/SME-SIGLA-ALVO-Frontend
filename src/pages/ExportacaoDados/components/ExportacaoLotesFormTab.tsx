@@ -8,43 +8,35 @@ import {
   StyledSelect,
   ActionButtonsContainer,
 } from "../../../components/EstilosCompartilhados";
-import { useExportacaoVagas } from "../hooks/useExportacaoVagas";
-import HistoricoExportacaoModal from "./HistoricoExportacaoModal";
-import type { ExportacaoTipo } from "../../../services/resources/exportacaoDados/types";
+import { useExportacaoLotes } from "../hooks/useExportacaoLotes";
+import HistoricoExportacaoLotesModal from "./HistoricoExportacaoLotesModal";
 
 const { Title } = Typography;
 
-interface ExportacaoVagasFormTabProps {
-  tipo: ExportacaoTipo;
-  canViewExportacaoVagasProcesso: boolean;
-  canAddExportacaoVagasProcesso: boolean;
-}
-
-const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = (
-  { tipo, canViewExportacaoVagasProcesso, canAddExportacaoVagasProcesso}
-) => {
+const ExportacaoLotesFormTab: React.FC = () => {
   const [showHistoricoModal, setShowHistoricoModal] = useState(false);
 
   const {
     control,
     handleSubmit,
     formErrors,
-    processosOptions,
-    processosOptionsLoading,
-    cargosOptions,
-    cargosOptionsLoading,
-    processoUuid,
-    handleProcessoChange,
+    concursosOptions,
+    concursosOptionsLoading,
+    lotesOptions,
+    lotesOptionsLoading,
+    concursoUuid,
+    handleConcursoChange,
+    handleLoteChange,
     handleExportar,
     isCreating,
-  } = useExportacaoVagas(tipo);
+  } = useExportacaoLotes();
 
   return (
     <>
       <TabContentContainer>
         <Row style={{ marginBottom: "1.8125rem" }}>
           <Title level={5} type="secondary" style={{ marginTop: "0" }}>
-            Selecione o processo e o cargo para exportar
+            Selecione o concurso e o número de lote para exportar os dados do SIGPEC
           </Title>
         </Row>
 
@@ -52,22 +44,21 @@ const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = (
           <Col xs={24} sm={12}>
             <Controller
               control={control}
-              name="processo_uuid"
+              name="concurso_uuid"
               render={({ field }) => (
                 <CustomFormItem
-                  label="Processo de convocação"
-                  validateStatus={formErrors.processo_uuid ? "error" : undefined}
-                  help={formErrors.processo_uuid?.message}
+                  label="Concurso"
+                  validateStatus={formErrors.concurso_uuid ? "error" : undefined}
+                  help={formErrors.concurso_uuid?.message}
                   labelCol={{ span: 24 }}
                 >
                   <StyledSelect
-                    disabled={!canAddExportacaoVagasProcesso}
                     value={field.value}
                     onChange={(value: unknown) =>
-                      handleProcessoChange(value as string | undefined)
+                      handleConcursoChange(value as string | undefined)
                     }
-                    placeholder="Selecione o processo"
-                    loading={processosOptionsLoading}
+                    placeholder="Selecione o concurso"
+                    loading={concursosOptionsLoading}
                     allowClear
                     suffixIcon={
                       <ExpandMoreIcon
@@ -75,7 +66,7 @@ const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = (
                       />
                     }
                   >
-                    {processosOptions.map((opt) => (
+                    {concursosOptions.map((opt) => (
                       <Select.Option key={opt.value} value={opt.value}>
                         {opt.label}
                       </Select.Option>
@@ -88,22 +79,23 @@ const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = (
           <Col xs={24} sm={12}>
             <Controller
               control={control}
-              name="cargo_uuid"
+              name="numero_lote"
               render={({ field }) => (
                 <CustomFormItem
-                  label="Cargo"
-                  validateStatus={formErrors.cargo_uuid ? "error" : undefined}
-                  help={formErrors.cargo_uuid?.message}
+                  label="Número do Lote"
+                  validateStatus={formErrors.numero_lote ? "error" : undefined}
+                  help={formErrors.numero_lote?.message}
                   labelCol={{ span: 24 }}
                 >
                   <StyledSelect
                     value={field.value}
-                    onChange={(value: unknown) =>
-                      field.onChange(value as string | undefined)
-                    }
-                    placeholder="Selecione o cargo"
-                    loading={cargosOptionsLoading}
-                    disabled={!processoUuid}
+                    onChange={(value: unknown) => {
+                      field.onChange(value);
+                      handleLoteChange(value as number | undefined);
+                    }}
+                    placeholder="Selecione o lote"
+                    loading={lotesOptionsLoading}
+                    disabled={!concursoUuid}
                     allowClear
                     suffixIcon={
                       <ExpandMoreIcon
@@ -111,7 +103,7 @@ const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = (
                       />
                     }
                   >
-                    {cargosOptions.map((opt) => (
+                    {lotesOptions.map((opt) => (
                       <Select.Option key={opt.value} value={opt.value}>
                         {opt.label}
                       </Select.Option>
@@ -122,7 +114,6 @@ const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = (
             />
           </Col>
         </Row>
-
       </TabContentContainer>
 
       <ActionButtonsContainer>
@@ -135,7 +126,6 @@ const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = (
           Histórico
         </Button>
         <Button
-          disabled={!canAddExportacaoVagasProcesso}
           type="primary"
           size="large"
           onClick={handleSubmit(handleExportar)}
@@ -145,13 +135,12 @@ const ExportacaoVagasFormTab: React.FC<ExportacaoVagasFormTabProps> = (
         </Button>
       </ActionButtonsContainer>
 
-      <HistoricoExportacaoModal
+      <HistoricoExportacaoLotesModal
         open={showHistoricoModal}
         onClose={() => setShowHistoricoModal(false)}
-        tipo={tipo}
       />
     </>
   );
 };
 
-export default ExportacaoVagasFormTab;
+export default ExportacaoLotesFormTab;

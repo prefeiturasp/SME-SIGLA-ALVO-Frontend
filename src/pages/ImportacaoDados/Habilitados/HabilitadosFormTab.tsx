@@ -19,14 +19,12 @@ import { useNavigate } from "react-router-dom";
 
 interface HabilitadosProps {
   onShowLayoutPadrao: () => void;
-  onShowHistorico: () => void;
   canViewHistoricoHabilitados: boolean;
   canImportarHabilitados: boolean;
 }
 
 const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
     onShowLayoutPadrao,
-    onShowHistorico,
     canViewHistoricoHabilitados,
     canImportarHabilitados
 }) => {
@@ -64,6 +62,7 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                 >
                   <StyledSelect
                     {...field}
+                    disabled={!canImportarHabilitados}
                     placeholder="Selecione o concurso"
                     loading={concursosOptionsIsLoading}
                     allowClear
@@ -153,9 +152,15 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
     </TabContentContainer>
     <ActionButtonsContainer>
       <Tooltip title={!canViewHistoricoHabilitados?"Você não possui permissão para essa ação":"Histórico"} arrow={true} >
-    <Button type="primary" ghost size="large" onClick={onShowHistorico} disabled={!canViewHistoricoHabilitados}>
+    <Button
+      type="primary"
+      ghost
+      size="large"
+      onClick={() => navigate("/processos/importacao-dados/historico-habilitados")}
+      disabled={!canViewHistoricoHabilitados}
+    >
       Histórico
-    </Button>        
+    </Button>
     </Tooltip>
     <Tooltip title={!canImportarHabilitados?"Você não possui permissão para essa ação":"Importar"} arrow={true} >
     <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)} disabled={!canImportarHabilitados}>

@@ -5,8 +5,8 @@ import { App } from "antd";
 import { useExportacaoCandidatos } from "../useExportacaoCandidatos";
 import { API } from "../../../../services";
 
-
 const listRequestMock = { pagination: { page: 1, page_size: 10 } };
+
 jest.mock("../../../Processos/ConvocacaoCandidatos/hooks/useConvocacao.tsx", () => ({
   __esModule: true,
   default: jest.fn(() => ({

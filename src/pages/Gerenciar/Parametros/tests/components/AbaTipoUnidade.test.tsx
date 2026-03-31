@@ -55,7 +55,7 @@ describe('AbaTipoUnidade', () => {
 
   const setupComponent = async (data: any[] = []) => {
     mockGetParametrizacaoEscolhas.mockResolvedValue(data);
-    render(<AbaTipoUnidade />, { wrapper: createWrapper() });
+    render(<AbaTipoUnidade canAddParametrizacao />, { wrapper: createWrapper() });
     await waitForLoading();
     if (data.length > 0) {
       await waitFor(() => expect(screen.getByText(data[0].tipo_ue)).toBeInTheDocument());
@@ -72,7 +72,7 @@ describe('AbaTipoUnidade', () => {
       mockGetParametrizacaoEscolhas.mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve([]), 100))
       );
-      render(<AbaTipoUnidade />, { wrapper: createWrapper() });
+      render(<AbaTipoUnidade canAddParametrizacao />, { wrapper: createWrapper() });
       expect(screen.getByText('Carregando...')).toBeInTheDocument();
       await waitForLoading();
     });
@@ -93,7 +93,7 @@ describe('AbaTipoUnidade', () => {
 
     it('deve tratar erro ao buscar dados', async () => {
       mockGetParametrizacaoEscolhas.mockRejectedValue(new Error('Erro de rede'));
-      render(<AbaTipoUnidade />, { wrapper: createWrapper() });
+      render(<AbaTipoUnidade canAddParametrizacao />, { wrapper: createWrapper() });
       await waitForLoading();
 
       await waitFor(() => {
@@ -108,7 +108,7 @@ describe('AbaTipoUnidade', () => {
     it('deve evitar múltiplas chamadas ao backend', async () => {
       await setupComponent();
       expect(mockGetParametrizacaoEscolhas).toHaveBeenCalledTimes(1);
-      render(<AbaTipoUnidade />, { wrapper: createWrapper() });
+      render(<AbaTipoUnidade canAddParametrizacao />, { wrapper: createWrapper() });
       await waitFor(() => expect(mockGetParametrizacaoEscolhas).toHaveBeenCalled());
     });
   });
@@ -126,7 +126,7 @@ describe('AbaTipoUnidade', () => {
       }));
 
       mockGetParametrizacaoEscolhas.mockResolvedValue(mockData);
-      const { container } = render(<AbaTipoUnidade />, { wrapper: createWrapper() });
+      const { container } = render(<AbaTipoUnidade canAddParametrizacao />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByText('Tipo 1')).toBeInTheDocument();

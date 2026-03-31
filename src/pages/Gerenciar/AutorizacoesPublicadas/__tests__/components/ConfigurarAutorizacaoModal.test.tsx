@@ -4,6 +4,12 @@ import '@testing-library/jest-dom';
 import { MemoryRouter } from "react-router-dom";
 import AutorizacoesPublicadasGerenciarTela from "../../AutorizacoesPublicadasGerenciarTela";
 
+jest.mock("../../../../../routes/PermissionContextGuard", () => ({
+  useGetPermissions: () => ({
+    can: () => true,
+  }),
+}));
+
 // Mock BaseTela to simplify layout
 jest.mock("../../../../Base/BaseTela", () => ({
   __esModule: true,

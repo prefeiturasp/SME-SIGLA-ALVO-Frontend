@@ -10,7 +10,6 @@ const mockHandleFileUpload = jest.fn();
 const mockHandleSubmit = jest.fn((callback) => callback);
 const mockHandleEnviarForm = jest.fn();
 const mockWatch = jest.fn(() => null);
-const mockOnShowHistorico = jest.fn();
 const mockOnShowLayoutPadrao = jest.fn();
 
 jest.mock('react-router-dom', () => ({
@@ -126,7 +125,6 @@ const { useConcursos } = require('../../../../hooks/useConcursos');
 const renderComponent = (props = {}) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const defaultProps = {
-    onShowHistorico: mockOnShowHistorico,
     onShowLayoutPadrao: mockOnShowLayoutPadrao,
     canViewHistoricoHabilitados: true,
     canImportarHabilitados: true,
@@ -355,14 +353,14 @@ describe('HabilitadosFormTab', () => {
   });
 
   describe('Ações', () => {
-    it('chama onShowHistorico ao clicar', async () => {
+    it('deve navegar para histórico ao clicar em Histórico', async () => {
       const user = userEvent.setup();
       renderComponent();
       
       const button = screen.getByText('Histórico').closest('button');
       await user.click(button!);
       
-      expect(mockOnShowHistorico).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledWith('/processos/importacao-dados/historico-habilitados');
     });
 
     it('chama handleSubmit ao clicar em Importar', async () => {

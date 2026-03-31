@@ -92,6 +92,7 @@ const VagasFormTab: React.FC<VagasProps> = ({
                   labelCol={{ span: 24 }}
                 >
                   <StyledSelect
+                    disabled={!canImportarVagas}
                     value={field.value}
                     onChange={(value: unknown) =>
                       field.onChange(value as string | undefined)

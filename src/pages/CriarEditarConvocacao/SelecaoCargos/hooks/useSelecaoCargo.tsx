@@ -200,10 +200,9 @@ export const useSelecaoCargo = () => {
       if (cargoAtual && JSON.stringify(cargoAtual.candidatos_uuids) === JSON.stringify(uuids)) {
         return prev; // Não há mudança, retornar o mesmo array
       }
-      
+
       const updated = prev.map(cargo => {
         if (cargo.cargo_uuid === cargoUuid) {
-          console.log('Atualizando UUIDs do cargo:', cargo.cargo_nome, 'de', cargo.candidatos_uuids, 'para', uuids);
           return {
             ...cargo,
             candidatos_uuids: uuids

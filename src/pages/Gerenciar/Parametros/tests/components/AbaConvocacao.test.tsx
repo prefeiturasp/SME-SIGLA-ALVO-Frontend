@@ -59,7 +59,7 @@ describe('AbaConvocacao', () => {
 
   const setupComponent = async (data: any = []) => {
     mockGetParametrizacaoCandidatos.mockResolvedValue(data);
-    const { container } = render(<AbaConvocacao />, { wrapper: createWrapper() });
+    const { container } = render(<AbaConvocacao canAddParametrizacao />, { wrapper: createWrapper() });
     await waitForLoading(container);
     return container;
   };
@@ -74,7 +74,7 @@ describe('AbaConvocacao', () => {
       mockGetParametrizacaoCandidatos.mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve([]), 100))
       );
-      const { container } = render(<AbaConvocacao />, { wrapper: createWrapper() });
+      const { container } = render(<AbaConvocacao canAddParametrizacao />, { wrapper: createWrapper() });
       expect(container.querySelector('.ant-spin')).toBeInTheDocument();
       await waitForLoading(container);
     });
@@ -96,7 +96,7 @@ describe('AbaConvocacao', () => {
     it('deve tratar erro ao buscar dados e usar valores padrão', async () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
       mockGetParametrizacaoCandidatos.mockRejectedValue(new Error('Erro de rede'));
-      const { container } = render(<AbaConvocacao />, { wrapper: createWrapper() });
+      const { container } = render(<AbaConvocacao canAddParametrizacao />, { wrapper: createWrapper() });
       await waitForLoading(container);
 
       await waitFor(() => {
@@ -111,7 +111,7 @@ describe('AbaConvocacao', () => {
     it('deve evitar múltiplas chamadas ao backend', async () => {
       await setupComponent();
       expect(mockGetParametrizacaoCandidatos).toHaveBeenCalledTimes(1);
-      render(<AbaConvocacao />, { wrapper: createWrapper() });
+      render(<AbaConvocacao canAddParametrizacao />, { wrapper: createWrapper() });
       await waitFor(() => expect(mockGetParametrizacaoCandidatos).toHaveBeenCalled());
     });
   });

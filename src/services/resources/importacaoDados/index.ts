@@ -14,7 +14,7 @@ import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 import type { IImportacaoVagasPayload } from "../../../pages/Processos/ImportacaoDados/Vagas/hooks/types";
 
 export const URL = {
-  getLayout: () => `/api/v1/layouts/`,  
+  getLayout: () => `/api/v1/layouts/`,
   getLayoutDownload: () => `/api/v1/layouts/download/`,
   getImportacaoArquivos: () => `/api/v1/importacao-arquivo/`,
   postImportacaoArquivosHabilitados: () => `/api/v1/importacao-arquivo/habilitados/`,
@@ -29,6 +29,8 @@ export const URL = {
   getImportacaoEscolhas: () => `/api/v1/importacao-escolhas/`,
   getErrosEscolhas: () => `/api/v1/importacao-escolhas/erros/`,
   getErrosEscolhasDownload: () => `/api/v1/importacao-escolhas/erros/download/`,
+  postImportacaoLotes: () => `/api/v1/importacao/lotes/`,
+  getImportacaoLotes: () => `/api/v1/importacao/lotes/`,
 };
 
 export const postImportacaoArquivosVagas = (
@@ -339,6 +341,44 @@ export const getErrosEscolhas = (
     response,
     abort,
   };
+};
+
+export const postImportacaoLotes = (
+  payload: { arquivo: File; concurso_uuid: string; concurso_nome?: string },
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const formData = new FormData();
+  formData.append('arquivo', payload.arquivo);
+  formData.append('concurso_uuid', payload.concurso_uuid);
+  if (payload.concurso_nome) formData.append('concurso_nome', payload.concurso_nome);
+
+  const response = appAxiosImportaArquivos
+    .post(URL.postImportacaoLotes(), formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return { response, abort };
+};
+
+export const getImportacaoLotes = (
+  params?: Record<string, any>,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  const response = appAxiosImportaArquivos
+    .get(URL.getImportacaoLotes(), {
+      params,
+      paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+  return { response, abort };
 };
 
 // Download erros de escolhas - retorna Blob

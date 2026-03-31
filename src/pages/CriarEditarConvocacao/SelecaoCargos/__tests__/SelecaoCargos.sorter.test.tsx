@@ -1,6 +1,7 @@
 import React from 'react';
 import { renderWithProviders } from '../../../../test-utils';
 
+import SelecaoCargos from '../SelecaoCargosTela';
 // Mocks de navegação e permissões
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
