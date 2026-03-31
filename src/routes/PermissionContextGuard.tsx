@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useContext, useCallback, createContext, useMemo } from 'react';
-import {  useNavigate, useParams } from 'react-router-dom';
+import {  Navigate, useNavigate, useParams } from 'react-router-dom';
 
 
 import type { IUsuarioPermissoes, IUsuarioPermissoesItem } from '../services/resources/permissoes/IPermissoes';
@@ -52,8 +52,7 @@ export interface PermissionContextGuardProps {
   const { data: dataPermissions = {} as IUsuarioPermissoes, isError, isLoading } = useQuery({
     queryKey: ['permissions', 'guard', model || params.model],
     refetchOnWindowFocus: false,
-    queryFn: () => API.Permissoes.getPermissoesPorUsuarioEModel({ model: model || "", usuario: localStorage.getItem("USUARIO") || "" }).response,
-    staleTime: 5 * (60 * 1000),     
+    queryFn: () => API.Permissoes.getPermissoesPorUsuarioEModel({ model: model || "", usuario: localStorage.getItem("USUARIO") || "" }).response
   });
 
   const can = useCallback(
@@ -70,26 +69,14 @@ export interface PermissionContextGuardProps {
     [dataPermissions, can],
   );
 
-  
-
-
   if (isLoading && !isError) {
     return  <LoadingContainer data-testid="@loading-element"><Spin size="large" spinning/></LoadingContainer>   
   }
 
   if (!can(permissaoDeExibirATELA) && !isLoading && !isError) {
-    console.log('redirectTo', redirectTo)
-    console.log('permissaoDeExibirATELA', permissaoDeExibirATELA)
-    console.log('can(permissaoDeExibirATELA)', can(permissaoDeExibirATELA))
-    console.log('isLoading', isLoading)
-    console.log('isError', isError)
-    if (redirectTo ) {      
-      navigate(redirectTo);
-    } else {                 
-      navigate('/403');
-    }
+    const to = redirectTo || '/403';
+    return <Navigate to={to} replace />;
   }
-
   return <PermissionContext.Provider value={permissions}>{children}</PermissionContext.Provider>;
 };
 

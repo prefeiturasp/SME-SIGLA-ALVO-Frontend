@@ -131,12 +131,12 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },  
   {
-    path: "/processos/gerenciamento-vagas",    
+    path: "/processos/gerenciamento-vagas",
     element: (
       <ProtectedRoute>
         <PermissionContextGuard model="processoconvocacao,importacaoarquivovagas" permissaoDeExibirATELA="add_importacaoarquivovagas">
         <GerenciamentoVagasTela />
-        </PermissionContextGuard>        
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,

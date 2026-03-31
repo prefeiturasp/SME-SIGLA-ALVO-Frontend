@@ -46,13 +46,8 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
   };
 
   const handleView = (viewData: IProcessoConvocacao) => {
-    if (isProcessoFinalizado(viewData.status)) {
-      navigate(`visualizar/${viewData.uuid}/resumo`, { state: { isViewMode: true } });
-    } else {
-      navigate(`editar/${viewData.uuid}/dados-processo`, {
-        state: { editData: viewData, isViewMode: true },
-      });
-    }
+    navigate(`visualizar/${viewData.uuid}/resumo`, { state: { isViewMode: true } });
+    return null;
   };
 
   const isProcessoFinalizado = (status: string | undefined) => {

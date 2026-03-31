@@ -180,7 +180,6 @@ const Resumo: React.FC = () => {
   const prev = () => {
     navigate(`/processos/convocacao/editar/${uuid}/agenda`);
   };
-  console.log('agendasPorCargo', agendasPorCargo)
   return (
     <>
       <BaseTela
