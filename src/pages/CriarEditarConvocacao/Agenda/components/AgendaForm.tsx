@@ -208,7 +208,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
             </Form.Item>
           </Col>
           <Col span={6}>
-            <Form.Item label="*Classificação" style={agendaFormStyles.formItemNoMargin}>
+            <Form.Item label="*Candidatos" style={agendaFormStyles.formItemNoMargin}>
               <Controller
                 name="quantidadeClassificados"
                 control={control}

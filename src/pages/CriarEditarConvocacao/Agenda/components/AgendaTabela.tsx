@@ -501,6 +501,13 @@ const AgendaTabelaExpandida: React.FC<{
     const valor = typeof periodo?.classificacao === "number" ? periodo.classificacao : 0;
     return sum + valor;
   }, 0);
+  // Se a primeira agenda for ONLINE, exibir a quantidade de candidatos da primeira agenda
+  const firstIsOnline = String(periodosList?.[0]?.tipoEscolha || "").toUpperCase() === "ONLINE";
+  const onlineFirstCount =
+    firstIsOnline && typeof periodosList?.[0]?.classificacao === "number"
+      ? (periodosList[0].classificacao as number)
+      : 0;
+  const totalParaExibir = firstIsOnline ? onlineFirstCount : totalCandidatos;
 
   if (periodosList.length === 0) {
     return (
@@ -555,7 +562,7 @@ const AgendaTabelaExpandida: React.FC<{
         {/* Contador de total de candidatos */}
         <div style={agendaTabelaStyles.candidatosCounter}>
           <Typography.Text style={agendaTabelaStyles.candidatosCounterText}>
-            Total de {totalCandidatos} candidatos adicionados
+            Total de {totalParaExibir} candidatos adicionados
           </Typography.Text>
         </div>
       </div>
