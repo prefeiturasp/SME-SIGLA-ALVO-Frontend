@@ -45,6 +45,9 @@ const addAuthInterceptor = (axiosInstance: AxiosInstance) => {
         localStorage.removeItem('USUARIO');
         window.location.href = '/login';
       }
+      else if (error.response?.status === 403 && error.response?.data?.code === 'token_not_valid') {
+        window.location.href = '/403';
+      }
       return Promise.reject(error);
     }
   );
