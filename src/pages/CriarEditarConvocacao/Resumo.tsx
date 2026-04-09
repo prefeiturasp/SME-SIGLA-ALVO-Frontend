@@ -6,6 +6,8 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { UserSwitchOutlined } from "@ant-design/icons";
 import { StepActions } from "./components/StepActions";
 import { items, steps } from "./components/StepsNames";
+import { ConvocacaoStepsGlobalStyle } from "./components/ConvocacaoStepsStyles";
+import { useStepVisualProgress } from "./components/useStepVisualProgress";
 import { StyledCardWithoutBorder } from "../../components/EstilosCompartilhados";
 import ResumoDoProcesso from "./Resumo/ResumoDoProcesso";
 import ResumoAgendaTabela from "./Resumo/ResumoAgendaTabela";
@@ -14,6 +16,7 @@ import { useGetAgendas } from "./Agenda/hooks/useGetAgendas";
 import type { IAgenda } from "../../services/resources/agenda/IAgenda";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 import { resumoStyles } from "./Resumo/styles";
+import { usePatchPassoProcessoConvocacao } from "./hooks/usePatchPassoProcessoConvocacao";
 
 const { Text } = Typography;
 
@@ -43,6 +46,7 @@ const Resumo: React.FC = () => {
   const canChangeProcessoConvocacao = can("change_processoconvocacao");
   const canAddImportacaoArquivoVagas = can("add_importacaoarquivovagas");
   const { token } = theme.useToken();
+  const patchPassoProcessoConvocacaoMutation = usePatchPassoProcessoConvocacao();
 
   const { uuid } = useParams<{ uuid: string }>();
   const navigate = useNavigate();
@@ -172,8 +176,42 @@ const Resumo: React.FC = () => {
   ] as TitleItem[];
 
   const current = 3;
+  const passoAtual = Number(processoConvocacaoData?.passo ?? 1);
+  const { passoVisual, completedStep, markStepCompleted } = useStepVisualProgress({
+    processoUuid: uuid,
+    passoAtual,
+    currentStepIndex: current,
+  });
+  const maxStepPermitido = Math.min(3, Math.max(current, passoAtual));
+  const stepItems = items.map((item, index) => {
+    const isLocked = index > maxStepPermitido;
+    const isVisited = !isLocked && index <= passoVisual - 1;
+
+    return {
+      ...item,
+      disabled: isLocked,
+      status: index + 1 <= completedStep ? ("finish" as const) : undefined,
+      className: isLocked ? "step-locked" : isVisited ? "step-visited" : undefined,
+    };
+  });
+
+  const getStepPath = (stepIndex: number) => {
+    if (stepIndex === 0) return `/processos/convocacao/editar/${uuid}/dados-processo`;
+    if (stepIndex === 1) return `/processos/convocacao/editar/${uuid}/selecao-cargos`;
+    if (stepIndex === 2) return `/processos/convocacao/editar/${uuid}/agenda`;
+    return `/processos/convocacao/editar/${uuid}/resumo`;
+  };
+
+  const handleStepChange = (nextStep: number) => {
+    if (nextStep > maxStepPermitido) return;
+    navigate(getStepPath(nextStep));
+  };
 
   const next = async () => {
+    if (uuid) {
+      await patchPassoProcessoConvocacaoMutation.mutateAsync({ processoUuid: uuid, passo: 4 });
+      markStepCompleted(4);
+    }
     navigate(`/processos/convocacao/`);
   };
 
@@ -182,6 +220,7 @@ const Resumo: React.FC = () => {
   };
   return (
     <>
+      <ConvocacaoStepsGlobalStyle />
       <BaseTela
         breadcrumbItems={breadcrumbItems}
         title={isViewOnlyResumo ? "Resumo do processo" : "Nova convocação"}
@@ -208,7 +247,7 @@ const Resumo: React.FC = () => {
             }
             variant="borderless"
           >
-            <Steps current={current} items={items} />
+            <Steps className="convocacao-steps" current={current} items={stepItems} onChange={handleStepChange} />
           </StyledCardWithoutBorder>
         )}
 

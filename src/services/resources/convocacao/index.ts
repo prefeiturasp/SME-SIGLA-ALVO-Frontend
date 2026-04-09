@@ -10,6 +10,7 @@ export const URL = {
   getConcursosOptions: () => `/api/v1/processos-convocacao/filtros/`,
   postProcessoConvocacao: () => `/api/v1/processos-convocacao/`,
   patchProcessoConvocacao: (uuid: string) => `/api/v1/processos-convocacao/${uuid}/`,
+  patchAtualizarPassoProcesso: (processoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/passo/`,
   getProcessoConvocacaoById:(uuid: string) => `/api/v1/processos-convocacao/${uuid}/`,
   postFinalizarProcessoConvocacao: (uuid: string) => `/api/v1/processos-convocacao/${uuid}/finalizar/`,
   getProcessosConvocacaoOptions: () => `/api/v1/processos-convocacao/?formato=select`,
@@ -102,6 +103,26 @@ export const patchProcessoConvocacao = (
 
   const response = appAxiosProcessoConvocacao
     .patch<IProcessoConvocacao>(URL.patchProcessoConvocacao(uuid), payload, {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+export const patchAtualizarPassoProcesso = (
+  processoUuid: string,
+  passo: 1 | 2 | 3 | 4,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosProcessoConvocacao
+    .patch<IProcessoConvocacao>(URL.patchAtualizarPassoProcesso(processoUuid), { passo }, {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })

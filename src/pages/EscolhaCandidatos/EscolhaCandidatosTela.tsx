@@ -252,6 +252,7 @@ const EscolhaCandidatosTela: React.FC = () => {
   const canAddEscolha = can("add_escolha");
   const navigate = useNavigate();
   const [selectedProcesso, setSelectedProcesso] = useState<string>();
+  const [selectedProcessoStatus, setSelectedProcessoStatus] = useState<string>();
   const [selectedAgenda, setSelectedAgenda] = useState<string>();
   const [selectedConcursoUuid, setSelectedConcursoUuid] = useState<string>();
   const [hasSearched, setHasSearched] = useState(false);
@@ -442,6 +443,7 @@ const EscolhaCandidatosTela: React.FC = () => {
           ...(option as any)?.concurso_uuid
             ? { concurso_uuid: (option as any).concurso_uuid }
             : {},
+          ...(option as any)?.status ? { status: (option as any).status } : {},
         })),
     [processosConvocacaoOptions]
   );
@@ -1138,12 +1140,15 @@ const EscolhaCandidatosTela: React.FC = () => {
       // extrair concurso_uuid do option (ou procurar na lista original)
       if (!value) {
         setSelectedConcursoUuid(undefined);
+        setSelectedProcessoStatus(undefined);
       } else {
         const singleOption =
           (Array.isArray(option) ? option[0] : option) as (DefaultOptionType & {
             concurso_uuid?: string;
+            status?: string;
           }) | undefined;
         const concursoFromOption = singleOption?.concurso_uuid;
+        const statusFromOption = singleOption?.status;
         if (typeof concursoFromOption === "string" && concursoFromOption.trim()) {
           setSelectedConcursoUuid(concursoFromOption);
         } else {
@@ -1153,6 +1158,18 @@ const EscolhaCandidatosTela: React.FC = () => {
           setSelectedConcursoUuid(
             typeof found?.concurso_uuid === "string" && found.concurso_uuid.trim()
               ? found.concurso_uuid
+              : undefined
+          );
+        }
+        if (typeof statusFromOption === "string" && statusFromOption.trim()) {
+          setSelectedProcessoStatus(statusFromOption);
+        } else {
+          const foundStatus = (processosConvocacaoOptions || []).find(
+            (opt: any) => opt?.value === value
+          ) as { status?: string } | undefined;
+          setSelectedProcessoStatus(
+            typeof foundStatus?.status === "string" && foundStatus.status.trim()
+              ? foundStatus.status
               : undefined
           );
         }
@@ -1456,6 +1473,7 @@ const EscolhaCandidatosTela: React.FC = () => {
       visible={modalEscolhaVisible}
       context={modalEscolhaContext}
       selectedProcesso={selectedProcesso}
+      selectedProcessoStatus={selectedProcessoStatus}
       selectedConcursoUuid={selectedConcursoUuid}
       selectedAgendaData={selectedAgendaData}
       cargoCodigoNumericoParam={cargoCodigoNumericoParam}

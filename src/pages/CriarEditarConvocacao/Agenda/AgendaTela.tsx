@@ -10,6 +10,7 @@ import {
   Divider,
   Tooltip,
   theme,
+  message,
 } from "antd";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +20,8 @@ import {
 } from "@ant-design/icons";
 import { StepActions } from "../components/StepActions";
 import { items, steps } from "../components/StepsNames";
+import { ConvocacaoStepsGlobalStyle } from "../components/ConvocacaoStepsStyles";
+import { useStepVisualProgress } from "../components/useStepVisualProgress";
 import { useAgenda } from "./hooks/useAgenda";
 import { 
   inlineStyles,
@@ -31,6 +34,7 @@ import AgendaForm from "./components/AgendaForm";
 import AgendaTabela from "./components/AgendaTabela";
 import { useGetPermissions } from "../../../routes/PermissionContextGuard";
 import { StyledCardWithoutBorder } from "../../../components/EstilosCompartilhados";
+import { usePatchPassoProcessoConvocacao } from "../hooks/usePatchPassoProcessoConvocacao";
 
 const { Text } = Typography;
 
@@ -73,7 +77,9 @@ const AgendaTela: React.FC = () => {
     temPeriodosAgenda,
     setValue,
     trigger,
+    agendasLoading,
   } = useAgenda();
+  const patchPassoProcessoConvocacaoMutation = usePatchPassoProcessoConvocacao();
 
   const isEdit = false;
   const breadcrumbItems = [
@@ -116,9 +122,50 @@ const AgendaTela: React.FC = () => {
   ] as TitleItem[];
 
   const current = 2;
+  const passoAtual = Number(processoConvocacaoData?.passo ?? 1);
+  const { passoVisual, completedStep, markStepCompleted } = useStepVisualProgress({
+    processoUuid: uuid,
+    passoAtual,
+    currentStepIndex: current,
+  });
+  const maxStepPermitido = Math.min(3, Math.max(current, passoAtual));
+  const stepItems = items.map((item, index) => {
+    const isLocked = index > maxStepPermitido;
+    const isVisited = !isLocked && index <= passoVisual - 1;
+
+    return {
+      ...item,
+      disabled: isLocked,
+      status: index + 1 <= completedStep ? ("finish" as const) : undefined,
+      className: isLocked ? "step-locked" : isVisited ? "step-visited" : undefined,
+    };
+  });
+
+  const getStepPath = (stepIndex: number) => {
+    if (stepIndex === 0) return `/processos/convocacao/editar/${uuid}/dados-processo`;
+    if (stepIndex === 1) return `/processos/convocacao/editar/${uuid}/selecao-cargos`;
+    if (stepIndex === 2) return `/processos/convocacao/editar/${uuid}/agenda`;
+    return `/processos/convocacao/editar/${uuid}/resumo`;
+  };
+
+  const hasEdits = periodosList.some((periodo) => !periodo.uuid);
+  const handleStepChange = (nextStep: number) => {
+    if (nextStep > maxStepPermitido) return;
+    if (agendasLoading) return;
+    if (hasEdits) {
+      message.warning("Salve as alterações antes de navegar entre as etapas.");
+      return;
+    }
+    navigate(getStepPath(nextStep));
+  };
+
   const next = async () => {
     const sucesso = await salvarAgendasNoBackend();
      if (sucesso) {
+        if (!uuid) return;
+        const passoAtualizado = Math.max(passoAtual, 3) as 1 | 2 | 3 | 4;
+        await patchPassoProcessoConvocacaoMutation.mutateAsync({ processoUuid: uuid, passo: passoAtualizado });
+        markStepCompleted(3);
         navigate(`/processos/convocacao/editar/${uuid}/resumo`);
       }
   };
@@ -162,6 +209,7 @@ const AgendaTela: React.FC = () => {
 
   return (
     <>
+      <ConvocacaoStepsGlobalStyle />
       <GlobalStyles />
       <BaseTela
         breadcrumbItems={breadcrumbItems}
@@ -182,7 +230,7 @@ const AgendaTela: React.FC = () => {
         }
       >
         <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
-          <Steps current={current} items={items} />
+          <Steps className="convocacao-steps" current={current} items={stepItems} onChange={handleStepChange} />
         </StyledCardWithoutBorder>
 
         <StyledCardWithoutBorder
