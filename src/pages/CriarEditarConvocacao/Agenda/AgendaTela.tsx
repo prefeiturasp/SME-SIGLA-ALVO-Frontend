@@ -19,9 +19,9 @@ import {
   UserSwitchOutlined,
 } from "@ant-design/icons";
 import { StepActions } from "../components/StepActions";
-import { items, steps } from "../components/StepsNames";
+import { steps } from "../components/StepsNames";
 import { ConvocacaoStepsGlobalStyle } from "../components/ConvocacaoStepsStyles";
-import { useStepVisualProgress } from "../components/useStepVisualProgress";
+import { useConvocacaoSteps } from "../components/useConvocacaoSteps";
 import { useAgenda } from "./hooks/useAgenda";
 import { 
   inlineStyles,
@@ -122,42 +122,17 @@ const AgendaTela: React.FC = () => {
   ] as TitleItem[];
 
   const current = 2;
-  const passoAtual = Number(processoConvocacaoData?.passo ?? 1);
-  const { passoVisual, completedStep, markStepCompleted } = useStepVisualProgress({
-    processoUuid: uuid,
-    passoAtual,
-    currentStepIndex: current,
-  });
-  const maxStepPermitido = Math.min(3, Math.max(current, passoAtual));
-  const stepItems = items.map((item, index) => {
-    const isLocked = index > maxStepPermitido;
-    const isVisited = !isLocked && index <= passoVisual - 1;
-
-    return {
-      ...item,
-      disabled: isLocked,
-      status: index + 1 <= completedStep ? ("finish" as const) : undefined,
-      className: isLocked ? "step-locked" : isVisited ? "step-visited" : undefined,
-    };
-  });
-
-  const getStepPath = (stepIndex: number) => {
-    if (stepIndex === 0) return `/processos/convocacao/editar/${uuid}/dados-processo`;
-    if (stepIndex === 1) return `/processos/convocacao/editar/${uuid}/selecao-cargos`;
-    if (stepIndex === 2) return `/processos/convocacao/editar/${uuid}/agenda`;
-    return `/processos/convocacao/editar/${uuid}/resumo`;
-  };
-
   const hasEdits = periodosList.some((periodo) => !periodo.uuid);
-  const handleStepChange = (nextStep: number) => {
-    if (nextStep > maxStepPermitido) return;
-    if (agendasLoading) return;
-    if (hasEdits) {
-      message.warning("Salve as alterações antes de navegar entre as etapas.");
-      return;
-    }
-    navigate(getStepPath(nextStep));
-  };
+  const { passoAtual, stepItems, handleStepChange, markStepCompleted } = useConvocacaoSteps({
+    uuid,
+    currentStepIndex: current,
+    passoAtualBackend: processoConvocacaoData?.passo,
+    hasEdits,
+    isLoading: agendasLoading,
+    onUnsavedChangesWarning: () =>
+      message.warning("Salve as alterações antes de navegar entre as etapas."),
+    onNavigate: (path) => navigate(path),
+  });
 
   const next = async () => {
     const sucesso = await salvarAgendasNoBackend();
