@@ -1,15 +1,18 @@
 import React from "react";
-import { Button, Steps, theme, Tooltip, Typography } from "antd";
+import { Button, Steps, theme, Tooltip, Typography, message } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
 
 import { UserSwitchOutlined } from "@ant-design/icons";
 import { StepActions } from "./components/StepActions";
-import { items, steps } from "./components/StepsNames";
+import { steps } from "./components/StepsNames";
+import { ConvocacaoStepsGlobalStyle } from "./components/ConvocacaoStepsStyles";
+import { useConvocacaoSteps } from "./components/useConvocacaoSteps";
 import { StyledCardWithoutBorder } from "../../components/EstilosCompartilhados";
 import FormPrincipal from "../Processos/NovaConvocacaoCandidatos/components/FormPrincipal";
 import { useNovaConvocacaoCandidatos } from "../Processos/NovaConvocacaoCandidatos/hooks/useNovaConvocacaoCandidatos";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
+import { usePatchPassoProcessoConvocacao } from "./hooks/usePatchPassoProcessoConvocacao";
 
 const { Text } = Typography;
 
@@ -39,6 +42,7 @@ const DadosDoProcesso: React.FC = () => {
     hasEdits,
     patchProcessoFromForm
     } = useNovaConvocacaoCandidatos();
+  const patchPassoProcessoConvocacaoMutation = usePatchPassoProcessoConvocacao();
   const breadcrumbItems = [
     {
       title: (
@@ -79,18 +83,35 @@ const DadosDoProcesso: React.FC = () => {
   ] as TitleItem[];
 
   const current = 0;
+  const { passoAtual, stepItems, handleStepChange, markStepCompleted } = useConvocacaoSteps({
+    uuid,
+    currentStepIndex: current,
+    passoAtualBackend: processoConvocacaoData?.passo,
+    hasEdits,
+    lockFutureStepsWithoutUuid: true,
+    onUnsavedChangesWarning: () =>
+      message.warning("Salve as alterações antes de navegar entre as etapas."),
+    onNavigate: (path) => navigate(path),
+  });
+
   const next = async () => {
     await handleSubmit(async (formData) => {
       if (isEdit || uuid) {
         if (hasEdits) {
           await patchProcessoFromForm(formData);
-          navigate(`/processos/convocacao/editar/${uuid}/selecao-cargos`);
+        }
+        if (uuid) {
+          const passoAtualizado = Math.max(passoAtual, 1) as 1 | 2 | 3 | 4;
+          await patchPassoProcessoConvocacaoMutation.mutateAsync({ processoUuid: uuid, passo: passoAtualizado });
+          markStepCompleted(1);
         }
         navigate(`/processos/convocacao/editar/${uuid}/selecao-cargos`);
         return;
       }
       const result = await handleSub(formData);
       if (result && typeof result === 'object' && 'uuid' in result) {
+        await patchPassoProcessoConvocacaoMutation.mutateAsync({ processoUuid: result.uuid, passo: 1 });
+        markStepCompleted(1);
         navigate(`/processos/convocacao/editar/${result.uuid}/selecao-cargos`, { state: { editData: result, isViewMode: false } });
       }
     })();
@@ -106,6 +127,7 @@ const DadosDoProcesso: React.FC = () => {
 
   return (
     <>
+      <ConvocacaoStepsGlobalStyle />
       <BaseTela
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
@@ -125,7 +147,7 @@ const DadosDoProcesso: React.FC = () => {
         }
       >
         <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
-          <Steps current={current} items={items} />
+          <Steps className="convocacao-steps" current={current} items={stepItems} onChange={handleStepChange} />
         </StyledCardWithoutBorder>
 
         <StyledCardWithoutBorder

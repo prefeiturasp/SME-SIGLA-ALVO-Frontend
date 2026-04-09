@@ -42,7 +42,18 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
   const navigate = useNavigate();
   
   const handleEdit = (editData: IProcessoConvocacao) => {    
-    navigate(`editar/${editData.uuid}/dados-processo`, {state:{editData}});
+    const passo = Number(editData.passo ?? 1);
+    let path = `editar/${editData.uuid}/dados-processo`;
+
+    if (passo === 1) {
+      path = `editar/${editData.uuid}/selecao-cargos`;
+    } else if (passo === 2) {
+      path = `editar/${editData.uuid}/agenda`;
+    } else if (passo >= 3) {
+      path = `editar/${editData.uuid}/resumo`;
+    }
+
+    navigate(path, { state: { editData } });
   };
 
   const handleView = (viewData: IProcessoConvocacao) => {
@@ -104,6 +115,11 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
         return {
           color: '#6691D3',
           label: 'Em andamento'
+        };
+      } else if (statusLower.includes('pendente')) {
+        return {
+          color: '#BFBFBF',
+          label: 'Pendente'
         };
       } else if (statusLower.includes('finalizado') || statusLower.includes('finalizada')) {
         return {

@@ -16,6 +16,7 @@ import {
   ModalButtonContainer,
   modalInlineStyles,
 } from "../../CriarEditarConvocacao/SelecaoCargos/styles";
+import { usePatchStatusProcessoConvocacao } from "../hooks/usePatchStatusProcessoConvocacao";
 import {
   ModalWrapper,
   ModalHeading,
@@ -73,6 +74,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   visible,
   context,
   selectedProcesso,
+  selectedProcessoStatus,
   selectedConcursoUuid,
   selectedAgendaData,
   cargoCodigoNumericoParam,
@@ -95,6 +97,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   const previousVisibleRef = useRef(visible);
   const previousContextRef = useRef(context);
   const syncPendingRef = useRef(false);
+  const processosComStatusAtualizadoRef = useRef<Set<string>>(new Set());
 
   const initialValues = useMemo(() => {
     if (!visible) {
@@ -427,6 +430,31 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   });
   const { mutateAsync: salvarEscolhaMutateAsync, isPending: salvarEscolhaIsPending } =
     salvarEscolhaMutation;
+  const patchStatusProcessoMutation = usePatchStatusProcessoConvocacao();
+  const { mutateAsync: patchStatusProcessoMutateAsync } = patchStatusProcessoMutation;
+
+  const atualizarStatusProcessoAoIniciarEscolha = useCallback(async () => {
+    if (!selectedProcesso || selectedProcessoStatus !== "PENDENTE") {
+      return;
+    }
+
+    if (processosComStatusAtualizadoRef.current.has(selectedProcesso)) {
+      return;
+    }
+
+    try {
+      await patchStatusProcessoMutateAsync(selectedProcesso);
+      processosComStatusAtualizadoRef.current.add(selectedProcesso);
+    } catch {
+      message.warning(
+        "Escolha salva, mas não foi possível atualizar o status do processo para Em Andamento."
+      );
+    }
+  }, [
+    patchStatusProcessoMutateAsync,
+    selectedProcesso,
+    selectedProcessoStatus,
+  ]);
 
   // Função para sincronizar agendas após salvar escolha
   const sincronizarAgendas = useCallback(async (
@@ -559,6 +587,8 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
           selectedAgendaData
         );
       }
+
+      await atualizarStatusProcessoAoIniciarEscolha();
       
       message.success("Escolha salva com sucesso.");
       onClose();
@@ -598,6 +628,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     onClose,
     onSuccess,
     salvarEscolhaMutateAsync,
+    atualizarStatusProcessoAoIniciarEscolha,
     selectedConcursoUuid,
     selectedProcesso,
     selectedAgendaData,

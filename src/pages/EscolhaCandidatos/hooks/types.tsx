@@ -52,6 +52,7 @@ export interface EscolhaCandidatosModalProps {
   visible: boolean;
   context: ModalEscolhaContext | null;
   selectedProcesso?: string;
+  selectedProcessoStatus?: string;
   selectedConcursoUuid?: string;
   selectedAgendaData?: IAgenda;
   cargoCodigoNumericoParam?: string;
