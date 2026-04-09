@@ -34,6 +34,7 @@ status : string;
 passo?: number;
 tipo_escolha : string;
 uuid : string;
+pode_deletar?: boolean;
 }
 export interface IProcessoConvocacaoResumo {
 

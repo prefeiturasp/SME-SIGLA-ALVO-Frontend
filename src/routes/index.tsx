@@ -135,7 +135,7 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <PermissionContextGuard model="processoconvocacao,importacaoarquivovagas" permissaoDeExibirATELA="add_importacaoarquivovagas">
-        <GerenciamentoVagasTela />
+          <GerenciamentoVagasTela />
         </PermissionContextGuard>
       </ProtectedRoute>
     ),
