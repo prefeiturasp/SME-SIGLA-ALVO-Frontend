@@ -6,6 +6,14 @@ import { ThemeProvider as SCThemeProvider } from 'styled-components';
 import { theme as appTheme } from '../../../../theme';
 import ConvocacaoTable from '../components/ConvocacaoTable';
 
+const mockDeletarProcesso = jest.fn();
+jest.mock('../hooks/useDeleteProcessoConvocacao', () => ({
+  useDeleteProcessoConvocacao: () => ({
+    deletarProcesso: mockDeletarProcesso,
+    isDeleting: false,
+  }),
+}));
+
 const makeRow = (over: Partial<any> = {}) => ({
   uuid: 'uuid-1',
   descricao: 'Concurso X',
@@ -123,7 +131,7 @@ describe('ConvocacaoTable', () => {
     await user.click(editButton as HTMLElement);
 
     // Check if navigate was called with the correct path
-    expect(mockNavigate).toHaveBeenCalledWith('editar/uuid-1/dados-processo', expect.objectContaining({
+    expect(mockNavigate).toHaveBeenCalledWith('editar/uuid-1/selecao-cargos', expect.objectContaining({
       state: expect.objectContaining({ editData: expect.any(Object) })
     }));
   });
@@ -208,10 +216,9 @@ describe('ConvocacaoTable', () => {
       if (viewButton && !viewButton.hasAttribute('disabled')) {
         await user.click(viewButton as HTMLElement);
         expect(mockNavigate).toHaveBeenCalledWith(
-          'editar/uuid-1/dados-processo',
+          'visualizar/uuid-1/resumo',
           expect.objectContaining({
             state: expect.objectContaining({
-              editData: expect.any(Object),
               isViewMode: true,
             }),
           })

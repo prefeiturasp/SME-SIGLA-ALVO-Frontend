@@ -22,6 +22,12 @@ jest.mock("../components/ExportacaoCandidatosFormTab", () => {
   };
 });
 
+jest.mock("../components/ExportacaoLotesFormTab", () => {
+  return function ExportacaoLotesFormTabMock() {
+    return <div data-testid="exportacao-lotes-tab" />;
+  };
+});
+
 jest.mock("../../Base/BaseTela", () => {
   return function BaseTelaMock({ children, title, breadcrumbItems }: any) {
     return (

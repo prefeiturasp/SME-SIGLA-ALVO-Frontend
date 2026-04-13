@@ -4,6 +4,12 @@ import { renderWithProviders } from '../../../../test-utils';
 import SelecaoCargos from '../SelecaoCargosTela';
 import dayjs from 'dayjs';
 
+jest.mock('../../hooks/usePatchPassoProcessoConvocacao', () => ({
+  usePatchPassoProcessoConvocacao: () => ({
+    mutateAsync: jest.fn().mockResolvedValue({}),
+  }),
+}));
+
 // Mock do useNavigate
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
