@@ -113,6 +113,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
 
     const situacaoFromContext = context?.situacaoCodigo;
     const tipoVagaFromContext = context?.tipoVagaCodigo;
+
     return {
       situacao:
         situacaoFromContext && situacaoFromContext !== "pendente"
@@ -174,18 +175,11 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     shouldFetchVagas
   );
 
-  // Verifica se o modal está em modo somente leitura
-  // Regras:
-  // 1) Se for "não-escolha" em agenda de retardatários -> editável (false)
-  // 2) Se a situação do candidato for "pendente" -> somente leitura (true)
-  // 3) Demais casos -> editável (false)
+  // Verifica se o modal está em modo somente leitura (candidato já tem escolha feita)
   const isReadOnly = useMemo(() => {
-    const agendaEhRetardatario = selectedAgendaData?.retardatario === true;
-    const isNaoEscolha = modalSituacao === "nao-escolha";
-    if (isNaoEscolha && agendaEhRetardatario) return false;
-    if (context?.situacaoCodigo === "pendente") return true;
-    return false; 
-  }, [context?.situacaoCodigo, selectedAgendaData?.retardatario, modalSituacao]);
+    return context?.situacaoCodigo !== "pendente";
+  }, [context?.situacaoCodigo]);
+
   const vagasElegiveisPorTipo = useMemo(() => {
     if (!vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
       return [];
@@ -520,12 +514,9 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
           (uuid) => uuid !== candidatoUuid
         );
 
-        // Só remove da agenda de retardatários quando a situação NÃO for "não-escolha"
-        if (modalSituacao !== "nao-escolha") {
-          await API.Agenda.patchAgenda(agendaAtual.uuid, {
-            candidatos_uuids: candidatosAtualizados,
-          }).response;
-        }
+        await API.Agenda.patchAgenda(agendaAtual.uuid, {
+          candidatos_uuids: candidatosAtualizados,
+        }).response;
       } else {
         // Caso 2: Escolha feita em agenda normal
         // Encontrar e atualizar a agenda de retardatários
@@ -538,11 +529,10 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
           const candidatosAtualizados = (agendaRetardatarios.candidatos_uuids || []).filter(
             (uuid) => uuid !== candidatoUuid
           );
-          if (modalSituacao !== "nao-escolha") {
-            await API.Agenda.patchAgenda(agendaRetardatarios.uuid, {
-              candidatos_uuids: candidatosAtualizados,
-            }).response;
-          }
+
+          await API.Agenda.patchAgenda(agendaRetardatarios.uuid, {
+            candidatos_uuids: candidatosAtualizados,
+          }).response;
         }
       }
 
@@ -558,7 +548,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       // Não mostrar erro ao usuário aqui, pois a escolha já foi salva
       // Apenas logar o erro
     }
-  }, [queryClient, modalSituacao]);
+  }, [queryClient]);
 
   const handleSalvarEscolha = useCallback(async () => {
     if (!context?.candidatoUuid) {
