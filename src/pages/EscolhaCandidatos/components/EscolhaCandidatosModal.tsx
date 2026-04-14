@@ -16,6 +16,7 @@ import {
   ModalButtonContainer,
   modalInlineStyles,
 } from "../../CriarEditarConvocacao/SelecaoCargos/styles";
+import { usePatchStatusProcessoConvocacao } from "../hooks/usePatchStatusProcessoConvocacao";
 import {
   ModalWrapper,
   ModalHeading,
@@ -73,12 +74,13 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   visible,
   context,
   selectedProcesso,
+  selectedProcessoStatus,
   selectedConcursoUuid,
   selectedAgendaData,
   cargoCodigoNumericoParam,
   onClose,
   onSuccess,
-  canViewEscolha,
+  canViewEscolha: _canViewEscolha,
   canAddEscolha,
 }) => {
   const [modalSituacao, setModalSituacao] = useState<SituacaoEscolha>("escolha");
@@ -95,6 +97,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   const previousVisibleRef = useRef(visible);
   const previousContextRef = useRef(context);
   const syncPendingRef = useRef(false);
+  const processosComStatusAtualizadoRef = useRef<Set<string>>(new Set());
 
   const initialValues = useMemo(() => {
     if (!visible) {
@@ -177,85 +180,97 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     return context?.situacaoCodigo !== "pendente";
   }, [context?.situacaoCodigo]);
 
-  const dreOptions = useMemo(() => {
-    const options: Array<{ value: string; label: string; codigo: string; raw: any }> = [];
-    
-    if (vagasData?.dres && Array.isArray(vagasData.dres)) {
-      vagasData.dres.forEach((dre) => {
-        options.push({
-          value: dre.uuid,
-          label: dre.nome,
-          codigo: dre.codigo,
-          raw: dre,
-        });
-      });
-    }
-    
-    // Se estiver em modo somente leitura e tiver dreUuid no context mas não estiver nas opções, adicionar
-    if (isReadOnly && context?.dreUuid && context?.dreCodigo) {
-      const exists = options.some((opt) => opt.value === context.dreUuid);
-      if (!exists) {
-        // Tentar encontrar a DRE nas opções por código primeiro
-        const foundByCodigo = options.find((opt) => opt.codigo === context.dreCodigo);
-        if (!foundByCodigo) {
-          // Se não encontrou, adicionar uma opção temporária (será substituída quando os dados carregarem)
-          options.push({
-            value: context.dreUuid,
-            label: `DRE ${context.dreCodigo}`, // Fallback label
-            codigo: context.dreCodigo,
-            raw: { uuid: context.dreUuid, codigo: context.dreCodigo },
-          });
-        }
-      }
-    }
-    
-    return options;
-  }, [vagasData?.dres, isReadOnly, context?.dreUuid, context?.dreCodigo]);
-
-  // Lista de escolas filtradas por DRE com estrutura { uuid, escola, vagas restantes, disabled }
-  const escolasPorDre = useMemo(() => {
+  const vagasElegiveisPorTipo = useMemo(() => {
     if (!vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
       return [];
     }
-    
-    // Se estiver em modo somente leitura e tiver uma escola selecionada, incluir ela mesmo que não esteja na DRE filtrada
-    let escolasFiltradas: any[] = [];
-    
-    if (modalDreCodigo) {
-      escolasFiltradas = vagasData.vagas.filter(
-        (vaga: any) => vaga?.escola?.dre?.codigo === modalDreCodigo
-      );
-    }
-    
-    // Se estiver em modo somente leitura e tiver vagaEscolaUuid, garantir que a escola esteja na lista
-    if (isReadOnly && context?.vagaEscolaUuid && vagasData.vagas.length > 0) {
+
+    let vagasElegiveis = vagasData.vagas.filter((vaga: any) => {
+      const vagasPrecariasRestantes = vaga.vagas_precarias_restantes ?? 0;
+      const vagasDefinitivasRestantes = vaga.vagas_definitivas_restantes ?? 0;
+
+      if (isReadOnly) {
+        return true;
+      }
+
+      return modalTipoVaga === "definitiva"
+        ? vagasDefinitivasRestantes > 0
+        : vagasPrecariasRestantes > 0;
+    });
+
+    // Em modo somente leitura, garante que a escola escolhida continue exibida.
+    if (isReadOnly && context?.vagaEscolaUuid) {
       const escolaSelecionada = vagasData.vagas.find(
         (vaga: any) => vaga.uuid === context.vagaEscolaUuid
       );
-      if (escolaSelecionada && !escolasFiltradas.some((v: any) => v.uuid === escolaSelecionada.uuid)) {
-        escolasFiltradas.push(escolaSelecionada);
+      if (
+        escolaSelecionada &&
+        !vagasElegiveis.some((vaga: any) => vaga.uuid === escolaSelecionada.uuid)
+      ) {
+        vagasElegiveis = [...vagasElegiveis, escolaSelecionada];
       }
     }
-    
-    return escolasFiltradas.map((vaga: any) => {
-      const vagasPrecariasRestantes = vaga.vagas_precarias_restantes ?? 0;
-      const vagasDefinitivasRestantes = vaga.vagas_definitivas_restantes ?? 0;
-      
-      // Desabilita escola se não tem vagas restantes do tipo selecionado (apenas se não estiver em modo somente leitura)
-      const isDisabled = !isReadOnly && (modalTipoVaga === "definitiva" 
-        ? vagasDefinitivasRestantes <= 0
-        : vagasPrecariasRestantes <= 0);
-      
+
+    return vagasElegiveis;
+  }, [vagasData?.vagas, modalTipoVaga, isReadOnly, context?.vagaEscolaUuid]);
+
+  const dreOptions = useMemo(() => {
+    const dreMap = new Map<string, { value: string; label: string; codigo: string; raw: any }>();
+
+    vagasElegiveisPorTipo.forEach((vaga: any) => {
+      const dre = vaga?.escola?.dre;
+      if (!dre?.uuid || !dre?.codigo) {
+        return;
+      }
+      dreMap.set(dre.uuid, {
+        value: dre.uuid,
+        label: dre.nome,
+        codigo: dre.codigo,
+        raw: dre,
+      });
+    });
+
+    const options = Array.from(dreMap.values()).sort((a, b) =>
+      a.label.localeCompare(b.label, "pt-BR")
+    );
+
+    // Se estiver em modo somente leitura e tiver dreUuid no context mas não estiver nas opções, adicionar.
+    if (isReadOnly && context?.dreUuid && context?.dreCodigo) {
+      const exists = options.some((opt) => opt.value === context.dreUuid);
+      if (!exists) {
+        options.push({
+          value: context.dreUuid,
+          label: `DRE ${context.dreCodigo}`,
+          codigo: context.dreCodigo,
+          raw: { uuid: context.dreUuid, codigo: context.dreCodigo },
+        });
+      }
+    }
+
+    return options;
+  }, [vagasElegiveisPorTipo, isReadOnly, context?.dreUuid, context?.dreCodigo]);
+
+  // Lista de escolas filtradas por DRE já considerando o tipo de vaga selecionado.
+  const escolasPorDre = useMemo(() => {
+    if (!modalDreCodigo) {
+      return [];
+    }
+
+    return vagasElegiveisPorTipo
+      .filter((vaga: any) => vaga?.escola?.dre?.codigo === modalDreCodigo)
+      .map((vaga: any) => {
+        const vagasPrecariasRestantes = vaga.vagas_precarias_restantes ?? 0;
+        const vagasDefinitivasRestantes = vaga.vagas_definitivas_restantes ?? 0;
+
       return {
         value: vaga.uuid,
-        label: vaga?.escola?.nome_oficial || '',
-        disabled: isDisabled,
+        label: vaga?.escola?.nome_oficial || "",
         vagasPrecariasRestantes,
         vagasDefinitivasRestantes,
         vagaData: vaga,
       };
     });
-  }, [vagasData?.vagas, modalDreCodigo, modalTipoVaga, isReadOnly, context?.vagaEscolaUuid]);
+  }, [vagasElegiveisPorTipo, modalDreCodigo]);
 
   const syncedModalDre = useMemo(() => {
     if (!visible) {
@@ -358,28 +373,6 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     [context?.vagas, vagasTotals?.total_vagas]
   );
 
-  // Verifica se deve desabilitar os radios de tipo de vaga baseado na escola selecionada
-  const tipoVagaDisabled = useMemo(() => {
-    if (!vagaSelecionada) {
-      // Se não há escola selecionada, nenhum radio é desabilitado
-      return {
-        precaria: false,
-        definitiva: false,
-      };
-    }
-
-    // Verifica vagas restantes da escola selecionada
-    const vagasDefinitivasRestantes = vagaSelecionada.vagas_definitivas_restantes ?? 0;
-    const vagasPrecariasRestantes = vagaSelecionada.vagas_precarias_restantes ?? 0;
-
-    return {
-      // Desabilita "Precária" se não houver vagas precárias restantes
-      precaria: vagasPrecariasRestantes <= 0,
-      // Desabilita "Definitiva" se não houver vagas definitivas restantes
-      definitiva: vagasDefinitivasRestantes <= 0,
-    };
-  }, [vagaSelecionada]);
-
   const handleModalDreChange = useCallback(
     (value?: string) => {
       setModalDre(value);
@@ -393,6 +386,23 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     },
     [dreOptions]
   );
+
+  // Limpa DRE/escola quando o tipo de vaga muda e a DRE deixa de ter opções elegíveis.
+  useEffect(() => {
+    if (isReadOnly || !modalDre) {
+      return;
+    }
+
+    const dreSelecionadaAindaElegivel = dreOptions.some(
+      (option) => option.value === modalDre
+    );
+
+    if (!dreSelecionadaAindaElegivel) {
+      setModalDre(undefined);
+      setModalDreCodigo(undefined);
+      setModalUnidadeEscolar(undefined);
+    }
+  }, [isReadOnly, modalDre, dreOptions]);
 
   // Limpa a seleção da escola se ela não tiver vagas do tipo selecionado
   // (apenas quando não estiver em modo somente leitura)
@@ -427,6 +437,31 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   });
   const { mutateAsync: salvarEscolhaMutateAsync, isPending: salvarEscolhaIsPending } =
     salvarEscolhaMutation;
+  const patchStatusProcessoMutation = usePatchStatusProcessoConvocacao();
+  const { mutateAsync: patchStatusProcessoMutateAsync } = patchStatusProcessoMutation;
+
+  const atualizarStatusProcessoAoIniciarEscolha = useCallback(async () => {
+    if (!selectedProcesso || selectedProcessoStatus !== "PENDENTE") {
+      return;
+    }
+
+    if (processosComStatusAtualizadoRef.current.has(selectedProcesso)) {
+      return;
+    }
+
+    try {
+      await patchStatusProcessoMutateAsync(selectedProcesso);
+      processosComStatusAtualizadoRef.current.add(selectedProcesso);
+    } catch {
+      message.warning(
+        "Escolha salva, mas não foi possível atualizar o status do processo para Em Andamento."
+      );
+    }
+  }, [
+    patchStatusProcessoMutateAsync,
+    selectedProcesso,
+    selectedProcessoStatus,
+  ]);
 
   // Função para sincronizar agendas após salvar escolha
   const sincronizarAgendas = useCallback(async (
@@ -559,6 +594,8 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
           selectedAgendaData
         );
       }
+
+      await atualizarStatusProcessoAoIniciarEscolha();
       
       message.success("Escolha salva com sucesso.");
       onClose();
@@ -598,6 +635,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     onClose,
     onSuccess,
     salvarEscolhaMutateAsync,
+    atualizarStatusProcessoAoIniciarEscolha,
     selectedConcursoUuid,
     selectedProcesso,
     selectedAgendaData,
@@ -633,7 +671,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
           )}
         </ModalButtonContainer>
       }
-      width={900}
+      width={950}
       style={modalInlineStyles.modalMaxSize}
       styles={{ body: { padding: "24px 32px 32px" } }}
       title={null}
@@ -699,6 +737,30 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
             <ModalRadio value="reconvocacao" disabled={isReadOnly}>Reconvocação</ModalRadio>
             <ModalRadio value="nao-escolha" disabled={isReadOnly}>Não escolha</ModalRadio>
           </ModalRadioGroup>
+
+          {modalSituacao === "escolha" && (
+            <>
+              <ModalSectionTitle style={{ marginTop: "0.5rem" }}>
+                Tipo de vaga
+              </ModalSectionTitle>
+              <ModalRadioGroup
+                value={modalTipoVaga}
+                onChange={(event) =>
+                  setModalTipoVaga(
+                    event.target.value as "precaria" | "definitiva"
+                  )
+                }
+                disabled={isReadOnly}
+              >
+                <ModalRadio value="precaria" disabled={isReadOnly}>
+                  Precária
+                </ModalRadio>
+                <ModalRadio value="definitiva" disabled={isReadOnly}>
+                  Definitiva
+                </ModalRadio>
+              </ModalRadioGroup>
+            </>
+          )}
         </ModalSection>
 
         {modalSituacao === "escolha" && (
@@ -741,29 +803,6 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
               </ModalFieldsRow>
             </ModalSection>
 
-            <ModalSection>
-              <ModalFieldsRow gutter={[24, 16]}>
-                <Col xs={24} md={12}>
-                  <ModalFieldLabel>Tipo de vaga</ModalFieldLabel>
-                  <ModalRadioGroup
-                    value={modalTipoVaga}
-                    onChange={(event) =>
-                      setModalTipoVaga(
-                        event.target.value as "precaria" | "definitiva"
-                      )
-                    }
-                    disabled={isReadOnly}
-                  >
-                    <ModalRadio value="precaria" disabled={isReadOnly || tipoVagaDisabled.precaria}>
-                      Precária
-                    </ModalRadio>
-                    <ModalRadio value="definitiva" disabled={isReadOnly || tipoVagaDisabled.definitiva}>
-                      Definitiva
-                    </ModalRadio>
-                  </ModalRadioGroup>
-                </Col>
-              </ModalFieldsRow>
-            </ModalSection>
           </>
         )}
       </ModalWrapper>

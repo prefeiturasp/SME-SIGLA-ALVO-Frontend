@@ -15,6 +15,7 @@ export interface IProcessoConvocacaoDetalhe {
   descricao: string;
   tipo_escolha: string;
   status: string;
+  passo?: number;
   data_convocacao: string;
   data_corte_vagas: string;
   cargos_processo: ICargoProcessoConvocacao[];
@@ -30,8 +31,10 @@ descricao : string;
 numero_convocados : number
 quantidade_cargos : number
 status : string;
+passo?: number;
 tipo_escolha : string;
 uuid : string;
+pode_deletar?: boolean;
 }
 export interface IProcessoConvocacaoResumo {
 
@@ -41,6 +44,7 @@ export interface IProcessoConvocacaoResumo {
   descricao: string;
   tipo_escolha: string;
   status: string;
+  passo?: number;
   data_convocacao: string;
   data_corte_vagas: string;
   criado_em: string;
@@ -49,6 +53,7 @@ export interface IProcessoConvocacaoResumo {
 }
 export interface IPostProcessoConvocacaoPayload {
   status?: string;
+  passo?: number;
   concurso_nome: string;
   concurso_uuid: string;
   tipo_escolha: string;

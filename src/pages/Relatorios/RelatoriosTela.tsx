@@ -10,6 +10,7 @@ import AtaEscolhaCargoModal from "./components/AtaEscolhaCargoModal";
 import { usePostRelatorio } from "./hooks/usePostRelatorio";
 import { FilterSelect, FilterLabel } from "../EscolhaCandidatos/styles";
 import PersonalizacaoModal from "./components/PersonalizacaoModal";
+import ShadowContent from "./components/ShadowContent";
 import type { RelatorioLinha } from "../../services/resources/relatorios/IRelatorios";
 
 type RelatorioTipo = "EM_ANDAMENTO" | "FINALIZADO";
@@ -468,9 +469,9 @@ const RelatoriosTela: React.FC = () => {
             style={{ width: "100%", height: "80vh", border: 0 }}
           />
         ) : previewHtml ? (
-          <div
-            style={{ width: "100%", height: "80vh", overflow: "auto", padding: 0 }}
-            dangerouslySetInnerHTML={{ __html: previewHtml }}
+          <ShadowContent
+            html={previewHtml}
+            style={{ width: "100%", height: "80vh", overflow: "auto", display: "block" }}
           />
         ) : (
           <pre style={{ margin: 0, padding: 16, whiteSpace: "pre-wrap" }}>

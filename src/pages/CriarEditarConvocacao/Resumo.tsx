@@ -5,7 +5,9 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 import { UserSwitchOutlined } from "@ant-design/icons";
 import { StepActions } from "./components/StepActions";
-import { items, steps } from "./components/StepsNames";
+import { steps } from "./components/StepsNames";
+import { ConvocacaoStepsGlobalStyle } from "./components/ConvocacaoStepsStyles";
+import { useConvocacaoSteps } from "./components/useConvocacaoSteps";
 import { StyledCardWithoutBorder } from "../../components/EstilosCompartilhados";
 import ResumoDoProcesso from "./Resumo/ResumoDoProcesso";
 import ResumoAgendaTabela from "./Resumo/ResumoAgendaTabela";
@@ -14,6 +16,7 @@ import { useGetAgendas } from "./Agenda/hooks/useGetAgendas";
 import type { IAgenda } from "../../services/resources/agenda/IAgenda";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 import { resumoStyles } from "./Resumo/styles";
+import { usePatchPassoProcessoConvocacao } from "./hooks/usePatchPassoProcessoConvocacao";
 
 const { Text } = Typography;
 
@@ -43,6 +46,7 @@ const Resumo: React.FC = () => {
   const canChangeProcessoConvocacao = can("change_processoconvocacao");
   const canAddImportacaoArquivoVagas = can("add_importacaoarquivovagas");
   const { token } = theme.useToken();
+  const patchPassoProcessoConvocacaoMutation = usePatchPassoProcessoConvocacao();
 
   const { uuid } = useParams<{ uuid: string }>();
   const navigate = useNavigate();
@@ -172,8 +176,18 @@ const Resumo: React.FC = () => {
   ] as TitleItem[];
 
   const current = 3;
+  const { stepItems, handleStepChange, markStepCompleted } = useConvocacaoSteps({
+    uuid,
+    currentStepIndex: current,
+    passoAtualBackend: processoConvocacaoData?.passo,
+    onNavigate: (path) => navigate(path),
+  });
 
   const next = async () => {
+    if (uuid) {
+      await patchPassoProcessoConvocacaoMutation.mutateAsync({ processoUuid: uuid, passo: 4 });
+      markStepCompleted(4);
+    }
     navigate(`/processos/convocacao/`);
   };
 
@@ -182,6 +196,7 @@ const Resumo: React.FC = () => {
   };
   return (
     <>
+      <ConvocacaoStepsGlobalStyle />
       <BaseTela
         breadcrumbItems={breadcrumbItems}
         title={isViewOnlyResumo ? "Resumo do processo" : "Nova convocação"}
@@ -208,7 +223,7 @@ const Resumo: React.FC = () => {
             }
             variant="borderless"
           >
-            <Steps current={current} items={items} />
+            <Steps className="convocacao-steps" current={current} items={stepItems} onChange={handleStepChange} />
           </StyledCardWithoutBorder>
         )}
 

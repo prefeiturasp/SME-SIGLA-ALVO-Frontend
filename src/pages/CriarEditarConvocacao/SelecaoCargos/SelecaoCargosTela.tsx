@@ -10,6 +10,7 @@ import {
   Divider,
   Table,
   Form,
+  message,
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Tooltip } from "antd";
@@ -24,7 +25,9 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { StepActions } from "../components/StepActions";
-import { items, steps } from "../components/StepsNames";
+import { steps } from "../components/StepsNames";
+import { ConvocacaoStepsGlobalStyle } from "../components/ConvocacaoStepsStyles";
+import { useConvocacaoSteps } from "../components/useConvocacaoSteps";
 import BuscarCandidatosModal from "./BuscarCandidatosModal";
 import { useSelecaoCargo } from "./hooks/useSelecaoCargo";
 import { CustomFormItem } from "../../../components/FormStyle";
@@ -39,6 +42,7 @@ import {
 } from "./styles";
 import dayjs from "dayjs";
 import { useGetPermissions } from "../../../routes/PermissionContextGuard";
+import { usePatchPassoProcessoConvocacao } from "../hooks/usePatchPassoProcessoConvocacao";
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -70,7 +74,9 @@ const SelecaoCargos: React.FC = () => {
     convocarCandidatosHabilitados,
     handleCandidatosUuidsChange,
     uuid,
+    hasEdits,
   } = useSelecaoCargo();
+  const patchPassoProcessoConvocacaoMutation = usePatchPassoProcessoConvocacao();
   const isEdit = false;
   const breadcrumbItems = [
     {
@@ -112,15 +118,29 @@ const SelecaoCargos: React.FC = () => {
   ] as TitleItem[];
 
   const current=1;
+  const { passoAtual, stepItems, handleStepChange, markStepCompleted } = useConvocacaoSteps({
+    uuid,
+    currentStepIndex: current,
+    passoAtualBackend: processoConvocacaoData?.passo,
+    hasEdits,
+    onUnsavedChangesWarning: () =>
+      message.warning("Salve as alterações antes de navegar entre as etapas."),
+    onNavigate: (path) => navigate(path),
+  });
+
  
   const next = async () => {
     const sucesso = await salvarCargosNoBackend();
     if (sucesso) {
+      if (!uuid) return;
       // Coletar todos os UUIDs de todos os cargos para convocar
       const todosCandidatosUuids = cargosAdicionados
         .flatMap(cargo => cargo.candidatos_uuids || [])
         .filter((uuid, index, self) => self.indexOf(uuid) === index); // remover duplicatas
       await convocarCandidatosHabilitados(todosCandidatosUuids, true);
+      const passoAtualizado = Math.max(passoAtual, 2) as 1 | 2 | 3 | 4;
+      await patchPassoProcessoConvocacaoMutation.mutateAsync({ processoUuid: uuid, passo: passoAtualizado });
+      markStepCompleted(2);
       navigate(`/processos/convocacao/editar/${uuid}/agenda`);
     }
   };
@@ -153,6 +173,7 @@ const SelecaoCargos: React.FC = () => {
 
   return (
     <>
+      <ConvocacaoStepsGlobalStyle />
       <BaseTela
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
@@ -171,7 +192,7 @@ const SelecaoCargos: React.FC = () => {
         }
       >
         <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
-          <Steps current={current} items={items} />
+          <Steps className="convocacao-steps" current={current} items={stepItems} onChange={handleStepChange} />
         </StyledCardWithoutBorder>
 
         <StyledCardWithoutBorder

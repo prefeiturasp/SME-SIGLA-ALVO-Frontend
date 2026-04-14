@@ -27,6 +27,8 @@ import {
 } from "./style";
 
 import { deleteIcon } from "../../../../components/EstilosCompartilhados";
+import ConfirmarExclusaoProcessoModal from "./ConfirmarExclusaoProcessoModal";
+import { useDeleteProcessoConvocacao } from "../hooks/useDeleteProcessoConvocacao";
 
 interface ConvocacaoTableProps extends TableProps<IProcessoConvocacao> {
   data: IProcessoConvocacao[];
@@ -40,9 +42,23 @@ interface ConvocacaoTableProps extends TableProps<IProcessoConvocacao> {
 
 const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProcessoConvocacao, canDeleteProcessoConvocacao, canViewDetailsProcessoConvocacao, canFinalizeProcessoConvocacao, onFinalizar, finalizandoUuid, ...rest }) => {
   const navigate = useNavigate();
+  const { deletarProcesso, isDeleting } = useDeleteProcessoConvocacao();
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const [deletingUuidState, setDeletingUuidState] = React.useState<string | null>(null);
   
   const handleEdit = (editData: IProcessoConvocacao) => {    
-    navigate(`editar/${editData.uuid}/dados-processo`, {state:{editData}});
+    const passo = Number(editData.passo ?? 1);
+    let path = `editar/${editData.uuid}/dados-processo`;
+
+    if (passo === 1) {
+      path = `editar/${editData.uuid}/selecao-cargos`;
+    } else if (passo === 2) {
+      path = `editar/${editData.uuid}/agenda`;
+    } else if (passo >= 3) {
+      path = `editar/${editData.uuid}/resumo`;
+    }
+
+    navigate(path, { state: { editData } });
   };
 
   const handleView = (viewData: IProcessoConvocacao) => {
@@ -104,6 +120,11 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
         return {
           color: '#6691D3',
           label: 'Em andamento'
+        };
+      } else if (statusLower.includes('pendente')) {
+        return {
+          color: '#BFBFBF',
+          label: 'Pendente'
         };
       } else if (statusLower.includes('finalizado') || statusLower.includes('finalizada')) {
         return {
@@ -244,7 +265,7 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
         if (!record) return null;
         const isFinalizado = isProcessoFinalizado(record.status);
         const isEditDisabled = isFinalizado || !canChangeProcessoConvocacao;
-        const isDeleteDisabled = isFinalizado || !canDeleteProcessoConvocacao;
+        const isDeleteDisabled = isFinalizado || !canDeleteProcessoConvocacao || record.pode_deletar === false;
         const isFinalizarDisabled = isFinalizado || !canFinalizeProcessoConvocacao || finalizandoUuid === record.uuid;
 
         return (
@@ -271,7 +292,11 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
               <Button
                 type={"link"}
                 icon={<DeleteOutlined style={isDeleteDisabled ? deleteIcon : deleteIconEnabled} />}
-                onClick={() => !isFinalizado && console.log("delete", record)}
+                onClick={() => {
+                  if (isFinalizado) return;
+                  setDeletingUuidState(record.uuid);
+                  setDeleteModalOpen(true);
+                }}
                 disabled={isDeleteDisabled}
               />
             </Tooltip>
@@ -317,6 +342,24 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
           )
         }}
         {...rest}
+      />
+      <ConfirmarExclusaoProcessoModal
+        open={deleteModalOpen}
+        confirmLoading={isDeleting}
+        onCancel={() => {
+          if (isDeleting) return;
+          setDeleteModalOpen(false);
+          setDeletingUuidState(null);
+        }}
+        onConfirm={() => {
+          if (!deletingUuidState) return;
+          deletarProcesso(deletingUuidState, {
+            onSettled: () => {
+              setDeleteModalOpen(false);
+              setDeletingUuidState(null);
+            },
+          } as any);
+        }}
       />
     </>
   );

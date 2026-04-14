@@ -343,6 +343,30 @@ export const useSelecaoCargo = () => {
     handleCandidatosUuidsChange,
     salvandoCargos: postCargoMutation.isPending,
     carregarCargos,
-    uuid
+    uuid,
+    hasEdits: useMemo(() => {
+      const initial = cargosIniciaisRef.current;
+      if (initial.length !== cargosAdicionados.length) return true;
+
+      const toComparable = (cargo: CargoAdicionado) => ({
+        uuid: cargo.uuid ?? null,
+        cargo_uuid: cargo.cargo_uuid,
+        cargo_nome: cargo.cargo_nome,
+        vagas: cargo.vagas,
+        candidatos_geral: cargo.candidatos_geral,
+        candidatos_pcd: cargo.candidatos_pcd,
+        candidatos_nna: cargo.candidatos_nna,
+        totalCandidatos: cargo.totalCandidatos,
+      });
+
+      const currentComparable = cargosAdicionados
+        .map(toComparable)
+        .sort((a, b) => String(a.uuid ?? a.cargo_uuid).localeCompare(String(b.uuid ?? b.cargo_uuid)));
+      const initialComparable = initial
+        .map(toComparable)
+        .sort((a, b) => String(a.uuid ?? a.cargo_uuid).localeCompare(String(b.uuid ?? b.cargo_uuid)));
+
+      return JSON.stringify(currentComparable) !== JSON.stringify(initialComparable);
+    }, [cargosAdicionados])
   };
 };
