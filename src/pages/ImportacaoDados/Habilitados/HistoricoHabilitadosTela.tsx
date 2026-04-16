@@ -34,12 +34,14 @@ const HistoricoHabilitadosTela: React.FC = () => {
   const {
     importacoesArquivos,
     importacoesArquivosIsLoading,
-    listRequest,
-    onAntTableChange,
   } = useImportacaoDados();
 
   const [isErrosModalOpen, setIsErrosModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null);
+  const [tablePagination, setTablePagination] = useState({
+    current: 1,
+    pageSize: 10,
+  });
 
   const { handleDownload, isDownloading } = useGetDownloadError(TipoImportacao.HABILITADOS);
 
@@ -125,7 +127,7 @@ const HistoricoHabilitadosTela: React.FC = () => {
               </CustomTitle>
               <StyledTable<any>
                 columns={columns}
-                dataSource={importacoesArquivos?.results || []}
+                dataSource={importacoesArquivos || []}
                 rowKey="id"
                 bordered
                 rowClassName={(_: any, index: number) =>
@@ -134,18 +136,23 @@ const HistoricoHabilitadosTela: React.FC = () => {
                 className="historico-table"
                 loading={importacoesArquivosIsLoading}
                 pagination={{
-                  current: listRequest.pagination.page,
-                  pageSize: 10,
-                  defaultPageSize: 10,
+                  current: tablePagination.current,
+                  pageSize: tablePagination.pageSize,
+                  showSizeChanger: true,
+                  onChange: (page: number, pageSize: number) => {
+                    setTablePagination({ current: page, pageSize });
+                  },
+                  onShowSizeChange: (_: number, pageSize: number) => {
+                    setTablePagination({ current: 1, pageSize });
+                  },
                   position: ["bottomLeft"],
-                  total: importacoesArquivos?.count,
+                  total: importacoesArquivos?.length || 0,
                   showTotal: (total: number, range: [number, number]) => (
                     <span style={{ marginLeft: 16 }}>
                       {`Mostrando ${range?.[0] ?? 0}-${range?.[1] ?? 0} de ${total ?? 0} registro(s)`}
                     </span>
                   ),
                 }}
-                onChange={onAntTableChange}
               />
             </Col>
           </Row>

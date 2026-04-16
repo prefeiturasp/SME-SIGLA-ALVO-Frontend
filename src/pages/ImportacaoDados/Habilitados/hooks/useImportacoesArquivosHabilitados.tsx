@@ -5,10 +5,9 @@ import type { IListRequest } from "../../../../types/IListRequest";
 const useImportacoesArquivosHabilitados = (listRequest: IListRequest) => {
   // Query para buscar importações com parâmetros
   const { data: importacoesArquivos, isLoading: importacoesArquivosIsLoading } = useQuery({
-    queryKey: ["getImportacaoArquivosHabilitados", listRequest],
+    queryKey: ["getImportacaoArquivosHabilitados"],
     queryFn: ({ signal }) =>
-      API.ImportacaoDados.getImportacaoArquivosHabilitados(
-         listRequest,
+      API.ImportacaoDados.getImportacaoArquivosHabilitados(         
          { signal }
       ).response,
     staleTime: 1000 * 60 * 5,

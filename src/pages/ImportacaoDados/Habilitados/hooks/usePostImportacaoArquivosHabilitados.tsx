@@ -11,7 +11,6 @@ export const usePostImportacaoArquivosHabilitados = () => {
     mutationFn: (payload: IImportacaoHabilitadosPayload) =>
       API.ImportacaoDados.postImportacaoArquivosHabilitados(payload).response,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getImportacaoArquivosHabilitados"] });
       notification.success({
         message: "Importação Realizada",
         description: "A importação dos dados foi processada com sucesso!",
@@ -26,6 +25,9 @@ export const usePostImportacaoArquivosHabilitados = () => {
         placement: "top",
         duration: 3.5,
       });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["getImportacaoArquivosHabilitados"] });
     },
   });
 };
