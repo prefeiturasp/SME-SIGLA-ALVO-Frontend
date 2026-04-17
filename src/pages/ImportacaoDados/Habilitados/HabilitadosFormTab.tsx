@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Select, Button, Tooltip } from "antd";
+import { Row, Col, Select, Button, Tooltip, Spin } from "antd";
 import { Controller } from "react-hook-form";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useImportacaoDados } from "./hooks/useImportacaoDadosHabilitados";
@@ -18,13 +18,11 @@ import FormItem from "antd/es/form/FormItem";
 import { useNavigate } from "react-router-dom";
 
 interface HabilitadosProps {
-  onShowLayoutPadrao: () => void;
   canViewHistoricoHabilitados: boolean;
   canImportarHabilitados: boolean;
 }
 
 const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
-    onShowLayoutPadrao,
     canViewHistoricoHabilitados,
     canImportarHabilitados
 }) => {
@@ -34,7 +32,8 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
     handleFileUpload,
     handleSubmit,
     handleEnviarForm,
-    watch    
+    watch,
+    isCreatingImportacao,
   } = useImportacaoDados();
   const navigate = useNavigate();
   const { concursosData, concursosOptionsIsLoading } = useConcursos();
@@ -42,132 +41,133 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
   
   return (
     <>
-    <TabContentContainer>
-      
+    <Spin spinning={isCreatingImportacao}>
+      <TabContentContainer>
+        
 
-        <Row
+          <Row
+            
+            gutter={40}
+          >
+            <Col xs={24} sm={12}>
+              <Controller
+                control={control}
+                name="concurso"
+                render={({ field }) => (
+                  <CustomFormItem
+                    label="Concurso"
+                    validateStatus={formErrors.concurso ? "error" : undefined}
+                    help={formErrors.concurso?.message}
+                    labelCol={{ span: 24 }}
+                  >
+                    <StyledSelect
+                      {...field}
+                      disabled={!canImportarHabilitados}
+                      placeholder="Selecione o concurso"
+                      loading={concursosOptionsIsLoading}
+                      allowClear
+                      suffixIcon={
+                        <ExpandMoreIcon
+                          style={{ fontSize: "1.5rem", color: "#032B68" }}
+                        />
+                      }
+                    >
+                      {Array.isArray(concursosData)
+                        ? concursosData.map((concurso: any) => (
+                            <Select.Option
+                              key={concurso.value}
+                              value={concurso.value}
+                            >
+                              {concurso.label}
+                            </Select.Option>
+                          ))
+                        : concursosData?.results?.map((concurso: any) => (
+                            <Select.Option
+                              key={concurso.value}
+                              value={concurso.value}
+                            >
+                              {concurso.label}
+                            </Select.Option>
+                          ))}
+                    </StyledSelect>
+                  </CustomFormItem>
+                )}
+              />
+            </Col>
           
-          gutter={40}
-        >
+
           <Col xs={24} sm={12}>
             <Controller
               control={control}
-              name="concurso"
-              render={({ field }) => (
-                <CustomFormItem
-                  label="Concurso"
-                  validateStatus={formErrors.concurso ? "error" : undefined}
-                  help={formErrors.concurso?.message}
+              name="arquivo"
+              render={() => (
+                <FormItem
+                  validateStatus={formErrors.arquivo ? "error" : undefined}
+                  help={formErrors.arquivo?.message}                
                   labelCol={{ span: 24 }}
                 >
-                  <StyledSelect
-                    {...field}
+                  
+                  <StyledUpload
                     disabled={!canImportarHabilitados}
-                    placeholder="Selecione o concurso"
-                    loading={concursosOptionsIsLoading}
-                    allowClear
-                    suffixIcon={
-                      <ExpandMoreIcon
-                        style={{ fontSize: "1.5rem", color: "#032B68" }}
-                      />
-                    }
+                    beforeUpload={(file) => {
+                      handleFileUpload(file);
+                      return false;
+                    }}
+                    accept=".csv"
+                    showUploadList={false}
+                    multiple={false}
                   >
-                    {Array.isArray(concursosData)
-                      ? concursosData.map((concurso: any) => (
-                          <Select.Option
-                            key={concurso.value}
-                            value={concurso.value}
-                          >
-                            {concurso.label}
-                          </Select.Option>
-                        ))
-                      : concursosData?.results?.map((concurso: any) => (
-                          <Select.Option
-                            key={concurso.value}
-                            value={concurso.value}
-                          >
-                            {concurso.label}
-                          </Select.Option>
-                        ))}
-                  </StyledSelect>
-                </CustomFormItem>
+                    <Tooltip title={!canImportarHabilitados?"Você não possui permissão para essa ação":"Selecionar arquivo"} arrow={true} >
+                    <UploadArea style={{ height: "64px" }} status={formErrors.arquivo ? "error" : undefined}>
+                    <GrupoEsquerda>
+                    <CloudUploadOutlined style={{ fontSize: 38, color: "#838383" }} />
+
+                      <span style={{ color: "#666", fontSize: "14px", textAlign: "left" }}>
+                        {watchedFile
+                          ? watchedFile.name
+                          : <>
+                          Selecione ou arraste e solte aqui <br />o arquivo de importação (.csv)
+                            </>                      
+                          }
+                      </span>
+                      </GrupoEsquerda>
+
+                      <Button type="primary" size="small" style={{ fontSize: "14px" }}>
+                        Selecionar
+                      </Button>
+                    </UploadArea>
+                    </Tooltip>
+
+                  </StyledUpload>
+                  
+                </FormItem>
               )}
             />
           </Col>
+          </Row>
+
         
 
-        <Col xs={24} sm={12}>
-          <Controller
-            control={control}
-            name="arquivo"
-            render={() => (
-              <FormItem
-                validateStatus={formErrors.arquivo ? "error" : undefined}
-                help={formErrors.arquivo?.message}                
-                labelCol={{ span: 24 }}
-              >
-                
-                <StyledUpload
-                  disabled={!canImportarHabilitados}
-                  beforeUpload={(file) => {
-                    handleFileUpload(file);
-                    return false;
-                    // Impede o upload automático
-                  }}
-                  accept=".csv"
-                  showUploadList={false}
-                  multiple={false}
-                >
-                  <Tooltip title={!canImportarHabilitados?"Você não possui permissão para essa ação":"Selecionar arquivo"} arrow={true} >
-                  <UploadArea style={{ height: "64px" }} status={formErrors.arquivo ? "error" : undefined}>
-                  <GrupoEsquerda>
-                  <CloudUploadOutlined style={{ fontSize: 38, color: "#838383" }} />
-
-                    <span style={{ color: "#666", fontSize: "14px", textAlign: "left" }}>
-                      {watchedFile
-                        ? watchedFile.name
-                        : <>
-                        Selecione ou arraste e solte aqui <br />o arquivo de importação (.csv)
-                          </>                      
-                        }
-                    </span>
-                    </GrupoEsquerda>
-
-                    <Button type="primary" size="small" style={{ fontSize: "14px" }}>
-                      Selecionar
-                    </Button>
-                  </UploadArea>
-                  </Tooltip>
-
-                </StyledUpload>
-                
-              </FormItem>
-            )}
-          />
-        </Col>
-        </Row>
-
-      
-
-    </TabContentContainer>
-    <ActionButtonsContainer>
-      <Tooltip title={!canViewHistoricoHabilitados?"Você não possui permissão para essa ação":"Histórico"} arrow={true} >
-    <Button
-      type="primary"
-      ghost
-      size="large"
-      onClick={() => navigate("/processos/importacao-dados/historico-habilitados")}
-      disabled={!canViewHistoricoHabilitados}
-    >
-      Histórico
-    </Button>
-    </Tooltip>
-    <Tooltip title={!canImportarHabilitados?"Você não possui permissão para essa ação":"Importar"} arrow={true} >
-    <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)} disabled={!canImportarHabilitados}>
-    Importar
-    </Button>
-    </Tooltip>
-  </ActionButtonsContainer>
+      </TabContentContainer>
+      <ActionButtonsContainer>
+        <Tooltip title={!canViewHistoricoHabilitados?"Você não possui permissão para essa ação":"Histórico"} arrow={true} >
+      <Button
+        type="primary"
+        ghost
+        size="large"
+        onClick={() => navigate("/processos/importacao-dados/historico-habilitados")}
+        disabled={!canViewHistoricoHabilitados}
+      >
+        Histórico
+      </Button>
+      </Tooltip>
+      <Tooltip title={!canImportarHabilitados?"Você não possui permissão para essa ação":"Importar"} arrow={true} >
+      <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)} disabled={!canImportarHabilitados}>
+      Importar
+      </Button>
+      </Tooltip>
+    </ActionButtonsContainer>
+    </Spin>
   </>
   );
 };
