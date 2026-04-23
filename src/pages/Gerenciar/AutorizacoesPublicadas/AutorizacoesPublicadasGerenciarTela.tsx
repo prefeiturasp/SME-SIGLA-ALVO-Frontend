@@ -22,8 +22,8 @@ const { Text } = Typography;
 
 const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
   const { can } = useGetPermissions();
-  const canViewAutorizacoesPublicadas = can("view_autorizacoespublicadas");
-  const canAddAutorizacoesPublicadas = can("add_autorizacoespublicadas");
+  const canViewAutorizacoesPublicadas = can("view_autorizacaopublicada");
+  const canAddAutorizacoesPublicadas = can("add_autorizacaopublicada");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const cargoUuid = searchParams.get("cargoUuid") || undefined;
