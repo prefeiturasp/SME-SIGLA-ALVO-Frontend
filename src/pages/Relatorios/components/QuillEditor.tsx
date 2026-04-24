@@ -8,6 +8,7 @@ type QuillEditorProps = {
   placeholder?: string;
   readOnly?: boolean;
   height?: number; // altura mínima em pixels
+  showToolbar?: boolean;
 };
 
 const QuillEditor: React.FC<QuillEditorProps> = ({
@@ -16,6 +17,7 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
   placeholder,
   readOnly = false,
   height = 240,
+  showToolbar = true,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const quillRef = useRef<Quill | null>(null);
@@ -30,14 +32,16 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
       placeholder,
       readOnly,
       modules: {
-        toolbar: [
-          [{ header: [1, 2, 3, false] }],
-          ["bold", "italic", "underline", "strike"],
-          [{ align: [] }, { align: false }],
-          [{ list: "ordered" }, { list: "bullet" }],
-          ["link"],
-          ["clean"],
-        ],
+        toolbar: showToolbar
+          ? [
+              [{ header: [1, 2, 3, false] }],
+              ["bold", "italic", "underline", "strike"],
+              [{ align: [] }, { align: false }],
+              [{ list: "ordered" }, { list: "bullet" }],
+              ["link"],
+              ["clean"],
+            ]
+          : false,
       },
     });
 
@@ -45,9 +49,20 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
     try {
       const root = quillRef.current.root as HTMLElement;
       root.style.minHeight = `${height}px`;
+      root.style.position = "relative";
+      root.style.zIndex = "0";
+
+      const toolbar = containerRef.current.querySelector(".ql-toolbar") as HTMLElement | null;
+      if (toolbar) {
+        toolbar.style.position = "relative";
+        toolbar.style.zIndex = "0";
+      }
+
       const container = containerRef.current.querySelector(".ql-container") as HTMLElement | null;
       if (container) {
         container.style.minHeight = `${height}px`;
+        container.style.position = "relative";
+        container.style.zIndex = "0";
       }
     } catch {
       // noop
@@ -66,7 +81,7 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
       const html = quillRef.current.root.innerHTML;
       onChange(html);
     });
-  }, [placeholder, readOnly, onChange, value, height]);
+  }, [placeholder, readOnly, onChange, value, height, showToolbar]);
 
   useEffect(() => {
     if (!quillRef.current) return;

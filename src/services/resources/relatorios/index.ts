@@ -113,8 +113,8 @@ export const getPersonalizacaoRelatorio = (
 export const patchPersonalizacaoRelatorio = (
   tipoRelatorio: string,
   payload: {
-    usar_cabecalho_padrao: boolean;
     usar_logotipo: boolean;
+    cabecalho_gabarito?: string;
     cabecalho: string;
     texto_final: string;
     cabecalho_capa_ata?: string;
@@ -130,8 +130,10 @@ export const patchPersonalizacaoRelatorio = (
       URL.patchPersonalizacao(uuid),
       {
         tipo: tipoRelatorio,
-        usar_cabecalho_padrao: payload.usar_cabecalho_padrao,
         usar_logotipo: payload.usar_logotipo,
+        ...(payload.cabecalho_gabarito !== undefined
+          ? { cabecalho_gabarito: payload.cabecalho_gabarito }
+          : {}),
         cabecalho: payload.cabecalho,
         texto_final: payload.texto_final,
         ...(payload.cabecalho_capa_ata !== undefined

@@ -2,8 +2,8 @@ import { API } from "../../../services";
 
 type PatchPersonalizacaoRelatorioPayload = {
   tipoRelatorio: string;
-  usar_cabecalho_padrao: boolean;
   usar_logotipo: boolean;
+  cabecalho_gabarito?: string;
   cabecalho: string;
   texto_final: string;
   cabecalho_capa_ata?: string;
@@ -16,8 +16,10 @@ export async function patchPersonalizacaoRelatorio(
   const { response } = API.Relatorios.patchPersonalizacaoRelatorio(
     payload.tipoRelatorio,
     {
-      usar_cabecalho_padrao: payload.usar_cabecalho_padrao,
       usar_logotipo: payload.usar_logotipo,
+      ...(payload.cabecalho_gabarito !== undefined
+        ? { cabecalho_gabarito: payload.cabecalho_gabarito }
+        : {}),
       cabecalho: payload.cabecalho,
       texto_final: payload.texto_final,
       cabecalho_capa_ata: payload.cabecalho_capa_ata,

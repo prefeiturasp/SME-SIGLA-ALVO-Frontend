@@ -7,6 +7,23 @@ import { getPersonalizacaoRelatorio } from "../hooks/useGetPersonalizacaoRelator
 import { patchPersonalizacaoRelatorio } from "../hooks/usePatchPersonalizacaoRelatorio";
 import type { PersonalizacaoModalProps } from "../../../services/resources/relatorios/IRelatorios";
 
+const RELATORIOS_COM_CABECALHO_GABARITO = new Set([
+  "LAUDA_VAGAS",
+  "LAUDA_CONVOCACAO",
+  "SUMULA_ESCOLHAS",
+  "SUMULA_RECONVOCACAO",
+  "SUMULA_NAO_ESCOLHAS",
+  "ATA_ESCOLHA",
+]);
+
+const RELATORIOS_COM_LOGOTIPO_LATERAL = new Set([
+  "LAUDA_VAGAS",
+  "RELACAO_VAGAS",
+  "LISTAGEM_ESCOLHAS_DRES",
+  "RESULTADO_ESCOLHA",
+  "LISTA_CANDIDATOS_SESSAO",
+]);
+
 const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
   open,
   onCancel,
@@ -15,9 +32,15 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
   processoUuid,
 }) => {
   const { notification } = App.useApp();
-  const [usarCabecalhoPadrao, setUsarCabecalhoPadrao] = useState(false);
+  const usaCabecalhoGabarito = RELATORIOS_COM_CABECALHO_GABARITO.has(
+    selectedRelatorio?.key ?? ""
+  );
+  const usaLogotipoLateral = RELATORIOS_COM_LOGOTIPO_LATERAL.has(
+    selectedRelatorio?.key ?? ""
+  );
   const [usarLogotipo, setUsarLogotipo] = useState(true);
-  const [cabecalhoPadraoHtml, setCabecalhoPadraoHtml] = useState<string>("");
+  const [cabecalhoGabaritoHtml, setCabecalhoGabaritoHtml] = useState<string>("");
+  const [cabecalhoHtml, setCabecalhoHtml] = useState<string>("");
   const [textoPadraoFinalHtml, setTextoPadraoFinalHtml] = useState<string>("");
   const [cabecalhoCapaAtaHtml, setCabecalhoCapaAtaHtml] = useState<string>("");
   const [personalizacaoUuid, setPersonalizacaoUuid] = useState<string | null>(null);
@@ -26,9 +49,9 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
   const hasFetchedRef = useRef<boolean>(false);
   
   const [valoresIniciais, setValoresIniciais] = useState({
-    usarCabecalhoPadrao: false,
     usarLogotipo: true,
-    cabecalhoPadraoHtml: "",
+    cabecalhoGabaritoHtml: "",
+    cabecalhoHtml: "",
     textoPadraoFinalHtml: "",
     cabecalhoCapaAtaHtml: "",
   });
@@ -52,23 +75,23 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
         
         // Armazenar UUID (sempre vem, mesmo que seja null - similar ao logo da parametrização)
         setPersonalizacaoUuid(personalizacaoData?.uuid ?? null);
-        const usarCabecalho = personalizacaoData?.usar_cabecalho_padrao ?? false;
         const usarLogotipo = personalizacaoData?.usar_logotipo ?? true;
+        const cabecalhoGabarito = personalizacaoData?.cabecalho_gabarito ?? "";
         const cabecalho = personalizacaoData?.cabecalho ?? "";
         const textoFinal = personalizacaoData?.texto_final ?? "";
         const cabecalhoCapaAta = personalizacaoData?.cabecalho_capa_ata ?? "";
         
-        setUsarCabecalhoPadrao(usarCabecalho);
         setUsarLogotipo(usarLogotipo);
-        setCabecalhoPadraoHtml(cabecalho);
+        setCabecalhoGabaritoHtml(cabecalhoGabarito);
+        setCabecalhoHtml(cabecalho);
         setTextoPadraoFinalHtml(textoFinal);
         setCabecalhoCapaAtaHtml(cabecalhoCapaAta);
         
         // Armazenar valores iniciais para comparação (sempre definir, mesmo se não houver dados)
         setValoresIniciais({
-          usarCabecalhoPadrao: usarCabecalho,
           usarLogotipo: usarLogotipo,
-          cabecalhoPadraoHtml: cabecalho,
+          cabecalhoGabaritoHtml: cabecalhoGabarito,
+          cabecalhoHtml: cabecalho,
           textoPadraoFinalHtml: textoFinal,
           cabecalhoCapaAtaHtml: cabecalhoCapaAta,
         });
@@ -86,15 +109,15 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
     if (!open) {
       hasFetchedRef.current = false;
       setPersonalizacaoUuid(null);
-      setUsarCabecalhoPadrao(false);
       setUsarLogotipo(true);
-      setCabecalhoPadraoHtml("");
+      setCabecalhoGabaritoHtml("");
+      setCabecalhoHtml("");
       setTextoPadraoFinalHtml("");
       setCabecalhoCapaAtaHtml("");
       setValoresIniciais({
-        usarCabecalhoPadrao: false,
         usarLogotipo: true,
-        cabecalhoPadraoHtml: "",
+        cabecalhoGabaritoHtml: "",
+        cabecalhoHtml: "",
         textoPadraoFinalHtml: "",
         cabecalhoCapaAtaHtml: "",
       });
@@ -104,12 +127,17 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
   const hasChanges = () => {
     const isAtaEscolha = selectedRelatorio?.key === "ATA_ESCOLHA";
     return (
-      usarCabecalhoPadrao !== valoresIniciais.usarCabecalhoPadrao ||
       usarLogotipo !== valoresIniciais.usarLogotipo ||
-      cabecalhoPadraoHtml !== valoresIniciais.cabecalhoPadraoHtml ||
+      (usaCabecalhoGabarito &&
+        cabecalhoGabaritoHtml !== valoresIniciais.cabecalhoGabaritoHtml) ||
+      cabecalhoHtml !== valoresIniciais.cabecalhoHtml ||
       textoPadraoFinalHtml !== valoresIniciais.textoPadraoFinalHtml ||
       (isAtaEscolha && cabecalhoCapaAtaHtml !== valoresIniciais.cabecalhoCapaAtaHtml)
     );
+  };
+
+  const handleCopyCabecalhoGabarito = () => {
+    setCabecalhoHtml(cabecalhoGabaritoHtml);
   };
 
   const handleSave = async () => {
@@ -130,9 +158,11 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
     try {
       await patchPersonalizacaoRelatorio({
         tipoRelatorio: selectedRelatorio.key,
-        usar_cabecalho_padrao: usarCabecalhoPadrao,
         usar_logotipo: usarLogotipo,
-        cabecalho: cabecalhoPadraoHtml,
+        ...(usaCabecalhoGabarito
+          ? { cabecalho_gabarito: cabecalhoGabaritoHtml }
+          : {}),
+        cabecalho: cabecalhoHtml,
         texto_final: textoPadraoFinalHtml,
         // Enviar somente quando for do tipo ATA_ESCOLHA
         ...(selectedRelatorio.key === "ATA_ESCOLHA"
@@ -184,28 +214,46 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
       <Spin spinning={isLoadingPersonalizacao || isSaving}>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         {/* Seção Processo */}
-        <ModalInfoCard>
-          <ModalInfoItem>
-            <ModalInfoLabel style={{ color: "#000000" }}>Processo</ModalInfoLabel>
-            <ModalInfoValue style={{ color: "#515151" }}>
-              {processoNome || "—"}
-            </ModalInfoValue>
-          </ModalInfoItem>
-        </ModalInfoCard>
-
-        {/* Seção Usar cabeçalho padrão */}
-        <div>
-          <div style={{ display: "flex", gap: 150, alignItems: "flex-start", flexWrap: "wrap" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <ModalInfoLabel style={{ color: "#000000" }}>Usar cabeçalho padrão?</ModalInfoLabel>
-              <Checkbox
-                checked={usarCabecalhoPadrao}
-                onChange={(e) => setUsarCabecalhoPadrao(e.target.checked)}
-              >
-                Sim
-              </Checkbox>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div
+          style={
+            usaLogotipoLateral
+              ? {
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 24,
+                }
+              : { width: "100%" }
+          }
+        >
+          <ModalInfoCard
+            style={
+              usaLogotipoLateral
+                ? {
+                    width: "50%",
+                    minWidth: 320,
+                  }
+                : undefined
+            }
+          >
+            <ModalInfoItem>
+              <ModalInfoLabel style={{ color: "#000000" }}>Processo</ModalInfoLabel>
+              <ModalInfoValue style={{ color: "#515151" }}>
+                {processoNome || "—"}
+              </ModalInfoValue>
+            </ModalInfoItem>
+          </ModalInfoCard>
+          {usaLogotipoLateral && (
+            <div
+              style={{
+                width: "50%",
+                minWidth: 320,
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.35rem",
+                padding: "1.5rem 1.75rem",
+              }}
+            >
               <ModalInfoLabel style={{ color: "#000000" }}>Usar logotipo?</ModalInfoLabel>
               <Checkbox
                 checked={usarLogotipo}
@@ -214,8 +262,27 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
                 Sim
               </Checkbox>
             </div>
-          </div>
+          )}
         </div>
+
+        {!usaCabecalhoGabarito && (
+          <div>
+            <div style={{ display: "flex", gap: 150, alignItems: "flex-start", flexWrap: "wrap" }}>
+              {!usaLogotipoLateral && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <ModalInfoLabel style={{ color: "#000000" }}>Usar logotipo?</ModalInfoLabel>
+                  <Checkbox
+                    checked={usarLogotipo}
+                    onChange={(e) => setUsarLogotipo(e.target.checked)}
+                  >
+                    Sim
+                  </Checkbox>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Seção Cabeçalho da capa (somente para ATA_ESCOLHA) */}
         {selectedRelatorio?.key === "ATA_ESCOLHA" && (
           <div>
@@ -232,13 +299,39 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
         )}
 
         {/* Seção Cabeçalho padrão */}
-        <div>
+        {usaCabecalhoGabarito && (
+          <>
+            <div>
+              <ModalInfoLabel style={{ display: "block", marginBottom: 12, color: "#000000" }}>Cabeçalho gabarito:</ModalInfoLabel>
+              <QuillEditor
+                value={cabecalhoGabaritoHtml}
+                onChange={setCabecalhoGabaritoHtml}
+                placeholder="Digite o cabeçalho"
+                height={140}
+              />
+            </div>
+
+            <div style={{ marginTop: 4, marginBottom: 0, position: "relative", zIndex: 1 }}>
+              <Button
+                type="primary"
+                icon={<SaveOutlined />}
+                onClick={handleCopyCabecalhoGabarito}
+                disabled={isSaving || isLoadingPersonalizacao}
+              >
+                Copiar cabeçalho gabarito
+              </Button>
+            </div>
+          </>
+        )}
+
+        <div style={{ marginTop: 4 }}>
           <ModalInfoLabel style={{ display: "block", marginBottom: 12, color: "#000000" }}>Cabeçalho:</ModalInfoLabel>
           <QuillEditor
-            value={cabecalhoPadraoHtml}
-            onChange={setCabecalhoPadraoHtml}
+            value={cabecalhoHtml}
+            onChange={setCabecalhoHtml}
             placeholder="Digite o cabeçalho"
             height={140}
+            showToolbar={usaCabecalhoGabarito ? false : true}
           />
         </div>
 
