@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Col, Modal, Spin, message } from "antd";
+import { Col, Modal, Spin, message, Form } from "antd";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { DefaultOptionType } from "antd/es/select";
 import type {
@@ -25,10 +25,8 @@ import {
   ModalInfoLabel,
   ModalInfoValue,
   ModalSection,
-  ModalSectionTitle,
   ModalRadioGroup,
   ModalFieldsRow,
-  ModalFieldLabel,
   ModalSelect,
   ModalRadio,
   ModalSaveButton,
@@ -162,6 +160,16 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     });
   }
 
+  // Captura se, ao abrir, é agenda de retardatários e a situação do candidato é "não-escolha"
+  const initialNaoEscolhaRef = useRef<boolean>(false);
+  useEffect(() => {
+    if (visible) {
+      initialNaoEscolhaRef.current = Boolean(
+        selectedAgendaData?.retardatario && context?.situacaoCodigo === "nao-escolha"
+      );
+    }
+  }, [visible, selectedAgendaData?.retardatario, context?.situacaoCodigo]);
+
   const shouldFetchVagas = useMemo(
     () =>
       visible &&
@@ -175,10 +183,14 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     shouldFetchVagas
   );
 
-  // Verifica se o modal está em modo somente leitura (candidato já tem escolha feita)
+// Verifica se o modal está em modo somente leitura (candidato já tem escolha feita)
   const isReadOnly = useMemo(() => {
+    const agendaEhRetardatario = selectedAgendaData?.retardatario === true;
+    const isNaoEscolha = modalSituacao === "nao-escolha";
+    // Se abriu em retardatário com "não-escolha", mantém editável mesmo após trocar a situação
+    if (agendaEhRetardatario && (initialNaoEscolhaRef.current || isNaoEscolha)) return false;
     return context?.situacaoCodigo !== "pendente";
-  }, [context?.situacaoCodigo]);
+  }, [context?.situacaoCodigo, selectedAgendaData?.retardatario, modalSituacao]);
 
   const vagasElegiveisPorTipo = useMemo(() => {
     if (!vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
@@ -585,18 +597,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
 
     try {
       await salvarEscolhaMutateAsync(payload);
-      
-      // Sincronizar agendas após salvar a escolha (para escolha, reconvocação e não escolha)
-      if (selectedProcesso && selectedAgendaData) {
-        await sincronizarAgendas(
-          context.candidatoUuid,
-          selectedProcesso,
-          selectedAgendaData
-        );
-      }
-
       await atualizarStatusProcessoAoIniciarEscolha();
-      
       message.success("Escolha salva com sucesso.");
       onClose();
       onSuccess();
@@ -723,84 +724,86 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
         </ModalInfoCard>
 
         <ModalSection>
-          <ModalSectionTitle>Situação</ModalSectionTitle>
-          <ModalRadioGroup
-            value={modalSituacao}
-            onChange={(event) =>
-              setModalSituacao(
-                event.target.value as "escolha" | "reconvocacao" | "nao-escolha"
-              )
-            }
-            disabled={isReadOnly}
-          >
-            <ModalRadio value="escolha" disabled={isReadOnly}>Escolha</ModalRadio>
-            <ModalRadio value="reconvocacao" disabled={isReadOnly}>Reconvocação</ModalRadio>
-            <ModalRadio value="nao-escolha" disabled={isReadOnly}>Não escolha</ModalRadio>
-          </ModalRadioGroup>
-
-          {modalSituacao === "escolha" && (
-            <>
-              <ModalSectionTitle style={{ marginTop: "0.5rem" }}>
-                Tipo de vaga
-              </ModalSectionTitle>
+          <Form layout="vertical" disabled={isReadOnly}>
+            <Form.Item label="Situação">
               <ModalRadioGroup
-                value={modalTipoVaga}
+                value={modalSituacao}
                 onChange={(event) =>
-                  setModalTipoVaga(
-                    event.target.value as "precaria" | "definitiva"
+                  setModalSituacao(
+                    event.target.value as "escolha" | "reconvocacao" | "nao-escolha"
                   )
                 }
-                disabled={isReadOnly}
               >
-                <ModalRadio value="precaria" disabled={isReadOnly}>
-                  Precária
-                </ModalRadio>
-                <ModalRadio value="definitiva" disabled={isReadOnly}>
-                  Definitiva
-                </ModalRadio>
+                <ModalRadio value="escolha">Escolha</ModalRadio>
+                <ModalRadio value="reconvocacao">Reconvocação</ModalRadio>
+                <ModalRadio value="nao-escolha">Não escolha</ModalRadio>
               </ModalRadioGroup>
-            </>
-          )}
+            </Form.Item>
+
+            {modalSituacao === "escolha" && (
+              <>
+                <Form.Item label="Tipo de vaga" style={{ marginTop: "0.5rem" }}>
+                  <ModalRadioGroup
+                    value={modalTipoVaga}
+                    onChange={(event) =>
+                      setModalTipoVaga(
+                        event.target.value as "precaria" | "definitiva"
+                      )
+                    }
+                  >
+                    <ModalRadio value="precaria">
+                      Precária
+                    </ModalRadio>
+                    <ModalRadio value="definitiva">
+                      Definitiva
+                    </ModalRadio>
+                  </ModalRadioGroup>
+                </Form.Item>
+              </>
+            )}
+          </Form>
         </ModalSection>
 
         {modalSituacao === "escolha" && (
           <>
             <ModalSection>
-              <ModalFieldsRow gutter={[24, 16]}>
-                <Col xs={24} md={12}>
-                  <ModalFieldLabel>DRE</ModalFieldLabel>
-                  <ModalSelect
-                    value={modalDre}
-                    placeholder="Selecione a DRE"
-                    onChange={(value) =>
-                      handleModalDreChange(value as string | undefined)
-                    }
-                    options={dreOptions}
-                    allowClear
-                    loading={vagasIsLoading}
-                    disabled={!canAddEscolha || isReadOnly || vagasIsLoading || !cargoCodigoNumericoParam}
-                    showSearch
-                    optionFilterProp="label"
-                    filterOption={filterOptionByLabel}
-                  />
-                </Col>
-                <Col xs={24} md={12}>
-                  <ModalFieldLabel>Unidade escolar</ModalFieldLabel>
-                  <ModalSelect
-                    value={modalUnidadeEscolar}
-                    placeholder="Selecione a unidade escolar"
-                    onChange={(value) =>
-                      setModalUnidadeEscolar(value as string | undefined)
-                    }
-                    options={escolasPorDre}
-                    allowClear
-                    disabled={isReadOnly || !modalDreCodigo}
-                    showSearch
-                    optionFilterProp="label"
-                    filterOption={filterOptionByLabel}
-                  />
-                </Col>
-              </ModalFieldsRow>
+              <Form layout="vertical" disabled={isReadOnly}>
+                <ModalFieldsRow gutter={[24, 16]}>
+                  <Col xs={24} md={12}>
+                    <Form.Item label="DRE">
+                      <ModalSelect
+                        value={modalDre}
+                        placeholder="Selecione a DRE"
+                        onChange={(value) =>
+                          handleModalDreChange(value as string | undefined)
+                        }
+                        options={dreOptions}
+                        allowClear
+                        loading={vagasIsLoading}
+                        showSearch
+                        optionFilterProp="label"
+                        filterOption={filterOptionByLabel}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={12}>
+                    <Form.Item label="Unidade escolar">
+                      <ModalSelect
+                        value={modalUnidadeEscolar}
+                        placeholder="Selecione a unidade escolar"
+                        onChange={(value) =>
+                          setModalUnidadeEscolar(value as string | undefined)
+                        }
+                        options={escolasPorDre}
+                        allowClear
+                        showSearch
+                        optionFilterProp="label"
+                        filterOption={filterOptionByLabel}
+                      />
+                    </Form.Item>
+                  </Col>
+                </ModalFieldsRow>
+              </Form>
             </ModalSection>
 
           </>

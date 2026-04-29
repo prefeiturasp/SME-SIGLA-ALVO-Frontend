@@ -924,17 +924,12 @@ const EscolhaCandidatosTela: React.FC = () => {
           : Boolean(candidateAny?.e_retardatario ?? rawAny?.e_retardatario);
 
       const categoriaEfetivaRaw = rawAny?.categoria_efetiva as string | undefined;
-      const categoriaEfetivaVal =
-        typeof categoriaEfetivaRaw === "string" &&
-        (categoriaEfetivaRaw === "PCD" || categoriaEfetivaRaw === "NNA")
-          ? categoriaEfetivaRaw
-          : undefined;
 
       return {
         uuid,
         nome,
         cargo: cargoNome,
-        ...(categoriaEfetivaVal ? { categoriaEfetiva: categoriaEfetivaVal } : {}),
+        ...(categoriaEfetivaRaw ? { categoriaEfetiva: categoriaEfetivaRaw } : {}),
         classificacao: classificacaoGeral,
         situacao: situacaoLabel,
         situacaoCodigo,
@@ -1063,16 +1058,27 @@ const EscolhaCandidatosTela: React.FC = () => {
     let pcd = 0;
     let nna = 0;
 
-    normalizedCandidatos.forEach(({ raw }) => {
+    normalizedCandidatos.forEach(({ raw, uuid }) => {
+      // Aplicar filtro de situações quando agenda for de retardatários
+      if (selectedAgendaData?.retardatario) {
+        const escolha = escolhaPorCandidato.get(uuid);
+        const situacaoCodigo: "pendente" | SituacaoEscolha = isSituacaoEscolha(
+          escolha?.situacao
+        )
+          ? (escolha!.situacao as SituacaoEscolha)
+          : "pendente";
+        if (situacaoCodigo !== "nao-escolha" && situacaoCodigo !== "pendente") {
+          return; // ignora para contagem dos cards
+        }
+      }
+
       // Buscar categoria_efetiva diretamente do objeto raw (que vem do backend)
-      // Mesma lógica do BuscarCandidatosModal
       const categoria = (raw as any)?.categoria_efetiva;
-      
-      if (categoria === 'GERAL' || !categoria) {
+      if (categoria === "GERAL" || !categoria) {
         geral++;
-      } else if (categoria === 'NNA') {
+      } else if (categoria === "NNA") {
         nna++;
-      } else if (categoria === 'PCD') {
+      } else if (categoria === "PCD") {
         pcd++;
       }
     });
@@ -1082,7 +1088,7 @@ const EscolhaCandidatosTela: React.FC = () => {
       totalPcd: pcd,
       totalNna: nna,
     };
-  }, [hasSearched, normalizedCandidatos]);
+  }, [hasSearched, normalizedCandidatos, selectedAgendaData?.retardatario, escolhaPorCandidato]);
 
   // Priorizar candidateTotals quando houver candidatos carregados (já filtrados pela agenda selecionada)
   // Usar cargoTotals apenas como fallback quando não houver candidatos carregados
@@ -1281,7 +1287,6 @@ const EscolhaCandidatosTela: React.FC = () => {
     },
     { title: "Escolha de Candidatos" },
   ];
-
   return (
     <>
       <SelecaoGlobalStyles />
