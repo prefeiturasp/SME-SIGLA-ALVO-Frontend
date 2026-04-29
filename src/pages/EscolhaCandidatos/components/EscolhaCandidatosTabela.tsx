@@ -121,7 +121,6 @@ const EscolhaCandidatosTabela: React.FC<EscolhaCandidatosTabelaProps> = ({
     ],
     [onOpenModal]
   );
-
   const renderRowKey = useCallback(
     (record: any, index?: number) => {
       if (record?.uuid) return record.uuid;
@@ -355,8 +354,22 @@ const EscolhaCandidatosTabela: React.FC<EscolhaCandidatosTabelaProps> = ({
     },
   ] as ColumnsType<Record<string, any>>);
 
-  const tablePaginationTotal = candidatosTableData.length;
-  const dataSource = candidatosTableData;
+  const dataSource = useMemo(() => {
+    const base = Array.isArray(candidatosTableData) ? candidatosTableData : [];
+    if (selectedAgendaData?.retardatario) {
+      return base.filter((record: any) => {
+        const situacao =
+          (typeof record?.situacaoCodigo === "string" && record.situacaoCodigo) ||
+          (typeof record?.situacao === "string" && record.situacao) ||
+          (typeof record?.status === "string" && record.status) ||
+          "";
+        return situacao === "nao-escolha" || situacao === "pendente";
+      });
+    }
+    return base;
+  }, [candidatosTableData, selectedAgendaData?.retardatario]);
+
+  const tablePaginationTotal = dataSource.length;
 
   if (candidatosError) {
     return (
