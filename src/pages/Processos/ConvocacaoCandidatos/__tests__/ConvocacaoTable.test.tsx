@@ -7,10 +7,11 @@ import { theme as appTheme } from '../../../../theme';
 import ConvocacaoTable from '../components/ConvocacaoTable';
 
 const mockDeletarProcesso = jest.fn();
+let mockIsDeleting = false;
 jest.mock('../hooks/useDeleteProcessoConvocacao', () => ({
   useDeleteProcessoConvocacao: () => ({
     deletarProcesso: mockDeletarProcesso,
-    isDeleting: false,
+    isDeleting: mockIsDeleting,
   }),
 }));
 
@@ -48,6 +49,8 @@ jest.mock('dayjs', () => {
 describe('ConvocacaoTable', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
+    mockDeletarProcesso.mockClear();
+    mockIsDeleting = false;
   });
 
   const renderWithTheme = (ui: React.ReactElement) =>
@@ -134,6 +137,38 @@ describe('ConvocacaoTable', () => {
     expect(mockNavigate).toHaveBeenCalledWith('editar/uuid-1/selecao-cargos', expect.objectContaining({
       state: expect.objectContaining({ editData: expect.any(Object) })
     }));
+  });
+
+  it('navega para agenda e resumo conforme passo do processo', async () => {
+    const user = userEvent.setup();
+    const data = [
+      makeRow({ uuid: 'uuid-passo-2', descricao: 'Processo Passo 2', passo: 2 }),
+      makeRow({ uuid: 'uuid-passo-3', descricao: 'Processo Passo 3', passo: 3 }),
+    ];
+
+    renderWithTheme(
+      <ConvocacaoTable
+        data={data}
+        canChangeProcessoConvocacao={true}
+        canDeleteProcessoConvocacao={true}
+        canViewDetailsProcessoConvocacao={true}
+        canFinalizeProcessoConvocacao={true}
+      />
+    );
+
+    const rowPasso2 = screen.getByText('Processo Passo 2').closest('tr') as HTMLElement;
+    await user.click(within(rowPasso2).getAllByRole('button')[0]);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      'editar/uuid-passo-2/agenda',
+      expect.objectContaining({ state: expect.any(Object) })
+    );
+
+    const rowPasso3 = screen.getByText('Processo Passo 3').closest('tr') as HTMLElement;
+    await user.click(within(rowPasso3).getAllByRole('button')[0]);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      'editar/uuid-passo-3/resumo',
+      expect.objectContaining({ state: expect.any(Object) })
+    );
   });
 
   it('aplica classes CSS corretas para linhas pares e ímpares', () => {
@@ -364,6 +399,33 @@ describe('ConvocacaoTable', () => {
 
       consoleSpy.mockRestore();
     });
+  });
+
+  it('alterna ordenação no mesmo campo: ascend -> descend -> sem ordenação', async () => {
+    const user = userEvent.setup();
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    renderWithTheme(
+      <ConvocacaoTable
+        data={[
+          makeRow({ uuid: 'a', descricao: 'Processo B' }),
+          makeRow({ uuid: 'b', descricao: 'Processo A' }),
+        ]}
+        canChangeProcessoConvocacao={true}
+        canDeleteProcessoConvocacao={true}
+        canViewDetailsProcessoConvocacao={true}
+        canFinalizeProcessoConvocacao={true}
+      />
+    );
+
+    const getSortContainer = () => screen.getAllByLabelText('caret-up')[0].parentElement as HTMLElement;
+    await user.click(getSortContainer()); // ascend
+    await user.click(getSortContainer()); // descend
+    await user.click(getSortContainer()); // null
+
+    expect(consoleSpy).toHaveBeenCalled();
+    expect(screen.getByText('Processo A')).toBeInTheDocument();
+    expect(screen.getByText('Processo B')).toBeInTheDocument();
+    consoleSpy.mockRestore();
   });
 
   describe('getSortedData', () => {
@@ -633,6 +695,76 @@ describe('ConvocacaoTable', () => {
       );
 
       expect(screen.getByText('Nenhum processo encontrado')).toBeInTheDocument();
+    });
+  });
+
+  describe('Fluxo de exclusão', () => {
+    it('abre modal ao clicar em excluir e confirma exclusão com onSettled', async () => {
+      const user = userEvent.setup();
+      mockDeletarProcesso.mockImplementation((_uuid: string, options: any) => {
+        options?.onSettled?.();
+      });
+
+      renderWithTheme(
+        <ConvocacaoTable
+          data={[makeRow({ uuid: 'uuid-delete', status: 'Em andamento' })]}
+          canChangeProcessoConvocacao={true}
+          canDeleteProcessoConvocacao={true}
+          canViewDetailsProcessoConvocacao={true}
+          canFinalizeProcessoConvocacao={true}
+        />
+      );
+
+      const row = screen.getByText('Concurso X').closest('tr') as HTMLElement;
+      const deleteButton = within(row).getAllByRole('button')[2];
+      await user.click(deleteButton);
+
+      expect(screen.getByText('Excluir processo', { selector: '.ant-modal-title' })).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Cancelar' }));
+
+      // Reabre e confirma
+      await user.click(deleteButton);
+
+      await user.click(screen.getByRole('button', { name: 'Excluir' }));
+      expect(mockDeletarProcesso).toHaveBeenCalledWith(
+        'uuid-delete',
+        expect.objectContaining({ onSettled: expect.any(Function) })
+      );
+    });
+
+    it('impede cancelar modal quando exclusão está em andamento', async () => {
+      const user = userEvent.setup();
+      const { rerender } = renderWithTheme(
+        <ConvocacaoTable
+          data={[makeRow({ uuid: 'uuid-delete-loading', status: 'Em andamento' })]}
+          canChangeProcessoConvocacao={true}
+          canDeleteProcessoConvocacao={true}
+          canViewDetailsProcessoConvocacao={true}
+          canFinalizeProcessoConvocacao={true}
+        />
+      );
+
+      const row = screen.getByText('Concurso X').closest('tr') as HTMLElement;
+      await user.click(within(row).getAllByRole('button')[2]);
+      expect(screen.getByText('Excluir processo', { selector: '.ant-modal-title' })).toBeInTheDocument();
+
+      mockIsDeleting = true;
+      rerender(
+        <BrowserRouter>
+          <SCThemeProvider theme={appTheme as any}>
+            <ConvocacaoTable
+              data={[makeRow({ uuid: 'uuid-delete-loading', status: 'Em andamento' })]}
+              canChangeProcessoConvocacao={true}
+              canDeleteProcessoConvocacao={true}
+              canViewDetailsProcessoConvocacao={true}
+              canFinalizeProcessoConvocacao={true}
+            />
+          </SCThemeProvider>
+        </BrowserRouter>
+      );
+
+      const cancelarButton = screen.getByRole('button', { name: 'Cancelar' });
+      expect(cancelarButton).toBeDisabled();
     });
   });
 

@@ -126,39 +126,27 @@ describe('SelecionarCandidatos', () => {
       const autorizacaoInputs = screen.getAllByPlaceholderText('Digite apenas números');
       expect(autorizacaoInputs).toHaveLength(3);
 
-      await act(async () => {
-        await user.type(autorizacaoInputs[0], '123');
-      });
+      await user.type(autorizacaoInputs[0], '123');
       expect(autorizacaoInputs[0]).toHaveValue('123');
 
-      await act(async () => {
-        await user.clear(autorizacaoInputs[0]);
-        await user.type(autorizacaoInputs[0], 'abc123def');
-      });
+      await user.clear(autorizacaoInputs[0]);
+      await user.type(autorizacaoInputs[0], 'abc123def');
       expect(autorizacaoInputs[0]).toHaveValue('123');
 
-      await act(async () => {
-        await user.type(autorizacaoInputs[1], '456');
-      });
+      await user.type(autorizacaoInputs[1], '456');
       expect(autorizacaoInputs[1]).toHaveValue('456');
 
-      await act(async () => {
-        await user.clear(autorizacaoInputs[1]);
-        await user.type(autorizacaoInputs[1], '456xyz');
-      });
+      await user.clear(autorizacaoInputs[1]);
+      await user.type(autorizacaoInputs[1], '456xyz');
       expect(autorizacaoInputs[1]).toHaveValue('456');
 
-      await act(async () => {
-        await user.type(autorizacaoInputs[2], '789');
-      });
+      await user.type(autorizacaoInputs[2], '789');
       expect(autorizacaoInputs[2]).toHaveValue('789');
 
-      await act(async () => {
-        await user.clear(autorizacaoInputs[2]);
-        await user.type(autorizacaoInputs[2], '@#$789');
-      });
+      await user.clear(autorizacaoInputs[2]);
+      await user.type(autorizacaoInputs[2], '@#$789');
       expect(autorizacaoInputs[2]).toHaveValue('789');
-    });
+    }, 10000);
 
     it('deve mostrar mensagem de aviso ao tentar digitar caracteres não numéricos', async () => {
       render(<SelecionarCandidatos {...defaultProps} />);

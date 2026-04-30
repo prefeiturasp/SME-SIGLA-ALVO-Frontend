@@ -148,13 +148,14 @@ jest.mock('../components/FormPrincipal', () => ({
 
 jest.mock('../components/Cargo', () => ({
   __esModule: true,
-  default: ({ cargosDisponiveis, cardData, selectedConcursoLabel, selectedCargoLabel, agendaComponent, isCargoLiberado }: any) => (
+  default: ({ cargosDisponiveis, cardData, selectedConcursoLabel, selectedCargoLabel, agendaComponent, isCargoLiberado, onCandidatosSelecionados }: any) => (
     <div data-testid="cargo-component">
       <div>Cargos</div>
       {!isCargoLiberado && <div>* Selecione o concurso para liberar a opção de Cargo.</div>}
       <div>Vagas</div>
       <div>Escolas selecionadas</div>
       <div>Candidatos selecionados</div>
+      <button onClick={() => onCandidatosSelecionados?.(3, { geral: 2, pcd: 1, nna: 0 })}>Mock selecionar candidatos</button>
       <button>Selecionar candidatos</button>
       <button>Buscar</button>
       {agendaComponent}
@@ -231,7 +232,10 @@ describe('NovaConvocacaoCandidatos', () => {
     mockUseNovaConvocacaoCandidatos.isCargoLiberado = false;
     mockUseNovaConvocacaoCandidatos.selectedConcursoLabel = '';
     mockUseNovaConvocacaoCandidatos.selectedCargoLabel = '';
+    mockUseNovaConvocacaoCandidatos.selectedConcursoValue = '';
     mockUseNovaConvocacaoCandidatos.cargosDisponiveis = [];
+    mockUseNovaConvocacaoCandidatos.isEdit = false;
+    mockUseNovaConvocacaoCandidatos.isViewMode = false;
   });
 
   test('deve alterar o valor do select de concurso', async () => {
@@ -728,5 +732,60 @@ describe('NovaConvocacaoCandidatos', () => {
     // Verifica se o componente ainda renderiza corretamente
     expect(screen.getByText('Processo de convocação de candidatos')).toBeInTheDocument();
     expect(screen.getByText('Busca Processos')).toBeInTheDocument();
+  });
+
+  test('deve navegar ao clicar nos breadcrumbs', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<NovaConvocacaoCandidatos />);
+
+    await user.click(screen.getByText('Home'));
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+
+    await user.click(screen.getAllByText('Processos')[0]);
+    expect(mockNavigate).toHaveBeenCalledWith('/processos');
+
+    await user.click(screen.getByText('Convocação de candidatos'));
+    expect(mockNavigate).toHaveBeenCalledWith('/processos/convocacao');
+  });
+
+  test('deve chamar handleSub ao clicar em Salvar e navegar ao cancelar', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<NovaConvocacaoCandidatos />);
+
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    expect(mockUseNovaConvocacaoCandidatos.handleSub).toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(mockNavigate).toHaveBeenCalledWith('/processos/convocacao');
+  });
+
+  test('deve executar callback de candidatos selecionados (linha do console.log)', async () => {
+    const user = userEvent.setup();
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    renderWithProviders(<NovaConvocacaoCandidatos />);
+
+    await user.click(screen.getByRole('button', { name: 'Mock selecionar candidatos' }));
+    expect(consoleSpy).toHaveBeenCalledWith('Candidatos selecionados:', 3, { geral: 2, pcd: 1, nna: 0 });
+    consoleSpy.mockRestore();
+  });
+
+  test('deve renderizar modo visualizar com botão Voltar e título correto', async () => {
+    const user = userEvent.setup();
+    mockUseNovaConvocacaoCandidatos.isViewMode = true;
+    renderWithProviders(<NovaConvocacaoCandidatos />);
+
+    expect(screen.getByText('Visualizar Convocação')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Salvar' })).not.toBeInTheDocument();
+    const voltarButton = screen.getByRole('button', { name: 'Voltar' });
+    fireEvent.mouseEnter(voltarButton);
+    fireEvent.mouseLeave(voltarButton);
+    await user.click(voltarButton);
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
+  });
+
+  test('deve renderizar título de editar quando isEdit estiver ativo', () => {
+    mockUseNovaConvocacaoCandidatos.isEdit = true;
+    renderWithProviders(<NovaConvocacaoCandidatos />);
+    expect(screen.getByText('Editar Convocação')).toBeInTheDocument();
   });
 });
