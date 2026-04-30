@@ -227,7 +227,7 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
         rf: String(candidato?.registro_funcional || "—"),
         rg: String(candidato?.rg || "—"),
         cpf: String(candidato?.cpf || "—"),
-        candidatoUuid: String(candidato?.uuid || item?.uuid || ""),
+        candidatoUuid: String(item?.uuid || ""),
         hasPCD: Boolean(item?.classificacao_pcd),
         hasNNA: Boolean(item?.classificacao_nna),
         reclassificadosDe,
