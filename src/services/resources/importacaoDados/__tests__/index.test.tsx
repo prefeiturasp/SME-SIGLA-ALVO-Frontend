@@ -223,7 +223,6 @@ describe('ImportacaoDados Service', () => {
       expect(mockAxios.get).toHaveBeenCalledWith(
         URL.getImportacaoArquivosHabilitados(),
         expect.objectContaining({
-          params: undefined,
           paramsSerializer: queryParamsSerializer,
           signal: expect.any(AbortSignal),
         })
@@ -248,7 +247,9 @@ describe('ImportacaoDados Service', () => {
       expect(mockAxios.get).toHaveBeenCalledWith(
         URL.getImportacaoArquivosHabilitados(),
         expect.objectContaining({
-          params: { concurso_uuid: 'concurso-123' },
+          concurso_uuid: 'concurso-123',
+          paramsSerializer: queryParamsSerializer,
+          signal: expect.any(AbortSignal),
         })
       );
     });
