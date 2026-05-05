@@ -2,9 +2,13 @@ import type { IUsuarioPermissoes, IUsuarioPermissoesRequest } from '../IPermisso
 
 // Mock do axios
 const mockGet = jest.fn();
+const mockPatch = jest.fn();
+const mockPut = jest.fn();
 jest.mock('../../../axios', () => ({
   appAxiosAdminUsuarios: {
     get: mockGet,
+    patch: mockPatch,
+    put: mockPut,
   },
 }));
 
@@ -13,7 +17,14 @@ const mockQueryParamsSerializer = jest.fn();
 jest.mock('../../../../utils/queryParamsSerializer', () => mockQueryParamsSerializer);
 
 // Importar após os mocks
-const { URL, getPermissoesPorUsuarioEModel } = require('../index');
+const {
+  URL,
+  getPermissoesPorUsuarioEModel,
+  getUsuariosComGrupos,
+  patchUsuario,
+  getGruposDisponiveis,
+  putGerenciarUsuariosGrupo,
+} = require('../index');
 
 describe('Permissões Service', () => {
   beforeEach(() => {
@@ -23,6 +34,12 @@ describe('Permissões Service', () => {
   describe('URL', () => {
     it('deve retornar URL correta para getPermissoesPorUsuarioEModel', () => {
       expect(URL.getPermissoesPorUsuarioEModel()).toBe('/api/v1/usuarios/permissoes/');
+    });
+
+    it('deve retornar URLs corretas para endpoints de grupos', () => {
+      expect(URL.usuariosComGrupos()).toBe('/api/v1/usuarios/grupos/');
+      expect(URL.gruposDisponiveis()).toBe('/api/v1/grupos/');
+      expect(URL.gerenciarUsuariosGrupo()).toBe('/api/v1/grupos/usuarios/');
     });
   });
 
@@ -202,6 +219,69 @@ describe('Permissões Service', () => {
       const result = await response;
 
       expect(result.permissoes).toHaveLength(4);
+    });
+  });
+
+  describe('funções de gerenciamento de grupos', () => {
+    it('getUsuariosComGrupos faz GET com params e retorna dados', async () => {
+      const payload = { results: [{ username: 'user1' }] };
+      mockGet.mockResolvedValueOnce({ data: payload });
+
+      const { response, abort } = getUsuariosComGrupos({ usuario: 'user1' });
+      await expect(response).resolves.toEqual(payload);
+      expect(mockGet).toHaveBeenCalledWith(
+        URL.usuariosComGrupos(),
+        expect.objectContaining({
+          params: { usuario: 'user1' },
+          paramsSerializer: mockQueryParamsSerializer,
+          signal: expect.any(AbortSignal),
+        })
+      );
+      expect(typeof abort).toBe('function');
+    });
+
+    it('patchUsuario faz PATCH e respeita config adicional', async () => {
+      const req = { usuario: 'u1', is_active: true };
+      const res = { ok: true };
+      mockPatch.mockResolvedValueOnce({ data: res });
+
+      const { response, abort } = patchUsuario(req, { timeout: 2500 });
+      await expect(response).resolves.toEqual(res);
+      expect(mockPatch).toHaveBeenCalledWith(
+        URL.usuariosComGrupos(),
+        req,
+        expect.objectContaining({
+          timeout: 2500,
+          signal: expect.any(AbortSignal),
+        })
+      );
+      expect(typeof abort).toBe('function');
+    });
+
+    it('getGruposDisponiveis faz GET simples', async () => {
+      const res = [{ id: 1, nome: 'Gestores' }];
+      mockGet.mockResolvedValueOnce({ data: res });
+
+      const { response } = getGruposDisponiveis();
+      await expect(response).resolves.toEqual(res);
+      expect(mockGet).toHaveBeenCalledWith(
+        URL.gruposDisponiveis(),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      );
+    });
+
+    it('putGerenciarUsuariosGrupo faz PUT com payload', async () => {
+      const req = { grupo_uuid: 'g1', usuarios_uuids: ['u1', 'u2'] };
+      const res = { success: true };
+      mockPut.mockResolvedValueOnce({ data: res });
+
+      const { response } = putGerenciarUsuariosGrupo(req);
+      await expect(response).resolves.toEqual(res);
+      expect(mockPut).toHaveBeenCalledWith(
+        URL.gerenciarUsuariosGrupo(),
+        req,
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      );
     });
   });
 });

@@ -20,11 +20,17 @@ import { getPersonalizacaoRelatorio } from '../hooks/useGetPersonalizacaoRelator
 import { patchPersonalizacaoRelatorio } from '../hooks/usePatchPersonalizacaoRelatorio';
 
 jest.mock('../components/QuillEditor', () => {
-  return function MockQuillEditor({ value, onChange, placeholder }: any) {
+  return function MockQuillEditor({ value, onChange, placeholder, showToolbar }: any) {
+    const testId = placeholder?.includes('texto final')
+      ? 'texto-final'
+      : showToolbar === false
+        ? 'cabecalho'
+        : 'cabecalho-gabarito';
+
     return (
       <div data-testid="quill-editor">
         <textarea
-          data-testid={`quill-textarea-${placeholder?.includes('cabeçalho') ? 'cabecalho' : 'texto-final'}`}
+          data-testid={`quill-textarea-${testId}`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
@@ -60,15 +66,15 @@ jest.spyOn(App, 'useApp').mockReturnValue({
 const defaultProps = {
   open: true,
   onCancel: jest.fn(),
-  selectedRelatorio: { key: 'tipo-relatorio-1', tipo: 'Relatório de Teste' },
+  selectedRelatorio: { key: 'LAUDA_VAGAS', tipo: 'Lauda de vagas' },
   processoNome: 'Processo Teste',
   processoUuid: 'processo-uuid-123',
 };
 
 const createMockData = (overrides = {}) => ({
   uuid: 'uuid-123',
-  usar_cabecalho_padrao: false,
   usar_logotipo: true,
+  cabecalho_gabarito: '',
   cabecalho: '',
   texto_final: '',
   cabecalho_capa_ata: '',
@@ -86,14 +92,25 @@ describe('PersonalizacaoModal', () => {
   describe('Renderização inicial', () => {
     it('deve renderizar todos os elementos principais', () => {
       setupComponent();
-      expect(screen.getByText('Personalizar Relatório de Teste')).toBeInTheDocument();
+      expect(screen.getByText('Personalizar Lauda de vagas')).toBeInTheDocument();
       expect(screen.getByText('Processo Teste')).toBeInTheDocument();
-      expect(screen.getByText('Usar cabeçalho padrão?')).toBeInTheDocument();
       expect(screen.getByText('Usar logotipo?')).toBeInTheDocument();
+      expect(screen.getByText('Cabeçalho gabarito:')).toBeInTheDocument();
       expect(screen.getByText('Cabeçalho:')).toBeInTheDocument();
+      expect(screen.getByText('Copiar cabeçalho gabarito')).toBeInTheDocument();
       expect(screen.getByText('Texto final:')).toBeInTheDocument();
       expect(screen.getByText('Cancelar')).toBeInTheDocument();
       expect(screen.getByText('Salvar')).toBeInTheDocument();
+    });
+
+    it('deve ocultar campo de cabeçalho gabarito e botão copiar para relatórios sem essa funcionalidade', () => {
+      setupComponent({
+        selectedRelatorio: { key: 'RELACAO_VAGAS', tipo: 'Relação de Vagas' },
+      });
+
+      expect(screen.queryByText('Cabeçalho gabarito:')).not.toBeInTheDocument();
+      expect(screen.queryByText('Copiar cabeçalho gabarito')).not.toBeInTheDocument();
+      expect(screen.getByText('Cabeçalho:')).toBeInTheDocument();
     });
 
     it.each([
@@ -109,7 +126,7 @@ describe('PersonalizacaoModal', () => {
     it('deve buscar personalização quando modal abre com dados válidos', async () => {
       mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData());
       setupComponent();
-      await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalledWith('tipo-relatorio-1'));
+      await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalledWith('LAUDA_VAGAS'));
     });
 
     it.each([
@@ -132,18 +149,19 @@ describe('PersonalizacaoModal', () => {
 
     it('deve atualizar estados com dados retornados', async () => {
       mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData({
-        usar_cabecalho_padrao: true,
         usar_logotipo: false,
+        cabecalho_gabarito: '<p>Cabeçalho gabarito carregado</p>',
         cabecalho: '<p>Cabeçalho carregado</p>',
         texto_final: '<p>Texto final carregado</p>',
       }));
       setupComponent();
       await waitFor(() => {
+        expect(screen.getByTestId('quill-textarea-cabecalho-gabarito')).toHaveValue('<p>Cabeçalho gabarito carregado</p>');
         expect(screen.getByTestId('quill-textarea-cabecalho')).toHaveValue('<p>Cabeçalho carregado</p>');
         expect(screen.getByTestId('quill-textarea-texto-final')).toHaveValue('<p>Texto final carregado</p>');
         const checkboxes = screen.getAllByRole('checkbox');
-        expect(checkboxes[0]).toBeChecked();
-        expect(checkboxes[1]).not.toBeChecked();
+        expect(checkboxes).toHaveLength(1);
+        expect(checkboxes[0]).not.toBeChecked();
       });
     });
 
@@ -152,8 +170,8 @@ describe('PersonalizacaoModal', () => {
       setupComponent();
       await waitFor(() => {
         const checkboxes = screen.getAllByRole('checkbox');
-        expect(checkboxes[0]).not.toBeChecked();
-        expect(checkboxes[1]).toBeChecked();
+        expect(checkboxes).toHaveLength(1);
+        expect(checkboxes[0]).toBeChecked();
       });
     });
 
@@ -170,15 +188,14 @@ describe('PersonalizacaoModal', () => {
 
   describe('Reset quando modal fecha', () => {
     it('deve resetar estados quando open muda para false', async () => {
-      mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData({ usar_cabecalho_padrao: true, usar_logotipo: false }));
+      mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData({ usar_logotipo: false }));
       const { rerender } = setupComponent();
       await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalled());
       rerender(<PersonalizacaoModal {...defaultProps} open={false} />);
       await waitFor(() => {
         const checkboxes = screen.queryAllByRole('checkbox');
         if (checkboxes.length > 0) {
-          expect(checkboxes[0]).not.toBeChecked();
-          expect(checkboxes[1]).toBeChecked();
+          expect(checkboxes[0]).toBeChecked();
         }
       });
     });
@@ -194,8 +211,8 @@ describe('PersonalizacaoModal', () => {
       await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalled());
       await waitFor(() => {
         const checkboxes = screen.getAllByRole('checkbox');
-        expect(checkboxes[0]).not.toBeChecked();
-        expect(checkboxes[1]).toBeChecked();
+        expect(checkboxes).toHaveLength(1);
+        expect(checkboxes[0]).toBeChecked();
       });
       fireEvent.click(screen.getByText('Salvar'));
       await waitFor(() => {
@@ -220,24 +237,24 @@ describe('PersonalizacaoModal', () => {
 
     it.each([
       {
-        name: 'usarCabecalhoPadrao',
-        change: (screen: any) => fireEvent.click(screen.getAllByRole('checkbox')[0]),
-        expected: { usar_cabecalho_padrao: true, usar_logotipo: true },
-      },
-      {
         name: 'usarLogotipo',
-        change: (screen: any) => fireEvent.click(screen.getAllByRole('checkbox')[1]),
-        expected: { usar_cabecalho_padrao: false, usar_logotipo: false },
+        change: (screen: any) => fireEvent.click(screen.getAllByRole('checkbox')[0]),
+        expected: { usar_logotipo: false },
       },
       {
-        name: 'cabecalhoPadraoHtml',
+        name: 'cabecalhoGabaritoHtml',
+        change: (screen: any) => fireEvent.change(screen.getByTestId('quill-textarea-cabecalho-gabarito'), { target: { value: '<p>Novo cabeçalho gabarito</p>' } }),
+        expected: { cabecalho_gabarito: '<p>Novo cabeçalho gabarito</p>', usar_logotipo: true },
+      },
+      {
+        name: 'cabecalhoHtml',
         change: (screen: any) => fireEvent.change(screen.getByTestId('quill-textarea-cabecalho'), { target: { value: '<p>Novo cabeçalho</p>' } }),
-        expected: { cabecalho: '<p>Novo cabeçalho</p>', usar_cabecalho_padrao: false, usar_logotipo: true },
+        expected: { cabecalho: '<p>Novo cabeçalho</p>', usar_logotipo: true },
       },
       {
         name: 'textoPadraoFinalHtml',
         change: (screen: any) => fireEvent.change(screen.getByTestId('quill-textarea-texto-final'), { target: { value: '<p>Novo texto final</p>' } }),
-        expected: { texto_final: '<p>Novo texto final</p>', usar_cabecalho_padrao: false, usar_logotipo: true },
+        expected: { texto_final: '<p>Novo texto final</p>', usar_logotipo: true },
       },
     ])('deve atualizar e salvar quando há mudanças em $name', async ({ change, expected }) => {
       mockPatchPersonalizacaoRelatorio.mockResolvedValue(undefined);
@@ -247,14 +264,53 @@ describe('PersonalizacaoModal', () => {
       fireEvent.click(screen.getByText('Salvar'));
       await waitFor(() => {
         expect(mockPatchPersonalizacaoRelatorio).toHaveBeenCalledWith({
-          tipoRelatorio: 'tipo-relatorio-1',
+          tipoRelatorio: 'LAUDA_VAGAS',
+          cabecalho_gabarito: expected.cabecalho_gabarito ?? '',
           cabecalho: expected.cabecalho ?? '',
           texto_final: expected.texto_final ?? '',
-          usar_cabecalho_padrao: expected.usar_cabecalho_padrao ?? false,
           usar_logotipo: expected.usar_logotipo ?? true,
           uuid: 'uuid-123',
         });
         expect(defaultProps.onCancel).toHaveBeenCalled();
+      });
+    });
+
+    it('deve copiar cabeçalho gabarito para o campo cabeçalho ao clicar no botão de copiar', async () => {
+      setupComponent();
+      await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalled());
+
+      fireEvent.change(screen.getByTestId('quill-textarea-cabecalho-gabarito'), {
+        target: { value: '<p>Texto gabarito</p>' },
+      });
+      fireEvent.click(screen.getByText('Copiar cabeçalho gabarito'));
+
+      expect(screen.getByTestId('quill-textarea-cabecalho')).toHaveValue('<p>Texto gabarito</p>');
+      expect(mockPatchPersonalizacaoRelatorio).not.toHaveBeenCalled();
+    });
+
+    it('deve salvar sem cabecalho_gabarito para relatórios fora da lista de gabarito', async () => {
+      mockPatchPersonalizacaoRelatorio.mockResolvedValue(undefined);
+      setupComponent({
+        selectedRelatorio: { key: 'RELACAO_VAGAS', tipo: 'Relação de Vagas' },
+      });
+
+      await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalledWith('RELACAO_VAGAS'));
+      const cabecalhoTextarea = screen.getAllByTestId(/quill-textarea-/)
+        .find((el) => el.getAttribute('data-testid') !== 'quill-textarea-texto-final');
+      expect(cabecalhoTextarea).toBeTruthy();
+      fireEvent.change(cabecalhoTextarea as HTMLTextAreaElement, {
+        target: { value: '<p>Cabeçalho sem gabarito</p>' },
+      });
+      fireEvent.click(screen.getByText('Salvar'));
+
+      await waitFor(() => {
+        expect(mockPatchPersonalizacaoRelatorio).toHaveBeenCalledWith({
+          tipoRelatorio: 'RELACAO_VAGAS',
+          usar_logotipo: true,
+          cabecalho: '<p>Cabeçalho sem gabarito</p>',
+          texto_final: '',
+          uuid: 'uuid-123',
+        });
       });
     });
 
@@ -264,15 +320,15 @@ describe('PersonalizacaoModal', () => {
       await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalled());
       const checkboxes = screen.getAllByRole('checkbox');
       fireEvent.click(checkboxes[0]);
-      fireEvent.click(checkboxes[1]);
+      fireEvent.change(screen.getByTestId('quill-textarea-cabecalho-gabarito'), { target: { value: '<p>Cabeçalho gabarito</p>' } });
       fireEvent.change(screen.getByTestId('quill-textarea-cabecalho'), { target: { value: '<p>Cabeçalho</p>' } });
       fireEvent.change(screen.getByTestId('quill-textarea-texto-final'), { target: { value: '<p>Texto final</p>' } });
       fireEvent.click(screen.getByText('Salvar'));
       await waitFor(() => {
         expect(mockPatchPersonalizacaoRelatorio).toHaveBeenCalledWith({
-          tipoRelatorio: 'tipo-relatorio-1',
-          usar_cabecalho_padrao: true,
+          tipoRelatorio: 'LAUDA_VAGAS',
           usar_logotipo: false,
+          cabecalho_gabarito: '<p>Cabeçalho gabarito</p>',
           cabecalho: '<p>Cabeçalho</p>',
           texto_final: '<p>Texto final</p>',
           uuid: 'uuid-123',
@@ -286,7 +342,7 @@ describe('PersonalizacaoModal', () => {
       mockPatchPersonalizacaoRelatorio.mockResolvedValue(undefined);
       setupComponent();
       await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalled());
-      fireEvent.change(screen.getByTestId('quill-textarea-cabecalho'), { target: { value: '<p>Novo</p>' } });
+      fireEvent.change(screen.getByTestId('quill-textarea-cabecalho-gabarito'), { target: { value: '<p>Novo</p>' } });
       fireEvent.click(screen.getByText('Salvar'));
       await waitFor(() => {
         expect(mockPatchPersonalizacaoRelatorio).toHaveBeenCalledWith(expect.objectContaining({ uuid: null }));
@@ -299,7 +355,7 @@ describe('PersonalizacaoModal', () => {
       mockPatchPersonalizacaoRelatorio.mockRejectedValue(new Error('Erro ao salvar'));
       setupComponent();
       await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalled());
-      fireEvent.change(screen.getByTestId('quill-textarea-cabecalho'), { target: { value: '<p>Novo</p>' } });
+      fireEvent.change(screen.getByTestId('quill-textarea-cabecalho-gabarito'), { target: { value: '<p>Novo</p>' } });
       fireEvent.click(screen.getByText('Salvar'));
       await waitFor(() => {
         expect(consoleErrorSpy).toHaveBeenCalledWith('Erro ao salvar personalização do relatório:', expect.any(Error));
@@ -334,7 +390,7 @@ describe('PersonalizacaoModal', () => {
         },
         trigger: async () => {
           await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalled());
-          fireEvent.change(screen.getByTestId('quill-textarea-cabecalho'), { target: { value: '<p>Novo</p>' } });
+          fireEvent.change(screen.getByTestId('quill-textarea-cabecalho-gabarito'), { target: { value: '<p>Novo</p>' } });
           fireEvent.click(screen.getByText('Salvar').closest('button')!);
         },
       },
@@ -395,9 +451,9 @@ describe('Hooks - getPersonalizacaoRelatorio e patchPersonalizacaoRelatorio', ()
 
   describe('patchPersonalizacaoRelatorio', () => {
     const basePayload = {
-      tipoRelatorio: 'tipo-relatorio-1',
-      usar_cabecalho_padrao: true,
+      tipoRelatorio: 'LAUDA_VAGAS',
       usar_logotipo: false,
+      cabecalho_gabarito: '<p>Cabeçalho gabarito</p>',
       cabecalho: '<p>Cabeçalho</p>',
       texto_final: '<p>Texto final</p>',
     };
@@ -412,10 +468,10 @@ describe('Hooks - getPersonalizacaoRelatorio e patchPersonalizacaoRelatorio', ()
       const result = await realPatchPersonalizacaoRelatorio({ ...basePayload, uuid: 'personalizacao-uuid-123' });
 
       expect(mockAPIPatchPersonalizacaoRelatorio).toHaveBeenCalledWith(
-        'tipo-relatorio-1',
+        'LAUDA_VAGAS',
         expect.objectContaining({
-          usar_cabecalho_padrao: true,
           usar_logotipo: false,
+          cabecalho_gabarito: '<p>Cabeçalho gabarito</p>',
           cabecalho: '<p>Cabeçalho</p>',
           texto_final: '<p>Texto final</p>',
           uuid: 'personalizacao-uuid-123',
@@ -437,15 +493,15 @@ describe('Hooks - getPersonalizacaoRelatorio e patchPersonalizacaoRelatorio', ()
 
       const result = await realPatchPersonalizacaoRelatorio({
         ...basePayload,
-        usar_cabecalho_padrao: false,
         usar_logotipo: true,
+        cabecalho_gabarito: '',
         cabecalho: '',
         texto_final: '',
         uuid,
       });
 
       expect(mockAPIPatchPersonalizacaoRelatorio).toHaveBeenCalledWith(
-        'tipo-relatorio-1',
+        'LAUDA_VAGAS',
         expect.objectContaining({ uuid: null }),
         undefined
       );

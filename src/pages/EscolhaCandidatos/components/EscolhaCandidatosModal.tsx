@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Col, Modal, Spin, message } from "antd";
+import { Col, Modal, Spin, message, Form } from "antd";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { DefaultOptionType } from "antd/es/select";
 import type {
@@ -25,10 +25,8 @@ import {
   ModalInfoLabel,
   ModalInfoValue,
   ModalSection,
-  ModalSectionTitle,
   ModalRadioGroup,
   ModalFieldsRow,
-  ModalFieldLabel,
   ModalSelect,
   ModalRadio,
   ModalSaveButton,
@@ -84,7 +82,9 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
   canAddEscolha,
 }) => {
   const [modalSituacao, setModalSituacao] = useState<SituacaoEscolha>("escolha");
-  const [modalTipoVaga, setModalTipoVaga] = useState<TipoVagaEscolha>("precaria");
+  const [modalTipoVaga, setModalTipoVaga] = useState<TipoVagaEscolha | undefined>(
+    "precaria"
+  );
   const [modalRetardatario, setModalRetardatario] = useState(false);
   const [modalDre, setModalDre] = useState<string | undefined>(undefined);
   const [modalDreCodigo, setModalDreCodigo] = useState<string | undefined>(
@@ -103,7 +103,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     if (!visible) {
       return {
         situacao: "escolha" as SituacaoEscolha,
-        tipoVaga: "precaria" as TipoVagaEscolha,
+        tipoVaga: "precaria" as TipoVagaEscolha | undefined,
         retardatario: false,
         dre: undefined as string | undefined,
         dreCodigo: undefined as string | undefined,
@@ -162,6 +162,16 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     });
   }
 
+  // Captura se, ao abrir, é agenda de retardatários e a situação do candidato é "não-escolha"
+  const initialNaoEscolhaRef = useRef<boolean>(false);
+  useEffect(() => {
+    if (visible) {
+      initialNaoEscolhaRef.current = Boolean(
+        selectedAgendaData?.retardatario && context?.situacaoCodigo === "nao-escolha"
+      );
+    }
+  }, [visible, selectedAgendaData?.retardatario, context?.situacaoCodigo]);
+
   const shouldFetchVagas = useMemo(
     () =>
       visible &&
@@ -175,28 +185,21 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     shouldFetchVagas
   );
 
-  // Verifica se o modal está em modo somente leitura (candidato já tem escolha feita)
+// Verifica se o modal está em modo somente leitura (candidato já tem escolha feita)
   const isReadOnly = useMemo(() => {
+    const agendaEhRetardatario = selectedAgendaData?.retardatario === true;
+    const isNaoEscolha = modalSituacao === "nao-escolha";
+    // Se abriu em retardatário com "não-escolha", mantém editável mesmo após trocar a situação
+    if (agendaEhRetardatario && (initialNaoEscolhaRef.current || isNaoEscolha)) return false;
     return context?.situacaoCodigo !== "pendente";
-  }, [context?.situacaoCodigo]);
+  }, [context?.situacaoCodigo, selectedAgendaData?.retardatario, modalSituacao]);
 
-  const vagasElegiveisPorTipo = useMemo(() => {
+  const vagasDisponiveis = useMemo(() => {
     if (!vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
       return [];
     }
 
-    let vagasElegiveis = vagasData.vagas.filter((vaga: any) => {
-      const vagasPrecariasRestantes = vaga.vagas_precarias_restantes ?? 0;
-      const vagasDefinitivasRestantes = vaga.vagas_definitivas_restantes ?? 0;
-
-      if (isReadOnly) {
-        return true;
-      }
-
-      return modalTipoVaga === "definitiva"
-        ? vagasDefinitivasRestantes > 0
-        : vagasPrecariasRestantes > 0;
-    });
+    let vagasElegiveis = [...vagasData.vagas];
 
     // Em modo somente leitura, garante que a escola escolhida continue exibida.
     if (isReadOnly && context?.vagaEscolaUuid) {
@@ -212,12 +215,12 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     }
 
     return vagasElegiveis;
-  }, [vagasData?.vagas, modalTipoVaga, isReadOnly, context?.vagaEscolaUuid]);
+  }, [vagasData?.vagas, isReadOnly, context?.vagaEscolaUuid]);
 
   const dreOptions = useMemo(() => {
     const dreMap = new Map<string, { value: string; label: string; codigo: string; raw: any }>();
 
-    vagasElegiveisPorTipo.forEach((vaga: any) => {
+    vagasDisponiveis.forEach((vaga: any) => {
       const dre = vaga?.escola?.dre;
       if (!dre?.uuid || !dre?.codigo) {
         return;
@@ -248,7 +251,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     }
 
     return options;
-  }, [vagasElegiveisPorTipo, isReadOnly, context?.dreUuid, context?.dreCodigo]);
+  }, [vagasDisponiveis, isReadOnly, context?.dreUuid, context?.dreCodigo]);
 
   // Lista de escolas filtradas por DRE já considerando o tipo de vaga selecionado.
   const escolasPorDre = useMemo(() => {
@@ -256,7 +259,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       return [];
     }
 
-    return vagasElegiveisPorTipo
+    return vagasDisponiveis
       .filter((vaga: any) => vaga?.escola?.dre?.codigo === modalDreCodigo)
       .map((vaga: any) => {
         const vagasPrecariasRestantes = vaga.vagas_precarias_restantes ?? 0;
@@ -270,7 +273,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
         vagaData: vaga,
       };
     });
-  }, [vagasElegiveisPorTipo, modalDreCodigo]);
+  }, [vagasDisponiveis, modalDreCodigo]);
 
   const syncedModalDre = useMemo(() => {
     if (!visible) {
@@ -387,44 +390,56 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     [dreOptions]
   );
 
-  // Limpa DRE/escola quando o tipo de vaga muda e a DRE deixa de ter opções elegíveis.
-  useEffect(() => {
-    if (isReadOnly || !modalDre) {
-      return;
+  const disponibilidadeTipoVaga = useMemo(() => {
+    if (!modalUnidadeEscolar) {
+      return {
+        temPrecaria: true,
+        temDefinitiva: true,
+      };
     }
 
-    const dreSelecionadaAindaElegivel = dreOptions.some(
-      (option) => option.value === modalDre
-    );
-
-    if (!dreSelecionadaAindaElegivel) {
-      setModalDre(undefined);
-      setModalDreCodigo(undefined);
-      setModalUnidadeEscolar(undefined);
-    }
-  }, [isReadOnly, modalDre, dreOptions]);
-
-  // Limpa a seleção da escola se ela não tiver vagas do tipo selecionado
-  // (apenas quando não estiver em modo somente leitura)
-  useEffect(() => {
-    if (isReadOnly || !modalUnidadeEscolar || !vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
-      return;
-    }
-    
-    const escolaSelecionada = vagasData.vagas.find(
+    const escolaSelecionada = vagasDisponiveis.find(
       (vaga: any) => vaga.uuid === modalUnidadeEscolar
     );
-    
-    if (escolaSelecionada) {
-      const temVagas = modalTipoVaga === "definitiva"
-        ? (escolaSelecionada.vagas_definitivas_restantes ?? 0) > 0
-        : (escolaSelecionada.vagas_precarias_restantes ?? 0) > 0;
-      
-      if (!temVagas) {
-        setModalUnidadeEscolar(undefined);
-      }
+
+    return {
+      temPrecaria: (escolaSelecionada?.vagas_precarias_restantes ?? 0) > 0,
+      temDefinitiva: (escolaSelecionada?.vagas_definitivas_restantes ?? 0) > 0,
+    };
+  }, [modalUnidadeEscolar, vagasDisponiveis]);
+
+  useEffect(() => {
+    if (isReadOnly || modalSituacao !== "escolha") {
+      return;
     }
-  }, [modalTipoVaga, modalUnidadeEscolar, vagasData?.vagas, isReadOnly]);
+
+    const { temPrecaria, temDefinitiva } = disponibilidadeTipoVaga;
+    const tipoAtualInvalido =
+      !modalTipoVaga ||
+      (modalTipoVaga === "precaria" && !temPrecaria) ||
+      (modalTipoVaga === "definitiva" && !temDefinitiva);
+
+    if (!tipoAtualInvalido) {
+      return;
+    }
+
+    if (temPrecaria) {
+      setModalTipoVaga("precaria");
+      return;
+    }
+
+    if (temDefinitiva) {
+      setModalTipoVaga("definitiva");
+      return;
+    }
+
+    setModalTipoVaga(undefined);
+  }, [
+    disponibilidadeTipoVaga,
+    isReadOnly,
+    modalSituacao,
+    modalTipoVaga,
+  ]);
 
   const queryClient = useQueryClient();
 
@@ -567,6 +582,18 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       return;
     }
 
+    if (
+      modalSituacao === "escolha" &&
+      (!modalTipoVaga ||
+        (modalTipoVaga === "precaria" && !disponibilidadeTipoVaga.temPrecaria) ||
+        (modalTipoVaga === "definitiva" && !disponibilidadeTipoVaga.temDefinitiva))
+    ) {
+      message.warning(
+        "A unidade escolar selecionada não possui vagas disponíveis para o tipo de vaga informado."
+      );
+      return;
+    }
+
     // Quando não for "escolha", enviar null para os campos não visíveis
     const payload: ISalvarEscolhaPayload = {
       candidato_uuid: context.candidatoUuid,
@@ -575,7 +602,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
         ? (modalUnidadeEscolar || null) 
         : null,
       tipo_vaga: modalSituacao === "escolha" 
-        ? modalTipoVaga 
+        ? (modalTipoVaga ?? null)
         : null,
       e_retardatario: modalSituacao === "escolha" 
         ? modalRetardatario 
@@ -585,18 +612,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
 
     try {
       await salvarEscolhaMutateAsync(payload);
-      
-      // Sincronizar agendas após salvar a escolha (para escolha, reconvocação e não escolha)
-      if (selectedProcesso && selectedAgendaData) {
-        await sincronizarAgendas(
-          context.candidatoUuid,
-          selectedProcesso,
-          selectedAgendaData
-        );
-      }
-
       await atualizarStatusProcessoAoIniciarEscolha();
-      
       message.success("Escolha salva com sucesso.");
       onClose();
       onSuccess();
@@ -641,6 +657,8 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
     selectedAgendaData,
     sincronizarAgendas,
     isReadOnly,
+    disponibilidadeTipoVaga.temDefinitiva,
+    disponibilidadeTipoVaga.temPrecaria,
   ]);
 
   return (
@@ -663,7 +681,13 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
               loading={salvarEscolhaIsPending}
               disabled={
                 salvarEscolhaIsPending || 
-                (modalSituacao === "escolha" && !modalUnidadeEscolar)
+                (modalSituacao === "escolha" &&
+                  (!modalUnidadeEscolar ||
+                    (modalTipoVaga === "precaria" &&
+                      !disponibilidadeTipoVaga.temPrecaria) ||
+                    !modalTipoVaga ||
+                    (modalTipoVaga === "definitiva" &&
+                      !disponibilidadeTipoVaga.temDefinitiva)))
               }
             >
               Salvar
@@ -723,84 +747,94 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
         </ModalInfoCard>
 
         <ModalSection>
-          <ModalSectionTitle>Situação</ModalSectionTitle>
-          <ModalRadioGroup
-            value={modalSituacao}
-            onChange={(event) =>
-              setModalSituacao(
-                event.target.value as "escolha" | "reconvocacao" | "nao-escolha"
-              )
-            }
-            disabled={isReadOnly}
-          >
-            <ModalRadio value="escolha" disabled={isReadOnly}>Escolha</ModalRadio>
-            <ModalRadio value="reconvocacao" disabled={isReadOnly}>Reconvocação</ModalRadio>
-            <ModalRadio value="nao-escolha" disabled={isReadOnly}>Não escolha</ModalRadio>
-          </ModalRadioGroup>
-
-          {modalSituacao === "escolha" && (
-            <>
-              <ModalSectionTitle style={{ marginTop: "0.5rem" }}>
-                Tipo de vaga
-              </ModalSectionTitle>
+          <Form layout="vertical" disabled={isReadOnly}>
+            <Form.Item label="Situação">
               <ModalRadioGroup
-                value={modalTipoVaga}
+                value={modalSituacao}
                 onChange={(event) =>
-                  setModalTipoVaga(
-                    event.target.value as "precaria" | "definitiva"
+                  setModalSituacao(
+                    event.target.value as "escolha" | "reconvocacao" | "nao-escolha"
                   )
                 }
-                disabled={isReadOnly}
               >
-                <ModalRadio value="precaria" disabled={isReadOnly}>
-                  Precária
-                </ModalRadio>
-                <ModalRadio value="definitiva" disabled={isReadOnly}>
-                  Definitiva
-                </ModalRadio>
+                <ModalRadio value="escolha">Escolha</ModalRadio>
+                <ModalRadio value="reconvocacao">Reconvocação</ModalRadio>
+                <ModalRadio value="nao-escolha">Não escolha</ModalRadio>
               </ModalRadioGroup>
-            </>
-          )}
+            </Form.Item>
+
+            {/* Removido: Tipo de vaga superior - manter apenas o bloco inferior */}
+          </Form>
         </ModalSection>
 
         {modalSituacao === "escolha" && (
           <>
             <ModalSection>
-              <ModalFieldsRow gutter={[24, 16]}>
-                <Col xs={24} md={12}>
-                  <ModalFieldLabel>DRE</ModalFieldLabel>
-                  <ModalSelect
-                    value={modalDre}
-                    placeholder="Selecione a DRE"
-                    onChange={(value) =>
-                      handleModalDreChange(value as string | undefined)
+              <Form layout="vertical" disabled={isReadOnly}>
+                <ModalFieldsRow gutter={[24, 16]}>
+                  <Col xs={24} md={12}>
+                    <Form.Item label="DRE">
+                      <ModalSelect
+                        value={modalDre}
+                        placeholder="Selecione a DRE"
+                        onChange={(value) =>
+                          handleModalDreChange(value as string | undefined)
+                        }
+                        options={dreOptions}
+                        allowClear
+                        loading={vagasIsLoading}
+                        showSearch
+                        optionFilterProp="label"
+                        filterOption={filterOptionByLabel}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={12}>
+                    <Form.Item label="Unidade escolar">
+                      <ModalSelect
+                        value={modalUnidadeEscolar}
+                        placeholder="Selecione a unidade escolar"
+                        onChange={(value) =>
+                          setModalUnidadeEscolar(value as string | undefined)
+                        }
+                        options={escolasPorDre}
+                        allowClear
+                        showSearch
+                        optionFilterProp="label"
+                        filterOption={filterOptionByLabel}
+                      />
+                    </Form.Item>
+                  </Col>
+                </ModalFieldsRow>
+              </Form>
+            </ModalSection>
+
+            <ModalSection>
+              <Form layout="vertical" disabled={isReadOnly}>
+                <Form.Item label="Tipo de vaga" style={{ marginTop: "0.5rem" }}>
+                  <ModalRadioGroup
+                    value={modalTipoVaga}
+                    onChange={(event) =>
+                      setModalTipoVaga(
+                        event.target.value as "precaria" | "definitiva"
+                      )
                     }
-                    options={dreOptions}
-                    allowClear
-                    loading={vagasIsLoading}
-                    disabled={!canAddEscolha || isReadOnly || vagasIsLoading || !cargoCodigoNumericoParam}
-                    showSearch
-                    optionFilterProp="label"
-                    filterOption={filterOptionByLabel}
-                  />
-                </Col>
-                <Col xs={24} md={12}>
-                  <ModalFieldLabel>Unidade escolar</ModalFieldLabel>
-                  <ModalSelect
-                    value={modalUnidadeEscolar}
-                    placeholder="Selecione a unidade escolar"
-                    onChange={(value) =>
-                      setModalUnidadeEscolar(value as string | undefined)
-                    }
-                    options={escolasPorDre}
-                    allowClear
-                    disabled={isReadOnly || !modalDreCodigo}
-                    showSearch
-                    optionFilterProp="label"
-                    filterOption={filterOptionByLabel}
-                  />
-                </Col>
-              </ModalFieldsRow>
+                  >
+                    <ModalRadio
+                      value="definitiva"
+                      disabled={!disponibilidadeTipoVaga.temDefinitiva}
+                    >
+                      Definitiva
+                    </ModalRadio>
+                    <ModalRadio
+                      value="precaria"
+                      disabled={!disponibilidadeTipoVaga.temPrecaria}
+                    >
+                      Precária
+                    </ModalRadio>
+                  </ModalRadioGroup>
+                </Form.Item>
+              </Form>
             </ModalSection>
 
           </>

@@ -88,14 +88,12 @@ export const postImportacaoArquivosHabilitados = (
 };
 
 // // TODO adicionar JWT no header Authorization
-export const getImportacaoArquivosHabilitados = (
-  params?: Record<string, any>,
+export const getImportacaoArquivosHabilitados = ( 
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
   const response = appAxiosImportaArquivos
-    .get<PaginatedResponse<IImportacaoFundacao>>(URL.getImportacaoArquivosHabilitados(), {
-      params,
+    .get<PaginatedResponse<IImportacaoFundacao>>(URL.getImportacaoArquivosHabilitados(), {      
       paramsSerializer: queryParamsSerializer,
       signal,
       ...axiosRequestConfig,
