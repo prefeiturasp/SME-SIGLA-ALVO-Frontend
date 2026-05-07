@@ -136,7 +136,17 @@ export const useSelecaoCargo = () => {
     setModalSelecionarCandidatosVisible(false);
   };
 
-  const handleCandidatosSelecionados = (quantidade: number, quantidadesIndividuais: { geral: number; pcd: number; nna: number }, vagas: number, candidatosUuids: string[] = []) => {
+  const [porcentagemNna, setPorcentagemNna] = useState<number | undefined>(undefined);
+  const [porcentagemPcd, setPorcentagemPcd] = useState<number | undefined>(undefined);
+
+  const handleCandidatosSelecionados = (
+    quantidade: number,
+    quantidadesIndividuais: { geral: number; pcd: number; nna: number },
+    vagas: number,
+    candidatosUuids: string[] = [],
+    porcentagem_nna?: number,
+    porcentagem_pcd?: number
+  ) => {
     if (cargoSelecionado) {
       const cargoInfo = cargosDisponiveis.find(c => c.value === cargoSelecionado);
       if (cargoInfo) {
@@ -188,6 +198,10 @@ export const useSelecaoCargo = () => {
     }
     
     // Limpar seleção e fechar modal
+    // Guardar porcentagens vindas do modal (quando disponíveis)
+    if (typeof porcentagem_nna === "number") setPorcentagemNna(porcentagem_nna);
+    if (typeof porcentagem_pcd === "number") setPorcentagemPcd(porcentagem_pcd);
+
     setCargoSelecionado(undefined);
     setModalSelecionarCandidatosVisible(false);
   };
@@ -293,7 +307,12 @@ export const useSelecaoCargo = () => {
       })); 
 
       // TODO: Descomentar quando a API estiver pronta
-      await postCargoMutation.mutateAsync({ processoUuid: uuid, payload: payload as any });
+      await postCargoMutation.mutateAsync({
+        processoUuid: uuid,
+        payload: payload as any,
+        porcentagem_nna: porcentagemNna,
+        porcentagem_pcd: porcentagemPcd,
+      });
       return true;
     } catch (error: any) {
       console.error('Erro ao salvar cargos:', error);
