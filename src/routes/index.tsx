@@ -36,6 +36,7 @@ import EliminacaoReclassificacaoCandidatoTela from "../pages/EliminacaoReclassif
 import CartaConvocacaoTela from "../pages/Gerenciar/CartaConvocacao/CartaConvocacaoTela";
 import HistoricoCartaConvocacaoTela from "../pages/Gerenciar/CartaConvocacao/HistoricoCartaConvocacaoTela";
 import PesquisarConcursadosTela from "../pages/Processos/PesquisarConcursados/PesquisarConcursadosTela";
+import MeusDadosTela from "../pages/MeusDados/MeusDadosTela";
 
 
 const router = createBrowserRouter([
@@ -252,6 +253,15 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
 
+  {
+    path: "/meus-dados",
+    element: (
+      <ProtectedRoute>
+        <MeusDadosTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
   {
     path: "/processos/importacao-dados",
     element: (
