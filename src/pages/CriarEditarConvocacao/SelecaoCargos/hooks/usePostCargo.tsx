@@ -8,8 +8,25 @@ export const usePostCargo = () => {
   const { notification } = App.useApp();
 
   return useMutation({
-    mutationFn: ({ processoUuid, payload }: { processoUuid: string; payload: Array<ICargoProcesso> }) =>
-      API.Convocacao.postCargosProcesso(processoUuid, payload).response,
+    mutationFn: ({
+      processoUuid,
+      payload,
+      porcentagem_nna,
+      porcentagem_pcd,
+    }: {
+      processoUuid: string;
+      payload: Array<ICargoProcesso>;
+      porcentagem_nna?: number;
+      porcentagem_pcd?: number;
+    }) =>
+      {
+        const body = {
+          ...(typeof porcentagem_nna === "number" ? { porcentagem_nna } : {}),
+          ...(typeof porcentagem_pcd === "number" ? { porcentagem_pcd } : {}),
+          cargos: payload,
+        };
+        return API.Convocacao.postCargosProcesso(processoUuid, body as any).response;
+      },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["getCargosProcesso", variables.processoUuid] });
       notification.success({
