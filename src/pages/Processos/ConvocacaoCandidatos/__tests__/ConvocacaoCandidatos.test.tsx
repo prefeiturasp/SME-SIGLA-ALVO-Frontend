@@ -6,6 +6,10 @@ import { theme as appTheme } from '../../../../theme';
 import { renderWithProviders } from '../../../../test-utils';
 import ConvocacaoCandidatos from '../index';
 
+jest.mock('../../../../pages/MeusDados/hooks/useGetMeusDados', () => ({
+  useGetMeusDados: () => ({ data: undefined }),
+}));
+
 // Mock Controller para evitar necessidade de control real
 jest.mock('react-hook-form', () => {
   const actual = jest.requireActual('react-hook-form');
