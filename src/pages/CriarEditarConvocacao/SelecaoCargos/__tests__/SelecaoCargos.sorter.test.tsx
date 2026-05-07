@@ -1,10 +1,6 @@
 import React from 'react';
 import { renderWithProviders } from '../../../../test-utils';
 
-jest.mock('../../../../pages/MeusDados/hooks/useGetMeusDados', () => ({
-  useGetMeusDados: () => ({ data: undefined }),
-}));
-
 import SelecaoCargos from '../SelecaoCargosTela';
 // Mocks de navegação e permissões
 const mockNavigate = jest.fn();
