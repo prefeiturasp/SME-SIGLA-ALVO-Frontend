@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Modal, Button, Alert, message, Row, Col } from "antd";
 import { EyeInvisibleOutlined, EyeOutlined, CheckCircleFilled, CloseCircleFilled } from "@ant-design/icons";
-import { useAlterarSenha } from "../hooks/useAlterarSenha";
+import { useAlterarSenha } from "../hooks/usePostAlterarSenha";
 import { StandardInput } from "../../../components/EstilosCompartilhados";
 import {
   ModalTitleStyled,
