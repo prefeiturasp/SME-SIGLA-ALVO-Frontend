@@ -137,7 +137,14 @@ describe('BuscarCandidatosModal', () => {
     });
 
     await user.click(screen.getByRole('button', { name: 'Adicionar ao cargo' }));
-    expect(mockOnSelecionados).toHaveBeenCalledWith(3, { geral: 1, pcd: 1, nna: 1 }, 5, ['c1', 'c2', 'c3']);
+    expect(mockOnSelecionados).toHaveBeenCalledWith(
+      3,
+      { geral: 1, pcd: 1, nna: 1 },
+      5,
+      ['c1', 'c2', 'c3'],
+      undefined,
+      undefined
+    );
     expect(mockOnClose).toHaveBeenCalled();
   });
 
@@ -222,7 +229,14 @@ describe('BuscarCandidatosModal', () => {
     await user.click(screen.getByRole('button', { name: /buscar/i }));
 
     await user.click(screen.getByRole('button', { name: 'Adicionar ao cargo' }));
-    expect(mockOnSelecionados).toHaveBeenCalledWith(3, { geral: 1, pcd: 1, nna: 1 }, 5, ['n1', 'n2', 'n3']);
+    expect(mockOnSelecionados).toHaveBeenCalledWith(
+      3,
+      { geral: 1, pcd: 1, nna: 1 },
+      5,
+      ['n1', 'n2', 'n3'],
+      undefined,
+      undefined
+    );
   });
 
   it('impede adicionar quando total excede vagas', async () => {
