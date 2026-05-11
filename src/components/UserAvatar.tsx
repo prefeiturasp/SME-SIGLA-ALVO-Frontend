@@ -3,17 +3,9 @@ import { Space, Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import { UserLabel, StyledUserAvatar, UserAvatarIcon } from "../pages/Base/styles";
 import { useNavigate } from "react-router-dom";
-import { useGetMeusDados } from "../pages/MeusDados/hooks/useGetMeusDados";
-
-const getPrimeiroNome = (nomeCompleto?: string | null) => {
-  const nome = String(nomeCompleto ?? "").trim();
-  if (!nome) return "";
-  return nome.split(/\s+/)[0] ?? "";
-};
 
 export const UserAvatar: React.FC = () => {
-  const { data } = useGetMeusDados();
-  const primeiroNome = getPrimeiroNome(data?.nome_completo) || localStorage.getItem("NOME_USUARIO") || "Usuário";
+  const primeiroNome = localStorage.getItem("NOME_USUARIO") || "Usuário";
   const navigate = useNavigate();
 
     const handleLogout = () => {
