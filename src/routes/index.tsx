@@ -20,6 +20,7 @@ import RouteError from "./RouteError";
 import GerenciamentoVagasTela from "../pages/GerenciamentoVagas/GerenciamentoVagasTela";
 import EscolhaCandidatosTela from "../pages/EscolhaCandidatos/EscolhaCandidatosTela";
 import PermissaoUsuarioTela from "../pages/Gerenciar/PermissaoUsuario/PermissaoUsuarioTela";
+import AdicionarUsuarioTela from "../pages/Gerenciar/AdicionarUsuario/AdicionarUsuarioTela";
 import CadastroParametrosTela from "../pages/Gerenciar/Parametros/CadastroParametrosTela";
 
 import DadosDoProcesso from "../pages/CriarEditarConvocacao/DadosDoProcesso";
@@ -154,11 +155,22 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },  
   {
-    path: "/gerenciar/permissao-usuario",
+    path: "/gerenciar/gerenciamento-usuarios",
     element: (
       <ProtectedRoute>
         <PermissionContextGuard model="group" permissaoDeExibirATELA="view_group">
-        <PermissaoUsuarioTela />
+          <PermissaoUsuarioTela />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/gerenciar/adicao-usuario",
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="user" permissaoDeExibirATELA="add_user">
+          <AdicionarUsuarioTela />
         </PermissionContextGuard>
       </ProtectedRoute>
     ),

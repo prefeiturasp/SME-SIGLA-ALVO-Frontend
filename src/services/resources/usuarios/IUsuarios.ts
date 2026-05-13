@@ -10,3 +10,19 @@ export interface IAlterarSenhaRequest {
   nova_senha: string;
   confirmacao_nova_senha: string;
 }
+
+export interface IBuscarUsuarioEolRequest {
+  rf: string;
+}
+
+export interface IBuscarUsuarioEolResponse {
+  username: string;
+  nome: string;
+  email: string;
+}
+
+export interface ICriarUsuarioRequest {
+  username: string;
+  nome: string;
+  email: string;
+}
