@@ -40,12 +40,12 @@ const addAuthInterceptor = (axiosInstance: AxiosInstance) => {
   axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error.response?.status === 401) {
+      if (error.response?.status === 401 || error.response?.data?.code === 'token_not_valid') {
         localStorage.removeItem('TOKEN');
         localStorage.removeItem('USUARIO');
         window.location.href = '/login';
       }
-      else if (error.response?.status === 403 && error.response?.data?.code === 'token_not_valid') {
+      else if (error.response?.status === 403) {
         window.location.href = '/403';
       }
       return Promise.reject(error);
