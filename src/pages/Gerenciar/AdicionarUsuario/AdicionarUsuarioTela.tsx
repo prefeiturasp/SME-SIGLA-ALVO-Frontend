@@ -73,11 +73,8 @@ const AdicionarUsuarioTela: React.FC = () => {
       const data = await response;
       setDadosUsuario(data);
     } catch (e: any) {
-      console.log(e);
-      console.log(e?.status);
       const statusCode = e?.response?.status;
       const detail = e?.response?.data?.detail;
-
       if (statusCode === 400) {
         setErro(detail || "Usuário já cadastrado no Sigla.");
       } else if (statusCode === 404) {
