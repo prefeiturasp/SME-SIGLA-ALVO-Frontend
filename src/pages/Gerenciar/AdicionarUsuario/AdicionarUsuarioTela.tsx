@@ -73,6 +73,8 @@ const AdicionarUsuarioTela: React.FC = () => {
       const data = await response;
       setDadosUsuario(data);
     } catch (e: any) {
+      console.log(e);
+      console.log(e?.status);
       const statusCode = e?.response?.status;
       const detail = e?.response?.data?.detail;
 
