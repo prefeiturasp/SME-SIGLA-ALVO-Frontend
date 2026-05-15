@@ -1,0 +1,28 @@
+{
+  "processoConvocacao": {
+    "nome": "Processo Convocação Automação",
+    "ano": 2024
+  },
+  "processoConvocacaoUpdate": {
+    "nome": "Processo Atualizado Automação",
+    "ano": 2024
+  },
+  "processoConvocacaoPatch": {
+    "nome": "Processo Parcialmente Atualizado"
+  },
+  "cartaConvocacao": {
+    "conteudo": "Carta de convocação gerada por automação de testes"
+  },
+  "cargo": {
+    "nome": "Cargo Teste Automação",
+    "quantidade_vagas": 1
+  },
+  "cargoUpdate": {
+    "nome": "Cargo Atualizado Automação",
+    "quantidade_vagas": 2
+  },
+  "cargoPatch": {
+    "nome": "Cargo Parcialmente Atualizado"
+  },
+  "passoPatch": {}
+}
