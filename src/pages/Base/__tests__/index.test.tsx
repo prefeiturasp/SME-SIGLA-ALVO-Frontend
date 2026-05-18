@@ -397,7 +397,7 @@ describe('BaseTela Component', () => {
         await user.click(gerenciarMenuItem);
 
         await waitFor(() => {
-          expect(screen.getByText('Permissão de usuário')).toBeInTheDocument();
+          expect(screen.getByText('Gerenciamento de usuários')).toBeInTheDocument();
           expect(screen.getByText('Cadastro de Parâmetros')).toBeInTheDocument();
         }, { timeout: 2000 });
       }

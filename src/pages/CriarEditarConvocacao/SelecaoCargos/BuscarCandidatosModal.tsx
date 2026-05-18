@@ -27,7 +27,14 @@ interface BuscarCandidatosModalProps {
   processoUuid?: string;
   tipoEscolha?: string;
   cargoEmEdicao?: { geral: number; pcd: number; nna: number } | null;
-  onCandidatosSelecionados?: (quantidade: number, quantidadesIndividuais: { geral: number; pcd: number; nna: number }, vagas: number, candidatosUuids: string[]) => void;
+  onCandidatosSelecionados?: (
+    quantidade: number,
+    quantidadesIndividuais: { geral: number; pcd: number; nna: number },
+    vagas: number,
+    candidatosUuids: string[],
+    porcentagem_nna?: number,
+    porcentagem_pcd?: number
+  ) => void;
   onCandidatosUuidsChange?: (cargoUuid: string, uuids: string[]) => void;
 }
 
@@ -189,6 +196,16 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       : isNovaAutorizacao && tipoConvocacao === 'calculada'
         ? candidatosCalculadosData
         : candidatosData;
+  
+  // Porcentagens retornadas junto com a listagem (quando a resposta é objeto paginado)
+  const porcentagemNna =
+    candidatosDataFinal && !Array.isArray(candidatosDataFinal)
+      ? (candidatosDataFinal as any)?.porcentagem_nna
+      : undefined;
+  const porcentagemPcd =
+    candidatosDataFinal && !Array.isArray(candidatosDataFinal)
+      ? (candidatosDataFinal as any)?.porcentagem_pcd
+      : undefined;
   
   const candidatos = mostrarTabelaCandidatos && candidatosDataFinal ? 
     (Array.isArray(candidatosDataFinal) ? candidatosDataFinal : candidatosDataFinal.results) : [];
@@ -544,7 +561,14 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       .filter((id: any) => typeof id === 'string' && id);
 
     if (onCandidatosSelecionados) {
-      onCandidatosSelecionados(quantidadeCandidatos, quantidadesIndividuais, totalVagas, candidatosUuids);
+      onCandidatosSelecionados(
+        quantidadeCandidatos,
+        quantidadesIndividuais,
+        totalVagas,
+        candidatosUuids,
+        porcentagemNna,
+        porcentagemPcd
+      );
     }
 
     onClose();

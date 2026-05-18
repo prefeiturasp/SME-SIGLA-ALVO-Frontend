@@ -1,5 +1,6 @@
 import React from "react";
 import { Col, Input, Row, Select, Typography, Tooltip, message } from "antd";
+import { UserAddOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
@@ -30,6 +31,7 @@ import {
   SearchFieldsContainer,
   ClearButton,
   SearchButton,
+  ActionButton,
 } from "../../Processos/ConvocacaoCandidatos/style";
 
 const { Text } = Typography;
@@ -82,7 +84,7 @@ const PermissaoUsuarioTela: React.FC = () => {
         </Text>
       ),
     },
-    { title: "Permissão de usuário" },
+    { title: "Gerenciamento de usuários" },
   ] as TitleItem[];
 
   const { control, handleSubmit, reset, formState } = useForm({
@@ -189,7 +191,17 @@ const PermissaoUsuarioTela: React.FC = () => {
     <PageContainer>
       <BaseTela
         breadcrumbItems={breadcrumbItems}
-        title="Permissão de usuário"
+        title="Gerenciamento de usuários"
+        buttons={
+          <ActionButton
+            type="primary"
+            size="large"
+            icon={<UserAddOutlined />}
+            onClick={() => navigate("/gerenciar/adicao-usuario")}
+          >
+            Adicionar usuário
+          </ActionButton>
+        }
       >
         <SucessoModal
           open={permissaoSucessoOpen}

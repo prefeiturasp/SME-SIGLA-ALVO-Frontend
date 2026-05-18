@@ -200,9 +200,9 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
             onClick: () => navigate("/eliminiacao-e-reclassificacao-candidato"),
           },
           {
-            key: "permissao-usuario",
-            label: "Permissão de usuário",
-            onClick: () => navigate("/gerenciar/permissao-usuario"),
+            key: "gerenciamento-usuarios",
+            label: "Gerenciamento de usuários",
+            onClick: () => navigate("/gerenciar/gerenciamento-usuarios"),
           },
           {
             key: "cadastro-parametros",

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Modal, Table, Typography, Select, Upload, Button, Card } from "antd";
+import { Modal, Table, Typography, Select, Upload, Button, Card, Input } from "antd";
 import Paragraph from "antd/es/typography/Paragraph";
 
 const { Text } = Typography;
@@ -385,4 +385,9 @@ export const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
+`;
+
+export const StandardInput = styled(Input)`
+  width: 100%;
+  height: 2.5rem;
 `;
