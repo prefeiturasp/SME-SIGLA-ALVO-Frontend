@@ -1,5 +1,5 @@
-# ============================================================
-# Dependências
+﻿# ============================================================
+# Dependencias
 # ============================================================
 node_modules/
 .npm/
@@ -8,7 +8,7 @@ node_modules/
 .yarn-integrity
 
 # ============================================================
-# Cypress — artefatos gerados em execução
+# Cypress - artefatos gerados em execucao
 # ============================================================
 cypress/videos/
 cypress/screenshots/
@@ -19,7 +19,7 @@ cypress/junit/
 cypress/.cache/
 
 # ============================================================
-# Relatórios de testes
+# Relatorios de testes
 # ============================================================
 mochawesome-report/
 allure-results/
@@ -28,13 +28,14 @@ test-results/
 *.xml
 
 # ============================================================
-# Feature files — ignorar todos exceto api_processos_convocacao
+# Feature files - ignorar todos exceto api_processos_convocacao
+# As pastas sao mantidas no repositorio via .gitkeep
 # ============================================================
 cypress/e2e/**/*.feature
-!cypress/e2e/api/api/api_processos_convocacao.feature
+!cypress/e2e/api/api_processos_convocacao.feature
 
 # ============================================================
-# Credenciais e segredos — NUNCA subir para o repositório
+# Credenciais e segredos - NUNCA subir para o repositorio
 # ============================================================
 .env
 .env.*
@@ -58,7 +59,7 @@ cypress/fixtures/**/senha*
 cypress/fixtures/**/password*
 
 # ============================================================
-# Cobertura de código
+# Cobertura de codigo
 # ============================================================
 coverage/
 .nyc_output/
