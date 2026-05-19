@@ -1,0 +1,24 @@
+{
+  "name": "sme-sigla-alvo-testes-ui",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Suite de testes automatizados E2E e API — SME SIGLA ALVO Frontend",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:api": "cypress run --spec 'cypress/e2e/api/**/*.feature'",
+    "cy:run:chrome": "cypress run --browser chrome",
+    "cy:run:firefox": "cypress run --browser firefox"
+  },
+  "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "^20.1.2",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
+    "cypress": "^13.17.0",
+    "dotenv": "^16.6.1",
+    "multiple-cucumber-html-reporter": "^3.9.3"
+  },
+  "cypress-cucumber-preprocessor": {
+    "nonGlobalStepDefinitions": false,
+    "stepDefinitions": "cypress/support/step_definitions/**/*.js"
+  }
+}
