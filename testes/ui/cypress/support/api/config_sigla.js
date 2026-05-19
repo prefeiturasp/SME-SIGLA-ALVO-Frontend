@@ -1,5 +1,5 @@
 // ============================================================================
-// CONFIGURAÇÕES DA API SIGLA — Processos Convocação
+// CONFIGURAÇÕES DA API SIGLA — Base compartilhada entre todos os microsserviços
 // ============================================================================
 // NÃO usar process.env aqui — os valores vêm de Cypress.env() em runtime.
 // Valores carregados pelo cypress.config.js via dotenv.

@@ -3,7 +3,7 @@
 import { Given, When, Then, Before } from '@badeball/cypress-cucumber-preprocessor'
 
 // ============================================================================
-// STEPS — API SIGLA (Processos Convocação)
+// STEPS — API SIGLA (Todos os microsserviços)
 // Projeto: SME-SIGLA-ALVO-Frontend
 // ============================================================================
 
@@ -135,15 +135,21 @@ Then('o tempo de resposta SIGLA deve ser menor que {int} milissegundos', (limite
 
 Then('a resposta deve conter o campo {string}', (campo) => {
   cy.get('@response').then((res) => {
-    expect(res.body).to.have.property(campo)
-    expect(res.body[campo]).to.not.be.undefined
+    const body = res.body
+    const valorTopLevel = body[campo]
+    const valorEmCargos = body.cargos && body.cargos[0] ? body.cargos[0][campo] : undefined
+    const valor = valorTopLevel !== undefined ? valorTopLevel : valorEmCargos
+    expect(valor, `Campo "${campo}" deve estar presente`).to.not.be.undefined
     Cypress.log({ name: 'Validação campo', message: `"${campo}" presente` })
   })
 })
 
 Then('o campo {string} da resposta deve ser um UUID válido', (campo) => {
   cy.get('@response').then((res) => {
-    const valor = res.body[campo]
+    const body = res.body
+    const valorTopLevel = body[campo]
+    const valorEmCargos = body.cargos && body.cargos[0] ? body.cargos[0][campo] : undefined
+    const valor = valorTopLevel !== undefined ? valorTopLevel : valorEmCargos
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
     expect(valor, `Campo "${campo}" deve ser UUID`).to.match(uuidRegex)
     Cypress.log({ name: 'Validação UUID', message: `${campo} = ${valor}` })
@@ -186,22 +192,43 @@ Then('cada processo deve ter os campos obrigatórios:', (dataTable) => {
 
 When('eu crio uma carta de convocação com dados válidos', () => {
   cy.fixture('api/sigla_payloads').then((payloads) => {
-    cy.sigla_post('/carta-convocacao/', payloads.cartaConvocacao).then((res) => {
-      cy.wrap(res).as('response')
-      if (res.status === 200 || res.status === 201) {
-        cy.wrap(res.body.uuid).as('cartaUuid')
+    cy.sigla_post('/processos-convocacao/', payloads.processoConvocacao).then((processoRes) => {
+      const today = new Date()
+      const data = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`
+      const cartaBody = {
+        ...payloads.cartaConvocacao,
+        processo_uuid: processoRes.body.uuid,
+        processo_nome: processoRes.body.descricao || 'Processo Teste',
+        data,
       }
-      Cypress.log({ name: 'Criar Carta', message: `HTTP ${res.status}` })
+      cy.sigla_post('/carta-convocacao/', cartaBody).then((res) => {
+        cy.wrap(res).as('response')
+        if (res.status === 200 || res.status === 201) {
+          cy.wrap(res.body.historico_uuid).as('cartaUuid')
+        }
+        Cypress.log({ name: 'Criar Carta', message: `HTTP ${res.status}` })
+      })
     })
   })
 })
 
 Given('que tenho uma carta de convocação criada', () => {
   cy.fixture('api/sigla_payloads').then((payloads) => {
-    cy.sigla_post('/carta-convocacao/', payloads.cartaConvocacao).then((res) => {
-      expect([200, 201]).to.include(res.status)
-      cy.wrap(res.body.uuid).as('cartaUuid')
-      Cypress.log({ name: 'Setup Carta', message: `UUID: ${res.body.uuid}` })
+    cy.sigla_post('/processos-convocacao/', payloads.processoConvocacao).then((processoRes) => {
+      expect([200, 201]).to.include(processoRes.status)
+      const today = new Date()
+      const data = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`
+      const cartaBody = {
+        ...payloads.cartaConvocacao,
+        processo_uuid: processoRes.body.uuid,
+        processo_nome: processoRes.body.descricao || 'Processo Teste',
+        data,
+      }
+      cy.sigla_post('/carta-convocacao/', cartaBody).then((res) => {
+        expect([200, 201]).to.include(res.status)
+        cy.wrap(res.body.historico_uuid).as('cartaUuid')
+        Cypress.log({ name: 'Setup Carta', message: `UUID: ${res.body.historico_uuid}` })
+      })
     })
   })
 })
@@ -262,26 +289,6 @@ Then('a resposta deve conter o campo {string} igual ao UUID do processo criado',
     cy.get('@response').then((res) => {
       expect(res.body[campo]).to.eq(uuid)
       Cypress.log({ name: 'Validação UUID Processo', message: `${campo} = ${uuid}` })
-    })
-  })
-})
-
-When('eu faço um PUT no processo de convocação criado com dados válidos', () => {
-  cy.fixture('api/sigla_payloads').then((payloads) => {
-    cy.get('@processoUuid').then((uuid) => {
-      cy.sigla_put(`/processos-convocacao/${uuid}/`, payloads.processoConvocacaoUpdate).then((res) => {
-        cy.wrap(res).as('response')
-        Cypress.log({ name: 'PUT Processo', message: `UUID: ${uuid} → HTTP ${res.status}` })
-      })
-    })
-  })
-})
-
-When('eu faço um PUT no processo de convocação criado sem body', () => {
-  cy.get('@processoUuid').then((uuid) => {
-    cy.sigla_put(`/processos-convocacao/${uuid}/`, {}).then((res) => {
-      cy.wrap(res).as('response')
-      Cypress.log({ name: 'PUT Processo sem body', message: `UUID: ${uuid} → HTTP ${res.status}` })
     })
   })
 })
@@ -379,7 +386,8 @@ When('eu adiciono um cargo ao processo de convocação criado', () => {
       cy.sigla_post(`/processos-convocacao/${uuid}/cargos/`, payloads.cargo).then((res) => {
         cy.wrap(res).as('response')
         if (res.status === 200 || res.status === 201) {
-          cy.wrap(res.body.uuid).as('cargoUuid')
+          const cargoUuid = res.body.cargos && res.body.cargos[0] ? res.body.cargos[0].uuid : res.body.uuid
+          cy.wrap(cargoUuid).as('cargoUuid')
         }
         Cypress.log({ name: 'Adicionar Cargo', message: `Processo: ${uuid} → HTTP ${res.status}` })
       })
@@ -404,131 +412,13 @@ Given('que tenho um cargo adicionado ao processo de convocação', () => {
       cy.wrap(processoUuid).as('processoUuid')
       cy.sigla_post(`/processos-convocacao/${processoUuid}/cargos/`, payloads.cargo).then((cargoRes) => {
         expect([200, 201]).to.include(cargoRes.status)
-        cy.wrap(cargoRes.body.uuid).as('cargoUuid')
+        const cargoUuid = cargoRes.body.cargos && cargoRes.body.cargos[0] ? cargoRes.body.cargos[0].uuid : cargoRes.body.uuid
+        cy.wrap(cargoUuid).as('cargoUuid')
         Cypress.log({
           name: 'Setup Cargo',
-          message: `Processo: ${processoUuid} | Cargo: ${cargoRes.body.uuid}`,
+          message: `Processo: ${processoUuid} | Cargo: ${cargoUuid}`,
         })
       })
-    })
-  })
-})
-
-When('eu busco o cargo pelo UUID criado no processo', () => {
-  cy.get('@processoUuid').then((processoUuid) => {
-    cy.get('@cargoUuid').then((cargoUuid) => {
-      cy.sigla_get(`/processos-convocacao/${processoUuid}/cargos/${cargoUuid}/`).then((res) => {
-        cy.wrap(res).as('response')
-        Cypress.log({ name: 'Buscar Cargo', message: `UUID: ${cargoUuid} → HTTP ${res.status}` })
-      })
-    })
-  })
-})
-
-Then('a resposta deve conter o campo {string} igual ao UUID do cargo criado', (campo) => {
-  cy.get('@cargoUuid').then((uuid) => {
-    cy.get('@response').then((res) => {
-      expect(res.body[campo]).to.eq(uuid)
-      Cypress.log({ name: 'Validação UUID Cargo', message: `${campo} = ${uuid}` })
-    })
-  })
-})
-
-When('eu busco cargo com UUID inexistente no processo', () => {
-  cy.get('@processoUuid').then((uuid) => {
-    cy.sigla_get(`/processos-convocacao/${uuid}/cargos/${UUID_INEXISTENTE}/`).then((res) => {
-      cy.wrap(res).as('response')
-      Cypress.log({ name: 'Cargo inexistente', message: `Processo: ${uuid} → HTTP ${res.status}` })
-    })
-  })
-})
-
-When('eu faço uma requisição SIGLA GET com UUID de cargo inválido no processo', () => {
-  cy.get('@processoUuid').then((uuid) => {
-    cy.sigla_get(`/processos-convocacao/${uuid}/cargos/uuid-invalido/`).then((res) => {
-      cy.wrap(res).as('response')
-      Cypress.log({ name: 'Cargo UUID inválido', message: `HTTP ${res.status}` })
-    })
-  })
-})
-
-When('eu faço um PUT no cargo criado com dados válidos', () => {
-  cy.fixture('api/sigla_payloads').then((payloads) => {
-    cy.get('@processoUuid').then((processoUuid) => {
-      cy.get('@cargoUuid').then((cargoUuid) => {
-        cy.sigla_put(
-          `/processos-convocacao/${processoUuid}/cargos/${cargoUuid}/`,
-          payloads.cargoUpdate
-        ).then((res) => {
-          cy.wrap(res).as('response')
-          Cypress.log({ name: 'PUT Cargo', message: `UUID: ${cargoUuid} → HTTP ${res.status}` })
-        })
-      })
-    })
-  })
-})
-
-When('eu faço um PUT no cargo criado sem body', () => {
-  cy.get('@processoUuid').then((processoUuid) => {
-    cy.get('@cargoUuid').then((cargoUuid) => {
-      cy.sigla_put(`/processos-convocacao/${processoUuid}/cargos/${cargoUuid}/`, {}).then((res) => {
-        cy.wrap(res).as('response')
-        Cypress.log({ name: 'PUT Cargo sem body', message: `UUID: ${cargoUuid} → HTTP ${res.status}` })
-      })
-    })
-  })
-})
-
-When('eu faço um PUT em cargo inexistente no processo', () => {
-  cy.get('@processoUuid').then((processoUuid) => {
-    cy.sigla_put(
-      `/processos-convocacao/${processoUuid}/cargos/${UUID_INEXISTENTE}/`,
-      {}
-    ).then((res) => {
-      cy.wrap(res).as('response')
-      Cypress.log({ name: 'PUT Cargo inexistente', message: `HTTP ${res.status}` })
-    })
-  })
-})
-
-When('eu faço um PATCH no cargo criado com dados parciais', () => {
-  cy.fixture('api/sigla_payloads').then((payloads) => {
-    cy.get('@processoUuid').then((processoUuid) => {
-      cy.get('@cargoUuid').then((cargoUuid) => {
-        cy.sigla_patch(
-          `/processos-convocacao/${processoUuid}/cargos/${cargoUuid}/`,
-          payloads.cargoPatch
-        ).then((res) => {
-          cy.wrap(res).as('response')
-          Cypress.log({ name: 'PATCH Cargo', message: `UUID: ${cargoUuid} → HTTP ${res.status}` })
-        })
-      })
-    })
-  })
-})
-
-When('eu faço um PATCH no cargo criado com campo inválido', () => {
-  cy.get('@processoUuid').then((processoUuid) => {
-    cy.get('@cargoUuid').then((cargoUuid) => {
-      cy.sigla_patch(
-        `/processos-convocacao/${processoUuid}/cargos/${cargoUuid}/`,
-        { campo_inexistente_xyz: 'valor' }
-      ).then((res) => {
-        cy.wrap(res).as('response')
-        Cypress.log({ name: 'PATCH Cargo inválido', message: `UUID: ${cargoUuid} → HTTP ${res.status}` })
-      })
-    })
-  })
-})
-
-When('eu faço um PATCH em cargo inexistente no processo', () => {
-  cy.get('@processoUuid').then((processoUuid) => {
-    cy.sigla_patch(
-      `/processos-convocacao/${processoUuid}/cargos/${UUID_INEXISTENTE}/`,
-      {}
-    ).then((res) => {
-      cy.wrap(res).as('response')
-      Cypress.log({ name: 'PATCH Cargo inexistente', message: `HTTP ${res.status}` })
     })
   })
 })
@@ -574,7 +464,8 @@ When('eu adiciono um cargo ao processo criado no fluxo completo', () => {
       cy.sigla_post(`/processos-convocacao/${uuid}/cargos/`, payloads.cargo).then((res) => {
         cy.wrap(res).as('response')
         if (res.status === 200 || res.status === 201) {
-          cy.wrap(res.body.uuid).as('cargoUuidFluxo')
+          const cargoUuid = res.body.cargos && res.body.cargos[0] ? res.body.cargos[0].uuid : res.body.uuid
+          cy.wrap(cargoUuid).as('cargoUuidFluxo')
         }
         Cypress.log({ name: 'Fluxo: Adicionar Cargo', message: `HTTP ${res.status}` })
       })

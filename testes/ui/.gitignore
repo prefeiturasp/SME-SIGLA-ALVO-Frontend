@@ -1,0 +1,96 @@
+# ============================================================
+# Dependências
+# ============================================================
+node_modules/
+.npm/
+.yarn/
+.pnp.*
+.yarn-integrity
+
+# ============================================================
+# Cypress — artefatos gerados em execução
+# ============================================================
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+cypress/reports/
+cypress/results/
+cypress/junit/
+cypress/.cache/
+
+# ============================================================
+# Relatórios de testes
+# ============================================================
+mochawesome-report/
+allure-results/
+allure-report/
+test-results/
+*.xml
+
+# ============================================================
+# Feature files — ignorar todos exceto api_processos_convocacao
+# ============================================================
+cypress/e2e/**/*.feature
+!cypress/e2e/api/api/api_processos_convocacao.feature
+
+# ============================================================
+# Credenciais e segredos — NUNCA subir para o repositório
+# ============================================================
+.env
+.env.*
+!.env.example
+cypress.env.json
+auth.json
+credentials.json
+secrets.json
+token.json
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+cypress/fixtures/**/auth*
+cypress/fixtures/**/credentials*
+cypress/fixtures/**/token*
+cypress/fixtures/**/secrets*
+cypress/fixtures/**/senha*
+cypress/fixtures/**/password*
+
+# ============================================================
+# Cobertura de código
+# ============================================================
+coverage/
+.nyc_output/
+
+# ============================================================
+# Sistema operacional
+# ============================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ============================================================
+# Editores / IDEs
+# ============================================================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ============================================================
+# Logs
+# ============================================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
