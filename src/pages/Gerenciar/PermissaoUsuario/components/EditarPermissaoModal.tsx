@@ -2,7 +2,12 @@ import React from "react";
 import { Button, Col, Input, Modal, Row, Select, Typography } from "antd";
 
 import { ClearButton } from "../../../Processos/ConvocacaoCandidatos/style";
-import type { EditarPermissaoModalProps } from "../../../../services/resources/permissoes/IPermissoes";
+import { CustomFormItem } from "../../../../components/FormStyle";
+import {
+  PatchUsuario400Error,
+  type EditarPermissaoModalProps,
+  type PatchUsuarioFieldErrors,
+} from "../../../../services/resources/permissoes/IPermissoes";
 
 const labelStyle: React.CSSProperties = {
   fontFamily: "Open Sans",
@@ -29,14 +34,34 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
   const [permissoes, setPermissoes] = React.useState<string[]>(data?.permissoes ?? []);
   const [nome, setNome] = React.useState<string>(data?.nome ?? "");
   const [email, setEmail] = React.useState<string>(data?.email ?? "");
+  const [errors, setErrors] = React.useState<PatchUsuarioFieldErrors>({});
+  const [saving, setSaving] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     setPermissoes(data?.permissoes ?? []);
     setNome(data?.nome ?? "");
     setEmail(data?.email ?? "");
+    setErrors({});
   }, [data?.permissoes, data?.nome, data?.email, open]);
 
   const isView = mode === "view";
+
+  const handleSalvar = async () => {
+    if (!onSave) return;
+    setSaving(true);
+    try {
+      await onSave({ permissoes, nome, email });
+      setErrors({});
+    } catch (err) {
+      if (err instanceof PatchUsuario400Error) {
+        setErrors(err.fieldErrors);
+        return;
+      }
+      throw err;
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Modal
@@ -56,14 +81,11 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
             <Button
               size="large"
               type="primary"
+              loading={saving}
               style={{ height: 48, width: 200, marginTop: 0 }}
-              onClick={() =>
-                onSave?.({
-                  permissoes,
-                  nome,
-                  email,
-                })
-              }
+              onClick={() => {
+                void handleSalvar();
+              }}
             >
               Salvar permissão
             </Button>
@@ -88,13 +110,21 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
           {isView ? (
             <div style={{ ...valueStyle, marginTop: 12 }}>{data?.nome ?? ""}</div>
           ) : (
-            <Input
-              size="large"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              style={{ marginTop: 12 }}
-              placeholder="Nome"
-            />
+            <CustomFormItem
+              style={{ marginTop: 12, marginBottom: 0 }}
+              validateStatus={errors.nome ? "error" : undefined}
+              help={errors.nome}
+            >
+              <Input
+                size="large"
+                value={nome}
+                onChange={(e) => {
+                  setNome(e.target.value);
+                  if (errors.nome) setErrors((prev) => ({ ...prev, nome: undefined }));
+                }}
+                placeholder="Nome"
+              />
+            </CustomFormItem>
           )}
         </Col>
         <Col span={8}>
@@ -102,13 +132,21 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
           {isView ? (
             <div style={{ ...valueStyle, marginTop: 12 }}>{data?.email ?? ""}</div>
           ) : (
-            <Input
-              size="large"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{ marginTop: 12 }}
-              placeholder="E-mail"
-            />
+            <CustomFormItem
+              style={{ marginTop: 12, marginBottom: 0 }}
+              validateStatus={errors.email ? "error" : undefined}
+              help={errors.email}
+            >
+              <Input
+                size="large"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+                }}
+                placeholder="E-mail"
+              />
+            </CustomFormItem>
           )}
         </Col>
 

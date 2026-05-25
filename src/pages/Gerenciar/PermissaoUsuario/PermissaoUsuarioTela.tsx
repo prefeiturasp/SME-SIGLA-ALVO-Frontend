@@ -19,6 +19,7 @@ import type {
   EditarPermissaoModalSavePayload,
   IPermissaoUsuarioRow,
 } from "../../../services/resources/permissoes/IPermissoes";
+import { PatchUsuario400Error } from "../../../services/resources/permissoes/IPermissoes";
 import { getGruposDisponiveisOptions, getUsuariosComGrupos } from "./hooks/getPermissaoUsuario";
 import { patchUsuario } from "./hooks/patchAtualizarPermissoesUsuarios";
 
@@ -269,29 +270,34 @@ const PermissaoUsuarioTela: React.FC = () => {
               return;
             }
 
+            const nextPermissoes = next?.permissoes || [];
+            const payload: any = { username, grupos: nextPermissoes };
+
+            const currentNome = (selectedUser?.nome ?? "").trim();
+            const nextNome = (next?.nome ?? "").trim();
+            if (next?.nome !== undefined && nextNome !== currentNome) {
+              payload.nome = nextNome;
+            }
+
+            const currentEmail = (selectedUser?.email ?? "").trim();
+            const nextEmail = (next?.email ?? "").trim();
+            if (next?.email !== undefined && nextEmail !== currentEmail) {
+              payload.email = nextEmail;
+            }
+
             try {
-              const nextPermissoes = next?.permissoes || [];
-              const payload: any = { username, grupos: nextPermissoes };
-
-              const currentNome = (selectedUser?.nome ?? "").trim();
-              const nextNome = (next?.nome ?? "").trim();
-              if (next?.nome !== undefined && nextNome !== currentNome) {
-                payload.nome = nextNome;
-              }
-
-              const currentEmail = (selectedUser?.email ?? "").trim();
-              const nextEmail = (next?.email ?? "").trim();
-              if (next?.email !== undefined && nextEmail !== currentEmail) {
-                payload.email = nextEmail;
-              }
-
               await patchUsuario(payload);
               setPermissaoSucessoNome(selectedUser?.nome || selectedUser?.login || "");
               setPermissaoSucessoOpen(true);
+              setModalOpen(false);
+              const vals = (control as any)?._formValues ?? {};
+              void handleSub(vals);
             } catch (e: any) {
+              if (e instanceof PatchUsuario400Error) {
+                throw e;
+              }
               console.error("Falha ao atualizar permissões do usuário:", e);
               message.error("Não foi possível salvar a permissão do usuário.");
-            } finally {
               setModalOpen(false);
               const vals = (control as any)?._formValues ?? {};
               void handleSub(vals);
