@@ -187,17 +187,17 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
           {
             key: "autorizacoes-publicadas",
             label: "Autorizações publicadas",
-            onClick: () => navigate("/autorizacoes-publicadas"),
+            onClick: () => navigate("/gerenciar/autorizacoes-publicadas"),
           },
           {
-            key: "carta-convocacao",
-            label: "E-mail de Convocação",
-            onClick: () => navigate("/gerenciar/carta-convocacao"),
+            key: "disparo-emails",
+            label: "Disparo de e-mails",
+            onClick: () => navigate("/gerenciar/disparo-emails"),
           },
           {
             key: "eliminacao-reclassificacao",
             label: "Eliminação e Reclassificação de Candidato",
-            onClick: () => navigate("/eliminiacao-e-reclassificacao-candidato"),
+            onClick: () => navigate("/gerenciar/eliminiacao-e-reclassificacao-candidato"),
           },
           {
             key: "gerenciamento-usuarios",
@@ -207,7 +207,7 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
           {
             key: "cadastro-parametros",
             label: "Cadastro de Parâmetros",
-            onClick: () => navigate("/parametrizacao"),
+            onClick: () => navigate("/gerenciar/parametrizacao"),
           },
         ];
       default:

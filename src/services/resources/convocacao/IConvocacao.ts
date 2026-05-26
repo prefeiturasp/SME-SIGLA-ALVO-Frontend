@@ -153,11 +153,8 @@ export interface IConvocacaoModal {
 }
 
 export interface IConvocacaoFiltros {
-    
-
   dre: string;
   escola: string;
-  
 }
 
 export interface ICargoProcesso {
@@ -171,39 +168,39 @@ export interface ICargoProcesso {
   total_candidatos: number;
 }
 
-export interface ICartaConvocacaoPayload {
+export interface IPostEnvioEmailPayload {
   processo_uuid: string;
   processo_nome: string;
-  data: string; 
+  tipo: "CONVOCACAO" | "VAGAS" | "RESULTADOS";
+  conteudo: string; 
 }
 
-export interface ICartaConvocacaoResponse {
-  detail: string;
-  historico_uuid: string;
-  processo_uuid: string;
-  processo_nome: string;
-  data: string;
-  quantidade_candidatos: number;
-}
-
-export interface IHistoricoCartaConvocacao {
+export interface IEnvioEmailResponse {
   uuid: string;
   processo_nome: string;
   processo_uuid: string;
-  data: string;
+  conteudo: string;
   criado_em?: string;
-  quantidade_convocados: number;
+  quantidade_candidatos: number;
 }
 
-export interface ICandidatoCartaConvocacao {
+export interface IHistoricoEnvioEmail {
+  uuid: string;
+  processo_nome: string;
+  processo_uuid: string;
+  tipo: "CONVOCACAO" | "VAGAS" | "RESULTADOS";
+  criado_em?: string;
+  quantidade_candidatos: number;
+}
+
+export interface ICandidatoEnvioEmail {
   nome: string;
   rf: string;
   email: string;
   status: string;
   status_detalhe?: string;
-  conteudo: string;
 }
 
-export interface IHistoricoCartaConvocacaoDetalhe extends IHistoricoCartaConvocacao {
-  candidatos: ICandidatoCartaConvocacao[];
+export interface IHistoricoEnvioEmailDetalhe extends IHistoricoEnvioEmail {
+  candidatos: ICandidatoEnvioEmail[];
 }

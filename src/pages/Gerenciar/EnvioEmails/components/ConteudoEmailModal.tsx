@@ -1,7 +1,7 @@
 import React from "react";
 import { CustomModal2 } from "../../../../components/EstilosCompartilhados";
 
-import logoCartaConvocacao from "../assets/logo_carta_convocacao.png";
+import logoEnvioEmail from "../assets/logo_envio_email.png";
 
 interface ConteudoEmailModalProps {
   open: boolean;
@@ -29,8 +29,8 @@ const ConteudoEmailModal: React.FC<ConteudoEmailModalProps> = ({
   const conteudoComLogo =
     typeof conteudo === "string"
       ? conteudo
-          .replace(/src="cid:logo_sigla"/g, `src="${logoCartaConvocacao}"`)
-          .replace(/src='cid:logo_sigla'/g, `src="${logoCartaConvocacao}"`)
+          .replace(/src="cid:logo_sigla"/g, `src="${logoEnvioEmail}"`)
+          .replace(/src='cid:logo_sigla'/g, `src="${logoEnvioEmail}"`)
       : "";
 
   return (

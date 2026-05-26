@@ -38,7 +38,7 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
               ["bold", "italic", "underline", "strike"],
               [{ align: [] }, { align: false }],
               [{ list: "ordered" }, { list: "bullet" }],
-              ["link"],
+              ["link", "image"],
               ["clean"],
             ]
           : false,

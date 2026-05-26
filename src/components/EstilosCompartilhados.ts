@@ -65,7 +65,6 @@ export const SectionTitle = styled(Typography.Title).attrs({ level: 5 })`
 // Estilos para o select de concurso
 export const StyledSelect = styled(Select)`
   width: 100%;
-  max-width: 900px;
   .ant-select-selector {
     border-radius: 0.375rem;
   }
@@ -355,9 +354,16 @@ line-height: 22px;
 `;
 
 export const TextTitulo = styled(Text)`
-color: rgba(19, 19, 19, 0.8);
+color: rgb(0, 0, 0);
 font-size: 14px;
-font-weight: 600;
+font-weight: 800;
+line-height: 22px;
+`;
+
+export const TextTituloSecundario = styled(Text)`
+color: rgb(0, 0, 0);
+font-size: 14px;
+font-weight: 400;
 line-height: 22px;
 `;
 

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Row, Col, Typography, Tooltip } from "antd";
+import { Row, Col, Typography, Tooltip, Button } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { EyeOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -9,28 +9,21 @@ import {
   TabContentContainer,
   SectionCard,
   StyledTable,
-  SecondaryButton,
-  ActionButtonsContainer,
+    ActionButtonsContainer,
 } from "../../../components/EstilosCompartilhados";
-import useListRequest from "../../../hooks/useListRequest";
-import useHistoricoCartaConvocacao from "./hooks/useHistoricoCartaConvocacao";
-import DetalheCartaConvocacaoModal from "./components/DetalheCartaConvocacaoModal";
-import type { IHistoricoCartaConvocacao } from "../../../services/resources/convocacao/IConvocacao";
+import useHistoricoEnvioEmail from "./hooks/useGetHistoricoEnvioEmail";
+import DetalheEnvioEmailModal from "./components/DetalheEnvioEmailModal";
+import type { IHistoricoEnvioEmail } from "../../../services/resources/convocacao/IConvocacao";
 
 const { Text } = Typography;
 
-const HistoricoCartaConvocacaoTela: React.FC = () => {
+const HistoricoEnvioEmailsTela: React.FC = () => {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedRegistro, setSelectedRegistro] = useState<IHistoricoCartaConvocacao | null>(null);
+  const [selectedRegistro, setSelectedRegistro] = useState<IHistoricoEnvioEmail | null>(null);
 
-  const { listRequest, onAntTableChange } = useListRequest<Record<string, never>>({
-    pagination: { page: 1, page_size: 10 },
-  });
-
-  const { historicoData, historicoIsLoading } = useHistoricoCartaConvocacao(listRequest);
-  const { results, count } = historicoData;
-
+  const { historicoData, historicoIsLoading } = useHistoricoEnvioEmail();
+  console.log(historicoData);
   const breadcrumbItems = useMemo(
     () => [
       {
@@ -52,9 +45,9 @@ const HistoricoCartaConvocacaoTela: React.FC = () => {
           <Text
             strong
             style={{ cursor: "pointer" }}
-            onClick={() => navigate("/gerenciar/carta-convocacao")}
+            onClick={() => navigate("/gerenciar/disparo-emails")}
           >
-            E-mail de Convocação
+            Disparo de E-mails
           </Text>
         ),
       },
@@ -63,7 +56,7 @@ const HistoricoCartaConvocacaoTela: React.FC = () => {
     [navigate]
   );
 
-  const handleOpenDetalhe = (record: IHistoricoCartaConvocacao) => {
+  const handleOpenDetalhe = (record: IHistoricoEnvioEmail) => {
     setSelectedRegistro(record);
     setModalOpen(true);
   };
@@ -79,7 +72,14 @@ const HistoricoCartaConvocacaoTela: React.FC = () => {
     return parsed.isValid() ? parsed.format("DD/MM/YYYY") : data;
   };
 
-  const columns: ColumnsType<IHistoricoCartaConvocacao> = [
+  const columns: ColumnsType<IHistoricoEnvioEmail> = [
+    {
+      title: "Tipo",
+      dataIndex: "tipo",
+      key: "tipo",
+      align: "center",
+      render: (val: "CONVOCACAO" | "VAGAS" | "RESULTADOS") => val === "CONVOCACAO" ? "Convocação" : val === "VAGAS" ? "Vagas" : "Resultados",
+    },
     {
       title: "Processo",
       dataIndex: "processo_nome",
@@ -88,19 +88,19 @@ const HistoricoCartaConvocacaoTela: React.FC = () => {
       render: (val: string) => val ?? "—",
     },
     {
-      title: "Data",
-      dataIndex: "data",
-      key: "data",
-      align: "center",
-      render: (val: string) => formatData(val),
-    },
-    {
       title: "Qtd candidatos",
-      dataIndex: "quantidade_convocados",
-      key: "quantidade_convocados",
+      dataIndex: "quantidade_candidatos",
+      key: "quantidade_candidatos",
       align: "center",
       render: (val: number) => (val != null ? val : "—"),
     },
+    {
+      title: "Data do envio",
+      dataIndex: "criado_em",
+      key: "criado_em",
+      align: "center",
+      render: (val: string) => val ? dayjs(val).format("DD/MM/YYYY HH:mm") : "—",
+    },    
     {
       title: "Ações",
       key: "acoes",
@@ -108,7 +108,7 @@ const HistoricoCartaConvocacaoTela: React.FC = () => {
       render: (_, record) => (
         <Tooltip title="Visualizar detalhes">
           <EyeOutlined
-            style={{ cursor: "pointer", fontSize: "18px", color: "#032B68" }}
+            style={{ cursor: "pointer", fontSize: "18px", color: "#0F59C8" }}
             onClick={() => handleOpenDetalhe(record)}
           />
         </Tooltip>
@@ -116,30 +116,39 @@ const HistoricoCartaConvocacaoTela: React.FC = () => {
     },
   ];
 
+  console.log(historicoData);
+
   return (
     <BaseTela
       breadcrumbItems={breadcrumbItems}
-      title="Histórico - E-mail de Convocação"
+      title="Histórico de envio de e-mails"
     >
       <TabContentContainer>
         <SectionCard>
           <Row gutter={[0, 16]}>
             <Col xs={24}>
+              <Text style={{ display: "block", marginBottom: 30}}>
+              Aqui você confere todos os e-mails enviados de convocação, resultado e vagas. 
+              </Text>
+            </Col>
+          </Row>
+          <Row gutter={[0, 16]}>
+            <Col xs={24}>
               <StyledTable
                 columns={columns}
-                dataSource={results}
+                dataSource={historicoData ?? []}
                 rowKey="uuid"
                 loading={historicoIsLoading}
                 bordered
                 pagination={{
-                  current: listRequest.pagination.page,
-                  pageSize: listRequest.pagination.page_size ?? 10,
-                  total: count,
+                  total: historicoData?.length ?? 0,
                   showSizeChanger: true,
-                  showTotal: (total, range) =>
-                    `${range[0]}-${range[1]} de ${total} registro(s)`,
+                  showTotal: (total, range) => (
+                    <Text style={{ paddingLeft: 16, fontWeight: 700 }}>
+                      Mostrando {range[0]}-{range[1]} de {total} registro(s)
+                    </Text>
+                  ),
                 }}
-                onChange={onAntTableChange}
               />
             </Col>
           </Row>
@@ -147,14 +156,14 @@ const HistoricoCartaConvocacaoTela: React.FC = () => {
 
         <ActionButtonsContainer>
           <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
-            <SecondaryButton size="large" onClick={() => navigate("/gerenciar/carta-convocacao")}>
+            <Button type="primary" ghost onClick={() => navigate("/gerenciar/disparo-emails")}>
               Voltar
-            </SecondaryButton>
+            </Button>
           </div>
         </ActionButtonsContainer>
       </TabContentContainer>
 
-      <DetalheCartaConvocacaoModal
+      <DetalheEnvioEmailModal
         open={modalOpen}
         onClose={handleCloseDetalhe}
         registro={selectedRegistro}
@@ -163,4 +172,4 @@ const HistoricoCartaConvocacaoTela: React.FC = () => {
   );
 };
 
-export default HistoricoCartaConvocacaoTela;
+export default HistoricoEnvioEmailsTela;
