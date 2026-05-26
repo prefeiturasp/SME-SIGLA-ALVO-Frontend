@@ -1,13 +1,18 @@
 import React from "react";
-import { Button, Col, Input, Modal, Row, Select, Typography } from "antd";
+import { Button, Col, Input, message, Modal, Row, Select, Typography } from "antd";
+import axios from "axios";
 
 import { ClearButton } from "../../../Processos/ConvocacaoCandidatos/style";
 import { CustomFormItem } from "../../../../components/FormStyle";
-import {
-  PatchUsuario400Error,
-  type EditarPermissaoModalProps,
-  type PatchUsuarioFieldErrors,
-} from "../../../../services/resources/permissoes/IPermissoes";
+import type { EditarPermissaoModalProps } from "../../../../services/resources/permissoes/IPermissoes";
+
+type FieldErrors = { nome?: string; email?: string };
+
+function primeiraString(valor: unknown): string | undefined {
+  if (typeof valor === "string" && valor.trim()) return valor;
+  if (Array.isArray(valor) && typeof valor[0] === "string") return valor[0];
+  return undefined;
+}
 
 const labelStyle: React.CSSProperties = {
   fontFamily: "Open Sans",
@@ -34,7 +39,7 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
   const [permissoes, setPermissoes] = React.useState<string[]>(data?.permissoes ?? []);
   const [nome, setNome] = React.useState<string>(data?.nome ?? "");
   const [email, setEmail] = React.useState<string>(data?.email ?? "");
-  const [errors, setErrors] = React.useState<PatchUsuarioFieldErrors>({});
+  const [errors, setErrors] = React.useState<FieldErrors>({});
   const [saving, setSaving] = React.useState<boolean>(false);
 
   React.useEffect(() => {
@@ -53,11 +58,18 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
       await onSave({ permissoes, nome, email });
       setErrors({});
     } catch (err) {
-      if (err instanceof PatchUsuario400Error) {
-        setErrors(err.fieldErrors);
-        return;
+      if (axios.isAxiosError(err) && err.response?.status === 400) {
+        const body = err.response.data as { nome?: unknown; email?: unknown };
+        const next: FieldErrors = {
+          nome: primeiraString(body?.nome),
+          email: primeiraString(body?.email),
+        };
+        if (next.nome || next.email) {
+          setErrors(next);
+          return;
+        }
       }
-      throw err;
+      message.error("Não foi possível salvar a permissão do usuário.");
     } finally {
       setSaving(false);
     }

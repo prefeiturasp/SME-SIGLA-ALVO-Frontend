@@ -19,7 +19,6 @@ import type {
   EditarPermissaoModalSavePayload,
   IPermissaoUsuarioRow,
 } from "../../../services/resources/permissoes/IPermissoes";
-import { PatchUsuario400Error } from "../../../services/resources/permissoes/IPermissoes";
 import { getGruposDisponiveisOptions, getUsuariosComGrupos } from "./hooks/getPermissaoUsuario";
 import { patchUsuario } from "./hooks/patchAtualizarPermissoesUsuarios";
 
@@ -285,23 +284,12 @@ const PermissaoUsuarioTela: React.FC = () => {
               payload.email = nextEmail;
             }
 
-            try {
-              await patchUsuario(payload);
-              setPermissaoSucessoNome(selectedUser?.nome || selectedUser?.login || "");
-              setPermissaoSucessoOpen(true);
-              setModalOpen(false);
-              const vals = (control as any)?._formValues ?? {};
-              void handleSub(vals);
-            } catch (e: any) {
-              if (e instanceof PatchUsuario400Error) {
-                throw e;
-              }
-              console.error("Falha ao atualizar permissões do usuário:", e);
-              message.error("Não foi possível salvar a permissão do usuário.");
-              setModalOpen(false);
-              const vals = (control as any)?._formValues ?? {};
-              void handleSub(vals);
-            }
+            await patchUsuario(payload);
+            setPermissaoSucessoNome(selectedUser?.nome || selectedUser?.login || "");
+            setPermissaoSucessoOpen(true);
+            setModalOpen(false);
+            const vals = (control as any)?._formValues ?? {};
+            void handleSub(vals);
           }}
         />
         <ConteudoPagina>

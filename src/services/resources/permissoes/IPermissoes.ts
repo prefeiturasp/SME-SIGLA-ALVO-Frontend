@@ -53,22 +53,6 @@ export interface EditarPermissaoModalSavePayload {
   email?: string;
 }
 
-export interface PatchUsuarioFieldErrors {
-  nome?: string;
-  email?: string;
-}
-
-export class PatchUsuario400Error extends Error {
-  fieldErrors: PatchUsuarioFieldErrors;
-  raw: unknown;
-  constructor(fieldErrors: PatchUsuarioFieldErrors, raw: unknown) {
-    super("PatchUsuario400Error");
-    this.name = "PatchUsuario400Error";
-    this.fieldErrors = fieldErrors;
-    this.raw = raw;
-  }
-}
-
 export interface EditarPermissaoModalProps {
   open: boolean;
   mode: EditarPermissaoModalMode;
