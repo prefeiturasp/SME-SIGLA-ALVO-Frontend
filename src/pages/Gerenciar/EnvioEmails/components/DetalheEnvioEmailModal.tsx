@@ -5,7 +5,7 @@ import { EyeOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../../services";
-import type { IHistoricoCartaConvocacao, ICandidatoCartaConvocacao } from "../../../../services/resources/convocacao/IConvocacao";
+import type { IHistoricoEnvioEmail, ICandidatoEnvioEmail } from "../../../../services/resources/convocacao/IConvocacao";
 import { CustomModal2 } from "../../../../components/EstilosCompartilhados";
 import ConteudoEmailModal from "./ConteudoEmailModal";
 
@@ -14,7 +14,7 @@ const { Text } = Typography;
 interface DetalheCartaConvocacaoModalProps {
   open: boolean;
   onClose: () => void;
-  registro: IHistoricoCartaConvocacao | null;
+  registro: IHistoricoEnvioEmail | null;
 }
 
 const DetalheCartaConvocacaoModal: React.FC<DetalheCartaConvocacaoModalProps> = ({
@@ -23,31 +23,26 @@ const DetalheCartaConvocacaoModal: React.FC<DetalheCartaConvocacaoModalProps> = 
   registro,
 }) => {
   const [emailModalOpen, setEmailModalOpen] = useState(false);
-  const [candidatoSelecionado, setCandidatoSelecionado] = useState<ICandidatoCartaConvocacao | null>(null);
+  const [candidatoSelecionado, setCandidatoSelecionado] = useState<ICandidatoEnvioEmail | null>(null);
 
   const { data: detalhe, isLoading } = useQuery({
-    queryKey: ["getDetalheCartaConvocacao", registro?.uuid],
+    queryKey: ["getDetalheEnvioEmail", registro?.uuid],
     queryFn: ({ signal }) =>
       registro?.uuid
-        ? API.Convocacao.getDetalheCartaConvocacao(registro.uuid, { signal }).response
+        ? API.Convocacao.getDetalheEnvioEmail(registro.uuid, { signal }).response
         : Promise.resolve(null),
     enabled: open && !!registro?.uuid,
     staleTime: 1000 * 60,
   });
 
-  const dataFormatada =
-    detalhe?.data && dayjs(detalhe.data, ["DD-MM-YYYY", "YYYY-MM-DD"]).isValid()
-      ? dayjs(detalhe.data, ["DD-MM-YYYY", "YYYY-MM-DD"]).format("DD/MM/YYYY")
-      : detalhe?.data ?? "—";
-
   const candidatos = detalhe?.candidatos ?? [];
 
-  const handleVerEmail = (record: ICandidatoCartaConvocacao) => {
+  const handleVerEmail = (record: ICandidatoEnvioEmail) => {
     setCandidatoSelecionado(record);
     setEmailModalOpen(true);
   };
 
-  const columns: ColumnsType<ICandidatoCartaConvocacao> = [
+  const columns: ColumnsType<ICandidatoEnvioEmail> = [
     { title: "Nome", dataIndex: "nome", key: "nome", ellipsis: true },
     { title: "RF", dataIndex: "rf", key: "rf", width: 100 },
     { title: "E-mail", dataIndex: "email", key: "email", ellipsis: true },
@@ -66,7 +61,7 @@ const DetalheCartaConvocacaoModal: React.FC<DetalheCartaConvocacaoModalProps> = 
       render: (_, record) => (
         <Tooltip title="Visualizar e-mail enviado">
           <EyeOutlined
-            style={{ cursor: "pointer", fontSize: "18px", color: "#032B68" }}
+            style={{ cursor: "pointer", fontSize: "18px", color: "#0F59C8" }}
             onClick={() => handleVerEmail(record)}
           />
         </Tooltip>
@@ -99,11 +94,8 @@ const DetalheCartaConvocacaoModal: React.FC<DetalheCartaConvocacaoModalProps> = 
             <Descriptions.Item label="Processo">
               <Text>{detalhe?.processo_nome ?? registro.processo_nome ?? "—"}</Text>
             </Descriptions.Item>
-            <Descriptions.Item label="Data">
-              <Text>{dataFormatada}</Text>
-            </Descriptions.Item>
             <Descriptions.Item label="Qtd. candidatos">
-              <Text>{detalhe?.quantidade_convocados ?? registro.quantidade_convocados ?? "—"}</Text>
+              <Text>{detalhe?.quantidade_candidatos ?? registro.quantidade_candidatos ?? "—"}</Text>
             </Descriptions.Item>
             {detalhe?.criado_em && (
               <Descriptions.Item label="Enviado em">
@@ -138,7 +130,10 @@ const DetalheCartaConvocacaoModal: React.FC<DetalheCartaConvocacaoModalProps> = 
                     pageSize: 10,
                     showSizeChanger: true,
                     showTotal: (total, range) =>
-                      `${range[0]}-${range[1]} de ${total} registro(s)`,
+                      <Text style={{ fontWeight: 700 }}>
+                        Mostrando {range[0]}-{range[1]} de {total} registro(s)
+                      </Text>
+
                   }}
                 />
               </div>

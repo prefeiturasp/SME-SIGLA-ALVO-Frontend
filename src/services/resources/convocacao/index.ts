@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosProcessoConvocacao } from "../../axios";
-import type { ISample, IProcessoConvocacao, IProcessoConvocacaoDetalhe, IPostProcessoConvocacaoPayload, IProcessoConvocacaoResumo, ICargoProcesso, ICartaConvocacaoPayload, ICartaConvocacaoResponse, IHistoricoCartaConvocacao, IHistoricoCartaConvocacaoDetalhe } from "./IConvocacao";
+import type { ISample, IProcessoConvocacao, IProcessoConvocacaoDetalhe, IPostProcessoConvocacaoPayload, IProcessoConvocacaoResumo, ICargoProcesso, IEnvioEmailResponse, IHistoricoEnvioEmail, IHistoricoEnvioEmailDetalhe, IPostEnvioEmailPayload } from "./IConvocacao";
 import type { IBackendWithSubOptions, IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
@@ -21,9 +21,9 @@ export const URL = {
   postCargosProcesso: (processoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/`,
   patchCargoProcesso: (processoUuid: string, cargoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/${cargoUuid}/`,
   deleteCargoProcesso: (processoUuid: string, cargoUuid: string) => `/api/v1/processos-convocacao/${processoUuid}/cargos/${cargoUuid}/`,
-  postCartaConvocacao: () => `/api/v1/carta-convocacao/`,
-  getHistoricoCartaConvocacao: () => `/api/v1/carta-convocacao/`,
-  getDetalheCartaConvocacao: (uuid: string) => `/api/v1/carta-convocacao/${uuid}/`,
+  postEnvioEmail: () => `/api/v1/envio-email/`,
+  getHistoricoEnvioEmail: () => `/api/v1/envio-email/`,
+  getDetalheEnvioEmail: (uuid: string) => `/api/v1/envio-email/${uuid}/`,
   createSample: () => `/api/v1/samples/`,
   editSample: (id: number) => `/api/v1/samples/${id}/`,
   deleteSample: (id: number) => `/api/v1/samples/${id}/`,
@@ -380,14 +380,14 @@ export const postCargosProcesso = (
 };
 
 
-export const postCartaConvocacao = (
-  payload: ICartaConvocacaoPayload,
+export const postEnvioEmail = (
+  payload: IPostEnvioEmailPayload,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
   const response = appAxiosProcessoConvocacao
-    .post<ICartaConvocacaoResponse>(URL.postCartaConvocacao(), payload, {
+    .post<IEnvioEmailResponse>(URL.postEnvioEmail(), payload, {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })
@@ -399,36 +399,32 @@ export const postCartaConvocacao = (
   };
 };
 
-export const getHistoricoCartaConvocacao = (
-  listRequest: IListRequest,
+export const getHistoricoEnvioEmail = (
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
-  const { pagination, filters, ...rest } = listRequest;
   const { signal, abort } = new AbortController();
 
   const response = appAxiosProcessoConvocacao
-    .get<PaginatedResponse<IHistoricoCartaConvocacao>>(URL.getHistoricoCartaConvocacao(), {
-      params: { ...pagination, ...filters, ...rest },
-      paramsSerializer: queryParamsSerializer,
+    .get<IHistoricoEnvioEmail[]>(URL.getHistoricoEnvioEmail(), {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })
     .then((res) => res.data);
-
+  console.log(response);
   return {
     response,
     abort,
   };
 };
 
-export const getDetalheCartaConvocacao = (
+export const getDetalheEnvioEmail = (
   uuid: string,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
   const response = appAxiosProcessoConvocacao
-    .get<IHistoricoCartaConvocacaoDetalhe>(URL.getDetalheCartaConvocacao(uuid), {
+    .get<IHistoricoEnvioEmailDetalhe>(URL.getDetalheEnvioEmail(uuid), {
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })

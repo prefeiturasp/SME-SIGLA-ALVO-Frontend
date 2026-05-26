@@ -38,6 +38,7 @@ export const CustomFormItem = styled(FormItem)`
     font-weight: 700;
     margin-bottom: 0;
     line-height: 1.05;
+    font-size: 0.875rem;
   }
   .ant-form-item-control {
     margin-top: -4px; /* aproxima o campo do label */
