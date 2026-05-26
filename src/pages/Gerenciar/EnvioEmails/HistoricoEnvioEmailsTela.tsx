@@ -65,13 +65,6 @@ const HistoricoEnvioEmailsTela: React.FC = () => {
     setModalOpen(false);
     setSelectedRegistro(null);
   };
-
-  const formatData = (data: string) => {
-    if (!data) return "—";
-    const parsed = dayjs(data, ["DD-MM-YYYY", "YYYY-MM-DD"], true);
-    return parsed.isValid() ? parsed.format("DD/MM/YYYY") : data;
-  };
-
   const columns: ColumnsType<IHistoricoEnvioEmail> = [
     {
       title: "Tipo",
