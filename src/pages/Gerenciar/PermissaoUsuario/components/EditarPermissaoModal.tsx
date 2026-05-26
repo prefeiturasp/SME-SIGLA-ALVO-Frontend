@@ -1,8 +1,18 @@
 import React from "react";
-import { Button, Col, Input, Modal, Row, Select, Typography } from "antd";
+import { Button, Col, Input, message, Modal, Row, Select, Typography } from "antd";
+import axios from "axios";
 
 import { ClearButton } from "../../../Processos/ConvocacaoCandidatos/style";
+import { CustomFormItem } from "../../../../components/FormStyle";
 import type { EditarPermissaoModalProps } from "../../../../services/resources/permissoes/IPermissoes";
+
+type FieldErrors = { nome?: string; email?: string };
+
+function primeiraString(valor: unknown): string | undefined {
+  if (typeof valor === "string" && valor.trim()) return valor;
+  if (Array.isArray(valor) && typeof valor[0] === "string") return valor[0];
+  return undefined;
+}
 
 const labelStyle: React.CSSProperties = {
   fontFamily: "Open Sans",
@@ -29,14 +39,41 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
   const [permissoes, setPermissoes] = React.useState<string[]>(data?.permissoes ?? []);
   const [nome, setNome] = React.useState<string>(data?.nome ?? "");
   const [email, setEmail] = React.useState<string>(data?.email ?? "");
+  const [errors, setErrors] = React.useState<FieldErrors>({});
+  const [saving, setSaving] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     setPermissoes(data?.permissoes ?? []);
     setNome(data?.nome ?? "");
     setEmail(data?.email ?? "");
+    setErrors({});
   }, [data?.permissoes, data?.nome, data?.email, open]);
 
   const isView = mode === "view";
+
+  const handleSalvar = async () => {
+    if (!onSave) return;
+    setSaving(true);
+    try {
+      await onSave({ permissoes, nome, email });
+      setErrors({});
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 400) {
+        const body = err.response.data as { nome?: unknown; email?: unknown };
+        const next: FieldErrors = {
+          nome: primeiraString(body?.nome),
+          email: primeiraString(body?.email),
+        };
+        if (next.nome || next.email) {
+          setErrors(next);
+          return;
+        }
+      }
+      message.error("Não foi possível salvar a permissão do usuário.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Modal
@@ -56,14 +93,11 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
             <Button
               size="large"
               type="primary"
+              loading={saving}
               style={{ height: 48, width: 200, marginTop: 0 }}
-              onClick={() =>
-                onSave?.({
-                  permissoes,
-                  nome,
-                  email,
-                })
-              }
+              onClick={() => {
+                void handleSalvar();
+              }}
             >
               Salvar permissão
             </Button>
@@ -88,13 +122,21 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
           {isView ? (
             <div style={{ ...valueStyle, marginTop: 12 }}>{data?.nome ?? ""}</div>
           ) : (
-            <Input
-              size="large"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              style={{ marginTop: 12 }}
-              placeholder="Nome"
-            />
+            <CustomFormItem
+              style={{ marginTop: 12, marginBottom: 0 }}
+              validateStatus={errors.nome ? "error" : undefined}
+              help={errors.nome}
+            >
+              <Input
+                size="large"
+                value={nome}
+                onChange={(e) => {
+                  setNome(e.target.value);
+                  if (errors.nome) setErrors((prev) => ({ ...prev, nome: undefined }));
+                }}
+                placeholder="Nome"
+              />
+            </CustomFormItem>
           )}
         </Col>
         <Col span={8}>
@@ -102,13 +144,21 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
           {isView ? (
             <div style={{ ...valueStyle, marginTop: 12 }}>{data?.email ?? ""}</div>
           ) : (
-            <Input
-              size="large"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{ marginTop: 12 }}
-              placeholder="E-mail"
-            />
+            <CustomFormItem
+              style={{ marginTop: 12, marginBottom: 0 }}
+              validateStatus={errors.email ? "error" : undefined}
+              help={errors.email}
+            >
+              <Input
+                size="large"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+                }}
+                placeholder="E-mail"
+              />
+            </CustomFormItem>
           )}
         </Col>
 

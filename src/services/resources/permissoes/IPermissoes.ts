@@ -59,7 +59,7 @@ export interface EditarPermissaoModalProps {
   data?: EditarPermissaoModalData;
   permissoesOptions?: Array<{ value: string; label: string }>;
   onClose: () => void;
-  onSave?: (next?: EditarPermissaoModalSavePayload) => void;
+  onSave?: (next?: EditarPermissaoModalSavePayload) => void | Promise<void>;
 }
 
 export interface IPermissaoUsuarioRow {
