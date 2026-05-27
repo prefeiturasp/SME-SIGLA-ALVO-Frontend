@@ -1,15 +1,12 @@
-﻿# ============================================================
-# Dependencias
-# ============================================================
+﻿# Dependencias
 node_modules/
 .npm/
 .yarn/
 .pnp.*
 .yarn-integrity
+package-lock.json
 
-# ============================================================
-# Cypress - artefatos gerados em execucao
-# ============================================================
+# Cypress - artefatos gerados
 cypress/videos/
 cypress/screenshots/
 cypress/downloads/
@@ -18,25 +15,16 @@ cypress/results/
 cypress/junit/
 cypress/.cache/
 
-# ============================================================
 # Relatorios de testes
-# ============================================================
 mochawesome-report/
 allure-results/
 allure-report/
 test-results/
 *.xml
 
-# ============================================================
-# Feature files - ignorar todos exceto api_processos_convocacao
-# As pastas sao mantidas no repositorio via .gitkeep
-# ============================================================
-cypress/e2e/**/*.feature
-!cypress/e2e/api/api_processos_convocacao.feature
 
-# ============================================================
-# Credenciais e segredos - NUNCA subir para o repositorio
-# ============================================================
+
+# Credenciais e segredos - NUNCA subir
 .env
 .env.*
 !.env.example
@@ -58,15 +46,15 @@ cypress/fixtures/**/secrets*
 cypress/fixtures/**/senha*
 cypress/fixtures/**/password*
 
-# ============================================================
+# Features incompletas - nao subir
+cypress/e2e/api/api_usuario_sigla.feature
+cypress/e2e/api/api_relatorios_sigla.feature
+
 # Cobertura de codigo
-# ============================================================
 coverage/
 .nyc_output/
 
-# ============================================================
 # Sistema operacional
-# ============================================================
 .DS_Store
 .DS_Store?
 ._*
@@ -76,9 +64,7 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# ============================================================
 # Editores / IDEs
-# ============================================================
 .vscode/
 .idea/
 *.suo
@@ -87,11 +73,14 @@ Desktop.ini
 *.sln
 *.sw?
 
-# ============================================================
 # Logs
-# ============================================================
 *.log
 logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Temporarios
+*.tmp
+*.temp
+.cache/
