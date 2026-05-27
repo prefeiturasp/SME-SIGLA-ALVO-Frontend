@@ -28,16 +28,14 @@ const AlterarEmailModal: React.FC<AlterarEmailModalProps> = ({ open, onClose }) 
   };
 
   const handleSalvar = async () => {
-    try {
-      const values = await form.validateFields();
 
-      mutate(
-        { novo_email: values.novo_email.trim() },
-        { onSuccess: handleClose }
-      );
-    } catch {
-      // validateFields já exibe os erros nos campos
-    }
+  const values = await form.validateFields();
+
+  mutate(
+    { novo_email: values.novo_email.trim() },
+    { onSuccess: handleClose }
+  );
+
   };
 
   return (
