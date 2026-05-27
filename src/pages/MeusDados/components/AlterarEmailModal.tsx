@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Modal, Button, Alert, Form } from "antd";
 import { useAlterarEmail } from "../hooks/usePostAlterarEmail";
 import { StandardInput } from "../../../components/EstilosCompartilhados";
@@ -19,44 +19,21 @@ interface AlterarEmailFormValues {
 
 const AlterarEmailModal: React.FC<AlterarEmailModalProps> = ({ open, onClose }) => {
   const [form] = Form.useForm<AlterarEmailFormValues>();
-  const [apiError, setApiError] = useState<string | null>(null);
 
   const { mutate, isPending } = useAlterarEmail();
 
   const handleClose = () => {
     form.resetFields();
-    setApiError(null);
     onClose();
   };
 
   const handleSalvar = async () => {
-    setApiError(null);
     try {
       const values = await form.validateFields();
 
       mutate(
         { novo_email: values.novo_email.trim() },
-        {
-          onSuccess: () => {
-            handleClose();
-          },
-          onError: (error: any) => {
-            const data = error?.response?.data;
-            const fieldError = Array.isArray(data?.novo_email)
-              ? data.novo_email[0]
-              : undefined;
-            const detail =
-              typeof data?.detail === "string" ? data.detail : undefined;
-            const mensagem =
-              fieldError ?? detail ?? "Erro ao alterar o e-mail. Tente novamente.";
-
-            if (fieldError) {
-              form.setFields([{ name: "novo_email", errors: [mensagem] }]);
-            } else {
-              setApiError(mensagem);
-            }
-          },
-        }
+        { onSuccess: handleClose }
       );
     } catch {
       // validateFields já exibe os erros nos campos
@@ -109,15 +86,6 @@ const AlterarEmailModal: React.FC<AlterarEmailModalProps> = ({ open, onClose }) 
           />
         </Form.Item>
       </Form>
-
-      {apiError && (
-        <Alert
-          type="error"
-          showIcon={false}
-          message={apiError}
-          style={{ marginTop: "1rem", textAlign: "center", fontWeight: 600 }}
-        />
-      )}
 
       <Alert
         type="info"

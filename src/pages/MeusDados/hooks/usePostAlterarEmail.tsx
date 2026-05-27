@@ -19,5 +19,22 @@ export const useAlterarEmail = () => {
         duration: 3.5,
       });
     },
+    onError: (error: any) => {
+      const data = error?.response?.data;
+      const fieldError = Array.isArray(data?.novo_email)
+        ? data.novo_email[0]
+        : undefined;
+      const detail =
+        typeof data?.detail === "string" ? data.detail : undefined;
+      const mensagem =
+        fieldError ?? detail ?? "Erro ao alterar o e-mail. Tente novamente.";
+
+      notification.error({
+        message: "Erro ao alterar e-mail",
+        description: mensagem,
+        placement: "top",
+        duration: 3.5,
+      });
+    },
   });
 };
