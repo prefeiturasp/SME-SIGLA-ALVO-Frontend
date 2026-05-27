@@ -14,11 +14,8 @@
     "@badeball/cypress-cucumber-preprocessor": "^20.1.2",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "cypress": "^13.17.0",
+    "cypress-xpath": "^2.0.1",
     "dotenv": "^16.6.1",
     "multiple-cucumber-html-reporter": "^3.9.3"
-  },
-  "cypress-cucumber-preprocessor": {
-    "nonGlobalStepDefinitions": false,
-    "stepDefinitions": "cypress/support/step_definitions/**/*.js"
   }
 }

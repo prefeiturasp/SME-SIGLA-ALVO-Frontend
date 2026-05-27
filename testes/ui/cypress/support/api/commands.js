@@ -1,11 +1,5 @@
 const { API_SIGLA_CONFIG } = require('./config_sigla')
 
-// ============================================================================
-// REQUISIÇÕES — API SIGLA (sem autenticação)
-// Base URL: https://hom-api-sigla.sme.prefeitura.sp.gov.br
-// Prefixo:  /ms-processos-convocacao/api/v1
-// ============================================================================
-
 Cypress.Commands.add('sigla_request', (method, path, options = {}) => {
   const baseUrl = Cypress.env('SIGLA_BASE_URL') || API_SIGLA_CONFIG.BASE_URL
   const basePath = Cypress.env('SIGLA_BASE_PATH') || API_SIGLA_CONFIG.BASE_PATH
