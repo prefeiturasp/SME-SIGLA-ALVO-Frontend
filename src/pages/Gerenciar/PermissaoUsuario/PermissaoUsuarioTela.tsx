@@ -284,12 +284,17 @@ const PermissaoUsuarioTela: React.FC = () => {
               payload.email = nextEmail;
             }
 
-            await patchUsuario(payload);
-            setPermissaoSucessoNome(selectedUser?.nome || selectedUser?.login || "");
-            setPermissaoSucessoOpen(true);
-            setModalOpen(false);
-            const vals = (control as any)?._formValues ?? {};
-            void handleSub(vals);
+            try {
+              await patchUsuario(payload);
+              setPermissaoSucessoNome(selectedUser?.nome || selectedUser?.login || "");
+              setPermissaoSucessoOpen(true);
+              setModalOpen(false);
+              const vals = (control as any)?._formValues ?? {};
+              void handleSub(vals);
+            } catch (e: any) {
+              console.error("Falha ao salvar permissão do usuário:", e);
+              message.error("Não foi possível salvar a permissão do usuário.");
+            }
           }}
         />
         <ConteudoPagina>
