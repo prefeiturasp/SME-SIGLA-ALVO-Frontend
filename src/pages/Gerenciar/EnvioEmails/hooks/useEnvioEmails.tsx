@@ -27,6 +27,7 @@ export const useEnvioEmails = () => {
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors: formErrors },
   } = useForm<IEnvioEmailsForm>({
     defaultValues,
@@ -71,6 +72,8 @@ export const useEnvioEmails = () => {
       tipo: data.tipo,
       conteudo: data.conteudo || "",
     });
+    // Resetar formulário após sucesso
+    reset(defaultValues);
   };
 
   return {
@@ -82,6 +85,7 @@ export const useEnvioEmails = () => {
     formErrors,
     watch,
     setValue,
+    enviando: postEnvioEmailMutation.isPending,
   };
 };
 
