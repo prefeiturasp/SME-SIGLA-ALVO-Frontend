@@ -89,7 +89,7 @@ const AlterarEmailModal: React.FC<AlterarEmailModalProps> = ({ open, onClose }) 
         type="info"
         showIcon={false}
         message="Importante: Ao alterar a seu e-mail, ele se tornará padrão em todos os sistemas da SME aos quais você já possui acesso."
-        style={{ marginTop: "1rem", fontSize: "0.8125rem" }}
+        style={{ marginTop: "40px", fontSize: "0.8125rem" }}
       />
 
       <ButtonsContainer>
