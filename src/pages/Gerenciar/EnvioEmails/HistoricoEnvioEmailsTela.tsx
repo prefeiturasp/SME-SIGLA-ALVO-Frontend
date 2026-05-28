@@ -28,14 +28,7 @@ const HistoricoEnvioEmailsTela: React.FC = () => {
     () => [
       {
         title: (
-          <Text strong style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
-            Home
-          </Text>
-        ),
-      },
-      {
-        title: (
-          <Text strong style={{ cursor: "pointer" }} onClick={() => navigate("/gerenciar")}>
+          <Text strong>
             Gerenciar
           </Text>
         ),
@@ -51,7 +44,11 @@ const HistoricoEnvioEmailsTela: React.FC = () => {
           </Text>
         ),
       },
-      { title: "Histórico" },
+      { title: (
+        <Text strong>
+          Histórico
+        </Text>
+      ) },
     ] as TitleItem[],
     [navigate]
   );

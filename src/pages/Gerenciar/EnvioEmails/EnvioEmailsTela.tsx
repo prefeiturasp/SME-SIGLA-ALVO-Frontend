@@ -31,12 +31,16 @@ const EnvioEmailsTela: React.FC = () => {
     () => [
       {
         title: (
-          <Text strong style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
-            Home
+          <Text strong>
+            Gerenciar
           </Text>
         ),
       },
-      { title: "Envio de e-mails" },
+      { title: (
+        <Text strong>
+          Disparo de e-mails
+        </Text>
+      ) },
     ] as TitleItem[],
     [navigate]
   );
