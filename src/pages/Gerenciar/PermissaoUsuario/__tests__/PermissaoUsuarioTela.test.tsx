@@ -80,42 +80,23 @@ jest.mock("../components/EditarPermissaoModal", () => {
   return function EditarPermissaoModal({
     open,
     onClose,
-    onSave,
+    onSuccess,
+    username,
     mode,
   }: any) {
     if (!open) return null;
     return (
       <div data-testid="editar-permissao-modal">
         <div data-testid="modal-mode">{mode}</div>
+        <div data-testid="modal-username">{username ?? ""}</div>
         <button data-testid="modal-close" onClick={onClose}>
           Fechar
         </button>
         <button
-          data-testid="modal-save"
-          onClick={() =>
-            onSave?.({
-              permissoes: ["grupo1"],
-              nome: "Nome Atualizado",
-              email: "email@teste.com",
-            })
-          }
+          data-testid="modal-success"
+          onClick={() => onSuccess?.("Nome Atualizado")}
         >
-          Salvar
-        </button>
-        <button
-          data-testid="modal-save-empty"
-          onClick={() => onSave?.(undefined)}
-        >
-          Salvar vazio
-        </button>
-        <button
-          data-testid="modal-save-no-username"
-          onClick={() => {
-            // Simula caso sem username
-            onSave?.({ permissoes: [] });
-          }}
-        >
-          Salvar sem username
+          Sucesso
         </button>
       </div>
     );
@@ -579,7 +560,7 @@ describe("PermissaoUsuarioTela", () => {
       });
     });
 
-    it("deve salvar permissões ao clicar em Salvar", async () => {
+    it("deve abrir SucessoModal quando onSuccess é disparado", async () => {
       const user = userEvent.setup();
       const wrapper = createWrapper();
       render(<PermissaoUsuarioTela />, { wrapper });
@@ -599,48 +580,15 @@ describe("PermissaoUsuarioTela", () => {
         expect(screen.getByTestId("editar-permissao-modal")).toBeInTheDocument();
       });
 
-      const saveButton = screen.getByTestId("modal-save");
-      await user.click(saveButton);
+      const successButton = screen.getByTestId("modal-success");
+      await user.click(successButton);
 
       await waitFor(() => {
-        expect(mockPatchUsuario).toHaveBeenCalled();
         expect(screen.getByTestId("sucesso-modal")).toBeInTheDocument();
       });
     });
 
-    it("deve tratar erro ao salvar permissões", async () => {
-      const user = userEvent.setup();
-      mockPatchUsuario.mockRejectedValueOnce(new Error("Erro ao salvar"));
-
-      const wrapper = createWrapper();
-      render(<PermissaoUsuarioTela />, { wrapper });
-
-      await waitFor(() => {
-        expect(screen.queryByTestId("table-loading")).not.toBeInTheDocument();
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId("row-edit-0")).toBeInTheDocument();
-      });
-
-      const editButton = screen.getByTestId("row-edit-0");
-      await user.click(editButton);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("editar-permissao-modal")).toBeInTheDocument();
-      });
-
-      const saveButton = screen.getByTestId("modal-save");
-      await user.click(saveButton);
-
-      await waitFor(() => {
-        expect(message.error).toHaveBeenCalledWith(
-          "Não foi possível salvar a permissão do usuário."
-        );
-      });
-    });
-
-    it("deve atualizar nome quando diferente", async () => {
+    it("deve passar username do usuário selecionado ao modal", async () => {
       const user = userEvent.setup();
       const wrapper = createWrapper();
       render(<PermissaoUsuarioTela />, { wrapper });
@@ -657,96 +605,8 @@ describe("PermissaoUsuarioTela", () => {
       await user.click(editButton);
 
       await waitFor(() => {
-        expect(screen.getByTestId("editar-permissao-modal")).toBeInTheDocument();
+        expect(screen.getByTestId("modal-username")).toHaveTextContent("user1");
       });
-
-      const saveButton = screen.getByTestId("modal-save");
-      await user.click(saveButton);
-
-      await waitFor(() => {
-        expect(mockPatchUsuario).toHaveBeenCalledWith(
-          expect.objectContaining({
-            username: "user1",
-            nome: "Nome Atualizado",
-          })
-        );
-      });
-    });
-
-    it("deve atualizar email quando diferente", async () => {
-      const user = userEvent.setup();
-      const wrapper = createWrapper();
-      render(<PermissaoUsuarioTela />, { wrapper });
-
-      await waitFor(() => {
-        expect(screen.queryByTestId("table-loading")).not.toBeInTheDocument();
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId("row-edit-0")).toBeInTheDocument();
-      });
-
-      const editButton = screen.getByTestId("row-edit-0");
-      await user.click(editButton);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("editar-permissao-modal")).toBeInTheDocument();
-      });
-
-      const saveButton = screen.getByTestId("modal-save");
-      await user.click(saveButton);
-
-      await waitFor(() => {
-        expect(mockPatchUsuario).toHaveBeenCalledWith(
-          expect.objectContaining({
-            username: "user1",
-            email: "email@teste.com",
-          })
-        );
-      });
-    });
-
-    it("deve tratar caso sem username ao salvar", async () => {
-      const user = userEvent.setup();
-      mockGetUsuariosComGrupos.mockResolvedValueOnce({
-        results: [
-          {
-            usuario: undefined,
-            nome: "Sem Username",
-            grupos: [],
-            is_active: true,
-          },
-        ],
-      });
-
-      const wrapper = createWrapper();
-      render(<PermissaoUsuarioTela />, { wrapper });
-
-      await waitFor(() => {
-        expect(screen.queryByTestId("table-loading")).not.toBeInTheDocument();
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId("row-edit-0")).toBeInTheDocument();
-      });
-
-      const editButton = screen.getByTestId("row-edit-0");
-      await user.click(editButton);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("editar-permissao-modal")).toBeInTheDocument();
-      });
-
-      const saveButton = screen.getByTestId("modal-save-no-username");
-      if (saveButton) {
-        await user.click(saveButton);
-
-        await waitFor(() => {
-          expect(
-            screen.queryByTestId("editar-permissao-modal")
-          ).not.toBeInTheDocument();
-        });
-      }
     });
 
     it("deve usar permissoes quando grupos não existir", async () => {
@@ -1032,8 +892,8 @@ describe("PermissaoUsuarioTela", () => {
         expect(screen.getByTestId("editar-permissao-modal")).toBeInTheDocument();
       });
 
-      const saveButton = screen.getByTestId("modal-save");
-      await user.click(saveButton);
+      const successButton = screen.getByTestId("modal-success");
+      await user.click(successButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("sucesso-modal")).toBeInTheDocument();
@@ -1192,74 +1052,5 @@ describe("PermissaoUsuarioTela", () => {
     });
   });
 
-  describe("Validação de nome e email no save", () => {
-    it("não deve atualizar nome quando igual", async () => {
-      const user = userEvent.setup();
-      const wrapper = createWrapper();
-      render(<PermissaoUsuarioTela />, { wrapper });
-
-      await waitFor(() => {
-        expect(screen.queryByTestId("table-loading")).not.toBeInTheDocument();
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId("row-edit-0")).toBeInTheDocument();
-      });
-
-      const editButton = screen.getByTestId("row-edit-0");
-      await user.click(editButton);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("editar-permissao-modal")).toBeInTheDocument();
-      });
-
-      // Simula salvar com mesmo nome
-      const saveButton = screen.getByTestId("modal-save-empty");
-      if (saveButton) {
-        await user.click(saveButton);
-
-        await waitFor(() => {
-          if (mockPatchUsuario.mock.calls.length > 0) {
-            const call = mockPatchUsuario.mock.calls[0][0];
-            expect(call).not.toHaveProperty("nome");
-          }
-        });
-      }
-    });
-
-    it("não deve atualizar email quando igual", async () => {
-      const user = userEvent.setup();
-      const wrapper = createWrapper();
-      render(<PermissaoUsuarioTela />, { wrapper });
-
-      await waitFor(() => {
-        expect(screen.queryByTestId("table-loading")).not.toBeInTheDocument();
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId("row-edit-0")).toBeInTheDocument();
-      });
-
-      const editButton = screen.getByTestId("row-edit-0");
-      await user.click(editButton);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("editar-permissao-modal")).toBeInTheDocument();
-      });
-
-      // Simula salvar com mesmo email
-      const saveButton = screen.getByTestId("modal-save-empty");
-      if (saveButton) {
-        await user.click(saveButton);
-
-        await waitFor(() => {
-          if (mockPatchUsuario.mock.calls.length > 0) {
-            const call = mockPatchUsuario.mock.calls[0][0];
-            expect(call).not.toHaveProperty("email");
-          }
-        });
-      }
-    });
-  });
 });
 

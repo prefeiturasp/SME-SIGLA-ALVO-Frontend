@@ -1,8 +1,9 @@
 import React from "react";
-import { Button, Col, Form, Input, Modal, Row, Select, Typography } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, Typography, message } from "antd";
 
 import { ClearButton } from "../../../Processos/ConvocacaoCandidatos/style";
 import type { EditarPermissaoModalProps } from "../../../../services/resources/permissoes/IPermissoes";
+import { patchUsuario } from "../hooks/patchAtualizarPermissoesUsuarios";
 
 const labelStyle: React.CSSProperties = {
   fontFamily: "Open Sans",
@@ -22,12 +23,14 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
   open,
   mode,
   data,
+  username,
   permissoesOptions,
   onClose,
-  onSave,
+  onSuccess,
 }) => {
   const [form] = Form.useForm<{ nome: string; email: string }>();
   const [permissoes, setPermissoes] = React.useState<string[]>(data?.permissoes ?? []);
+  const [saving, setSaving] = React.useState(false);
 
   React.useEffect(() => {
     if (open) {
@@ -43,6 +46,52 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
 
   const isView = mode === "view";
 
+  const handleSalvar = async () => {
+    if (!username) {
+      onClose();
+      return;
+    }
+
+    let values: { nome: string; email: string };
+    try {
+      values = await form.validateFields();
+    } catch {
+      return;
+    }
+
+    const currentNome = (data?.nome ?? "").trim();
+    const nextNome = (values.nome ?? "").trim();
+    const currentEmail = (data?.email ?? "").trim();
+    const nextEmail = (values.email ?? "").trim();
+
+    const payload: {
+      username: string;
+      grupos: string[];
+      nome?: string;
+      email?: string;
+    } = { username, grupos: permissoes };
+
+    if (nextNome !== currentNome) payload.nome = nextNome;
+    if (nextEmail !== currentEmail) payload.email = nextEmail;
+
+    setSaving(true);
+    try {
+      await patchUsuario(payload);
+      onSuccess?.(nextNome || data?.nome || "");
+    } catch (e: any) {
+      const respData = e?.response?.data;
+      const emailErr = Array.isArray(respData?.email) ? respData.email[0] : undefined;
+      if (emailErr) {
+        form.setFields([{ name: "email", errors: [String(emailErr)] }]);
+        return;
+      }
+      console.error("Falha ao salvar permissão do usuário:", e);
+      message.error("Não foi possível salvar a permissão do usuário.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <Modal
       open={open}
@@ -54,6 +103,7 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
             size="large"
             style={{ height: 48, width: 152, marginTop: 0 }}
             onClick={onClose}
+            disabled={saving}
           >
             Cancelar
           </ClearButton>
@@ -62,18 +112,8 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
               size="large"
               type="primary"
               style={{ height: 48, width: 200, marginTop: 0 }}
-              onClick={async () => {
-                try {
-                  const values = await form.validateFields();
-                  onSave?.({
-                    permissoes,
-                    nome: values.nome,
-                    email: values.email,
-                  });
-                } catch {
-                  // validateFields lança quando há erros; o Form já exibe as mensagens
-                }
-              }}
+              loading={saving}
+              onClick={handleSalvar}
             >
               Salvar permissão
             </Button>
@@ -104,6 +144,12 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
                 style={{ marginTop: 12, marginBottom: 0 }}
                 rules={[
                   { required: true, whitespace: true, message: "Campo obrigatório." },
+                  { min: 3, message: "O nome deve ter ao menos 3 caracteres." },
+                  { max: 100, message: "O nome deve ter no máximo 100 caracteres." },
+                  {
+                    pattern: /^[A-Za-zÀ-ÿ\s'-]+$/,
+                    message: "O nome não pode conter números ou caracteres especiais.",
+                  },
                 ]}
               >
                 <Input size="large" placeholder="Nome" />
