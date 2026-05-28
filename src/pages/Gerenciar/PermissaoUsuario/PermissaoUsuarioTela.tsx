@@ -16,7 +16,6 @@ import type {
   AtivacaoModalMode,
   AtivacaoModalStep,
   EditarPermissaoModalMode,
-  EditarPermissaoModalSavePayload,
   IPermissaoUsuarioRow,
 } from "../../../services/resources/permissoes/IPermissoes";
 import { getGruposDisponiveisOptions, getUsuariosComGrupos } from "./hooks/getPermissaoUsuario";
@@ -260,41 +259,15 @@ const PermissaoUsuarioTela: React.FC = () => {
             email: selectedUser?.email,
             permissoes: selectedUser?.grupos || (selectedUser?.permissoes ? [selectedUser.permissoes] : []),
           }}
+          username={selectedUser?.username || selectedUser?.login}
           onClose={() => setModalOpen(false)}
           permissoesOptions={gruposOptions}
-          onSave={async (next: EditarPermissaoModalSavePayload | undefined) => {
-            const username = selectedUser?.username || selectedUser?.login;
-            if (!username) {
-              setModalOpen(false);
-              return;
-            }
-
-            const nextPermissoes = next?.permissoes || [];
-            const payload: any = { username, grupos: nextPermissoes };
-
-            const currentNome = (selectedUser?.nome ?? "").trim();
-            const nextNome = (next?.nome ?? "").trim();
-            if (next?.nome !== undefined && nextNome !== currentNome) {
-              payload.nome = nextNome;
-            }
-
-            const currentEmail = (selectedUser?.email ?? "").trim();
-            const nextEmail = (next?.email ?? "").trim();
-            if (next?.email !== undefined && nextEmail !== currentEmail) {
-              payload.email = nextEmail;
-            }
-
-            try {
-              await patchUsuario(payload);
-              setPermissaoSucessoNome(selectedUser?.nome || selectedUser?.login || "");
-              setPermissaoSucessoOpen(true);
-              setModalOpen(false);
-              const vals = (control as any)?._formValues ?? {};
-              void handleSub(vals);
-            } catch (e: any) {
-              console.error("Falha ao salvar permissão do usuário:", e);
-              message.error("Não foi possível salvar a permissão do usuário.");
-            }
+          onSuccess={(savedNome) => {
+            setPermissaoSucessoNome(savedNome || selectedUser?.nome || selectedUser?.login || "");
+            setPermissaoSucessoOpen(true);
+            setModalOpen(false);
+            const vals = (control as any)?._formValues ?? {};
+            void handleSub(vals);
           }}
         />
         <ConteudoPagina>
