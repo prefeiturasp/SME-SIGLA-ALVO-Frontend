@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { Row, Col, Button, Typography, Select, Card, Alert } from "antd";
+import { Row, Col, Button, Typography, Select, Card, Alert, Spin } from "antd";
 import { TextTitulo, TextTituloSecundario } from "../../../components/EstilosCompartilhados";
 import { Controller } from "react-hook-form";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -24,6 +24,7 @@ const EnvioEmailsTela: React.FC = () => {
     formErrors,
     watch,
     setValue,
+    enviando,
   } = useEnvioEmails();
 
   const breadcrumbItems = useMemo(
@@ -56,8 +57,9 @@ const EnvioEmailsTela: React.FC = () => {
   };
 
   return (
-    <BaseTela breadcrumbItems={breadcrumbItems} title="Envio de e-mails">
+    <BaseTela breadcrumbItems={breadcrumbItems} title="Disparo de e-mails">
       <>
+        <Spin spinning={enviando}>
         <TabContentContainer>
           <Card style={{ marginBottom: 16 }}>
             <Row>
@@ -157,6 +159,7 @@ const EnvioEmailsTela: React.FC = () => {
                         } catch {
                         }
                       }}
+                      loading={enviando}
                     >
                       Filtrar
                     </Button>
@@ -259,13 +262,13 @@ const EnvioEmailsTela: React.FC = () => {
             </Card>
           )}
         </TabContentContainer>
-
+        </Spin>
         {conteudoVisivel && (
           <ActionButtonsContainer>
             <Button type="primary" ghost size="large" onClick={() => navigate("/processos/convocacao")}>
               Voltar
             </Button>
-            <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)}>
+            <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)} loading={enviando} disabled={enviando}>
               Enviar
             </Button>
           </ActionButtonsContainer>
