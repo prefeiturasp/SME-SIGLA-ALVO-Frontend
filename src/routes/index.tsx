@@ -34,8 +34,8 @@ import AutorizacoesPublicadasTela from "../pages/Gerenciar/AutorizacoesPublicada
 import AutorizacoesPublicadasGerenciarTela from "../pages/Gerenciar/AutorizacoesPublicadas/AutorizacoesPublicadasGerenciarTela";
 import { HomeTela } from "../pages/Home/HomeTela";
 import EliminacaoReclassificacaoCandidatoTela from "../pages/EliminacaoReclassificacaoCandidato/EliminacaoReclassificacaoCandidatoTela";
-import CartaConvocacaoTela from "../pages/Gerenciar/CartaConvocacao/CartaConvocacaoTela";
-import HistoricoCartaConvocacaoTela from "../pages/Gerenciar/CartaConvocacao/HistoricoCartaConvocacaoTela";
+import EnvioEmailsTela from "../pages/Gerenciar/EnvioEmails/EnvioEmailsTela";
+import HistoricoEnvioEmailsTela from "../pages/Gerenciar/EnvioEmails/HistoricoEnvioEmailsTela";
 import PesquisarConcursadosTela from "../pages/Processos/PesquisarConcursados/PesquisarConcursadosTela";
 import MeusDadosTela from "../pages/MeusDados/MeusDadosTela";
 
@@ -60,7 +60,7 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
-    path: "/autorizacoes-publicadas",
+    path: "/gerenciar/autorizacoes-publicadas",
     element: (
       <ProtectedRoute>
         <PermissionContextGuard model="autorizacaopublicada" permissaoDeExibirATELA="view_autorizacaopublicada">
@@ -71,7 +71,7 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
-    path: "/autorizacoes-publicadas-gerenciar",
+    path: "/gerenciar/autorizacoes-publicadas-gerenciar",
     element: (
       <ProtectedRoute>
         <PermissionContextGuard model="autorizacaopublicada" permissaoDeExibirATELA="view_autorizacaopublicada">
@@ -82,7 +82,7 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
-    path: "/eliminiacao-e-reclassificacao-candidato",
+    path: "/gerenciar/eliminiacao-e-reclassificacao-candidato",
     element: (
       <ProtectedRoute>
         <PermissionContextGuard model="concursocandidatoreclassificacao,concursocandidatoeliminacao" permissaoDeExibirATELA="view_concursocandidatoreclassificacao">
@@ -93,21 +93,21 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
-    path: "/gerenciar/carta-convocacao",
+    path: "/gerenciar/disparo-emails",
     element: (
       <ProtectedRoute>
         <PermissionContextGuard model="cartaconvocacaocandidato" permissaoDeExibirATELA="view_cartaconvocacaocandidato">
-        <CartaConvocacaoTela />
+          <EnvioEmailsTela />
         </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
   },
   {
-    path: "/gerenciar/carta-convocacao/historico",
+    path: "/gerenciar/disparo-emails/historico",
     element: (
       <ProtectedRoute>
-        <HistoricoCartaConvocacaoTela />
+        <HistoricoEnvioEmailsTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
@@ -177,7 +177,7 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
-    path: "/parametrizacao",
+    path: "/gerenciar/parametrizacao",
     element: (
       <ProtectedRoute>
         <PermissionContextGuard model="parametrizacao" permissaoDeExibirATELA="view_parametrizacao">

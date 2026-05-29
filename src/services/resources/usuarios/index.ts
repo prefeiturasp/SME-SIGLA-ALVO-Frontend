@@ -3,6 +3,7 @@ import { appAxiosAdminUsuarios } from "../../axios";
 import type {
   IMeusDadosResponse,
   IAlterarSenhaRequest,
+  IAlterarEmailRequest,
   IBuscarUsuarioEolRequest,
   IBuscarUsuarioEolResponse,
   ICriarUsuarioRequest,
@@ -11,6 +12,7 @@ import type {
 export type {
   IMeusDadosResponse,
   IAlterarSenhaRequest,
+  IAlterarEmailRequest,
   IBuscarUsuarioEolRequest,
   IBuscarUsuarioEolResponse,
   ICriarUsuarioRequest,
@@ -19,6 +21,7 @@ export type {
 export const URL = {
   meusDados: () => `/api/v1/meus-dados/`,
   alterarSenha: () => `/api/v1/alterar-senha/`,
+  alterarEmail: () => `/api/v1/alterar-email/`,
   buscarUsuarioEol: () => `/api/v1/buscar-usuario-eol/`,
   criarUsuario: () => `/api/v1/criar-usuario/`,
 };
@@ -44,6 +47,22 @@ export const postAlterarSenha = (
 
   const response = appAxiosAdminUsuarios
     .post<{ detail: string }>(URL.alterarSenha(), payload, {
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return { response, abort };
+};
+
+export const postAlterarEmail = (
+  payload: IAlterarEmailRequest,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosAdminUsuarios
+    .post<{ detail: string }>(URL.alterarEmail(), payload, {
       signal,
       ...axiosRequestConfig,
     })

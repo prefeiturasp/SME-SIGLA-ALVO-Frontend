@@ -11,6 +11,10 @@ export interface IAlterarSenhaRequest {
   confirmacao_nova_senha: string;
 }
 
+export interface IAlterarEmailRequest {
+  novo_email: string;
+}
+
 export interface IBuscarUsuarioEolRequest {
   rf: string;
 }

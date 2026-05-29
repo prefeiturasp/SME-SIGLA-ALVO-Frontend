@@ -1,8 +1,9 @@
 import React from "react";
-import { Button, Col, Input, Modal, Row, Select, Typography } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, Typography, message } from "antd";
 
 import { ClearButton } from "../../../Processos/ConvocacaoCandidatos/style";
 import type { EditarPermissaoModalProps } from "../../../../services/resources/permissoes/IPermissoes";
+import { patchUsuario } from "../hooks/patchAtualizarPermissoesUsuarios";
 
 const labelStyle: React.CSSProperties = {
   fontFamily: "Open Sans",
@@ -22,21 +23,74 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
   open,
   mode,
   data,
+  username,
   permissoesOptions,
   onClose,
-  onSave,
+  onSuccess,
 }) => {
+  const [form] = Form.useForm<{ nome: string; email: string }>();
   const [permissoes, setPermissoes] = React.useState<string[]>(data?.permissoes ?? []);
-  const [nome, setNome] = React.useState<string>(data?.nome ?? "");
-  const [email, setEmail] = React.useState<string>(data?.email ?? "");
+  const [saving, setSaving] = React.useState(false);
 
   React.useEffect(() => {
-    setPermissoes(data?.permissoes ?? []);
-    setNome(data?.nome ?? "");
-    setEmail(data?.email ?? "");
-  }, [data?.permissoes, data?.nome, data?.email, open]);
+    if (open) {
+      setPermissoes(data?.permissoes ?? []);
+      form.setFieldsValue({
+        nome: data?.nome ?? "",
+        email: data?.email ?? "",
+      });
+    } else {
+      form.resetFields();
+    }
+  }, [open, data?.permissoes, data?.nome, data?.email, form]);
 
   const isView = mode === "view";
+
+  const handleSalvar = async () => {
+    if (!username) {
+      onClose();
+      return;
+    }
+
+    let values: { nome: string; email: string };
+    try {
+      values = await form.validateFields();
+    } catch {
+      return;
+    }
+
+    const currentNome = (data?.nome ?? "").trim();
+    const nextNome = (values.nome ?? "").trim();
+    const currentEmail = (data?.email ?? "").trim();
+    const nextEmail = (values.email ?? "").trim();
+
+    const payload: {
+      username: string;
+      grupos: string[];
+      nome?: string;
+      email?: string;
+    } = { username, grupos: permissoes };
+
+    if (nextNome !== currentNome) payload.nome = nextNome;
+    if (nextEmail !== currentEmail) payload.email = nextEmail;
+
+    setSaving(true);
+    try {
+      await patchUsuario(payload);
+      onSuccess?.(nextNome || data?.nome || "");
+    } catch (e: any) {
+      const respData = e?.response?.data;
+      const emailErr = Array.isArray(respData?.email) ? respData.email[0] : undefined;
+      if (emailErr) {
+        form.setFields([{ name: "email", errors: [String(emailErr)] }]);
+        return;
+      }
+      console.error("Falha ao salvar permissão do usuário:", e);
+      message.error("Não foi possível salvar a permissão do usuário.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Modal
@@ -49,6 +103,7 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
             size="large"
             style={{ height: 48, width: 152, marginTop: 0 }}
             onClick={onClose}
+            disabled={saving}
           >
             Cancelar
           </ClearButton>
@@ -57,13 +112,8 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
               size="large"
               type="primary"
               style={{ height: 48, width: 200, marginTop: 0 }}
-              onClick={() =>
-                onSave?.({
-                  permissoes,
-                  nome,
-                  email,
-                })
-              }
+              loading={saving}
+              onClick={handleSalvar}
             >
               Salvar permissão
             </Button>
@@ -78,64 +128,77 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
         footer: { padding: "20px 24px" },
       }}
     >
-      <Row gutter={[32, 24]} style={{ marginTop: 8 }}>
-        <Col span={6}>
-          <div style={labelStyle}>Login (RF)</div>
-          <div style={{ ...valueStyle, marginTop: 12 }}>{data?.login ?? ""}</div>
-        </Col>
-        <Col span={10}>
-          <div style={labelStyle}>Nome</div>
-          {isView ? (
-            <div style={{ ...valueStyle, marginTop: 12 }}>{data?.nome ?? ""}</div>
-          ) : (
-            <Input
-              size="large"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              style={{ marginTop: 12 }}
-              placeholder="Nome"
-            />
-          )}
-        </Col>
-        <Col span={8}>
-          <div style={labelStyle}>E-mail</div>
-          {isView ? (
-            <div style={{ ...valueStyle, marginTop: 12 }}>{data?.email ?? ""}</div>
-          ) : (
-            <Input
-              size="large"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{ marginTop: 12 }}
-              placeholder="E-mail"
-            />
-          )}
-        </Col>
+      <Form form={form} layout="vertical" requiredMark={false} component={false}>
+        <Row gutter={[32, 24]} style={{ marginTop: 8 }}>
+          <Col span={6}>
+            <div style={labelStyle}>Login (RF)</div>
+            <div style={{ ...valueStyle, marginTop: 12 }}>{data?.login ?? ""}</div>
+          </Col>
+          <Col span={10}>
+            <div style={labelStyle}>Nome</div>
+            {isView ? (
+              <div style={{ ...valueStyle, marginTop: 12 }}>{data?.nome ?? ""}</div>
+            ) : (
+              <Form.Item
+                name="nome"
+                style={{ marginTop: 12, marginBottom: 0 }}
+                rules={[
+                  { required: true, whitespace: true, message: "Campo obrigatório." },
+                  { min: 3, message: "O nome deve ter ao menos 3 caracteres." },
+                  { max: 100, message: "O nome deve ter no máximo 100 caracteres." },
+                  {
+                    pattern: /^[A-Za-zÀ-ÿ\s'-]+$/,
+                    message: "O nome não pode conter números ou caracteres especiais.",
+                  },
+                ]}
+              >
+                <Input size="large" placeholder="Nome" />
+              </Form.Item>
+            )}
+          </Col>
+          <Col span={8}>
+            <div style={labelStyle}>E-mail</div>
+            {isView ? (
+              <div style={{ ...valueStyle, marginTop: 12 }}>{data?.email ?? ""}</div>
+            ) : (
+              <Form.Item
+                name="email"
+                style={{ marginTop: 12, marginBottom: 0 }}
+                rules={[
+                  { required: true, whitespace: true, message: "Campo obrigatório." },
+                  { type: "email", message: "Informe um e-mail válido." },
+                ]}
+              >
+                <Input size="large" placeholder="E-mail" />
+              </Form.Item>
+            )}
+          </Col>
 
-        <Col span={12}>
-          <div style={{ ...labelStyle, marginTop: 4 }}>Permissões</div>
-          <Select
-            mode="multiple"
-            allowClear
-            size="large"
-            value={permissoes}
-            onChange={(v) => setPermissoes(v)}
-            disabled={isView}
-            style={{ width: "100%", marginTop: 12 }}
-            placeholder="Selecione"
-            options={
-              permissoesOptions?.length
-                ? permissoesOptions
-                : [
-                    { value: "Administrador", label: "Administrador" },
-                    { value: "Gestor", label: "Gestor" },
-                    { value: "Operador", label: "Operador" },
-                    { value: "Consulta", label: "Consulta" },
-                  ]
-            }
-          />
-        </Col>
-      </Row>
+          <Col span={12}>
+            <div style={{ ...labelStyle, marginTop: 4 }}>Permissões</div>
+            <Select
+              mode="multiple"
+              allowClear
+              size="large"
+              value={permissoes}
+              onChange={(v) => setPermissoes(v)}
+              disabled={isView}
+              style={{ width: "100%", marginTop: 12 }}
+              placeholder="Selecione"
+              options={
+                permissoesOptions?.length
+                  ? permissoesOptions
+                  : [
+                      { value: "Administrador", label: "Administrador" },
+                      { value: "Gestor", label: "Gestor" },
+                      { value: "Operador", label: "Operador" },
+                      { value: "Consulta", label: "Consulta" },
+                    ]
+              }
+            />
+          </Col>
+        </Row>
+      </Form>
 
       <div
         style={{

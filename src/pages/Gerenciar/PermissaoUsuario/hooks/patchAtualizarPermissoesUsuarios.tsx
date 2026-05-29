@@ -8,10 +8,6 @@ export async function patchUsuario(params: {
   is_active?: boolean;
 }) {
   const { username, ...rest } = params;
-  const payload = {
-    usuario: username,
-    ...rest,
-  };
-  const { response } = API.Permissoes.patchUsuario(payload);
+  const { response } = API.Permissoes.patchUsuario({ usuario: username, ...rest });
   return await response;
 }

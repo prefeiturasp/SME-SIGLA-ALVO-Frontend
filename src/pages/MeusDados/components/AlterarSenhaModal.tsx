@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Modal, Button, Alert, message, Row, Col } from "antd";
+import { App, Modal, Button, Alert, Row, Col } from "antd";
 import { EyeInvisibleOutlined, EyeOutlined, CheckCircleFilled, CloseCircleFilled } from "@ant-design/icons";
 import { useAlterarSenha } from "../hooks/usePostAlterarSenha";
 import { StandardInput } from "../../../components/EstilosCompartilhados";
@@ -90,6 +90,7 @@ const AlterarSenhaModal: React.FC<AlterarSenhaModalProps> = ({ open, onClose }) 
     ];
   }, [form.nova_senha, senhaDigitada]);
 
+  const { notification } = App.useApp();
   const { mutate, isPending } = useAlterarSenha();
 
   const handleClose = () => {
@@ -148,7 +149,12 @@ const AlterarSenhaModal: React.FC<AlterarSenhaModalProps> = ({ open, onClose }) 
 
     mutate(form, {
       onSuccess: () => {
-        message.success("Senha alterada com sucesso!");
+        notification.success({
+          message: "Senha Alterada",
+          description: "A senha foi alterada com sucesso!",
+          placement: "top",
+          duration: 3.5,
+        });
         handleClose();
       },
       onError: (error: any) => {

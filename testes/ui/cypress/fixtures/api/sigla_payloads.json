@@ -1,0 +1,43 @@
+{
+  "processoConvocacao": {
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "concurso_nome": "ACESSO DIRETOR DE ESCOLA N15 240723",
+    "descricao": "Processo de Teste Automacao"
+  },
+  "processoConvocacaoUpdate": {
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "concurso_nome": "ACESSO DIRETOR DE ESCOLA N15 240723",
+    "descricao": "Processo Atualizado Automacao"
+  },
+  "processoConvocacaoPatch": {
+    "descricao": "Processo Parcialmente Atualizado"
+  },
+  "cartaConvocacao": {
+    "conteudo": "Carta de convocacao gerada por automacao de testes"
+  },
+  "cargo": {
+    "cargos": [
+      {
+        "cargo_nome": "DIRETOR DE ESCOLA",
+        "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c"
+      }
+    ]
+  },
+  "cargoUpdate": {
+    "cargos": [
+      {
+        "cargo_nome": "DIRETOR DE ESCOLA",
+        "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c"
+      }
+    ]
+  },
+  "cargoPatch": {
+    "cargos": [
+      {
+        "cargo_nome": "DIRETOR DE ESCOLA",
+        "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c"
+      }
+    ]
+  },
+  "passoPatch": {}
+}

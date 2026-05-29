@@ -47,19 +47,14 @@ export interface EditarPermissaoModalData {
   permissoes?: string[];
 }
 
-export interface EditarPermissaoModalSavePayload {
-  permissoes?: string[];
-  nome?: string;
-  email?: string;
-}
-
 export interface EditarPermissaoModalProps {
   open: boolean;
   mode: EditarPermissaoModalMode;
   data?: EditarPermissaoModalData;
+  username?: string;
   permissoesOptions?: Array<{ value: string; label: string }>;
   onClose: () => void;
-  onSave?: (next?: EditarPermissaoModalSavePayload) => void;
+  onSuccess?: (savedNome: string) => void;
 }
 
 export interface IPermissaoUsuarioRow {
