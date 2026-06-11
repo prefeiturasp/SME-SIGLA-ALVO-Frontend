@@ -59,6 +59,7 @@ export const useImportacaoDadosVagas = () => {
     return processosConvocacaoData.results.map((processo: any) => ({
       value: processo.uuid,
       label: processo.descricao,
+      concurso_uuid: processo.concurso_uuid,
     }));
   }, [processosConvocacaoData]);
 
@@ -71,11 +72,13 @@ export const useImportacaoDadosVagas = () => {
 
   const handleEnviarForm = async (data: IImportacaoVagasForm) => {
     const uuid = data.processo_convocacao!;
-    const label = (processosConvocacaoOptions || []).find((o: any) => o?.value === uuid)?.label as string | undefined;
+    const selected = (processosConvocacaoOptions || []).find((o: any) => o?.value === uuid);
+    const label = selected?.label as string | undefined;
 
     const payload: IImportacaoVagasPayload = {
       processo_nome: label,
       processo_uuid: uuid,
+      concurso_uuid: selected?.concurso_uuid as string | undefined,
       arquivo: data.arquivo!,
     };
     try {

@@ -368,6 +368,7 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
       expect(API.ImportacaoDados.postImportacaoArquivosVagas).toHaveBeenCalledWith({
         processo_nome: undefined,
         processo_uuid: 'PROCESSO_001',
+        concurso_uuid: undefined,
         arquivo: testFile,
       });
     });
