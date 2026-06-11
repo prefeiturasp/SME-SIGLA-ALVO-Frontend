@@ -329,9 +329,8 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
           <QuillEditor
             value={cabecalhoHtml}
             onChange={setCabecalhoHtml}
-            placeholder="Digite o cabeçalho"
+            placeholder="Digite o cabeçalho do relatório"
             height={140}
-            showToolbar={usaCabecalhoGabarito ? false : true}
           />
         </div>
 

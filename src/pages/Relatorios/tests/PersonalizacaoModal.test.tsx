@@ -20,12 +20,14 @@ import { getPersonalizacaoRelatorio } from '../hooks/useGetPersonalizacaoRelator
 import { patchPersonalizacaoRelatorio } from '../hooks/usePatchPersonalizacaoRelatorio';
 
 jest.mock('../components/QuillEditor', () => {
-  return function MockQuillEditor({ value, onChange, placeholder, showToolbar }: any) {
+  return function MockQuillEditor({ value, onChange, placeholder }: any) {
     const testId = placeholder?.includes('texto final')
       ? 'texto-final'
-      : showToolbar === false
-        ? 'cabecalho'
-        : 'cabecalho-gabarito';
+      : placeholder?.includes('da capa')
+        ? 'cabecalho-capa-ata'
+        : placeholder === 'Digite o cabeçalho do relatório'
+          ? 'cabecalho'
+          : 'cabecalho-gabarito';
 
     return (
       <div data-testid="quill-editor">
