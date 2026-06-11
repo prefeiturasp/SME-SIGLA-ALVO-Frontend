@@ -1,10 +1,13 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosRelatorios } from "../../axios";
+import type { IExtracaoDadosParams } from "./IExtracaoDados";
 import type { FormatoRelatorio, IRelatorioPayload } from "./IRelatorios";
 
 export const URL = {
   postRelatorios: () => `/api/v1/relatorios/`,
   getAtaEscolhaCargos: () => `/api/v1/relatorios/ata-escolha-cargos/`,
+  getExtracaoDados: () => `/api/v1/extracao-dados/`,
+  getExtracaoDadosTodos: () => `/api/v1/extracao-dados/todos/`,
   getParametrizacao: () => `/api/v1/parametrizacao/`,
   patchParametrizacao: (uuid?: string) => uuid ? `/api/v1/parametrizacao/${uuid}/` : `/api/v1/parametrizacao/`,
   getPersonalizacao: () => `/api/v1/personalizacao/`,
@@ -36,6 +39,47 @@ export const postRelatorio = (
   };
 };
 
+
+export const getExtracaoDados = (
+  params: IExtracaoDadosParams,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+  console.log(params);
+  const response = appAxiosRelatorios
+    .get(URL.getExtracaoDados(), {
+      params: {
+        concurso_uuid: params.concurso_uuid,
+        ano: params.ano,
+      },
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+export const getExtracaoDadosTodos = (
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosRelatorios
+    .get(URL.getExtracaoDadosTodos(), {
+      signal: axiosRequestConfig?.signal || signal,
+      ...axiosRequestConfig,
+    })
+    .then((res) => res.data);
+
+  return {
+    response,
+    abort,
+  };
+};
 
 // GET Parametrizacao do MS-Relatorios
 export const getParametrizacaoRelatorios = (
