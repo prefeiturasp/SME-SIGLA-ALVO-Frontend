@@ -26,5 +26,6 @@ export interface IImportacaoVagasForm {
 export interface IImportacaoVagasPayload {
   processo_nome?:string;
   processo_uuid?:string;
+  concurso_uuid?:string;
   arquivo: File;
 }
