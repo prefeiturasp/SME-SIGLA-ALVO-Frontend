@@ -38,6 +38,7 @@ import EnvioEmailsTela from "../pages/Gerenciar/EnvioEmails/EnvioEmailsTela";
 import HistoricoEnvioEmailsTela from "../pages/Gerenciar/EnvioEmails/HistoricoEnvioEmailsTela";
 import PesquisarConcursadosTela from "../pages/Processos/PesquisarConcursados/PesquisarConcursadosTela";
 import MeusDadosTela from "../pages/MeusDados/MeusDadosTela";
+import ExtracaoDadosTela from "../pages/Gerenciar/ExtracaoDados/ExtracaoDadosTela";
 
 
 const router = createBrowserRouter([
@@ -108,6 +109,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <HistoricoEnvioEmailsTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/gerenciar/extracao-dados",
+    element: (
+      <ProtectedRoute>
+        <ExtracaoDadosTela />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
