@@ -2,7 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../../services";
 import type { TipoEnvio } from "./useEnvioEmails";
 
-type EnvioEmailConteudoResponse = Array<{ conteudo?: string; [key: string]: any }>;
+export type EnvioEmailConteudoRegistro = {
+  conteudo?: string;
+  conteudo_gabarito?: string;
+  assunto?: string;
+  [key: string]: unknown;
+};
+
+type EnvioEmailConteudoResponse = EnvioEmailConteudoRegistro[];
 
 const useGetEnvioEmailConteudo = (
   tipo: TipoEnvio | undefined,
@@ -29,14 +36,16 @@ const useGetEnvioEmailConteudo = (
     retry: 1,
   });
 
-  const conteudo = Array.isArray(data) && data.length > 0 ? String(data[0]?.conteudo || "") : "";
+  const registro = Array.isArray(data) && data.length > 0 ? data[0] : null;
 
   return {
-    conteudo,
+    registro,
+    conteudo: registro?.conteudo ? String(registro.conteudo) : "",
+    conteudoGabarito: registro?.conteudo_gabarito ? String(registro.conteudo_gabarito) : "",
+    assunto: registro?.assunto ? String(registro.assunto) : "",
     isLoading,
     refetch,
   };
 };
 
 export default useGetEnvioEmailConteudo;
-
