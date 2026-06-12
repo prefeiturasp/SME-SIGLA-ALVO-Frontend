@@ -11,12 +11,16 @@ export type TipoEnvio = "CONVOCACAO" | "VAGAS" | "RESULTADOS";
 export interface IEnvioEmailsForm {
   processo_convocacao?: string;
   tipo?: TipoEnvio;
+  assunto: string;
+  conteudo_gabarito: string;
   conteudo: string;
 }
 
 const defaultValues: IEnvioEmailsForm = {
   processo_convocacao: undefined,
   tipo: undefined,
+  assunto: "",
+  conteudo_gabarito: "",
   conteudo: "",
 };
 
@@ -66,11 +70,16 @@ export const useEnvioEmails = () => {
     const processo_nome =
       processosConvocacaoOptions.find((o) => o.value === data.processo_convocacao)?.label ?? "";
 
+    const conteudoEfetivo = (data.conteudo || "").trim()
+      ? data.conteudo
+      : data.conteudo_gabarito || "";
+
     await postEnvioEmailMutation.mutateAsync({
       processo_uuid: data.processo_convocacao,
       processo_nome,
       tipo: data.tipo,
-      conteudo: data.conteudo || "",
+      conteudo: conteudoEfetivo,
+      assunto: data.assunto || "",
     });
     // Resetar formulário após sucesso
     reset(defaultValues);

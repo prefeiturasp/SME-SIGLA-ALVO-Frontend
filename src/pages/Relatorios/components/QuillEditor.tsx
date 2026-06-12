@@ -9,6 +9,7 @@ type QuillEditorProps = {
   readOnly?: boolean;
   height?: number; // altura mínima em pixels
   showToolbar?: boolean;
+  editorId?: string;
 };
 
 const QuillEditor: React.FC<QuillEditorProps> = ({
@@ -18,6 +19,7 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
   readOnly = false,
   height = 240,
   showToolbar = true,
+  editorId,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const quillRef = useRef<Quill | null>(null);
@@ -93,7 +95,19 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
     }
   }, [value]);
 
-  return <div ref={containerRef} />;
+  return (
+    <div
+      style={{
+        position: "relative",
+        isolation: "isolate",
+        overflow: "hidden",
+        zIndex: 0,
+      }}
+      data-testid={editorId ? `quill-editor-${editorId}` : undefined}
+    >
+      <div ref={containerRef} />
+    </div>
+  );
 };
 
 export default QuillEditor;
