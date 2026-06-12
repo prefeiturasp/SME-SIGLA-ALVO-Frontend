@@ -1,5 +1,9 @@
+import dayjs from "dayjs";
 import type { IExtracaoDadosTodosResponse } from "../../../../services/resources/relatorios/IExtracaoDados";
 import { formatarNomeDreParaTabela } from "./mapGraficosDre";
+
+const formatarDataAutorizacao = (data?: string) =>
+  data ? dayjs(data).format("DD/MM/YYYY") : "-";
 
 export type RelatorioDetalhadoItem = {
   key: string;
@@ -12,7 +16,7 @@ export type RelatorioDetalhadoItem = {
   escolhas: number;
   naoEscolhas: number;
   autorizacoes: number;
-  ultimaAtualizacao: string;
+  data_autorizacao: string;
 };
 
 type ConcursoOption = {
@@ -32,19 +36,31 @@ export const mapDresConcursosParaRelatoriosDetalhados = (
 
   const concursosMap = new Map(concursosOptions.map((concurso) => [concurso.value, concurso.label]));
 
+  const dadosPorCargo = new Map(
+    (data?.concurso?.cargos ?? []).map((cargo) => [
+      cargo.codigo,
+      { autorizacoes: cargo.autorizacoes, data_autorizacao: cargo.data_autorizacao },
+    ])
+  );
+
   return Object.entries(dresConcursos).flatMap(([concursoUuid, itens]) =>
-    itens.map((item, index) => ({
-      key: `${concursoUuid}-${item.codigo_cargo ?? index}-${item.nome}`,
-      concursoUuid,
-      concurso: concursosMap.get(concursoUuid) ?? concursoUuid,
-      cargo: item.cargo_descricao ?? "-",
-      codigoCargo: item.codigo_cargo,
-      dre: formatarNomeDreParaTabela(item.nome),
-      dreOriginal: item.nome,
-      escolhas: item.escolhas,
-      naoEscolhas: Math.max(item.vagas - item.escolhas, 0),
-      autorizacoes: 0,
-      ultimaAtualizacao: "-",
-    }))
+    itens.map((item, index) => {
+      const cargoInfo =
+        item.codigo_cargo != null ? dadosPorCargo.get(item.codigo_cargo) : undefined;
+
+      return {
+        key: `${concursoUuid}-${item.codigo_cargo ?? index}-${item.nome}`,
+        concursoUuid,
+        concurso: concursosMap.get(concursoUuid) ?? concursoUuid,
+        cargo: item.cargo_descricao ?? "-",
+        codigoCargo: item.codigo_cargo,
+        dre: formatarNomeDreParaTabela(item.nome),
+        dreOriginal: item.nome,
+        escolhas: item.escolhas,
+        naoEscolhas: Math.max(item.vagas - item.escolhas, 0),
+        autorizacoes: cargoInfo?.autorizacoes ?? 0,
+        data_autorizacao: formatarDataAutorizacao(cargoInfo?.data_autorizacao),
+      };
+    })
   );
 };

@@ -39,6 +39,18 @@ export interface IExtracaoDadosConcursoAno {
   "autorizacoes-publicadas": number;
 }
 
+export interface IExtracaoDadosConcursoCargo {
+  uuid: string;
+  nome: string;
+  codigo: number;
+  autorizacoes: number;
+  data_autorizacao: string;
+}
+
+export interface IExtracaoDadosConcursoTodos extends IExtracaoDadosConcursoAno {
+  cargos?: IExtracaoDadosConcursoCargo[];
+}
+
 export interface IExtracaoDadosCandidatos {
   habilitados: IExtracaoDadosHabilitados;
   [ano: string]: IExtracaoDadosHabilitados | IExtracaoDadosCandidatosAno;
@@ -59,7 +71,7 @@ export interface IExtracaoDadosResponse {
 export interface IExtracaoDadosTodosResponse {
   candidatos: IExtracaoDadosCandidatosConsolidado;
   escolhas: IExtracaoDadosEscolhasTodos;
-  concurso: IExtracaoDadosConcursoAno;
+  concurso: IExtracaoDadosConcursoTodos;
 }
 
 export interface IExtracaoDadosParams {

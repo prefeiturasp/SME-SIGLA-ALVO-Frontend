@@ -112,8 +112,9 @@ export const RelatoriosDetalhadosFilter = styled.div`
 export const RelatoriosDetalhadosTable = styled(StyledTable)`
   margin-top: 1.5rem;
 
-  .col-numerica {
-    text-align: right !important;
+  .col-numerica-valor {
+    text-align: left !important;
+    padding-left: 1.5rem !important;
   }
 ` as typeof StyledTable;
 
