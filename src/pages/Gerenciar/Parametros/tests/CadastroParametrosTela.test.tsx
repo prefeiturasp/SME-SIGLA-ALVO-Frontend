@@ -97,7 +97,7 @@ describe('CadastroParametrosTela', () => {
   });
 
   describe('Renderização inicial', () => {
-    it('deve renderizar o componente BaseTela com título correto', () => {
+    it('deve renderizar o componente BaseTela com o título correto', () => {
       render(
         <CadastroParametrosTela />,
         { wrapper: createWrapper() }
