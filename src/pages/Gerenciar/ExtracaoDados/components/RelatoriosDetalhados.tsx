@@ -99,14 +99,6 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data }) => 
         render: (value: number) => formatNumber(value),
       },
       {
-        title: "Não Escolhas",
-        dataIndex: "naoEscolhas",
-        key: "naoEscolhas",
-        width: 140,
-        onCell: () => ({ className: "col-numerica-valor" }),
-        render: (value: number) => formatNumber(value),
-      },
-      {
         title: "Autorizações",
         dataIndex: "autorizacoes",
         key: "autorizacoes",
