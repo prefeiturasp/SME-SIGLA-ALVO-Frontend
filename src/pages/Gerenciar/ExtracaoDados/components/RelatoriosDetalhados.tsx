@@ -199,15 +199,16 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data }) => 
           </Col>
         </Row>
 
-        <FilterActions style={{ marginTop: 0 }}>
-          <Button type="primary" ghost size="large" onClick={handleLimparFiltros}>
-            Limpar filtros
-          </Button>
-          <Button type="primary" size="large" onClick={handleFiltrar}>
-            Filtrar
-          </Button>
-        </FilterActions>
       </RelatoriosDetalhadosFilter>
+
+      <FilterActions style={{ marginTop: 20 }}>
+        <Button type="primary" ghost size="large" onClick={handleLimparFiltros}>
+          Limpar filtros
+        </Button>
+        <Button type="primary" size="large" onClick={handleFiltrar}>
+          Filtrar
+        </Button>
+      </FilterActions>
 
       <RelatoriosDetalhadosTable
         columns={columns}
