@@ -86,6 +86,6 @@ export const mapExtracaoDadosToIndicadores = (
       : 0,
     reconvocacoes: escolhasAno?.reconvocacao ?? 0,
     semEscolha: escolhasAno?.["nao-escolha"] ?? 0,
-    autorizacoes: concursoAno?.["autorizacoes-publicadas"] ?? 0,
+    autorizacoes: concursoAno?.["autorizacoes-publicadas"] ?? data.concurso?.["autorizacoes-publicadas"] ?? 0,
   };
 };

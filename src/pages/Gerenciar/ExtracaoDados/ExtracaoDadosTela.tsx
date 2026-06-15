@@ -329,9 +329,9 @@ const ExtracaoDadosTela: React.FC = () => {
               <Col xs={24} sm={12} lg={6}>
                 <IndicadorCard
                   icon={<ScheduleIcon fontSize="small" />}
-                  title="Sem escolha"
+                  title="Não escolha"
                   value={indicadores.semEscolha}
-                  description="Convocados que não concluíram a escolha no prazo."
+                  description="Convocados que decidiram pela não escolha."
                 />
               </Col>
               <Col xs={24} sm={12} lg={6}>

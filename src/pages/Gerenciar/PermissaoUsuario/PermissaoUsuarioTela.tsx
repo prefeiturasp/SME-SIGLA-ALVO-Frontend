@@ -67,17 +67,6 @@ const PermissaoUsuarioTela: React.FC = () => {
   const breadcrumbItems = [
     {
       title: (
-        <Text
-          strong
-          style={{ cursor: "pointer" }}
-          onClick={() => navigate("/")}
-        >
-          Home
-        </Text>
-      ),
-    },
-    {
-      title: (
         <Text strong style={{ cursor: "pointer" }} onClick={() => navigate("/gerenciar")}>
           Gerenciar
         </Text>
