@@ -33,17 +33,6 @@ const AutorizacoesPublicadasTela: React.FC = () => {
         title: (
           <Text
             strong
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/")}
-          >
-            Home
-          </Text>
-        ),
-      },
-      {
-        title: (
-          <Text
-            strong
           >
             Gerenciar
           </Text>
@@ -123,7 +112,7 @@ const AutorizacoesPublicadasTela: React.FC = () => {
                 cargoCodigo: String(record?.cargoCodigo || ""),
                 cargo: record?.cargo || "",
               });
-              navigate(`/autorizacoes-publicadas-gerenciar?${params.toString()}`);
+              navigate(`/gerenciar/autorizacoes-publicadas-gerenciar?${params.toString()}`);
             }}
           />
         ),

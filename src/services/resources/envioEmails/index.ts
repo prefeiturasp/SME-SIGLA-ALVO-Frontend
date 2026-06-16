@@ -10,7 +10,8 @@ export interface IPostEnvioEmailsPayload {
   processo_uuid: string;
   processo_nome: string;
   tipo: "CONVOCACAO" | "VAGAS" | "RESULTADOS";
-  conteudo: string; // HTML do Quill
+  conteudo: string;
+  assunto?: string;
 }
 
 export const postEnvioEmails = (

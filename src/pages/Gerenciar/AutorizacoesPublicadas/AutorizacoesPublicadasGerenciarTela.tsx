@@ -51,9 +51,8 @@ const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
           <Text
             strong
             style={{ cursor: "pointer" }}
-            onClick={() => navigate("/")}
           >
-            Home
+            Gerenciar
           </Text>
         ),
       },

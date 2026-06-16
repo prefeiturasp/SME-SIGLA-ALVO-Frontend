@@ -54,7 +54,7 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
   const navigate = useNavigate();
   const breadcrumbItems = useMemo<TitleItem[]>(
     () => [
-      { title: <Text strong style={{ cursor: "pointer" }} onClick={() => navigate("/")}>Home</Text> },
+      { title: <Text strong style={{ cursor: "pointer" }}>Gerenciar</Text> },
       { title: "Eliminação e Reclassificação de Candidato" },
     ],
     [navigate]

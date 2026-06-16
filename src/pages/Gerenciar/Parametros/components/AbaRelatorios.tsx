@@ -41,7 +41,6 @@ const AbaRelatorios: React.FC<{
         
         // O GET retorna um array, pegar o primeiro item
         const parametrizacao = Array.isArray(data) ? data[0] : data;
-        console.log(parametrizacao);
         if (parametrizacao) {
           // Armazenar UUID
           setParametrizacaoUuid(parametrizacao.uuid);

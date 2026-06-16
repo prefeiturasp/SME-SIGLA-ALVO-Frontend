@@ -13,10 +13,18 @@ jest.mock("react-router-dom", () => ({
 
 // Mock do QuillEditor para um textarea simples
 jest.mock("../../../Relatorios/components/QuillEditor", () => {
-  return function MockQuillEditor(props: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  return function MockQuillEditor(props: {
+    value: string;
+    onChange: (v: string) => void;
+    placeholder?: string;
+    editorId?: string;
+  }) {
+    const ariaLabel = props.editorId
+      ? `quill-editor-${props.editorId}`
+      : "quill-editor";
     return (
       <textarea
-        aria-label="quill-editor"
+        aria-label={ariaLabel}
         value={props.value || ""}
         onChange={(e) => props.onChange(e.target.value)}
         placeholder={props.placeholder}
@@ -31,6 +39,8 @@ jest.mock("../hooks/useGetEnvioEmailConteudo", () => ({
   __esModule: true,
   default: () => ({
     conteudo: "",
+    conteudoGabarito: "",
+    assunto: "",
     isLoading: false,
     refetch: mockRefetchConteudo,
   }),
@@ -78,35 +88,39 @@ describe("EnvioEmailsTela", () => {
     const filtrarBtn = screen.getByRole("button", { name: /filtrar/i });
     expect(filtrarBtn).toBeDisabled();
 
-    // Selecionar processo (primeiro combobox)
     const combos = screen.getAllByRole("combobox");
     await user.click(combos[0]);
     await user.click(screen.getByText("Processo 1"));
-
-    // Selecionar tipo (segundo combobox)
     await user.click(combos[1]);
     await user.click(screen.getByText("Convocação"));
 
-    // Agora pode filtrar
     expect(screen.getByRole("button", { name: /filtrar/i })).not.toBeDisabled();
 
-    // Mock do refetch retornando conteúdo
     mockRefetchConteudo.mockResolvedValueOnce({
-      data: [{ conteudo: "<p>conteudo padrao</p>" }],
+      data: [
+        {
+          conteudo_gabarito: "<p>gabarito padrao</p>",
+          conteudo: "",
+          assunto: "Assunto de convocação",
+        },
+      ],
     });
 
     await user.click(screen.getByRole("button", { name: /filtrar/i }));
 
-    // textarea aparece
     await waitFor(() => {
-      expect(screen.getByLabelText("quill-editor")).toBeInTheDocument();
+      expect(screen.getByLabelText("quill-editor-conteudo-gabarito")).toBeInTheDocument();
+      expect(screen.getByLabelText("quill-editor-conteudo")).toBeInTheDocument();
     });
 
-    // Label inclui o tipo
     expect(screen.getByText(/E-mail de Convocação/i)).toBeInTheDocument();
+    expect(screen.getByText("Assunto do E-mail:")).toBeInTheDocument();
+    expect(screen.getByLabelText("assunto")).toHaveValue("");
+    expect(screen.getByLabelText("quill-editor-conteudo-gabarito")).toHaveValue("<p>gabarito padrao</p>");
+    expect(screen.getByText("Copiar conteúdo gabarito")).toBeInTheDocument();
   });
 
-  it("mostra e esconde o botão Voltar do topo conforme visibilidade do conteúdo; envia com payload correto", async () => {
+  it("copia conteúdo gabarito para o conteúdo ao clicar no botão de copiar", async () => {
     const user = userEvent.setup();
     const client = new QueryClient();
     render(
@@ -117,36 +131,279 @@ describe("EnvioEmailsTela", () => {
       </QueryClientProvider>
     );
 
-    // Voltar do topo visível inicialmente (conteúdo oculto)
+    const combos = screen.getAllByRole("combobox");
+    await user.click(combos[0]);
+    await user.click(screen.getByText("Processo 1"));
+    await user.click(combos[1]);
+    await user.click(screen.getByText("Convocação"));
+
+    mockRefetchConteudo.mockResolvedValueOnce({
+      data: [
+        {
+          conteudo_gabarito: "<p>gabarito padrao</p>",
+          conteudo: "",
+          assunto: "Assunto inicial",
+        },
+      ],
+    });
+
+    await user.click(screen.getByRole("button", { name: /filtrar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("quill-editor-conteudo-gabarito")).toHaveValue("<p>gabarito padrao</p>");
+    });
+
+    fireEvent.change(screen.getByLabelText("quill-editor-conteudo-gabarito"), {
+      target: { value: "<p>gabarito editado</p>" },
+    });
+    await user.click(screen.getByText("Copiar conteúdo gabarito"));
+
+    expect(screen.getByLabelText("quill-editor-conteudo")).toHaveValue("<p>gabarito editado</p>");
+  });
+
+  it("mantém assunto em branco ao filtrar independentemente da API", async () => {
+    const user = userEvent.setup();
+    const client = new QueryClient();
+    render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={["/gerenciar/disparo-emails"]}>
+          <EnvioEmailsTela />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const combos = screen.getAllByRole("combobox");
+    await user.click(combos[0]);
+    await user.click(screen.getByText("Processo 1"));
+    await user.click(combos[1]);
+    await user.click(screen.getByText("Resultados"));
+
+    mockRefetchConteudo.mockResolvedValueOnce({
+      data: [
+        {
+          conteudo_gabarito: "<p>gabarito resultado</p>",
+          conteudo: "<p>resultado</p>",
+          assunto: "Assunto de resultados",
+        },
+      ],
+    });
+
+    await user.click(screen.getByRole("button", { name: /filtrar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("assunto")).toHaveValue("");
+    });
+  });
+
+  it("envia assunto em branco quando o usuário não preenche o campo", async () => {
+    const user = userEvent.setup();
+    const client = new QueryClient();
+    render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={["/gerenciar/disparo-emails"]}>
+          <EnvioEmailsTela />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const combos = screen.getAllByRole("combobox");
+    await user.click(combos[0]);
+    await user.click(screen.getByText("Processo 1"));
+    await user.click(combos[1]);
+    await user.click(screen.getByText("Resultados"));
+
+    mockRefetchConteudo.mockResolvedValueOnce({
+      data: [
+        {
+          conteudo_gabarito: "<p>gabarito resultado</p>",
+          conteudo: "",
+          assunto: "Assunto de resultados",
+        },
+      ],
+    });
+    await user.click(screen.getByRole("button", { name: /filtrar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("assunto")).toHaveValue("");
+    });
+
+    await user.click(screen.getByRole("button", { name: /enviar/i }));
+
+    await waitFor(() => {
+      expect(mockMutateAsync).toHaveBeenCalledWith({
+        processo_uuid: "p1",
+        processo_nome: "Processo 1",
+        tipo: "RESULTADOS",
+        conteudo: "<p>gabarito resultado</p>",
+        assunto: "",
+      });
+    });
+  });
+
+  it("envia assunto customizado quando o usuário preenche o campo", async () => {
+    const user = userEvent.setup();
+    const client = new QueryClient();
+    render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={["/gerenciar/disparo-emails"]}>
+          <EnvioEmailsTela />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const combos = screen.getAllByRole("combobox");
+    await user.click(combos[0]);
+    await user.click(screen.getByText("Processo 1"));
+    await user.click(combos[1]);
+    await user.click(screen.getByText("Convocação"));
+
+    mockRefetchConteudo.mockResolvedValueOnce({
+      data: [
+        {
+          conteudo_gabarito: "<p>gabarito</p>",
+          conteudo: "",
+          assunto: "Assunto da API",
+        },
+      ],
+    });
+    await user.click(screen.getByRole("button", { name: /filtrar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("assunto")).toHaveValue("");
+    });
+
+    fireEvent.change(screen.getByLabelText("assunto"), {
+      target: { value: "Meu assunto personalizado" },
+    });
+    await user.click(screen.getByRole("button", { name: /enviar/i }));
+
+    await waitFor(() => {
+      expect(mockMutateAsync).toHaveBeenCalledWith({
+        processo_uuid: "p1",
+        processo_nome: "Processo 1",
+        tipo: "CONVOCACAO",
+        conteudo: "<p>gabarito</p>",
+        assunto: "Meu assunto personalizado",
+      });
+    });
+  });
+
+  it("envia conteúdo customizado quando preenchido; caso contrário usa gabarito", async () => {
+    const user = userEvent.setup();
+    const client = new QueryClient();
+    render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={["/gerenciar/disparo-emails"]}>
+          <EnvioEmailsTela />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const combos = screen.getAllByRole("combobox");
+    await user.click(combos[0]);
+    await user.click(screen.getByText("Processo 1"));
+    await user.click(combos[1]);
+    await user.click(screen.getByText("Resultados"));
+
+    mockRefetchConteudo.mockResolvedValueOnce({
+      data: [
+        {
+          conteudo_gabarito: "<p>gabarito resultado</p>",
+          conteudo: "",
+          assunto: "Assunto de resultados",
+        },
+      ],
+    });
+    await user.click(screen.getByRole("button", { name: /filtrar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("quill-editor-conteudo-gabarito")).toHaveValue("<p>gabarito resultado</p>");
+    });
+
+    const enviarBtn = screen.getByRole("button", { name: /enviar/i });
+    await user.click(enviarBtn);
+
+    await waitFor(() => {
+      expect(mockMutateAsync).toHaveBeenCalledWith({
+        processo_uuid: "p1",
+        processo_nome: "Processo 1",
+        tipo: "RESULTADOS",
+        conteudo: "<p>gabarito resultado</p>",
+        assunto: "",
+      });
+    });
+  });
+
+  it("envia conteúdo editado no segundo textarea quando preenchido", async () => {
+    const user = userEvent.setup();
+    const client = new QueryClient();
+    render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={["/gerenciar/disparo-emails"]}>
+          <EnvioEmailsTela />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const combos = screen.getAllByRole("combobox");
+    await user.click(combos[0]);
+    await user.click(screen.getByText("Processo 1"));
+    await user.click(combos[1]);
+    await user.click(screen.getByText("Resultados"));
+
+    mockRefetchConteudo.mockResolvedValueOnce({
+      data: [
+        {
+          conteudo_gabarito: "<p>gabarito</p>",
+          conteudo: "<p>customizado</p>",
+          assunto: "Assunto customizado",
+        },
+      ],
+    });
+    await user.click(screen.getByRole("button", { name: /filtrar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("quill-editor-conteudo")).toHaveValue("<p>customizado</p>");
+    });
+
+    await user.click(screen.getByRole("button", { name: /enviar/i }));
+
+    await waitFor(() => {
+      expect(mockMutateAsync).toHaveBeenCalledWith({
+        processo_uuid: "p1",
+        processo_nome: "Processo 1",
+        tipo: "RESULTADOS",
+        conteudo: "<p>customizado</p>",
+        assunto: "",
+      });
+    });
+  });
+
+  it("mostra e esconde o botão Voltar do topo conforme visibilidade do conteúdo", async () => {
+    const user = userEvent.setup();
+    const client = new QueryClient();
+    render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={["/gerenciar/disparo-emails"]}>
+          <EnvioEmailsTela />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
     expect(screen.getByRole("button", { name: "Voltar" })).toBeInTheDocument();
 
-    // Selecionar ambos e filtrar
     const combos = screen.getAllByRole("combobox");
     await user.click(combos[0]);
     await user.click(screen.getByText("Processo 1"));
     await user.click(combos[1]);
     await user.click(screen.getByText("Resultados"));
     mockRefetchConteudo.mockResolvedValueOnce({
-      data: [{ conteudo: "<p>resultado</p>" }],
+      data: [{ conteudo_gabarito: "<p>gabarito</p>", conteudo: "", assunto: "Assunto" }],
     });
     await user.click(screen.getByRole("button", { name: /filtrar/i }));
 
-    // Aparece os botões de rodapé
     await waitFor(() => {
       expect(screen.getAllByRole("button", { name: "Voltar" }).length).toBe(1);
     });
-    const enviarBtn = screen.getByRole("button", { name: /enviar/i });
-
-    // Enviar dispara mutate com payload esperado
-    await user.click(enviarBtn);
-    await waitFor(() => {
-      expect(mockMutateAsync).toHaveBeenCalledWith({
-        processo_uuid: "p1",
-        processo_nome: "Processo 1",
-        tipo: "RESULTADOS",
-        conteudo: "<p>resultado</p>",
-      });
-    });
   });
 });
-

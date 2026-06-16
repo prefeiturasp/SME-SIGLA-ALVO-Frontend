@@ -20,18 +20,7 @@ const CadastroParametrosTela: React.FC = () => {
   const breadcrumbItems = [
     {
       title: (
-        <Text
-          strong
-          style={{ cursor: "pointer" }}
-          onClick={() => navigate("/")}
-        >
-          Home
-        </Text>
-      ),
-    },
-    {
-      title: (
-        <Text strong style={{ cursor: "pointer" }} onClick={() => navigate("/gerenciar")}>
+        <Text strong style={{ cursor: "pointer" }}>
           Gerenciar
         </Text>
       ),

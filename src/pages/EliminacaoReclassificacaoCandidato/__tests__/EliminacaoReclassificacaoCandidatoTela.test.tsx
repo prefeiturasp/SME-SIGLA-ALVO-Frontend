@@ -117,15 +117,6 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
     mockGetCandidatosHabilitados.mockReturnValue({ response: Promise.resolve({ results: [] }), abort: () => {} });
   });
 
-  describe("renderização e breadcrumb", () => {
-    it("renderiza título e breadcrumb e navega ao clicar em Home", () => {
-      render(<EliminacaoReclassificacaoCandidatoTela />, { wrapper });
-      expect(screen.getByTestId("title")).toHaveTextContent("Eliminação e Reclassificação de Candidato");
-      fireEvent.click(screen.getByTestId("breadcrumb-0"));
-      expect(mockNavigate).toHaveBeenCalledWith("/");
-    });
-  });
-
   describe("filtros e botões", () => {
     it("botão Filtrar está desabilitado sem concurso e cargo selecionados", () => {
       render(<EliminacaoReclassificacaoCandidatoTela />, { wrapper });

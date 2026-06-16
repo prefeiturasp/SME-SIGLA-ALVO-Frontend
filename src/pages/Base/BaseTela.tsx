@@ -190,6 +190,11 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
             onClick: () => navigate("/gerenciar/autorizacoes-publicadas"),
           },
           {
+            key: "extracao-dados",
+            label: "Extração de dados",
+            onClick: () => navigate("/gerenciar/extracao-dados"),
+          },
+          {
             key: "disparo-emails",
             label: "Disparo de e-mails",
             onClick: () => navigate("/gerenciar/disparo-emails"),

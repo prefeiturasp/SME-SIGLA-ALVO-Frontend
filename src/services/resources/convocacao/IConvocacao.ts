@@ -172,7 +172,8 @@ export interface IPostEnvioEmailPayload {
   processo_uuid: string;
   processo_nome: string;
   tipo: "CONVOCACAO" | "VAGAS" | "RESULTADOS";
-  conteudo: string; 
+  conteudo: string;
+  assunto?: string;
 }
 
 export interface IEnvioEmailResponse {

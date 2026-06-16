@@ -97,7 +97,7 @@ describe('CadastroParametrosTela', () => {
   });
 
   describe('Renderização inicial', () => {
-    it('deve renderizar o componente BaseTela com título correto', () => {
+    it('deve renderizar o componente BaseTela com o título correto', () => {
       render(
         <CadastroParametrosTela />,
         { wrapper: createWrapper() }
@@ -105,17 +105,6 @@ describe('CadastroParametrosTela', () => {
 
       expect(screen.getByTestId('base-tela')).toBeInTheDocument();
       expect(screen.getByTestId('base-title')).toHaveTextContent('Cadastro de Parâmetros');
-    });
-
-    it('deve renderizar breadcrumbs corretos', () => {
-      require('@testing-library/react').render(
-        <CadastroParametrosTela />,
-        { wrapper: createWrapper() }
-      );
-
-      expect(screen.getByTestId('breadcrumb-0')).toHaveTextContent('Home');
-      expect(screen.getByTestId('breadcrumb-1')).toHaveTextContent('Gerenciar');
-      expect(screen.getByTestId('breadcrumb-2')).toHaveTextContent('Cadastro de Parâmetros');
     });
 
     it('deve renderizar a aba Relatório por padrão', () => {
@@ -141,42 +130,5 @@ describe('CadastroParametrosTela', () => {
     });
   });
 
-  describe('Navegação via breadcrumbs', () => {
-    it('deve navegar para home ao clicar no breadcrumb Home', () => {
-      require('@testing-library/react').render(
-        <CadastroParametrosTela />,
-        { wrapper: createWrapper() }
-      );
-
-      const homeBreadcrumb = screen.getByTestId('breadcrumb-0');
-      fireEvent.click(homeBreadcrumb);
-
-      expect(mockNavigate).toHaveBeenCalledWith('/');
-    });
-
-    it('deve navegar para gerenciar ao clicar no breadcrumb Gerenciar', () => {
-      require('@testing-library/react').render(
-        <CadastroParametrosTela />,
-        { wrapper: createWrapper() }
-      );
-
-      const gerenciarBreadcrumb = screen.getByTestId('breadcrumb-1');
-      fireEvent.click(gerenciarBreadcrumb);
-
-      expect(mockNavigate).toHaveBeenCalledWith('/gerenciar');
-    });
-
-    it('não deve navegar ao clicar no breadcrumb atual (Cadastro de Parâmetros)', () => {
-      require('@testing-library/react').render(
-        <CadastroParametrosTela />,
-        { wrapper: createWrapper() }
-      );
-
-      const cadastroBreadcrumb = screen.getByTestId('breadcrumb-2');
-      fireEvent.click(cadastroBreadcrumb);
-
-      expect(mockNavigate).not.toHaveBeenCalled();
-    });
-  });
 });
 
