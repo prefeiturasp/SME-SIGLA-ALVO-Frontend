@@ -49,8 +49,16 @@ export interface IExtracaoDadosConcursoCargo {
   data_autorizacao: string;
 }
 
+export interface IExtracaoDadosConcursoFiltrado extends IExtracaoDadosConcursoAno {
+  cargos?: IExtracaoDadosConcursoCargo[];
+}
+
 export interface IExtracaoDadosConcursoTodos extends IExtracaoDadosConcursoAno {
   cargos?: IExtracaoDadosConcursoCargo[];
+}
+
+export interface IExtracaoDadosEscolhasFiltrado extends Record<string, IExtracaoDadosEscolhasAno> {
+  dres_concursos?: Record<string, IExtracaoDadosDreConcurso[]>;
 }
 
 export interface IExtracaoDadosCandidatos {
@@ -66,8 +74,8 @@ export interface IExtracaoDadosCandidatosConsolidado {
 
 export interface IExtracaoDadosResponse {
   candidatos: IExtracaoDadosCandidatos;
-  escolhas: Record<string, IExtracaoDadosEscolhasAno>;
-  concurso: Record<string, IExtracaoDadosConcursoAno>;
+  escolhas: IExtracaoDadosEscolhasFiltrado;
+  concurso: IExtracaoDadosConcursoFiltrado;
 }
 
 export interface IExtracaoDadosTodosResponse {
