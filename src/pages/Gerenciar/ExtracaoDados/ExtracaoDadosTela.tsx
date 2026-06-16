@@ -39,7 +39,10 @@ import {
   mapDresTodosParaGraficoVagas,
   mapDresTodosParaTabela,
 } from "./utils/mapGraficosDre";
-import { mapDresConcursosParaRelatoriosDetalhados } from "./utils/mapRelatoriosDetalhados";
+import {
+  mapDresConcursosParaRelatoriosDetalhados,
+  mapDresParaRelatoriosDetalhados,
+} from "./utils/mapRelatoriosDetalhados";
 import { FilterActions, FilterCard, IndicatorsCard } from "./styles";
 
 const { Text } = Typography;
@@ -137,8 +140,16 @@ const ExtracaoDadosTela: React.FC = () => {
   );
 
   const relatoriosDetalhados = useMemo(
-    () => mapDresConcursosParaRelatoriosDetalhados(extracaoDadosTodos, concursosOptions),
-    [extracaoDadosTodos, concursosOptions]
+    () =>
+      filtrosAplicados
+        ? mapDresParaRelatoriosDetalhados(
+            extracaoDados,
+            filtrosAplicados.ano,
+            filtrosAplicados.concurso_uuid,
+            concursosOptions
+          )
+        : mapDresConcursosParaRelatoriosDetalhados(extracaoDadosTodos, concursosOptions),
+    [extracaoDados, extracaoDadosTodos, filtrosAplicados, concursosOptions]
   );
 
   const canFilter = Boolean(concursoUuid && ano);

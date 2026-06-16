@@ -1,6 +1,10 @@
-import { mapDresConcursosParaRelatoriosDetalhados } from "../../utils/mapRelatoriosDetalhados";
+import {
+  mapDresConcursosParaRelatoriosDetalhados,
+  mapDresParaRelatoriosDetalhados,
+} from "../../utils/mapRelatoriosDetalhados";
 import {
   concursosOptionsMock,
+  extracaoDadosFiltradoMock,
   extracaoDadosTodosMock,
 } from "../../testFixtures/extracaoDadosFixtures";
 
@@ -45,5 +49,32 @@ describe("mapRelatoriosDetalhados", () => {
     const resultado = mapDresConcursosParaRelatoriosDetalhados(extracaoDadosTodosMock, []);
 
     expect(resultado[0].concurso).toBe("uuid-concurso-1");
+  });
+
+  it("mapeia relatórios detalhados filtrados por concurso e ano", () => {
+    const resultado = mapDresParaRelatoriosDetalhados(
+      extracaoDadosFiltradoMock,
+      "2024",
+      "uuid-concurso-1",
+      concursosOptionsMock
+    );
+
+    expect(resultado).toHaveLength(1);
+    expect(resultado[0]).toMatchObject({
+      concursoUuid: "uuid-concurso-1",
+      concurso: "Concurso Teste 1",
+      cargo: "-",
+      dre: "Butantã",
+      escolhas: 25,
+      naoEscolhas: 15,
+      autorizacoes: 0,
+      data_autorizacao: "-",
+    });
+  });
+
+  it("retorna lista vazia quando não há dres no ano filtrado", () => {
+    expect(
+      mapDresParaRelatoriosDetalhados(extracaoDadosFiltradoMock, "2023", "uuid-concurso-1", [])
+    ).toEqual([]);
   });
 });
