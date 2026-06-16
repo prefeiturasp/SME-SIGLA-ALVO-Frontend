@@ -14,6 +14,8 @@ export interface IExtracaoDadosEscolhasDre {
   nome: string;
   escolhas: number;
   vagas: number;
+  codigo_cargo?: number;
+  cargo_descricao?: string;
 }
 
 export interface IExtracaoDadosEscolhasAno {
