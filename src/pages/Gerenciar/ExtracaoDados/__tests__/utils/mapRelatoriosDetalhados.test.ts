@@ -51,7 +51,7 @@ describe("mapRelatoriosDetalhados", () => {
     expect(resultado[0].concurso).toBe("uuid-concurso-1");
   });
 
-  it("mapeia relatórios detalhados filtrados por concurso e ano", () => {
+  it("mapeia relatórios detalhados filtrados por concurso", () => {
     const resultado = mapDresParaRelatoriosDetalhados(
       extracaoDadosFiltradoMock,
       "2024",
@@ -59,22 +59,28 @@ describe("mapRelatoriosDetalhados", () => {
       concursosOptionsMock
     );
 
-    expect(resultado).toHaveLength(1);
+    expect(resultado).toHaveLength(2);
     expect(resultado[0]).toMatchObject({
       concursoUuid: "uuid-concurso-1",
       concurso: "Concurso Teste 1",
-      cargo: "-",
+      cargo: "Professor",
+      codigoCargo: 101,
       dre: "Butantã",
       escolhas: 25,
       naoEscolhas: 15,
-      autorizacoes: 0,
-      data_autorizacao: "-",
+      autorizacoes: 5,
+      data_autorizacao: "10/08/2024",
+    });
+    expect(resultado[1]).toMatchObject({
+      cargo: "Coordenador",
+      autorizacoes: 3,
+      data_autorizacao: "15/09/2024",
     });
   });
 
-  it("retorna lista vazia quando não há dres no ano filtrado", () => {
+  it("retorna lista vazia quando não há dres_concursos para o concurso", () => {
     expect(
-      mapDresParaRelatoriosDetalhados(extracaoDadosFiltradoMock, "2023", "uuid-concurso-1", [])
+      mapDresParaRelatoriosDetalhados(extracaoDadosFiltradoMock, "2024", "uuid-inexistente", [])
     ).toEqual([]);
   });
 });

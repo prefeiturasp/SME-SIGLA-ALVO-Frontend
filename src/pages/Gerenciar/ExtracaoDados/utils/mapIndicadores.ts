@@ -67,7 +67,6 @@ export const mapExtracaoDadosToIndicadores = (
   const { habilitados } = data.candidatos;
   const candidatosAno = data.candidatos[ano];
   const escolhasAno = data.escolhas[ano];
-  const concursoAno = data.concurso[ano];
 
   const listaGeral = habilitados?.geral ?? 0;
   const listaPcd = habilitados?.pcd ?? 0;
@@ -86,6 +85,6 @@ export const mapExtracaoDadosToIndicadores = (
       : 0,
     reconvocacoes: escolhasAno?.reconvocacao ?? 0,
     semEscolha: escolhasAno?.["nao-escolha"] ?? 0,
-    autorizacoes: concursoAno?.["autorizacoes-publicadas"] ?? data.concurso?.["autorizacoes-publicadas"] ?? 0,
+    autorizacoes: data.concurso?.["autorizacoes-publicadas"] ?? 0,
   };
 };

@@ -60,7 +60,7 @@ describe("mapIndicadores", () => {
 
       expect(indicadores.convocados).toBe(0);
       expect(indicadores.escolhasRealizadas).toBe(0);
-      expect(indicadores.autorizacoes).toBe(0);
+      expect(indicadores.autorizacoes).toBe(8);
       expect(indicadores.habilitados).toBe(200);
     });
   });
