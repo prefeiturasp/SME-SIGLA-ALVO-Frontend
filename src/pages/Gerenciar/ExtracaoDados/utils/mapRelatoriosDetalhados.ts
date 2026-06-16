@@ -1,5 +1,8 @@
 import dayjs from "dayjs";
-import type { IExtracaoDadosTodosResponse } from "../../../../services/resources/relatorios/IExtracaoDados";
+import type {
+  IExtracaoDadosResponse,
+  IExtracaoDadosTodosResponse,
+} from "../../../../services/resources/relatorios/IExtracaoDados";
 import { formatarNomeDreParaTabela } from "./mapGraficosDre";
 
 const formatarDataAutorizacao = (data?: string) =>
@@ -63,4 +66,34 @@ export const mapDresConcursosParaRelatoriosDetalhados = (
       };
     })
   );
+};
+
+export const mapDresParaRelatoriosDetalhados = (
+  data: IExtracaoDadosResponse | undefined,
+  ano: string,
+  concursoUuid: string,
+  concursosOptions: ConcursoOption[]
+): RelatorioDetalhadoItem[] => {
+  const dres = data?.escolhas?.[ano]?.dres ?? [];
+
+  if (!dres.length) {
+    return [];
+  }
+
+  const concursosMap = new Map(concursosOptions.map((concurso) => [concurso.value, concurso.label]));
+  const concurso = concursosMap.get(concursoUuid) ?? concursoUuid;
+
+  return dres.map((item, index) => ({
+    key: `${concursoUuid}-${item.codigo_cargo ?? index}-${item.nome}`,
+    concursoUuid,
+    concurso,
+    cargo: item.cargo_descricao ?? "-",
+    codigoCargo: item.codigo_cargo,
+    dre: formatarNomeDreParaTabela(item.nome),
+    dreOriginal: item.nome,
+    escolhas: item.escolhas,
+    naoEscolhas: Math.max(item.vagas - item.escolhas, 0),
+    autorizacoes: 0,
+    data_autorizacao: "-",
+  }));
 };
