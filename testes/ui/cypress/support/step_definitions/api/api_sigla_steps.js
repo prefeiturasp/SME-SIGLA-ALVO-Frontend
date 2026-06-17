@@ -1,15 +1,20 @@
+﻿// ── PUT Processo de Convocação ─────────────────────────────────────────────
+When('eu faço um PUT no processo de convocação criado com dados válidos', () => {
+  cy.fixture('api/sigla_payloads').then((payloads) => {
+    cy.get('@processoUuid').then((uuid) => {
+      cy.sigla_put(`/processos-convocacao/${uuid}/`, payloads.processoConvocacao).then((res) => {
+        cy.wrap(res).as('response')
+        Cypress.log({ name: 'PUT Processo', message: `UUID: ${uuid} → HTTP ${res.status}` })
+      })
+    })
+  })
+})
+// ...existing code...
 /// <reference types="cypress" />
 
 import { Given, When, Then, Before } from '@badeball/cypress-cucumber-preprocessor'
 
-// ============================================================================
-// STEPS — API SIGLA (Todos os microsserviços)
-// Projeto: SME-SIGLA-ALVO-Frontend
-// ============================================================================
-
 const UUID_INEXISTENTE = '00000000-0000-0000-0000-000000000000'
-
-// ── Hooks ────────────────────────────────────────────────────────────────────
 
 Before({ tags: '@api' }, function () {
   this.testStart = Date.now()
@@ -48,22 +53,9 @@ When('eu faço um POST SIGLA para {string} com body vazio', (path) => {
   })
 })
 
-When('eu faço um POST SIGLA para {string} sem body', (path) => {
-  cy.sigla_post(path, {}).then((res) => {
-    cy.wrap(res).as('response')
-    Cypress.log({ name: 'SIGLA POST sem body', message: `${path} → HTTP ${res.status}` })
-  })
-})
+// ...existing code...
 
-When('eu faço um POST SIGLA para {string} com body:', (path, dataTable) => {
-  const rows = dataTable.rawTable.slice(1)
-  const body = {}
-  rows.forEach((row) => { body[row[0]] = row[1] })
-  cy.sigla_post(path, body).then((res) => {
-    cy.wrap(res).as('response')
-    Cypress.log({ name: 'SIGLA POST body', message: `${path} → HTTP ${res.status}` })
-  })
-})
+// ...existing code...
 
 // ── Assertivas de status ─────────────────────────────────────────────────────
 
@@ -77,11 +69,7 @@ Then('o status SIGLA deve ser {int} ou {int}', (s1, s2) => {
   })
 })
 
-Then('o status SIGLA deve ser {int} ou {int} ou {int}', (s1, s2, s3) => {
-  cy.get('@response').its('status').then((status) => {
-    expect([s1, s2, s3], `Status deve ser ${s1}, ${s2} ou ${s3}`).to.include(status)
-  })
-})
+// ...existing code...
 
 Then('o status SIGLA não deve ser {int}', (statusIndesejado) => {
   cy.get('@response').its('status').should('not.eq', statusIndesejado)
@@ -98,16 +86,7 @@ Then('a resposta SIGLA deve ser uma lista', () => {
   })
 })
 
-Then('a resposta SIGLA deve ser uma lista ou paginada', () => {
-  cy.get('@response').then((res) => {
-    const body = res.body
-    const isListOrPaginated =
-      Array.isArray(body) ||
-      (body && (Array.isArray(body.results) || typeof body.count !== 'undefined'))
-    expect(isListOrPaginated, 'Resposta deve ser lista ou paginada').to.be.true
-    Cypress.log({ name: 'Validação', message: 'Resposta é lista ou paginada' })
-  })
-})
+// ...existing code...
 
 Then('a resposta SIGLA deve ser um objeto', () => {
   cy.get('@response').then((res) => {
@@ -121,6 +100,21 @@ Then('a resposta SIGLA deve ser um objeto ou lista', () => {
     const body = res.body
     expect(typeof body === 'object' && body !== null, 'Resposta deve ser objeto ou lista').to.be.true
     Cypress.log({ name: 'Validação', message: `Tipo: ${Array.isArray(body) ? 'array' : 'object'}` })
+  })
+})
+
+Then('a resposta SIGLA deve conter {string}', (chave) => {
+  cy.get('@response').then((res) => {
+    const body = res.body
+    // Se a resposta é string (YAML), verifica se contém a chave como texto
+    // Se é objeto/JSON, verifica propriedade
+    if (typeof body === 'string') {
+      expect(body).to.include(chave)
+      Cypress.log({ name: 'Validação', message: `Resposta contém "${chave}"` })
+    } else if (typeof body === 'object') {
+      expect(JSON.stringify(body)).to.include(chave)
+      Cypress.log({ name: 'Validação', message: `Resposta contém "${chave}"` })
+    }
   })
 })
 

@@ -88,8 +88,42 @@ export const extracaoDadosFiltradoMock: IExtracaoDadosResponse = {
         },
       ],
     },
+    dres_concursos: {
+      "uuid-concurso-1": [
+        {
+          nome: "Diretoria Regional de Educação Butantã",
+          escolhas: 25,
+          vagas: 40,
+          codigo_cargo: 101,
+          cargo_descricao: "Professor",
+        },
+        {
+          nome: "Diretoria Regional de Educação Centro",
+          escolhas: 10,
+          vagas: 20,
+          codigo_cargo: 102,
+          cargo_descricao: "Coordenador",
+        },
+      ],
+    },
   },
   concurso: {
-    "2024": { "autorizacoes-publicadas": 8 },
+    "autorizacoes-publicadas": 8,
+    cargos: [
+      {
+        uuid: "cargo-1",
+        nome: "Professor",
+        codigo: 101,
+        autorizacoes: 5,
+        data_autorizacao: "2024-08-10",
+      },
+      {
+        uuid: "cargo-2",
+        nome: "Coordenador",
+        codigo: 102,
+        autorizacoes: 3,
+        data_autorizacao: "2024-09-15",
+      },
+    ],
   },
 };
