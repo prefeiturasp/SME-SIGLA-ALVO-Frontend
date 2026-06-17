@@ -115,6 +115,8 @@ const obterCredenciaisVisualizacao = () => ({
 })
 
 const realizarLogin = (rf, senha) => {
+  cy.clearCookies()
+  cy.clearLocalStorage()
   cy.visit('https://qa-sigla.sme.prefeitura.sp.gov.br/login', { timeout: 15000 })
   cy.get('input').filter('[type="text"], [type="number"]').first().clear().type(rf, { delay: 100 })
   cy.wait(500)

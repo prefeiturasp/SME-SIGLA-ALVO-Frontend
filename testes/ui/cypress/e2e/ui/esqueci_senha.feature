@@ -6,8 +6,8 @@ Funcionalidade: Recuperação de Senha no Sistema SIGLA
   Para poder acessar o sistema quando esquecer minha senha
 
   # ============================================================================
-  # BASE URL: https://hom-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS: RF válido para teste = 007007
+  # BASE URL : https://qa-sigla.sme.prefeitura.sp.gov.br
+  # CREDENCIAIS : definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
   # ============================================================================
 
   Contexto:
@@ -22,7 +22,7 @@ Funcionalidade: Recuperação de Senha no Sistema SIGLA
   Cenário: Fluxo esqueci a senha com RF válido
     Quando clico na opção "Esqueci minha senha"
     E valido que estou na página de recuperação de senha
-    E preencho o campo RF com "007007"
+    E preencho o campo RF do perfil administrador
     E clico no botão continuar
     E valido que estou na página de confirmação
     E valido a existência do texto de confirmação

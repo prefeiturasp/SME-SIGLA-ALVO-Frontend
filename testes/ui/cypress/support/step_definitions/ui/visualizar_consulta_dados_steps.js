@@ -113,7 +113,16 @@ Given('que estou no dashboard', () => {
 })
 
 When('navego até a opção {string}', (opcao) => {
+  const baseUrl = Cypress.env('SIGLA_UI_BASE_URL') || 'https://qa-sigla.sme.prefeitura.sp.gov.br'
   cy.wait(1000)
+  // Verifica se já está em sub-rota de processos; se sim, volta ao dashboard para
+  // evitar que o clique no menu colapse o submenu em vez de expandi-lo
+  cy.url().then((url) => {
+    if (/\/processos/.test(url)) {
+      cy.visit(baseUrl, { timeout: 15000 })
+      cy.wait(2000)
+    }
+  })
   consultaSelectors.menuProcessos().should('be.visible').click({ force: true })
   cy.wait(1000)
 })
