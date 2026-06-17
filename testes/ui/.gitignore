@@ -4,7 +4,6 @@ node_modules/
 .yarn/
 .pnp.*
 .yarn-integrity
-package-lock.json
 
 # Cypress - artefatos gerados
 cypress/videos/
