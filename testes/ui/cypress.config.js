@@ -101,6 +101,23 @@ module.exports = defineConfig({
           console.table(message)
           return null
         },
+        // Task para leitura segura de arquivos (não falha se não existir)
+        lerArquivoSeguro(caminho) {
+          try {
+            const fs = require('fs')
+            const path = require('path')
+            const caminhoAbsoluto = path.isAbsolute(caminho)
+              ? caminho
+              : path.join(process.cwd(), caminho)
+            if (fs.existsSync(caminhoAbsoluto)) {
+              return fs.readFileSync(caminhoAbsoluto, 'utf8')
+            }
+            return null
+          } catch (e) {
+            console.error('Erro ao ler arquivo:', e.message)
+            return null
+          }
+        }
       })
 
       return config

@@ -75,6 +75,11 @@ When('preencho o campo RF com {string}', (rf) => {
   esqueciSenhaSelectors.campoRF().clear({ force: true }).type(rf, { force: true, delay: 50 })
 })
 
+When('preencho o campo RF do perfil administrador', () => {
+  const rf = Cypress.env('SIGLA_LOGIN_RF')
+  esqueciSenhaSelectors.campoRF().clear({ force: true }).type(rf, { force: true, delay: 50 })
+})
+
 When('valida a existencia do texto de aviso importante', () => {
   cy.get('body', { timeout: 3000 }).then(($body) => {
     const temTextoImportante = !!$body.text().match(/importante|senha.*padr[ãa]o|alterar.*senha/i)

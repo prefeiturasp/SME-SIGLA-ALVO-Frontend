@@ -9,7 +9,7 @@ import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
 const importacaoPack = {
 
   titulos: {
-    principal: () => cy.contains(/Importa[çc][ãa]o de Dados/i, { timeout: 10000 })
+    principal: () => cy.contains(/Importação de Dados/i, { timeout: 10000 })
   },
 
   abas: {
@@ -19,17 +19,15 @@ const importacaoPack = {
   botoes: {
     selecionar: () => cy.get('.ant-tabs-tabpane-active, .ant-tabs-tabpane:not(.ant-tabs-tabpane-hidden)').first().contains('button', /Selecionar/i, { timeout: 10000 }),
     importar: () => cy.get('.ant-tabs-tabpane-active, .ant-tabs-tabpane:not(.ant-tabs-tabpane-hidden)').first().contains('button', /Importar/i, { timeout: 10000 }),
-    historico: () => cy.get('.ant-tabs-tabpane-active, .ant-tabs-tabpane:not(.ant-tabs-tabpane-hidden)').first().contains('button', /Hist[oó]rico/i, { timeout: 10000 }),
+    historico: () => cy.get('.ant-tabs-tabpane-active, .ant-tabs-tabpane:not(.ant-tabs-tabpane-hidden)').first().contains('button', /Histórico/i, { timeout: 10000 }),
     voltar: () => cy.contains('button, a', /Voltar/i, { timeout: 10000 })
   },
 
-  // Mensagem de permissão negada
   mensagemPermissao: () =>
-    cy.contains(/Voc[êe] n[ãa]o possui permiss[ãa]o para essa a[çc][ãa]o/i, { timeout: 8000 }),
+    cy.contains(/Você não possui permissão para essa ação/i, { timeout: 8000 }),
 
-  // Tabela de histórico
   historicoPack: {
-    titulo: () => cy.contains(/[UÚ]ltimas importa[çc][õo]es/i, { timeout: 10000 }),
+    titulo: () => cy.contains(/Últimas importações/i, { timeout: 10000 }),
     tabela: () => cy.get('table', { timeout: 10000 }),
     coluna: (nome) => cy.contains('th', new RegExp(nome, 'i'), { timeout: 10000 })
   }
@@ -55,8 +53,8 @@ const clicarEValidarPermissao = (botaoFn, mensagem) => {
         if (tooltipVisivel) {
           cy.get('.ant-tooltip:not(.ant-tooltip-hidden) .ant-tooltip-inner').then(($inner) => {
             const tooltipTexto = $inner.text()
-            if (tooltipTexto.match(/permiss[ãa]o/i)) {
-              expect(tooltipTexto).to.match(/permiss[ãa]o/i)
+            if (tooltipTexto.match(/permissão/i)) {
+              expect(tooltipTexto).to.match(/permissão/i)
             }
           })
         }
@@ -67,9 +65,9 @@ const clicarEValidarPermissao = (botaoFn, mensagem) => {
       cy.wrap($btn).click({ force: true })
       cy.wait(1000)
       cy.get('body').then(($body) => {
-        const temMensagem = $body.text().match(/permiss[ãa]o/i)
+        const temMensagem = $body.text().match(/permissão/i)
         if (temMensagem) {
-          cy.wrap($body).contains(/permiss[ãa]o/i).should('be.visible')
+          cy.wrap($body).contains(/permissão/i).should('be.visible')
         }
       })
     }
@@ -80,7 +78,7 @@ const clicarEValidarPermissao = (botaoFn, mensagem) => {
 // STEPS — TELA PRINCIPAL E ABAS
 // =====================================================
 
-When('clico na aba {string} da importa\u00e7\u00e3o de dados', (nomeAba) => {
+When('clico na aba {string} da importação de dados', (nomeAba) => {
   cy.url().then((url) => {
     if (!url.match(/\/importacao-dados\/?([?#].*)?$/)) {
       cy.visit('/processos/importacao-dados')
@@ -101,13 +99,12 @@ Then('valido a existência das abas de importação de dados:', (dataTable) => {
   })
 })
 
-Then('o sistema exibe o texto de instru\u00e7\u00e3o {string}', (texto) => {
+Then('o sistema exibe o texto de instrução {string}', (texto) => {
   cy.wait(500)
   cy.get('body').should('contain.text', texto.slice(0, 30))
-
 })
 
-Then('o sistema exibe a descri\u00e7\u00e3o da aba vagas escolas', () => {
+Then('o sistema exibe a descrição da aba vagas escolas', () => {
   cy.wait(300)
   cy.get('body').should('contain.text', 'Nesta aba')
 })
@@ -125,14 +122,14 @@ Then('o sistema exibe o campo {string} na aba de importação', (campo) => {
 // STEPS — BOTÕES COM VALIDAÇÃO DE PERMISSÃO
 // =====================================================
 
-When('ao clicar no bot\u00e3o {string} da importa\u00e7\u00e3o devo ver {string}', (botao, mensagem) => {
+When('ao clicar no botão {string} da importação devo ver {string}', (botao, mensagem) => {
   cy.wait(300)
 
   if (botao.match(/Selecionar/i)) {
     clicarEValidarPermissao(importacaoPack.botoes.selecionar, mensagem)
   } else if (botao.match(/Importar/i)) {
     clicarEValidarPermissao(importacaoPack.botoes.importar, mensagem)
-  } else if (botao.match(/Hist[oó]rico/i)) {
+  } else if (botao.match(/Histórico/i)) {
     clicarEValidarPermissao(importacaoPack.botoes.historico, mensagem)
   }
 })
@@ -159,7 +156,7 @@ When('clico no botão {string} da aba lotes sigpec', () => {
   cy.wait(2000)
 })
 
-Then('o sistema exibe o t\u00edtulo de hist\u00f3rico {string}', (titulo) => {
+Then('o sistema exibe o título de histórico {string}', (titulo) => {
   cy.wait(1000)
   cy.get('body').then(($body) => {
     const partes = titulo.split(' - ')
@@ -172,20 +169,18 @@ Then('o sistema exibe o t\u00edtulo de hist\u00f3rico {string}', (titulo) => {
   })
 })
 
-Then('valido o texto {string} no hist\u00f3rico de importa\u00e7\u00e3o', (texto) => {
+Then('valido o texto {string} no histórico de importação', (texto) => {
   cy.wait(300)
   cy.contains(new RegExp(texto.replace(/[ÚU]/g, '[ÚU]').replace(/[çc]/g, '[çc]').replace(/[õo]/g, '[õo]'), 'i'))
     .should('be.visible')
-
 })
 
-Then('valido a tabela de hist\u00f3rico de importa\u00e7\u00e3o com as colunas:', (dataTable) => {
+Then('valido a tabela de histórico de importação com as colunas:', (dataTable) => {
   const colunas = dataTable.raw().flat().filter(Boolean)
   cy.wait(500)
   importacaoPack.historicoPack.tabela().should('be.visible')
   colunas.forEach((coluna) => {
     cy.contains('th', new RegExp(coluna.trim(), 'i')).should('be.visible')
-
   })
 })
 

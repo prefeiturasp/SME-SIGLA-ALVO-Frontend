@@ -50,6 +50,17 @@ cypress/fixtures/**/password*
 cypress/e2e/api/api_usuario_sigla.feature
 cypress/e2e/api/api_relatorios_sigla.feature
 
+# Documentacao auxiliar - nao necessaria para rodar a automacao
+README_EXECUTIVO.md
+ARQUITETURA_API.md
+CHECKLIST_JENKINS.md
+JENKINS_SETUP.md
+ESTIMATIVA_HORAS_TESTES.md
+
+# Pipelines CI/CD - gerenciados separadamente do repositorio de testes
+Jenkinsfile
+Jenkinsfile_qa
+
 # Cobertura de codigo
 coverage/
 .nyc_output/
