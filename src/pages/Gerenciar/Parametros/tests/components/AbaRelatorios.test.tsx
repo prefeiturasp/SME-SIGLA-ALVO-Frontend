@@ -41,6 +41,25 @@ jest.mock('@mui/icons-material/Image', () => {
   };
 });
 
+// Stub do modal de recorte: expoe se esta aberto e um botao que dispara
+// onConfirmar com um File recortado.
+const mockCroppedFile = new File(['cropped'], 'logo.png', { type: 'image/png' });
+jest.mock('../../../../../components/CropImageModal', () => {
+  return function MockCropImageModal({ open, onConfirmar, onClose }: any) {
+    if (!open) return null;
+    return (
+      <div data-testid="crop-modal">
+        <button data-testid="crop-confirmar" onClick={() => onConfirmar(mockCroppedFile)}>
+          confirmar recorte
+        </button>
+        <button data-testid="crop-cancelar" onClick={onClose}>
+          cancelar recorte
+        </button>
+      </div>
+    );
+  };
+});
+
 jest.mock('antd', () => {
   const actual = jest.requireActual('antd');
   const UploadComponent = ({ children, beforeUpload, accept }: any) => {
@@ -80,6 +99,17 @@ const mockNotification = {
 
 global.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
 
+// FileReader que dispara onload imediatamente com um dataURL fixo.
+class MockFileReader {
+  result: string | null = null;
+  onload: (() => void) | null = null;
+  readAsDataURL() {
+    this.result = 'data:image/png;base64,mock';
+    this.onload?.();
+  }
+}
+(global as any).FileReader = MockFileReader;
+
 const createWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -90,12 +120,6 @@ const createWrapper = () => {
     </QueryClientProvider>
   );
 };
-
-jest.spyOn(App, 'useApp').mockReturnValue({
-  message: {} as any,
-  notification: mockNotification as any,
-  modal: {} as any,
-});
 
 const createTestFile = (name = 'test.png', size = 1024 * 1024) => {
   const file = new File(['test'], name, { type: 'image/png' });
@@ -118,11 +142,26 @@ describe('AbaRelatorios', () => {
     return container;
   };
 
+  // Seleciona um arquivo (abre o modal de recorte) e confirma o recorte.
+  const selecionarERecortar = async (file = createTestFile()) => {
+    fireEvent.change(getFileInput(), { target: { files: [file] } });
+    await waitFor(() => expect(screen.getByTestId('crop-modal')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('crop-confirmar'));
+    await waitFor(() => expect(screen.queryByTestId('crop-modal')).not.toBeInTheDocument());
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     Object.values(mockNotification).forEach(mock => mock.mockClear());
     (global.URL.createObjectURL as jest.Mock).mockClear();
     jest.spyOn(console, 'log').mockImplementation();
+    // Re-estabelece o spy (restaurado em afterEach) para que o componente
+    // sempre receba o mockNotification.
+    jest.spyOn(App, 'useApp').mockReturnValue({
+      message: {} as any,
+      notification: mockNotification as any,
+      modal: {} as any,
+    });
   });
 
   afterEach(() => {
@@ -210,26 +249,58 @@ describe('AbaRelatorios', () => {
   });
 
   describe('Upload de logo', () => {
-    it('deve permitir selecionar arquivo válido', async () => {
-      const container = await setupComponent();
-      const file = createTestFile();
+    it('deve abrir o modal de recorte ao selecionar arquivo válido', async () => {
+      await setupComponent();
 
-      fireEvent.change(getFileInput(), { target: { files: [file] } });
+      fireEvent.change(getFileInput(), { target: { files: [createTestFile()] } });
+
+      await waitFor(() => expect(screen.getByTestId('crop-modal')).toBeInTheDocument());
+    });
+
+    it('deve exibir a logo recortada após confirmar o recorte', async () => {
+      const container = await setupComponent();
+
+      await selecionarERecortar();
 
       await waitFor(() => {
-        expect(global.URL.createObjectURL).toHaveBeenCalledWith(file);
+        expect(global.URL.createObjectURL).toHaveBeenCalledWith(mockCroppedFile);
         expect(getLogoImg(container)).toBeInTheDocument();
       });
     });
 
-    it('deve priorizar arquivo selecionado sobre logo do backend', async () => {
+    it('deve rejeitar arquivo maior que 5MB sem abrir o modal', async () => {
+      await setupComponent();
+      const grande = createTestFile('grande.png', 6 * 1024 * 1024);
+
+      fireEvent.change(getFileInput(), { target: { files: [grande] } });
+
+      expect(screen.queryByTestId('crop-modal')).not.toBeInTheDocument();
+      expect(mockNotification.error).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'O arquivo deve ter um tamanho inferior a 5MB.' }),
+      );
+    });
+
+    it('deve fechar o modal sem alterar a logo ao cancelar o recorte', async () => {
       const container = await setupComponent([{
         uuid: 'test-uuid',
         logo: 'https://example.com/backend-logo.png',
       }]);
-      const file = createTestFile();
 
-      fireEvent.change(getFileInput(), { target: { files: [file] } });
+      fireEvent.change(getFileInput(), { target: { files: [createTestFile()] } });
+      await waitFor(() => expect(screen.getByTestId('crop-modal')).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId('crop-cancelar'));
+
+      await waitFor(() => expect(screen.queryByTestId('crop-modal')).not.toBeInTheDocument());
+      expect(getLogoImg(container)).toHaveAttribute('src', 'https://example.com/backend-logo.png');
+    });
+
+    it('deve priorizar arquivo recortado sobre logo do backend', async () => {
+      const container = await setupComponent([{
+        uuid: 'test-uuid',
+        logo: 'https://example.com/backend-logo.png',
+      }]);
+
+      await selecionarERecortar();
 
       await waitFor(() => {
         const img = getLogoImg(container);
@@ -255,11 +326,9 @@ describe('AbaRelatorios', () => {
       {
         description: 'apenas logo é alterada',
         setup: async () => {
-          const file = createTestFile();
-          fireEvent.change(getFileInput(), { target: { files: [file] } });
-          await waitFor(() => expect(global.URL.createObjectURL).toHaveBeenCalled());
+          await selecionarERecortar();
           return { formDataCheck: (formData: FormData) => {
-            expect(formData.get('logo')).toBe(file);
+            expect(formData.get('logo')).toBe(mockCroppedFile);
             expect(formData.get('cabecalho')).toBeNull();
           }};
         },
@@ -268,11 +337,10 @@ describe('AbaRelatorios', () => {
         description: 'cabeçalho e logo são alterados',
         setup: async () => {
           fireEvent.change(getTextarea(), { target: { value: '<p>Novo cabeçalho</p>' } });
-          const file = createTestFile();
-          fireEvent.change(getFileInput(), { target: { files: [file] } });
+          await selecionarERecortar();
           return { formDataCheck: (formData: FormData) => {
             expect(formData.get('cabecalho')).toBe('<p>Novo cabeçalho</p>');
-            expect(formData.get('logo')).toBe(file);
+            expect(formData.get('logo')).toBe(mockCroppedFile);
           }};
         },
       },
@@ -309,8 +377,7 @@ describe('AbaRelatorios', () => {
       mockPatchParametrizacaoRelatorios.mockResolvedValue(undefined);
       const container = await setupComponent(defaultData);
 
-      const file = createTestFile();
-      fireEvent.change(getFileInput(), { target: { files: [file] } });
+      await selecionarERecortar();
       fireEvent.click(screen.getByText('Salvar'));
 
       await waitFor(() => {
