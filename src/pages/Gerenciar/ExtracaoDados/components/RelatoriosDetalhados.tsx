@@ -102,20 +102,6 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
         onCell: () => ({ className: "col-numerica-valor" }),
         render: (value: number) => formatNumber(value),
       },
-      {
-        title: "Autorizações",
-        dataIndex: "autorizacoes",
-        key: "autorizacoes",
-        width: 140,
-        onCell: () => ({ className: "col-numerica-valor" }),
-        render: (value: number) => formatNumber(value),
-      },
-      {
-        title: "Última atualização",
-        dataIndex: "data_autorizacao",
-        key: "data_autorizacao",
-        width: 180,
-      },
     ],
     []
   );

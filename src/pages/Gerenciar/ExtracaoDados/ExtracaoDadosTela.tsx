@@ -27,6 +27,7 @@ import { useGetExtracaoDadosTodos } from "./hooks/useGetExtracaoDadosTodos";
 import GraficoBarrasDre from "./components/GraficoBarrasDre";
 import TabelaVagasDre from "./components/TabelaVagasDre";
 import RelatoriosDetalhados from "./components/RelatoriosDetalhados";
+import AutorizacoesPublicadas from "./components/AutorizacoesPublicadas";
 import ConteudoExtracaoPdf from "./components/ConteudoExtracaoPdf";
 import { useExportarPdf } from "./hooks/useExportarPdf";
 import {
@@ -42,6 +43,7 @@ import {
   mapDresTodosParaTabela,
 } from "./utils/mapGraficosDre";
 import {
+  mapCargosParaAutorizacoesPublicadas,
   mapDresConcursosParaRelatoriosDetalhados,
   mapDresParaRelatoriosDetalhados,
 } from "./utils/mapRelatoriosDetalhados";
@@ -132,6 +134,10 @@ const ExtracaoDadosTela: React.FC = () => {
     () => mapDresConcursosParaRelatoriosDetalhados(extracaoDadosTodos, concursosOptions),
     [extracaoDadosTodos, concursosOptions]
   );
+  const autorizacoesPublicadasTodos = useMemo(
+    () => mapCargosParaAutorizacoesPublicadas(extracaoDadosTodos?.concurso?.cargos),
+    [extracaoDadosTodos]
+  );
 
   // Dados exibidos na tela: filtrados quando ha filtro aplicado, senao usam a
   // variante consolidada ja calculada acima.
@@ -207,6 +213,14 @@ const ExtracaoDadosTela: React.FC = () => {
 
     return partes.length > 0 ? partes.join(" | ") : undefined;
   }, [concursoUuid, ano, concursosOptions]);
+
+  const autorizacoesPublicadas = useMemo(
+    () =>
+      filtrosAplicados
+        ? mapCargosParaAutorizacoesPublicadas(extracaoDados?.concurso?.cargos)
+        : autorizacoesPublicadasTodos,
+    [extracaoDados, autorizacoesPublicadasTodos, filtrosAplicados]
+  );
 
   const canFilter = Boolean(concursoUuid && ano);
 
@@ -437,6 +451,8 @@ const ExtracaoDadosTela: React.FC = () => {
           <TabelaVagasDre data={tabelaVagasDre} />
 
           <RelatoriosDetalhados data={relatoriosDetalhados} />
+
+          <AutorizacoesPublicadas data={autorizacoesPublicadas} />
         </TabContentContainer>
       </Spin>
 
@@ -459,6 +475,7 @@ const ExtracaoDadosTela: React.FC = () => {
           graficoVagasDre={graficoVagasDreTodos}
           tabelaVagasDre={tabelaVagasDreTodos}
           relatoriosDetalhados={relatoriosDetalhadosTodos}
+          autorizacoesPublicadas={autorizacoesPublicadasTodos}
           dataGeracao={dataGeracao}
           filtroAplicado={filtroAplicado}
         />

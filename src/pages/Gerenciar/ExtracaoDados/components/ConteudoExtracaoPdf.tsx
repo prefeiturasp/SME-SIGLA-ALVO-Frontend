@@ -14,11 +14,15 @@ import {
 } from "../../../../components/EstilosCompartilhados";
 import type { IExtracaoDadosIndicadores } from "../../../../services/resources/relatorios/IExtracaoDados";
 import type { DreGraficoItem, TabelaVagasDreItem } from "../utils/mapGraficosDre";
-import type { RelatorioDetalhadoItem } from "../utils/mapRelatoriosDetalhados";
+import type {
+  AutorizacaoPublicadaItem,
+  RelatorioDetalhadoItem,
+} from "../utils/mapRelatoriosDetalhados";
 import IndicadorCard from "./IndicadorCard";
 import GraficoBarrasDre from "./GraficoBarrasDre";
 import TabelaVagasDre from "./TabelaVagasDre";
 import RelatoriosDetalhados from "./RelatoriosDetalhados";
+import AutorizacoesPublicadas from "./AutorizacoesPublicadas";
 import { IndicatorsCard, PdfHeader } from "../styles";
 
 export type ConteudoExtracaoPdfProps = {
@@ -27,6 +31,7 @@ export type ConteudoExtracaoPdfProps = {
   graficoVagasDre: DreGraficoItem[];
   tabelaVagasDre: TabelaVagasDreItem[];
   relatoriosDetalhados: RelatorioDetalhadoItem[];
+  autorizacoesPublicadas: AutorizacaoPublicadaItem[];
   dataGeracao: string;
   filtroAplicado?: string;
 };
@@ -43,6 +48,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = ({
   graficoVagasDre,
   tabelaVagasDre,
   relatoriosDetalhados,
+  autorizacoesPublicadas,
   dataGeracao,
   filtroAplicado,
 }) => (
@@ -164,6 +170,10 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = ({
 
     <div data-pdf-section>
       <RelatoriosDetalhados data={relatoriosDetalhados} mostrarFiltros={false} />
+    </div>
+
+    <div data-pdf-section>
+      <AutorizacoesPublicadas data={autorizacoesPublicadas} />
     </div>
   </div>
 );
