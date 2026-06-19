@@ -118,6 +118,26 @@ export const RelatoriosDetalhadosTable = styled(StyledTable)`
   }
 ` as typeof StyledTable;
 
+export const PdfHeader = styled.div`
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #d9d9d9;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #032b68;
+  }
+
+  span {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #595959;
+  }
+`;
+
 export const IndicatorCard = styled(Card)`
   height: 100%;
   border-radius: 0.5rem;
