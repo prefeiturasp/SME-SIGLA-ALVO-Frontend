@@ -1,6 +1,65 @@
 import styled from "styled-components";
 import { Card } from "antd";
-import { StyledTable } from "../../../components/EstilosCompartilhados";
+import { StyledSelect, StyledTable } from "../../../components/EstilosCompartilhados";
+
+export const ExtracaoFilterSelect = styled(StyledSelect)`
+  width: 100%;
+  height: 2.5rem;
+
+  .ant-select-selector {
+    height: 2.5rem !important;
+    min-height: 2.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 0.75rem !important;
+    border-radius: 0.375rem;
+  }
+
+  .ant-select-selection-item,
+  .ant-select-selection-placeholder {
+    display: flex;
+    align-items: center;
+  }
+
+  &.ant-select-multiple {
+    .ant-select-selector {
+      padding-block: 0 !important;
+    }
+
+    .ant-select-selection-wrap {
+      align-self: center !important;
+    }
+
+    .ant-select-selection-wrap::after {
+      margin-block: 0 !important;
+    }
+
+    .ant-select-selection-overflow {
+      align-items: center;
+    }
+
+    .ant-select-selection-overflow-item-suffix {
+      align-self: center;
+      margin-block: 0 !important;
+      min-height: unset !important;
+    }
+
+    .ant-select-selection-item {
+      margin-block: 0 !important;
+    }
+
+    .ant-select-selection-placeholder {
+      top: 50%;
+      transform: translateY(-50%);
+      inset-inline-start: 0.75rem !important;
+      line-height: 1.5;
+    }
+
+    .ant-select-selection-search-input {
+      height: 2.5rem !important;
+    }
+  }
+`;
 
 export const FilterCard = styled(Card)`
   margin-bottom: 1.5rem;
@@ -27,6 +86,7 @@ export const VagasDreTable = styled(StyledTable)`
 
   .col-dre {
     padding-right: 1rem !important;
+    vertical-align: middle;
   }
 
   .col-escolhas,
@@ -72,6 +132,22 @@ export const PercentualCell = styled.div`
   }
 `;
 
+export const TabelaCelulaDupla = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  line-height: 1.4;
+`;
+
+export const TabelaPercentualDuplo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+`;
+
 export const ChartCard = styled(Card)`
   margin-bottom: 1.5rem;
   border-radius: 0.5rem;
@@ -113,8 +189,9 @@ export const RelatoriosDetalhadosTable = styled(StyledTable)`
   margin-top: 1.5rem;
 
   .col-numerica-valor {
-    text-align: left !important;
-    padding-left: 1.5rem !important;
+    text-align: center !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
   }
 ` as typeof StyledTable;
 
@@ -189,4 +266,71 @@ export const IndicatorBreakdown = styled.div`
   span {
     font-weight: 700;
   }
+`;
+
+export const IndicatorCompareRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+`;
+
+export const IndicatorYearBox = styled.div`
+  position: relative;
+  background-color: #e7eff6;
+  border-radius: 0.375rem;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  min-height: 4.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+`;
+
+export const IndicatorYearLabel = styled.span`
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0f59c8;
+`;
+
+export const IndicatorCompareValue = styled.span`
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1c1d22;
+  line-height: 1.2;
+`;
+
+export const IndicatorVariationPill = styled.span<{ $positivo: boolean }>`
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: ${({ $positivo }) => ($positivo ? "#1e7e34" : "#c41e3a")};
+  background-color: ${({ $positivo }) => ($positivo ? "#e6f4ea" : "#fce8e8")};
+`;
+
+export const IndicatorCompareBreakdown = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.75);
+`;
+
+export const IndicatorCompareBreakdownColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+`;
+
+export const IndicatorCompareBreakdownLabel = styled.span`
+  font-weight: 700;
+`;
+
+export const IndicatorCompareBreakdownValue = styled.span`
+  line-height: 1.3;
 `;

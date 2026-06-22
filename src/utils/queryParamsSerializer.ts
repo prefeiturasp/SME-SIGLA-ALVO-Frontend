@@ -14,9 +14,16 @@ function queryCaptalization(key: string, param: any) {
 function queryByEntries(key: string, param: any) {
   if (param === null) return [];
 
-  return !Array.isArray(param)
-    ? [`${key}=${queryCaptalization(key, param)}`]
-    : param.map((p) => `${key}=${queryCaptalization(key, p)}`);
+  if (!Array.isArray(param)) {
+    return [`${key}=${queryCaptalization(key, param)}`];
+  }
+
+  if (!param.length) {
+    return [];
+  }
+
+  const value = param.map((p) => queryCaptalization(key, p)).join(",");
+  return [`${key}=${value}`];
 }
 
 export default function queryParamsSerializer<T extends {}>(params: T) {
