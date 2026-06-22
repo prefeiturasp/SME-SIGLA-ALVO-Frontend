@@ -15,8 +15,6 @@ const relatoriosMock: RelatorioDetalhadoItem[] = [
     dreOriginal: "Diretoria Regional de Educação Butantã",
     escolhas: 10,
     naoEscolhas: 5,
-    autorizacoes: 3,
-    data_autorizacao: "15/06/2025",
   },
   {
     key: "2",
@@ -28,8 +26,6 @@ const relatoriosMock: RelatorioDetalhadoItem[] = [
     dreOriginal: "Diretoria Regional de Educação Centro",
     escolhas: 8,
     naoEscolhas: 2,
-    autorizacoes: 1,
-    data_autorizacao: "20/07/2025",
   },
 ];
 
@@ -42,6 +38,15 @@ describe("RelatoriosDetalhados", () => {
     expect(screen.getByRole("cell", { name: "Coordenador" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /filtrar/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /limpar filtros/i })).toBeInTheDocument();
+  });
+
+  it("não exibe mais as colunas de autorização", () => {
+    render(<RelatoriosDetalhados data={relatoriosMock} />);
+
+    expect(screen.queryByRole("columnheader", { name: "Autorizações" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("columnheader", { name: "Última atualização" })
+    ).not.toBeInTheDocument();
   });
 
   it("mantém todos os registros ao limpar filtros", async () => {

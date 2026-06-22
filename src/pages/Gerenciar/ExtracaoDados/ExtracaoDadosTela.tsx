@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { Button, Col, Row, Select, Spin, Typography } from "antd";
 import { BarChartOutlined } from "@ant-design/icons";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -28,6 +28,9 @@ import GraficoBarrasDre from "./components/GraficoBarrasDre";
 import GraficoBarrasDreComparativo from "./components/GraficoBarrasDreComparativo";
 import TabelaVagasDre from "./components/TabelaVagasDre";
 import RelatoriosDetalhados from "./components/RelatoriosDetalhados";
+import AutorizacoesPublicadas from "./components/AutorizacoesPublicadas";
+import ConteudoExtracaoPdf from "./components/ConteudoExtracaoPdf";
+import { useExportarPdf } from "./hooks/useExportarPdf";
 import {
   mapExtracaoDadosToIndicadores,
   mapExtracaoDadosTodosToIndicadores,
@@ -45,6 +48,7 @@ import {
   mapDresTodosParaTabela,
 } from "./utils/mapGraficosDre";
 import {
+  mapCargosParaAutorizacoesPublicadas,
   mapDresConcursosParaRelatoriosDetalhados,
   mapDresParaRelatoriosDetalhados,
 } from "./utils/mapRelatoriosDetalhados";
@@ -112,12 +116,42 @@ const ExtracaoDadosTela: React.FC = () => {
       .map((year) => ({ value: year, label: year }));
   }, [processosConvocacaoData]);
 
+  // Variantes consolidadas (todos os concursos). Servem de base tanto para a
+  // tela (quando nao ha filtro aplicado) quanto para o PDF, que e sempre
+  // consolidado independentemente do filtro.
+  const indicadoresTodos = useMemo(
+    () => mapExtracaoDadosTodosToIndicadores(extracaoDadosTodos),
+    [extracaoDadosTodos]
+  );
+  const graficoEscolhasDreTodos = useMemo(
+    () => mapDresTodosParaGraficoEscolhas(extracaoDadosTodos),
+    [extracaoDadosTodos]
+  );
+  const graficoVagasDreTodos = useMemo(
+    () => mapDresTodosParaGraficoVagas(extracaoDadosTodos),
+    [extracaoDadosTodos]
+  );
+  const tabelaVagasDreTodos = useMemo(
+    () => mapDresTodosParaTabela(extracaoDadosTodos),
+    [extracaoDadosTodos]
+  );
+  const relatoriosDetalhadosTodos = useMemo(
+    () => mapDresConcursosParaRelatoriosDetalhados(extracaoDadosTodos, concursosOptions),
+    [extracaoDadosTodos, concursosOptions]
+  );
+  const autorizacoesPublicadasTodos = useMemo(
+    () => mapCargosParaAutorizacoesPublicadas(extracaoDadosTodos?.concurso?.cargos),
+    [extracaoDadosTodos]
+  );
+
+  // Dados exibidos na tela: filtrados quando ha filtro aplicado, senao usam a
+  // variante consolidada ja calculada acima.
   const indicadores = useMemo(
     () =>
       filtrosAplicados
         ? mapExtracaoDadosToIndicadores(extracaoDados, filtrosAplicados.anos)
-        : mapExtracaoDadosTodosToIndicadores(extracaoDadosTodos),
-    [extracaoDados, extracaoDadosTodos, filtrosAplicados]
+        : indicadoresTodos,
+    [extracaoDados, indicadoresTodos, filtrosAplicados]
   );
 
   const indicadoresComparativo = useMemo(
@@ -135,16 +169,16 @@ const ExtracaoDadosTela: React.FC = () => {
     () =>
       filtrosAplicados
         ? mapDresParaGraficoEscolhas(extracaoDados, filtrosAplicados.anos)
-        : mapDresTodosParaGraficoEscolhas(extracaoDadosTodos),
-    [extracaoDados, extracaoDadosTodos, filtrosAplicados]
+        : graficoEscolhasDreTodos,
+    [extracaoDados, graficoEscolhasDreTodos, filtrosAplicados]
   );
 
   const graficoVagasDre = useMemo(
     () =>
       filtrosAplicados
         ? mapDresParaGraficoVagas(extracaoDados, filtrosAplicados.anos)
-        : mapDresTodosParaGraficoVagas(extracaoDadosTodos),
-    [extracaoDados, extracaoDadosTodos, filtrosAplicados]
+        : graficoVagasDreTodos,
+    [extracaoDados, graficoVagasDreTodos, filtrosAplicados]
   );
 
   const dresComparativo = useMemo(
@@ -169,8 +203,8 @@ const ExtracaoDadosTela: React.FC = () => {
     () =>
       filtrosAplicados
         ? mapDresParaTabela(extracaoDados, filtrosAplicados.anos)
-        : mapDresTodosParaTabela(extracaoDadosTodos),
-    [extracaoDados, extracaoDadosTodos, filtrosAplicados]
+        : tabelaVagasDreTodos,
+    [extracaoDados, tabelaVagasDreTodos, filtrosAplicados]
   );
 
   const tabelaVagasDreComparativo = useMemo(
@@ -187,8 +221,45 @@ const ExtracaoDadosTela: React.FC = () => {
             filtrosAplicados.concurso_uuid,
             concursosOptions
           )
-        : mapDresConcursosParaRelatoriosDetalhados(extracaoDadosTodos, concursosOptions),
-    [extracaoDados, extracaoDadosTodos, filtrosAplicados, concursosOptions]
+        : relatoriosDetalhadosTodos,
+    [extracaoDados, relatoriosDetalhadosTodos, filtrosAplicados, concursosOptions]
+  );
+
+  const pdfRef = useRef<HTMLDivElement>(null);
+  const { exportarPdf, isExporting } = useExportarPdf();
+
+  const dataGeracao = useMemo(
+    () => new Date().toLocaleDateString("pt-BR"),
+    []
+  );
+
+  // Descricao do filtro selecionado na tela, exibida no cabecalho do PDF.
+  // Os dados do PDF permanecem consolidados; isto e apenas informativo.
+  const filtroAplicado = useMemo(() => {
+    const partes: string[] = [];
+
+    if (concursoUuid) {
+      const concursoSelecionado = concursosOptions.find(
+        (concurso: { value: string; label: string }) =>
+          concurso.value === concursoUuid
+      );
+      partes.push(`Concurso: ${concursoSelecionado?.label ?? concursoUuid}`);
+    }
+
+    if (anos.length > 0) {
+      const anosOrdenados = [...anos].sort((a, b) => a.localeCompare(b));
+      partes.push(`Ano: ${anosOrdenados.join(", ")}`);
+    }
+
+    return partes.length > 0 ? partes.join(" | ") : undefined;
+  }, [concursoUuid, anos, concursosOptions]);
+
+  const autorizacoesPublicadas = useMemo(
+    () =>
+      filtrosAplicados
+        ? mapCargosParaAutorizacoesPublicadas(extracaoDados?.concurso?.cargos)
+        : autorizacoesPublicadasTodos,
+    [extracaoDados, autorizacoesPublicadasTodos, filtrosAplicados]
   );
 
   const isComparativo = Boolean(
@@ -251,7 +322,13 @@ const ExtracaoDadosTela: React.FC = () => {
       breadcrumbItems={breadcrumbItems}
       title="Extração de dados"
       buttons={
-        <Button type="primary" size="large" icon={<BarChartOutlined />}>
+        <Button
+          type="primary"
+          size="large"
+          icon={<BarChartOutlined />}
+          loading={isExporting}
+          onClick={() => exportarPdf(pdfRef)}
+        >
           Gerar relatório
         </Button>
       }
@@ -560,8 +637,35 @@ const ExtracaoDadosTela: React.FC = () => {
             data={relatoriosDetalhados}
             anos={filtrosAplicados?.anos}
           />
+
+          <AutorizacoesPublicadas data={autorizacoesPublicadas} />
         </TabContentContainer>
       </Spin>
+
+      {/* Versao consolidada renderizada fora da viewport, capturada para o PDF. */}
+      <div
+        ref={pdfRef}
+        aria-hidden
+        style={{
+          position: "fixed",
+          left: "-10000px",
+          top: 0,
+          width: "1123px",
+          backgroundColor: "#ffffff",
+          padding: "24px",
+        }}
+      >
+        <ConteudoExtracaoPdf
+          indicadores={indicadoresTodos}
+          graficoEscolhasDre={graficoEscolhasDreTodos}
+          graficoVagasDre={graficoVagasDreTodos}
+          tabelaVagasDre={tabelaVagasDreTodos}
+          relatoriosDetalhados={relatoriosDetalhadosTodos}
+          autorizacoesPublicadas={autorizacoesPublicadasTodos}
+          dataGeracao={dataGeracao}
+          filtroAplicado={filtroAplicado}
+        />
+      </div>
     </BaseTela>
   );
 };

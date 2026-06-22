@@ -94,7 +94,8 @@ describe("ExtracaoDadosTela", () => {
     expect(screen.getAllByText("1.000").length).toBeGreaterThan(0);
     expect(screen.getByTestId("grafico-Escolhas por DRE")).toBeInTheDocument();
     expect(screen.getByText("Relatórios detalhados")).toBeInTheDocument();
-    expect(screen.getByRole("cell", { name: "Professor" })).toBeInTheDocument();
+    expect(screen.getByText("Autorizações Publicadas")).toBeInTheDocument();
+    expect(screen.getAllByRole("cell", { name: "Professor" }).length).toBeGreaterThan(0);
   });
 
   it("desabilita Filtrar até selecionar concurso e ano", async () => {

@@ -1,4 +1,5 @@
 import {
+  mapCargosParaAutorizacoesPublicadas,
   mapDresConcursosParaRelatoriosDetalhados,
   mapDresParaRelatoriosDetalhados,
 } from "../../utils/mapRelatoriosDetalhados";
@@ -34,14 +35,10 @@ describe("mapRelatoriosDetalhados", () => {
       dreOriginal: "Diretoria Regional de Educação Butantã",
       escolhas: 10,
       naoEscolhas: 10,
-      autorizacoes: 5,
-      data_autorizacao: "15/06/2025",
     });
     expect(resultado[1]).toMatchObject({
       cargo: "Coordenador",
       naoEscolhas: 10,
-      autorizacoes: 3,
-      data_autorizacao: "20/07/2025",
     });
   });
 
@@ -68,19 +65,51 @@ describe("mapRelatoriosDetalhados", () => {
       dre: "Butantã",
       escolhas: 25,
       naoEscolhas: 15,
-      autorizacoes: 5,
-      data_autorizacao: "10/08/2024",
     });
     expect(resultado[1]).toMatchObject({
       cargo: "Coordenador",
-      autorizacoes: 3,
-      data_autorizacao: "15/09/2024",
     });
+  });
+
+  it("não inclui campos de autorização nos itens de relatórios detalhados", () => {
+    const resultado = mapDresConcursosParaRelatoriosDetalhados(
+      extracaoDadosTodosMock,
+      concursosOptionsMock
+    );
+
+    expect(resultado[0]).not.toHaveProperty("autorizacoes");
+    expect(resultado[0]).not.toHaveProperty("data_autorizacao");
   });
 
   it("retorna lista vazia quando não há dres_concursos para o concurso", () => {
     expect(
       mapDresParaRelatoriosDetalhados(extracaoDadosFiltradoMock, "2024", "uuid-inexistente", [])
     ).toEqual([]);
+  });
+});
+
+describe("mapCargosParaAutorizacoesPublicadas", () => {
+  it("retorna lista vazia quando cargos é undefined", () => {
+    expect(mapCargosParaAutorizacoesPublicadas(undefined)).toEqual([]);
+  });
+
+  it("mapeia cargos para autorizações publicadas formatando a data", () => {
+    const resultado = mapCargosParaAutorizacoesPublicadas(
+      extracaoDadosTodosMock.concurso.cargos
+    );
+
+    expect(resultado).toHaveLength(2);
+    expect(resultado[0]).toEqual({
+      key: "cargo-1",
+      cargo: "Professor",
+      quantidade: 5,
+      data_autorizacao: "15/06/2025",
+    });
+    expect(resultado[1]).toEqual({
+      key: "cargo-2",
+      cargo: "Coordenador",
+      quantidade: 3,
+      data_autorizacao: "20/07/2025",
+    });
   });
 });

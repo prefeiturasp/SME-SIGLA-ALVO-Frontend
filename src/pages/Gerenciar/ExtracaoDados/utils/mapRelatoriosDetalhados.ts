@@ -20,6 +20,9 @@ const formatarUltimaEscolha = (data?: string | null) => {
   return parsed.format("DD/MM/YYYY HH:mm");
 };
 
+const formatarDataAutorizacao = (data?: string | null) =>
+  data ? dayjs(data).format("DD/MM/YYYY") : "-";
+
 export type RelatorioDetalhadoDetalheAno = {
   escolhas: number;
   naoEscolhas: number;
@@ -39,6 +42,13 @@ export type RelatorioDetalhadoItem = {
   autorizacoes: number;
   data_autorizacao: string;
   detalhePorAno?: Record<string, RelatorioDetalhadoDetalheAno>;
+};
+
+export type AutorizacaoPublicadaItem = {
+  key: string;
+  cargo: string;
+  quantidade: number;
+  data_autorizacao: string;
 };
 
 type ConcursoOption = {
@@ -162,6 +172,16 @@ const somarDetalhePorAno = (
   detalhePorAno
     ? Object.values(detalhePorAno).reduce((total, detalhe) => total + detalhe[campo], 0)
     : 0;
+
+export const mapCargosParaAutorizacoesPublicadas = (
+  cargos: IExtracaoDadosConcursoCargo[] | undefined
+): AutorizacaoPublicadaItem[] =>
+  (cargos ?? []).map((cargo) => ({
+    key: cargo.uuid,
+    cargo: cargo.nome,
+    quantidade: cargo.autorizacoes,
+    data_autorizacao: formatarDataAutorizacao(cargo.data_autorizacao),
+  }));
 
 export const mapDresConcursosParaRelatoriosDetalhados = (
   data: IExtracaoDadosTodosResponse | undefined,

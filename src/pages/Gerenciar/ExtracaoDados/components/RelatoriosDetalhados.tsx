@@ -23,6 +23,7 @@ import {
 type RelatoriosDetalhadosProps = {
   data: RelatorioDetalhadoItem[];
   anos?: string[];
+  mostrarFiltros?: boolean;
 };
 
 const TODOS_CARGOS = "todos";
@@ -70,7 +71,11 @@ const renderValorComDetalheAnos = (
   );
 };
 
-const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data, anos }) => {
+const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
+  data,
+  anos,
+  mostrarFiltros = true,
+}) => {
   const [cargo, setCargo] = useState<string>(TODOS_CARGOS);
   const [dre, setDre] = useState<string>(TODAS_DRES);
   const [cargoAplicado, setCargoAplicado] = useState<string>(TODOS_CARGOS);
@@ -222,54 +227,59 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data, anos 
         {subtitulo}
       </TextTituloSecundario>
 
-      <RelatoriosDetalhadosFilter>
-        <Row gutter={24}>
-          <Col xs={24} md={12}>
-            <CustomFormItem label="Cargo" labelCol={{ span: 24 }}>
-              <StyledSelect
-                value={cargo}
-                onChange={(value) => setCargo(value as string)}
-                suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
-              >
-                {cargoOptions.map((option) => (
-                  <Select.Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Select.Option>
-                ))}
-              </StyledSelect>
-            </CustomFormItem>
-          </Col>
-          <Col xs={24} md={12}>
-            <CustomFormItem label="DRE" labelCol={{ span: 24 }}>
-              <StyledSelect
-                value={dre}
-                onChange={(value) => setDre(value as string)}
-                suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
-              >
-                {dreOptions.map((option) => (
-                  <Select.Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Select.Option>
-                ))}
-              </StyledSelect>
-            </CustomFormItem>
-          </Col>
-        </Row>
+      {mostrarFiltros && (
+        <>
+          <RelatoriosDetalhadosFilter>
+            <Row gutter={24}>
+              <Col xs={24} md={12}>
+                <CustomFormItem label="Cargo" labelCol={{ span: 24 }}>
+                  <StyledSelect
+                    value={cargo}
+                    onChange={(value) => setCargo(value as string)}
+                    suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
+                  >
+                    {cargoOptions.map((option) => (
+                      <Select.Option key={option.value} value={option.value}>
+                        {option.label}
+                      </Select.Option>
+                    ))}
+                  </StyledSelect>
+                </CustomFormItem>
+              </Col>
+              <Col xs={24} md={12}>
+                <CustomFormItem label="DRE" labelCol={{ span: 24 }}>
+                  <StyledSelect
+                    value={dre}
+                    onChange={(value) => setDre(value as string)}
+                    suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
+                  >
+                    {dreOptions.map((option) => (
+                      <Select.Option key={option.value} value={option.value}>
+                        {option.label}
+                      </Select.Option>
+                    ))}
+                  </StyledSelect>
+                </CustomFormItem>
+              </Col>
+            </Row>
 
-        <FilterActions style={{ marginTop: 20 }}>
-          <Button type="primary" ghost size="large" onClick={handleLimparFiltros}>
-            Limpar filtros
-          </Button>
-          <Button type="primary" size="large" onClick={handleFiltrar}>
-            Filtrar
-          </Button>
-        </FilterActions>
-      </RelatoriosDetalhadosFilter>
+          </RelatoriosDetalhadosFilter>
+
+          <FilterActions style={{ marginTop: 20 }}>
+            <Button type="primary" ghost size="large" onClick={handleLimparFiltros}>
+              Limpar filtros
+            </Button>
+            <Button type="primary" size="large" onClick={handleFiltrar}>
+              Filtrar
+            </Button>
+          </FilterActions>
+        </>
+      )}
 
       <RelatoriosDetalhadosTable
         columns={columns}
-        dataSource={dadosPaginados}
-        pagination={pagination}
+        dataSource={mostrarFiltros ? dadosPaginados : dadosFiltrados}
+        pagination={mostrarFiltros ? pagination : false}
         locale={{ emptyText: "Nenhum dado encontrado" }}
       />
     </TableCard>
