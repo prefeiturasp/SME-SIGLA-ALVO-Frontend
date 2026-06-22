@@ -8,6 +8,7 @@ import {
   IndicatorValue,
   IndicatorValueBox,
 } from "../styles";
+import { formatValorNumerico } from "../utils/formatValorIndicador";
 
 export type IndicadorBreakdownItem = {
   label: string;
@@ -17,12 +18,10 @@ export type IndicadorBreakdownItem = {
 export type IndicadorCardProps = {
   icon: React.ReactNode;
   title: string;
-  value: number;
+  value: number | null;
   description: string;
   breakdown?: IndicadorBreakdownItem[];
 };
-
-const formatNumber = (value: number) => value.toLocaleString("pt-BR");
 
 const IndicadorCard: React.FC<IndicadorCardProps> = ({
   icon,
@@ -30,27 +29,29 @@ const IndicadorCard: React.FC<IndicadorCardProps> = ({
   value,
   description,
   breakdown,
-}) => (
-  <IndicatorCard>
-    <IndicatorHeader>
-      <IndicatorIcon>{icon}</IndicatorIcon>
-      {title}
-    </IndicatorHeader>
-    <IndicatorValueBox>
-      <IndicatorValue>{formatNumber(value)}</IndicatorValue>
-    </IndicatorValueBox>
-    <IndicatorDescription>{description}</IndicatorDescription>
-    {breakdown && breakdown.length > 0 && (
-      <IndicatorBreakdown>
-        {breakdown.map((item) => (
-          <div key={item.label}>
-            <span>{item.label}:</span>
-            <div>{formatNumber(item.value)}</div>
-          </div>
-        ))}
-      </IndicatorBreakdown>
-    )}
-  </IndicatorCard>
-);
+}) => {
+  return (
+    <IndicatorCard>
+      <IndicatorHeader>
+        <IndicatorIcon>{icon}</IndicatorIcon>
+        {title}
+      </IndicatorHeader>
+      <IndicatorValueBox>
+        <IndicatorValue>{formatValorNumerico(value ?? 0)}</IndicatorValue>
+      </IndicatorValueBox>
+      <IndicatorDescription>{description}</IndicatorDescription>
+      {breakdown && breakdown.length > 0 && (
+        <IndicatorBreakdown>
+          {breakdown.map((item) => (
+            <div key={item.label}>
+              <span>{item.label}:</span>
+              <div>{formatValorNumerico(item.value)}</div>
+            </div>
+          ))}
+        </IndicatorBreakdown>
+      )}
+    </IndicatorCard>
+  );
+};
 
 export default IndicadorCard;

@@ -16,25 +16,30 @@ import {
   TabContentContainer,
   TextTitulo,
   TextTituloSecundario,
-  StyledSelect,
 } from "../../../components/EstilosCompartilhados";
 import { useConcursos } from "../../../hooks/useConcursos";
 import useConvocacao from "../../Processos/ConvocacaoCandidatos/hooks/useConvocacao";
 import type { IListRequest } from "../../../types/IListRequest";
 import IndicadorCard from "./components/IndicadorCard";
+import IndicadorCardComparativo from "./components/IndicadorCardComparativo";
 import { useGetExtracaoDados } from "./hooks/useGetExtracaoDados";
 import { useGetExtracaoDadosTodos } from "./hooks/useGetExtracaoDadosTodos";
 import GraficoBarrasDre from "./components/GraficoBarrasDre";
+import GraficoBarrasDreComparativo from "./components/GraficoBarrasDreComparativo";
 import TabelaVagasDre from "./components/TabelaVagasDre";
 import RelatoriosDetalhados from "./components/RelatoriosDetalhados";
 import {
   mapExtracaoDadosToIndicadores,
   mapExtracaoDadosTodosToIndicadores,
 } from "./utils/mapIndicadores";
+import { mapExtracaoDadosToIndicadoresComparativo } from "./utils/mapIndicadoresComparativo";
 import {
+  mapDresComparativoPorDre,
+  mapDresParaGraficoComparativo,
   mapDresParaGraficoEscolhas,
   mapDresParaGraficoVagas,
   mapDresParaTabela,
+  mapDresParaTabelaComparativo,
   mapDresTodosParaGraficoEscolhas,
   mapDresTodosParaGraficoVagas,
   mapDresTodosParaTabela,
@@ -43,18 +48,18 @@ import {
   mapDresConcursosParaRelatoriosDetalhados,
   mapDresParaRelatoriosDetalhados,
 } from "./utils/mapRelatoriosDetalhados";
-import { FilterActions, FilterCard, IndicatorsCard } from "./styles";
+import { FilterActions, FilterCard, IndicatorsCard, ExtracaoFilterSelect } from "./styles";
 
 const { Text } = Typography;
 
 type FiltrosAplicados = {
   concurso_uuid: string;
-  ano: string;
+  anos: string[];
 };
 
 const ExtracaoDadosTela: React.FC = () => {
   const [concursoUuid, setConcursoUuid] = useState<string | undefined>();
-  const [ano, setAno] = useState<string | undefined>();
+  const [anos, setAnos] = useState<string[]>([]);
   const [filtrosAplicados, setFiltrosAplicados] = useState<FiltrosAplicados | null>(null);
 
   const { concursosData, concursosOptionsIsLoading } = useConcursos();
@@ -76,7 +81,7 @@ const ExtracaoDadosTela: React.FC = () => {
 
   const { extracaoDados, extracaoDadosIsLoading } = useGetExtracaoDados(
     filtrosAplicados?.concurso_uuid,
-    filtrosAplicados?.ano,
+    filtrosAplicados?.anos,
     Boolean(filtrosAplicados)
   );
 
@@ -110,15 +115,26 @@ const ExtracaoDadosTela: React.FC = () => {
   const indicadores = useMemo(
     () =>
       filtrosAplicados
-        ? mapExtracaoDadosToIndicadores(extracaoDados, filtrosAplicados.ano)
+        ? mapExtracaoDadosToIndicadores(extracaoDados, filtrosAplicados.anos)
         : mapExtracaoDadosTodosToIndicadores(extracaoDadosTodos),
     [extracaoDados, extracaoDadosTodos, filtrosAplicados]
+  );
+
+  const indicadoresComparativo = useMemo(
+    () =>
+      filtrosAplicados && filtrosAplicados.anos.length === 2
+        ? mapExtracaoDadosToIndicadoresComparativo(
+            extracaoDados,
+            filtrosAplicados.anos
+          )
+        : null,
+    [extracaoDados, filtrosAplicados]
   );
 
   const graficoEscolhasDre = useMemo(
     () =>
       filtrosAplicados
-        ? mapDresParaGraficoEscolhas(extracaoDados, filtrosAplicados.ano)
+        ? mapDresParaGraficoEscolhas(extracaoDados, filtrosAplicados.anos)
         : mapDresTodosParaGraficoEscolhas(extracaoDadosTodos),
     [extracaoDados, extracaoDadosTodos, filtrosAplicados]
   );
@@ -126,17 +142,40 @@ const ExtracaoDadosTela: React.FC = () => {
   const graficoVagasDre = useMemo(
     () =>
       filtrosAplicados
-        ? mapDresParaGraficoVagas(extracaoDados, filtrosAplicados.ano)
+        ? mapDresParaGraficoVagas(extracaoDados, filtrosAplicados.anos)
         : mapDresTodosParaGraficoVagas(extracaoDadosTodos),
     [extracaoDados, extracaoDadosTodos, filtrosAplicados]
+  );
+
+  const dresComparativo = useMemo(
+    () =>
+      filtrosAplicados && filtrosAplicados.anos.length === 2
+        ? mapDresComparativoPorDre(extracaoDados, filtrosAplicados.anos)
+        : [],
+    [extracaoDados, filtrosAplicados]
+  );
+
+  const graficoEscolhasComparativo = useMemo(
+    () => mapDresParaGraficoComparativo(dresComparativo, "escolhas"),
+    [dresComparativo]
+  );
+
+  const graficoVagasComparativo = useMemo(
+    () => mapDresParaGraficoComparativo(dresComparativo, "vagas"),
+    [dresComparativo]
   );
 
   const tabelaVagasDre = useMemo(
     () =>
       filtrosAplicados
-        ? mapDresParaTabela(extracaoDados, filtrosAplicados.ano)
+        ? mapDresParaTabela(extracaoDados, filtrosAplicados.anos)
         : mapDresTodosParaTabela(extracaoDadosTodos),
     [extracaoDados, extracaoDadosTodos, filtrosAplicados]
+  );
+
+  const tabelaVagasDreComparativo = useMemo(
+    () => mapDresParaTabelaComparativo(dresComparativo),
+    [dresComparativo]
   );
 
   const relatoriosDetalhados = useMemo(
@@ -144,7 +183,7 @@ const ExtracaoDadosTela: React.FC = () => {
       filtrosAplicados
         ? mapDresParaRelatoriosDetalhados(
             extracaoDados,
-            filtrosAplicados.ano,
+            filtrosAplicados.anos,
             filtrosAplicados.concurso_uuid,
             concursosOptions
           )
@@ -152,7 +191,22 @@ const ExtracaoDadosTela: React.FC = () => {
     [extracaoDados, extracaoDadosTodos, filtrosAplicados, concursosOptions]
   );
 
-  const canFilter = Boolean(concursoUuid && ano);
+  const isComparativo = Boolean(
+    filtrosAplicados && filtrosAplicados.anos.length === 2
+  );
+
+  const anosComparativo = useMemo(
+    () =>
+      filtrosAplicados
+        ? [...filtrosAplicados.anos].sort((a, b) => a.localeCompare(b))
+        : [],
+    [filtrosAplicados]
+  );
+
+  const anoAntigoComparativo = anosComparativo[0] ?? "";
+  const anoRecenteComparativo = anosComparativo.at(-1) ?? "";
+
+  const canFilter = Boolean(concursoUuid && anos.length > 0);
 
   const breadcrumbItems = useMemo(
     () =>
@@ -177,18 +231,18 @@ const ExtracaoDadosTela: React.FC = () => {
 
   const handleLimparFiltros = () => {
     setConcursoUuid(undefined);
-    setAno(undefined);
+    setAnos([]);
     setFiltrosAplicados(null);
   };
 
   const handleFiltrar = () => {
-    if (!concursoUuid || !ano) {
+    if (!concursoUuid || !anos.length) {
       return;
     }
 
     setFiltrosAplicados({
       concurso_uuid: concursoUuid,
-      ano: ano,
+      anos,
     });
   };
 
@@ -217,11 +271,11 @@ const ExtracaoDadosTela: React.FC = () => {
             <Row gutter={24} style={{ marginTop: "1.5rem" }}>
               <Col xs={24} md={12}>
                 <CustomFormItem label="Concurso" labelCol={{ span: 24 }}>
-                  <StyledSelect
+                  <ExtracaoFilterSelect
                     value={concursoUuid}
                     onChange={(value) => {
                       setConcursoUuid(value as string | undefined);
-                      setAno(undefined);
+                      setAnos([]);
                       setFiltrosAplicados(null);
                     }}
                     placeholder="Selecione o concurso"
@@ -234,26 +288,23 @@ const ExtracaoDadosTela: React.FC = () => {
                         {concurso.label}
                       </Select.Option>
                     ))}
-                  </StyledSelect>
+                  </ExtracaoFilterSelect>
                 </CustomFormItem>
               </Col>
               <Col xs={24} md={12}>
                 <CustomFormItem label="Ano" labelCol={{ span: 24 }}>
-                  <StyledSelect
-                    value={ano}
-                    onChange={(value) => setAno(value as string | undefined)}
+                  <ExtracaoFilterSelect
+                    mode="multiple"
+                    maxCount={2}
+                    value={anos}
+                    onChange={(value) => setAnos(value as string[])}
                     placeholder="Selecione o ano"
                     disabled={!concursoUuid}
                     loading={processosConvocacaoIsLoading}
                     allowClear
+                    options={anoOptions}
                     suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
-                  >
-                    {anoOptions.map((option) => (
-                      <Select.Option key={option.value} value={option.value}>
-                        {option.label}
-                      </Select.Option>
-                    ))}
-                  </StyledSelect>
+                  />
                 </CustomFormItem>
               </Col>
             </Row>
@@ -280,101 +331,235 @@ const ExtracaoDadosTela: React.FC = () => {
                 <TextTituloSecundario style={{ fontSize: 14, marginTop: 8, display: "block" }}>
                   Acompanhe os indicadores, convocações, escolhas e dados consolidados dos concursos públicos.
                 </TextTituloSecundario>
+                {isComparativo && indicadoresComparativo && (
+                  <TextTituloSecundario
+                    style={{ fontSize: 14, marginTop: 8, display: "block", fontWeight: 600 }}
+                  >
+                    Acompanhe os indicadores nos anos {indicadoresComparativo.anoRecente} e{" "}
+                    {indicadoresComparativo.anoAntigo}.
+                  </TextTituloSecundario>
+                )}
               </Col>
             </Row>
 
             <Row gutter={[16, 16]} style={{ marginTop: "1.5rem" }}>
-              <Col xs={24} sm={12} lg={6}>
-                <IndicadorCard
-                  icon={<TaskAltIcon fontSize="small" />}
-                  title="Habilitados"
-                  value={indicadores.habilitados}
-                  description="Total de pessoas aprovadas e consideradas aptas no concurso"
-                />
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <IndicadorCard
-                  icon={<GroupsIcon fontSize="small" />}
-                  title="Lista específica"
-                  value={indicadores.listaEspecifica}
-                  description="Distribuição de candidatos por lista de classificação"
-                  breakdown={[
-                    { label: "Geral", value: indicadores.listaGeral },
-                    { label: "PCD", value: indicadores.listaPcd },
-                    { label: "NNA", value: indicadores.listaNna },
-                  ]}
-                />
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <IndicadorCard
-                  icon={<CampaignIcon fontSize="small" />}
-                  title="Convocados"
-                  value={indicadores.convocados}
-                  description="Total de candidatos chamados oficialmente."
-                />
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <IndicadorCard
-                  icon={<HowToRegIcon fontSize="small" />}
-                  title="Escolhas realizadas"
-                  value={indicadores.escolhasRealizadas}
-                  description="Candidatos que realizaram escolha de vaga ou unidade."
-                />
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <IndicadorCard
-                  icon={<PersonOffIcon fontSize="small" />}
-                  title="Não convocados"
-                  value={indicadores.naoConvocados}
-                  description="Habilitados que ainda não foram convocados."
-                />
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <IndicadorCard
-                  icon={<ReplayIcon fontSize="small" />}
-                  title="Reconvocações"
-                  value={indicadores.reconvocacoes}
-                  description="Candidatos que solicitaram participação em nova chamada."
-                />
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <IndicadorCard
-                  icon={<ScheduleIcon fontSize="small" />}
-                  title="Não escolha"
-                  value={indicadores.semEscolha}
-                  description="Convocados que decidiram pela não escolha."
-                />
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <IndicadorCard
-                  icon={<VerifiedUserIcon fontSize="small" />}
-                  title="Autorizações"
-                  value={indicadores.autorizacoes}
-                  description="Autorizações liberadas para continuidade das contratações."
-                />
-              </Col>
+              {isComparativo && indicadoresComparativo ? (
+                <>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCardComparativo
+                      icon={<TaskAltIcon fontSize="small" />}
+                      title="Habilitados"
+                      anoAntigo={indicadoresComparativo.anoAntigo}
+                      anoRecente={indicadoresComparativo.anoRecente}
+                      item={indicadoresComparativo.habilitados}
+                      modoValorUnico
+                      description="Total de pessoas aprovadas e consideradas aptas no concurso"
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCardComparativo
+                      icon={<GroupsIcon fontSize="small" />}
+                      title="Lista específica"
+                      anoAntigo={indicadoresComparativo.anoAntigo}
+                      anoRecente={indicadoresComparativo.anoRecente}
+                      item={indicadoresComparativo.listaEspecifica}
+                      breakdown={indicadoresComparativo.listaEspecifica.breakdown}
+                      description="Distribuição de candidatos por lista de classificação"
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCardComparativo
+                      icon={<CampaignIcon fontSize="small" />}
+                      title="Convocados"
+                      anoAntigo={indicadoresComparativo.anoAntigo}
+                      anoRecente={indicadoresComparativo.anoRecente}
+                      item={indicadoresComparativo.convocados}
+                      description="Total de candidatos chamados oficialmente."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCardComparativo
+                      icon={<HowToRegIcon fontSize="small" />}
+                      title="Escolhas realizadas"
+                      anoAntigo={indicadoresComparativo.anoAntigo}
+                      anoRecente={indicadoresComparativo.anoRecente}
+                      item={indicadoresComparativo.escolhasRealizadas}
+                      description="Candidatos que realizaram escolha de vaga ou unidade."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCardComparativo
+                      icon={<PersonOffIcon fontSize="small" />}
+                      title="Não convocados"
+                      anoAntigo={indicadoresComparativo.anoAntigo}
+                      anoRecente={indicadoresComparativo.anoRecente}
+                      item={indicadoresComparativo.naoConvocados}
+                      description="Habilitados que ainda não foram convocados."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCardComparativo
+                      icon={<ReplayIcon fontSize="small" />}
+                      title="Reconvocações"
+                      anoAntigo={indicadoresComparativo.anoAntigo}
+                      anoRecente={indicadoresComparativo.anoRecente}
+                      item={indicadoresComparativo.reconvocacoes}
+                      description="Candidatos que solicitaram participação em nova chamada."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCardComparativo
+                      icon={<ScheduleIcon fontSize="small" />}
+                      title="Não escolha"
+                      anoAntigo={indicadoresComparativo.anoAntigo}
+                      anoRecente={indicadoresComparativo.anoRecente}
+                      item={indicadoresComparativo.semEscolha}
+                      description="Convocados que decidiram pela não escolha."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCardComparativo
+                      icon={<VerifiedUserIcon fontSize="small" />}
+                      title="Autorizações"
+                      anoAntigo={indicadoresComparativo.anoAntigo}
+                      anoRecente={indicadoresComparativo.anoRecente}
+                      item={indicadoresComparativo.autorizacoes}
+                      description="Autorizações liberadas para continuidade das contratações."
+                    />
+                  </Col>
+                </>
+              ) : (
+                <>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCard
+                      icon={<TaskAltIcon fontSize="small" />}
+                      title="Habilitados"
+                      value={indicadores.habilitados}
+                      description="Total de pessoas aprovadas e consideradas aptas no concurso"
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCard
+                      icon={<GroupsIcon fontSize="small" />}
+                      title="Lista específica"
+                      value={indicadores.listaEspecifica}
+                      description="Distribuição de candidatos por lista de classificação"
+                      breakdown={[
+                        { label: "Geral", value: indicadores.listaGeral },
+                        { label: "PCD", value: indicadores.listaPcd },
+                        { label: "NNA", value: indicadores.listaNna },
+                      ]}
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCard
+                      icon={<CampaignIcon fontSize="small" />}
+                      title="Convocados"
+                      value={indicadores.convocados}
+                      description="Total de candidatos chamados oficialmente."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCard
+                      icon={<HowToRegIcon fontSize="small" />}
+                      title="Escolhas realizadas"
+                      value={indicadores.escolhasRealizadas}
+                      description="Candidatos que realizaram escolha de vaga ou unidade."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCard
+                      icon={<PersonOffIcon fontSize="small" />}
+                      title="Não convocados"
+                      value={indicadores.naoConvocados}
+                      description="Habilitados que ainda não foram convocados."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCard
+                      icon={<ReplayIcon fontSize="small" />}
+                      title="Reconvocações"
+                      value={indicadores.reconvocacoes}
+                      description="Candidatos que solicitaram participação em nova chamada."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCard
+                      icon={<ScheduleIcon fontSize="small" />}
+                      title="Não escolha"
+                      value={indicadores.semEscolha}
+                      description="Convocados que decidiram pela não escolha."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCard
+                      icon={<VerifiedUserIcon fontSize="small" />}
+                      title="Autorizações"
+                      value={indicadores.autorizacoes}
+                      description="Autorizações liberadas para continuidade das contratações."
+                    />
+                  </Col>
+                </>
+              )}
             </Row>
           </IndicatorsCard>
 
-          <GraficoBarrasDre
-            title="Escolhas por DRE"
-            subtitle="Distribuição de escolhas consolidadas por DRE."
-            data={graficoEscolhasDre}
-            tooltipLabel="escolhas"
-            barColor="#002C8C"
+          {isComparativo ? (
+            <>
+              <GraficoBarrasDreComparativo
+                title="Escolhas por DRE"
+                subtitle={`Distribuição de escolhas consolidadas por DRE nos anos ${anoRecenteComparativo} e ${anoAntigoComparativo}.`}
+                data={graficoEscolhasComparativo}
+                resumos={dresComparativo}
+                tooltipLabel="escolhas"
+                corAnoAntigo="#002C8C"
+                corAnoRecente="#F5A623"
+                layoutBarras="empilhado"
+                exibirTituloDreNoTooltip
+              />
+
+              <GraficoBarrasDreComparativo
+                title="Total de vagas ofertadas por DRE"
+                subtitle={`Comparativo de vagas disponibilizadas em cada DRE nos anos ${anoRecenteComparativo} e ${anoAntigoComparativo}.`}
+                data={graficoVagasComparativo}
+                resumos={dresComparativo}
+                tooltipLabel="vagas"
+                corAnoAntigo="#0F59C8"
+                corAnoRecente="#F5A623"
+                layoutBarras="empilhado"
+              />
+
+              <TabelaVagasDre
+                dataComparativo={tabelaVagasDreComparativo}
+                subtitle={`Tabela com escolhas e percentual de preenchimento nos anos ${anoRecenteComparativo} e ${anoAntigoComparativo}.`}
+              />
+            </>
+          ) : (
+            <>
+              <GraficoBarrasDre
+                title="Escolhas por DRE"
+                subtitle="Distribuição de escolhas consolidadas por DRE."
+                data={graficoEscolhasDre}
+                tooltipLabel="escolhas"
+                barColor="#002C8C"
+              />
+
+              <GraficoBarrasDre
+                title="Total de vagas ofertadas por DRE"
+                subtitle="Comparativo de vagas disponibilizadas em cada DRE."
+                data={graficoVagasDre}
+                tooltipLabel="vagas"
+                barColor="#0F59C8"
+              />
+
+              <TabelaVagasDre data={tabelaVagasDre} />
+            </>
+          )}
+
+          <RelatoriosDetalhados
+            data={relatoriosDetalhados}
+            anos={filtrosAplicados?.anos}
           />
-
-          <GraficoBarrasDre
-            title="Total de vagas ofertadas por DRE"
-            subtitle="Comparativo de vagas disponibilizadas em cada DRE."
-            data={graficoVagasDre}
-            tooltipLabel="vagas"
-            barColor="#0F59C8"
-          />
-
-          <TabelaVagasDre data={tabelaVagasDre} />
-
-          <RelatoriosDetalhados data={relatoriosDetalhados} />
         </TabContentContainer>
       </Spin>
     </BaseTela>

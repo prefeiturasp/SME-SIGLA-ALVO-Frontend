@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Button, Col, Row, Select } from "antd";
+import { Button, Col, Row, Select, Tooltip } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { CustomFormItem } from "../../../../components/FormStyle";
@@ -8,7 +8,11 @@ import {
   TextTitulo,
   TextTituloSecundario,
 } from "../../../../components/EstilosCompartilhados";
-import type { RelatorioDetalhadoItem } from "../utils/mapRelatoriosDetalhados";
+import type {
+  RelatorioDetalhadoDetalheAno,
+  RelatorioDetalhadoItem,
+} from "../utils/mapRelatoriosDetalhados";
+import { montarSubtituloRelatoriosDetalhados } from "../utils/mapRelatoriosDetalhados";
 import {
   FilterActions,
   RelatoriosDetalhadosFilter,
@@ -18,6 +22,7 @@ import {
 
 type RelatoriosDetalhadosProps = {
   data: RelatorioDetalhadoItem[];
+  anos?: string[];
 };
 
 const TODOS_CARGOS = "todos";
@@ -25,12 +30,54 @@ const TODAS_DRES = "todas";
 
 const formatNumber = (value: number) => value.toLocaleString("pt-BR");
 
-const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data }) => {
+const renderUltimaAtualizacao = (valor: string) => {
+  if (!valor || valor === "-") {
+    return "-";
+  }
+
+  const [data, hora] = valor.split(" ");
+
+  if (!hora) {
+    return valor;
+  }
+
+  return (
+    <span style={{ display: "inline-flex", flexDirection: "column", lineHeight: 1.35 }}>
+      <span>{data}</span>
+      <span>{hora}</span>
+    </span>
+  );
+};
+
+const renderValorComDetalheAnos = (
+  value: number,
+  detalhePorAno: RelatorioDetalhadoItem["detalhePorAno"],
+  campo: keyof RelatorioDetalhadoDetalheAno
+) => {
+  if (!detalhePorAno || !Object.keys(detalhePorAno).length) {
+    return formatNumber(value);
+  }
+
+  const tooltip = Object.entries(detalhePorAno)
+    .sort(([anoA], [anoB]) => anoA.localeCompare(anoB))
+    .map(([ano, detalhe]) => `${ano}: ${formatNumber(detalhe[campo])}`)
+    .join(" | ");
+
+  return (
+    <Tooltip title={tooltip}>
+      <span>{formatNumber(value)}</span>
+    </Tooltip>
+  );
+};
+
+const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data, anos }) => {
   const [cargo, setCargo] = useState<string>(TODOS_CARGOS);
   const [dre, setDre] = useState<string>(TODAS_DRES);
   const [cargoAplicado, setCargoAplicado] = useState<string>(TODOS_CARGOS);
   const [dreAplicado, setDreAplicado] = useState<string>(TODAS_DRES);
   const [paginaAtual, setPaginaAtual] = useState(1);
+
+  const subtitulo = useMemo(() => montarSubtituloRelatoriosDetalhados(anos), [anos]);
 
   const cargoOptions = useMemo(() => {
     const cargos = new Map<string, string>();
@@ -77,6 +124,7 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data }) => 
         dataIndex: "concurso",
         key: "concurso",
         ellipsis: true,
+        render: (value: string) => <strong>{value}</strong>,
       },
       {
         title: "Cargo",
@@ -94,23 +142,40 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data }) => 
         title: "Escolhas",
         dataIndex: "escolhas",
         key: "escolhas",
-        width: 100,
+        width: 110,
+        align: "center",
         onCell: () => ({ className: "col-numerica-valor" }),
-        render: (value: number) => formatNumber(value),
+        render: (value: number, record) =>
+          renderValorComDetalheAnos(value, record.detalhePorAno, "escolhas"),
+      },
+      {
+        title: "Não Escolhas",
+        dataIndex: "naoEscolhas",
+        key: "naoEscolhas",
+        width: 130,
+        align: "center",
+        onCell: () => ({ className: "col-numerica-valor" }),
+        render: (value: number, record) =>
+          renderValorComDetalheAnos(value, record.detalhePorAno, "naoEscolhas"),
       },
       {
         title: "Autorizações",
         dataIndex: "autorizacoes",
         key: "autorizacoes",
-        width: 140,
+        width: 145,
+        align: "center",
+        onHeaderCell: () => ({ style: { whiteSpace: "nowrap" } }),
         onCell: () => ({ className: "col-numerica-valor" }),
-        render: (value: number) => formatNumber(value),
+        render: (value: number, record) =>
+          renderValorComDetalheAnos(value, record.detalhePorAno, "autorizacoes"),
       },
       {
         title: "Última atualização",
         dataIndex: "data_autorizacao",
         key: "data_autorizacao",
-        width: 180,
+        width: 140,
+        align: "center",
+        render: (value: string) => renderUltimaAtualizacao(value),
       },
     ],
     []
@@ -154,7 +219,7 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data }) => 
         Relatórios detalhados
       </TextTitulo>
       <TextTituloSecundario style={{ fontSize: 14, marginTop: 8, marginLeft: 16, display: "block" }}>
-        Lista consolidada por concurso, cargo e DRE.
+        {subtitulo}
       </TextTituloSecundario>
 
       <RelatoriosDetalhadosFilter>
@@ -191,16 +256,15 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data }) => 
           </Col>
         </Row>
 
+        <FilterActions style={{ marginTop: 20 }}>
+          <Button type="primary" ghost size="large" onClick={handleLimparFiltros}>
+            Limpar filtros
+          </Button>
+          <Button type="primary" size="large" onClick={handleFiltrar}>
+            Filtrar
+          </Button>
+        </FilterActions>
       </RelatoriosDetalhadosFilter>
-
-      <FilterActions style={{ marginTop: 20 }}>
-        <Button type="primary" ghost size="large" onClick={handleLimparFiltros}>
-          Limpar filtros
-        </Button>
-        <Button type="primary" size="large" onClick={handleFiltrar}>
-          Filtrar
-        </Button>
-      </FilterActions>
 
       <RelatoriosDetalhadosTable
         columns={columns}

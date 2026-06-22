@@ -1,5 +1,6 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosRelatorios } from "../../axios";
+import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 import type { IExtracaoDadosParams } from "./IExtracaoDados";
 import type { FormatoRelatorio, IRelatorioPayload } from "./IRelatorios";
 
@@ -45,13 +46,14 @@ export const getExtracaoDados = (
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
-  console.log(params);
+
   const response = appAxiosRelatorios
     .get(URL.getExtracaoDados(), {
       params: {
         concurso_uuid: params.concurso_uuid,
         ano: params.ano,
       },
+      paramsSerializer: queryParamsSerializer,
       signal: axiosRequestConfig?.signal || signal,
       ...axiosRequestConfig,
     })

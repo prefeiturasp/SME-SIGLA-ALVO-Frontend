@@ -4,8 +4,10 @@ import type {
   IExtracaoDadosResponse,
   IExtracaoDadosTodosResponse,
 } from "../../../../services/resources/relatorios/IExtracaoDados";
+import { obterAutorizacoesDoAno } from "./obterAutorizacoesDoAno";
 
 export const INDICADORES_VAZIOS: IExtracaoDadosIndicadores = {
+  modoComparativo: false,
   habilitados: 0,
   listaEspecifica: 0,
   listaGeral: 0,
@@ -27,16 +29,9 @@ const isCandidatosAno = (
   "convocados" in value &&
   "nao-convocados" in value;
 
-export const mapExtracaoDadosTodosToIndicadores = (
-  data: IExtracaoDadosTodosResponse | undefined
-): IExtracaoDadosIndicadores => {
-  if (!data) {
-    return INDICADORES_VAZIOS;
-  }
-
-  const { habilitados, convocados, "nao-convocados": naoConvocados } = data.candidatos;
-  const { escolha, reconvocacao, "nao-escolha": semEscolha } = data.escolhas;
-
+const obterIndicadoresHabilitados = (
+  habilitados: IExtracaoDadosResponse["candidatos"]["habilitados"] | undefined
+) => {
   const listaGeral = habilitados?.geral ?? 0;
   const listaPcd = habilitados?.pcd ?? 0;
   const listaNna = habilitados?.nna ?? 0;
@@ -47,6 +42,22 @@ export const mapExtracaoDadosTodosToIndicadores = (
     listaGeral,
     listaPcd,
     listaNna,
+  };
+};
+
+export const mapExtracaoDadosTodosToIndicadores = (
+  data: IExtracaoDadosTodosResponse | undefined
+): IExtracaoDadosIndicadores => {
+  if (!data) {
+    return INDICADORES_VAZIOS;
+  }
+
+  const { habilitados, convocados, "nao-convocados": naoConvocados } = data.candidatos;
+  const { escolha, reconvocacao, "nao-escolha": semEscolha } = data.escolhas;
+
+  return {
+    modoComparativo: false,
+    ...obterIndicadoresHabilitados(habilitados),
     convocados: convocados ?? 0,
     escolhasRealizadas: escolha ?? 0,
     naoConvocados: naoConvocados ?? 0,
@@ -58,26 +69,21 @@ export const mapExtracaoDadosTodosToIndicadores = (
 
 export const mapExtracaoDadosToIndicadores = (
   data: IExtracaoDadosResponse | undefined,
-  ano: string
+  anos: string[]
 ): IExtracaoDadosIndicadores => {
-  if (!data || !ano) {
+  if (!data || !anos.length) {
     return INDICADORES_VAZIOS;
   }
 
-  const { habilitados } = data.candidatos;
+  const habilitadosBase = obterIndicadoresHabilitados(data.candidatos.habilitados);
+
+  const ano = anos[0];
   const candidatosAno = data.candidatos[ano];
   const escolhasAno = data.escolhas[ano];
 
-  const listaGeral = habilitados?.geral ?? 0;
-  const listaPcd = habilitados?.pcd ?? 0;
-  const listaNna = habilitados?.nna ?? 0;
-
   return {
-    habilitados: habilitados?.total ?? 0,
-    listaEspecifica: listaGeral + listaPcd + listaNna,
-    listaGeral,
-    listaPcd,
-    listaNna,
+    modoComparativo: false,
+    ...habilitadosBase,
     convocados: isCandidatosAno(candidatosAno) ? candidatosAno.convocados : 0,
     escolhasRealizadas: escolhasAno?.escolha ?? 0,
     naoConvocados: isCandidatosAno(candidatosAno)
@@ -85,6 +91,8 @@ export const mapExtracaoDadosToIndicadores = (
       : 0,
     reconvocacoes: escolhasAno?.reconvocacao ?? 0,
     semEscolha: escolhasAno?.["nao-escolha"] ?? 0,
-    autorizacoes: data.concurso?.["autorizacoes-publicadas"] ?? 0,
+    autorizacoes: obterAutorizacoesDoAno(data.concurso, ano, {
+      permitirFallbackRaiz: true,
+    }),
   };
 };

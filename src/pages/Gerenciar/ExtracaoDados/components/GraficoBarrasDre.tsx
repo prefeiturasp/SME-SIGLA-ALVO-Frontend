@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { Bar } from "@ant-design/charts";
 import { TextTitulo, TextTituloSecundario } from "../../../../components/EstilosCompartilhados";
 import type { DreGraficoItem } from "../utils/mapGraficosDre";
+import { formatValorComparativo, formatValorNumerico } from "../utils/formatValorIndicador";
 import { ChartCard, ChartContainer } from "../styles";
 
 type GraficoBarrasDreProps = {
@@ -10,7 +11,13 @@ type GraficoBarrasDreProps = {
   data: DreGraficoItem[];
   tooltipLabel: string;
   barColor: string;
+  modoComparativo?: boolean;
+  anosComparativo?: string[];
+  tooltipComparativoApenasAnos?: boolean;
 };
+
+const formatValorGrafico = (valor: number | null, modoComparativo: boolean) =>
+  modoComparativo ? formatValorComparativo(valor) : formatValorNumerico(valor ?? 0);
 
 const GraficoBarrasDre: React.FC<GraficoBarrasDreProps> = ({
   title,
@@ -18,6 +25,9 @@ const GraficoBarrasDre: React.FC<GraficoBarrasDreProps> = ({
   data,
   tooltipLabel,
   barColor,
+  modoComparativo = false,
+  anosComparativo = [],
+  tooltipComparativoApenasAnos = false,
 }) => {
   const chartHeight = Math.max(320, data.length * 40 + 80);
 
@@ -76,7 +86,11 @@ const GraficoBarrasDre: React.FC<GraficoBarrasDreProps> = ({
         items: [
           (datum: DreGraficoItem) => ({
             name: datum.nome,
-            value: `${datum.valor.toLocaleString("pt-BR")} ${tooltipLabel}`,
+            value: modoComparativo
+              ? tooltipComparativoApenasAnos
+                ? anosComparativo.join(" e ")
+                : `Variação de ${tooltipLabel} entre ${anosComparativo.join(" e ")}: ${formatValorGrafico(datum.valor, true)}`
+              : `${formatValorGrafico(datum.valor, false)} ${tooltipLabel}`,
             color: barColor,
           }),
         ],
@@ -89,7 +103,7 @@ const GraficoBarrasDre: React.FC<GraficoBarrasDreProps> = ({
         },
       },
     }),
-    [data, chartHeight, tooltipLabel, barColor]
+    [data, chartHeight, tooltipLabel, barColor, modoComparativo, anosComparativo, tooltipComparativoApenasAnos]
   );
 
   return (
