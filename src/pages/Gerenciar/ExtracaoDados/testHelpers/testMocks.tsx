@@ -84,14 +84,17 @@ export const createMockBaseTela = () => {
   return ({
     children,
     title,
+    buttons,
   }: {
     children: React.ReactNode;
     title: string;
+    buttons?: React.ReactNode;
   }) =>
     React.createElement(
       "div",
       null,
       React.createElement("h1", null, title),
+      buttons,
       children
     );
 };

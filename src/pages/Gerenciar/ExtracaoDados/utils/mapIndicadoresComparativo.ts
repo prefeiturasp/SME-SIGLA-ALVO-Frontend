@@ -82,6 +82,23 @@ export const mapExtracaoDadosToIndicadoresComparativo = (
   const autorizacoesAntigo = obterAutorizacoesDoAno(data.concurso, anoAntigo);
   const autorizacoesRecente = obterAutorizacoesDoAno(data.concurso, anoRecente);
 
+  // Pendentes de escolha por ano: convocados que ainda nao registraram nenhuma
+  // situacao de escolha (escolha, nao-escolha ou reconvocacao). Nunca negativo.
+  const pendentesAntigo = Math.max(
+    0,
+    convocadosAntigo -
+      (escolhasAntigo?.escolha ?? 0) -
+      (escolhasAntigo?.["nao-escolha"] ?? 0) -
+      (escolhasAntigo?.reconvocacao ?? 0)
+  );
+  const pendentesRecente = Math.max(
+    0,
+    convocadosRecente -
+      (escolhasRecente?.escolha ?? 0) -
+      (escolhasRecente?.["nao-escolha"] ?? 0) -
+      (escolhasRecente?.reconvocacao ?? 0)
+  );
+
   return {
     modoComparativo: true,
     anoAntigo,
@@ -121,6 +138,7 @@ export const mapExtracaoDadosToIndicadoresComparativo = (
       escolhasAntigo?.["nao-escolha"] ?? 0,
       escolhasRecente?.["nao-escolha"] ?? 0
     ),
+    pendentesEscolha: montarItemComparativo(pendentesAntigo, pendentesRecente),
     autorizacoes: montarItemComparativo(autorizacoesAntigo, autorizacoesRecente),
   };
 };
