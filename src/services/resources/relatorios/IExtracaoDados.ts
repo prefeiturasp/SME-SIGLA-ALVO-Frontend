@@ -146,6 +146,7 @@ export interface IExtracaoDadosIndicadores {
   naoConvocados: IndicadorValor;
   reconvocacoes: IndicadorValor;
   semEscolha: IndicadorValor;
+  pendentesEscolha: IndicadorValor;
   autorizacoes: IndicadorValor;
 }
 
@@ -175,5 +176,6 @@ export interface IExtracaoDadosIndicadoresComparativo {
   naoConvocados: IExtracaoDadosIndicadorComparativoItem;
   reconvocacoes: IExtracaoDadosIndicadorComparativoItem;
   semEscolha: IExtracaoDadosIndicadorComparativoItem;
+  pendentesEscolha: IExtracaoDadosIndicadorComparativoItem;
   autorizacoes: IExtracaoDadosIndicadorComparativoItem;
 }

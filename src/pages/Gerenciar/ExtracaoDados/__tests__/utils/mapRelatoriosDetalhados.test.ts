@@ -1,10 +1,12 @@
 import {
   mapCargosParaAutorizacoesPublicadas,
+  mapConcursoFiltradoParaAutorizacoesPublicadas,
   mapDresConcursosParaRelatoriosDetalhados,
   mapDresParaRelatoriosDetalhados,
 } from "../../utils/mapRelatoriosDetalhados";
 import {
   concursosOptionsMock,
+  extracaoDadosComparativoMock,
   extracaoDadosFiltradoMock,
   extracaoDadosTodosMock,
 } from "../../testFixtures/extracaoDadosFixtures";
@@ -111,5 +113,77 @@ describe("mapCargosParaAutorizacoesPublicadas", () => {
       quantidade: 3,
       data_autorizacao: "20/07/2025",
     });
+  });
+});
+
+describe("mapConcursoFiltradoParaAutorizacoesPublicadas", () => {
+  it("usa os cargos do bloco do ano selecionado (um ano)", () => {
+    const resultado = mapConcursoFiltradoParaAutorizacoesPublicadas(
+      extracaoDadosFiltradoMock.concurso,
+      ["2024"]
+    );
+
+    expect(resultado).toEqual([
+      {
+        key: "2024-cargo-1",
+        cargo: "Professor",
+        quantidade: 5,
+        data_autorizacao: "10/08/2024",
+      },
+      {
+        key: "2024-cargo-2",
+        cargo: "Coordenador",
+        quantidade: 3,
+        data_autorizacao: "15/09/2024",
+      },
+    ]);
+  });
+
+  it("gera uma linha por cargo de cada ano (comparativo), sem agregar", () => {
+    const resultado = mapConcursoFiltradoParaAutorizacoesPublicadas(
+      extracaoDadosComparativoMock.concurso,
+      ["2024", "2025"]
+    );
+
+    expect(resultado).toEqual([
+      {
+        key: "2024-cargo-1",
+        cargo: "Professor",
+        quantidade: 5,
+        data_autorizacao: "10/08/2024",
+      },
+      {
+        key: "2025-cargo-1",
+        cargo: "Professor",
+        quantidade: 6,
+        data_autorizacao: "10/08/2025",
+      },
+    ]);
+  });
+
+  it("cai para os cargos da raiz quando não há blocos por ano", () => {
+    const resultado = mapConcursoFiltradoParaAutorizacoesPublicadas(
+      extracaoDadosTodosMock.concurso,
+      ["2025"]
+    );
+
+    expect(resultado).toEqual([
+      {
+        key: "cargo-1",
+        cargo: "Professor",
+        quantidade: 5,
+        data_autorizacao: "15/06/2025",
+      },
+      {
+        key: "cargo-2",
+        cargo: "Coordenador",
+        quantidade: 3,
+        data_autorizacao: "20/07/2025",
+      },
+    ]);
+  });
+
+  it("retorna lista vazia quando não há concurso", () => {
+    expect(mapConcursoFiltradoParaAutorizacoesPublicadas(undefined, ["2024"])).toEqual([]);
   });
 });

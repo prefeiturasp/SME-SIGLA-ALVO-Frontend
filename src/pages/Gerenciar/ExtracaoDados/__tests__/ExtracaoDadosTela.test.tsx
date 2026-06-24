@@ -88,13 +88,15 @@ describe("ExtracaoDadosTela", () => {
   it("exibe visão consolidada com indicadores e seções principais", () => {
     renderTela();
 
+    // Varios textos aparecem tanto na tela visivel quanto no conteudo oculto
+    // capturado para o PDF (div fora da viewport), por isso usamos getAllBy*.
     expect(screen.getByRole("heading", { name: "Extração de dados" })).toBeInTheDocument();
-    expect(screen.getByText("Indicadores")).toBeInTheDocument();
-    expect(screen.getByText("Habilitados")).toBeInTheDocument();
+    expect(screen.getAllByText("Indicadores").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Habilitados").length).toBeGreaterThan(0);
     expect(screen.getAllByText("1.000").length).toBeGreaterThan(0);
-    expect(screen.getByTestId("grafico-Escolhas por DRE")).toBeInTheDocument();
-    expect(screen.getByText("Relatórios detalhados")).toBeInTheDocument();
-    expect(screen.getByText("Autorizações Publicadas")).toBeInTheDocument();
+    expect(screen.getAllByTestId("grafico-Escolhas por DRE").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Relatórios detalhados").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Autorizações Publicadas").length).toBeGreaterThan(0);
     expect(screen.getAllByRole("cell", { name: "Professor" }).length).toBeGreaterThan(0);
   });
 

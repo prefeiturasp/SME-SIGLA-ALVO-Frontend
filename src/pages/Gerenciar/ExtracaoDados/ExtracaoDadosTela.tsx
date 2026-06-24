@@ -3,12 +3,12 @@ import { Button, Col, Row, Select, Spin, Typography } from "antd";
 import { BarChartOutlined } from "@ant-design/icons";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
-import GroupsIcon from "@mui/icons-material/Groups";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import ReplayIcon from "@mui/icons-material/Replay";
 import ScheduleIcon from "@mui/icons-material/Schedule";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import { CustomFormItem } from "../../../components/FormStyle";
@@ -49,6 +49,7 @@ import {
 } from "./utils/mapGraficosDre";
 import {
   mapCargosParaAutorizacoesPublicadas,
+  mapConcursoFiltradoParaAutorizacoesPublicadas,
   mapDresConcursosParaRelatoriosDetalhados,
   mapDresParaRelatoriosDetalhados,
 } from "./utils/mapRelatoriosDetalhados";
@@ -233,31 +234,13 @@ const ExtracaoDadosTela: React.FC = () => {
     []
   );
 
-  // Descricao do filtro selecionado na tela, exibida no cabecalho do PDF.
-  // Os dados do PDF permanecem consolidados; isto e apenas informativo.
-  const filtroAplicado = useMemo(() => {
-    const partes: string[] = [];
-
-    if (concursoUuid) {
-      const concursoSelecionado = concursosOptions.find(
-        (concurso: { value: string; label: string }) =>
-          concurso.value === concursoUuid
-      );
-      partes.push(`Concurso: ${concursoSelecionado?.label ?? concursoUuid}`);
-    }
-
-    if (anos.length > 0) {
-      const anosOrdenados = [...anos].sort((a, b) => a.localeCompare(b));
-      partes.push(`Ano: ${anosOrdenados.join(", ")}`);
-    }
-
-    return partes.length > 0 ? partes.join(" | ") : undefined;
-  }, [concursoUuid, anos, concursosOptions]);
-
   const autorizacoesPublicadas = useMemo(
     () =>
       filtrosAplicados
-        ? mapCargosParaAutorizacoesPublicadas(extracaoDados?.concurso?.cargos)
+        ? mapConcursoFiltradoParaAutorizacoesPublicadas(
+            extracaoDados?.concurso,
+            filtrosAplicados.anos
+          )
         : autorizacoesPublicadasTodos,
     [extracaoDados, autorizacoesPublicadasTodos, filtrosAplicados]
   );
@@ -429,19 +412,9 @@ const ExtracaoDadosTela: React.FC = () => {
                       anoAntigo={indicadoresComparativo.anoAntigo}
                       anoRecente={indicadoresComparativo.anoRecente}
                       item={indicadoresComparativo.habilitados}
+                      breakdown={indicadoresComparativo.listaEspecifica.breakdown}
                       modoValorUnico
                       description="Total de pessoas aprovadas e consideradas aptas no concurso"
-                    />
-                  </Col>
-                  <Col xs={24} sm={12} lg={6}>
-                    <IndicadorCardComparativo
-                      icon={<GroupsIcon fontSize="small" />}
-                      title="Lista específica"
-                      anoAntigo={indicadoresComparativo.anoAntigo}
-                      anoRecente={indicadoresComparativo.anoRecente}
-                      item={indicadoresComparativo.listaEspecifica}
-                      breakdown={indicadoresComparativo.listaEspecifica.breakdown}
-                      description="Distribuição de candidatos por lista de classificação"
                     />
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
@@ -456,16 +429,6 @@ const ExtracaoDadosTela: React.FC = () => {
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
                     <IndicadorCardComparativo
-                      icon={<HowToRegIcon fontSize="small" />}
-                      title="Escolhas realizadas"
-                      anoAntigo={indicadoresComparativo.anoAntigo}
-                      anoRecente={indicadoresComparativo.anoRecente}
-                      item={indicadoresComparativo.escolhasRealizadas}
-                      description="Candidatos que realizaram escolha de vaga ou unidade."
-                    />
-                  </Col>
-                  <Col xs={24} sm={12} lg={6}>
-                    <IndicadorCardComparativo
                       icon={<PersonOffIcon fontSize="small" />}
                       title="Não convocados"
                       anoAntigo={indicadoresComparativo.anoAntigo}
@@ -476,12 +439,22 @@ const ExtracaoDadosTela: React.FC = () => {
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
                     <IndicadorCardComparativo
-                      icon={<ReplayIcon fontSize="small" />}
-                      title="Reconvocações"
+                      icon={<VerifiedUserIcon fontSize="small" />}
+                      title="Autorizações"
                       anoAntigo={indicadoresComparativo.anoAntigo}
                       anoRecente={indicadoresComparativo.anoRecente}
-                      item={indicadoresComparativo.reconvocacoes}
-                      description="Candidatos que solicitaram participação em nova chamada."
+                      item={indicadoresComparativo.autorizacoes}
+                      description="Autorizações liberadas para continuidade das contratações."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCardComparativo
+                      icon={<HowToRegIcon fontSize="small" />}
+                      title="Escolhas realizadas"
+                      anoAntigo={indicadoresComparativo.anoAntigo}
+                      anoRecente={indicadoresComparativo.anoRecente}
+                      item={indicadoresComparativo.escolhasRealizadas}
+                      description="Candidatos que realizaram escolha de vaga ou unidade."
                     />
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
@@ -496,12 +469,22 @@ const ExtracaoDadosTela: React.FC = () => {
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
                     <IndicadorCardComparativo
-                      icon={<VerifiedUserIcon fontSize="small" />}
-                      title="Autorizações"
+                      icon={<ReplayIcon fontSize="small" />}
+                      title="Reconvocações"
                       anoAntigo={indicadoresComparativo.anoAntigo}
                       anoRecente={indicadoresComparativo.anoRecente}
-                      item={indicadoresComparativo.autorizacoes}
-                      description="Autorizações liberadas para continuidade das contratações."
+                      item={indicadoresComparativo.reconvocacoes}
+                      description="Candidatos que solicitaram participação em nova chamada."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCardComparativo
+                      icon={<PendingActionsIcon fontSize="small" />}
+                      title="Pendentes de escolha"
+                      anoAntigo={indicadoresComparativo.anoAntigo}
+                      anoRecente={indicadoresComparativo.anoRecente}
+                      item={indicadoresComparativo.pendentesEscolha}
+                      description="Convocados que ainda não realizaram a escolha de vaga."
                     />
                   </Col>
                 </>
@@ -513,14 +496,6 @@ const ExtracaoDadosTela: React.FC = () => {
                       title="Habilitados"
                       value={indicadores.habilitados}
                       description="Total de pessoas aprovadas e consideradas aptas no concurso"
-                    />
-                  </Col>
-                  <Col xs={24} sm={12} lg={6}>
-                    <IndicadorCard
-                      icon={<GroupsIcon fontSize="small" />}
-                      title="Lista específica"
-                      value={indicadores.listaEspecifica}
-                      description="Distribuição de candidatos por lista de classificação"
                       breakdown={[
                         { label: "Geral", value: indicadores.listaGeral },
                         { label: "PCD", value: indicadores.listaPcd },
@@ -538,14 +513,6 @@ const ExtracaoDadosTela: React.FC = () => {
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
                     <IndicadorCard
-                      icon={<HowToRegIcon fontSize="small" />}
-                      title="Escolhas realizadas"
-                      value={indicadores.escolhasRealizadas}
-                      description="Candidatos que realizaram escolha de vaga ou unidade."
-                    />
-                  </Col>
-                  <Col xs={24} sm={12} lg={6}>
-                    <IndicadorCard
                       icon={<PersonOffIcon fontSize="small" />}
                       title="Não convocados"
                       value={indicadores.naoConvocados}
@@ -554,10 +521,18 @@ const ExtracaoDadosTela: React.FC = () => {
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
                     <IndicadorCard
-                      icon={<ReplayIcon fontSize="small" />}
-                      title="Reconvocações"
-                      value={indicadores.reconvocacoes}
-                      description="Candidatos que solicitaram participação em nova chamada."
+                      icon={<VerifiedUserIcon fontSize="small" />}
+                      title="Autorizações"
+                      value={indicadores.autorizacoes}
+                      description="Autorizações liberadas para continuidade das contratações."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCard
+                      icon={<HowToRegIcon fontSize="small" />}
+                      title="Escolhas realizadas"
+                      value={indicadores.escolhasRealizadas}
+                      description="Candidatos que realizaram escolha de vaga ou unidade."
                     />
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
@@ -570,10 +545,18 @@ const ExtracaoDadosTela: React.FC = () => {
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
                     <IndicadorCard
-                      icon={<VerifiedUserIcon fontSize="small" />}
-                      title="Autorizações"
-                      value={indicadores.autorizacoes}
-                      description="Autorizações liberadas para continuidade das contratações."
+                      icon={<ReplayIcon fontSize="small" />}
+                      title="Reconvocações"
+                      value={indicadores.reconvocacoes}
+                      description="Candidatos que solicitaram participação em nova chamada."
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} lg={6}>
+                    <IndicadorCard
+                      icon={<PendingActionsIcon fontSize="small" />}
+                      title="Pendentes de escolha"
+                      value={indicadores.pendentesEscolha}
+                      description="Convocados que ainda não realizaram a escolha de vaga."
                     />
                   </Col>
                 </>
@@ -642,7 +625,9 @@ const ExtracaoDadosTela: React.FC = () => {
         </TabContentContainer>
       </Spin>
 
-      {/* Versao consolidada renderizada fora da viewport, capturada para o PDF. */}
+      {/* Conteudo renderizado fora da viewport, capturado para o PDF. Reflete o
+          filtro aplicado na tela: comparativo (2 anos) ou simples (sem filtro
+          ou 1 ano). */}
       <div
         ref={pdfRef}
         aria-hidden
@@ -655,16 +640,31 @@ const ExtracaoDadosTela: React.FC = () => {
           padding: "24px",
         }}
       >
-        <ConteudoExtracaoPdf
-          indicadores={indicadoresTodos}
-          graficoEscolhasDre={graficoEscolhasDreTodos}
-          graficoVagasDre={graficoVagasDreTodos}
-          tabelaVagasDre={tabelaVagasDreTodos}
-          relatoriosDetalhados={relatoriosDetalhadosTodos}
-          autorizacoesPublicadas={autorizacoesPublicadasTodos}
-          dataGeracao={dataGeracao}
-          filtroAplicado={filtroAplicado}
-        />
+        {isComparativo && indicadoresComparativo ? (
+          <ConteudoExtracaoPdf
+            isComparativo
+            indicadoresComparativo={indicadoresComparativo}
+            anoAntigo={anoAntigoComparativo}
+            anoRecente={anoRecenteComparativo}
+            dresComparativo={dresComparativo}
+            graficoEscolhasComparativo={graficoEscolhasComparativo}
+            graficoVagasComparativo={graficoVagasComparativo}
+            tabelaVagasDreComparativo={tabelaVagasDreComparativo}
+            relatoriosDetalhados={relatoriosDetalhados}
+            autorizacoesPublicadas={autorizacoesPublicadas}
+            dataGeracao={dataGeracao}
+          />
+        ) : (
+          <ConteudoExtracaoPdf
+            indicadores={indicadores}
+            graficoEscolhasDre={graficoEscolhasDre}
+            graficoVagasDre={graficoVagasDre}
+            tabelaVagasDre={tabelaVagasDre}
+            relatoriosDetalhados={relatoriosDetalhados}
+            autorizacoesPublicadas={autorizacoesPublicadas}
+            dataGeracao={dataGeracao}
+          />
+        )}
       </div>
     </BaseTela>
   );

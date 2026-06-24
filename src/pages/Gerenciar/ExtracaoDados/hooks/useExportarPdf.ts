@@ -117,11 +117,18 @@ export const useExportarPdf = () => {
             cursorY = MARGEM_MM;
           }
 
-          // Secao mais alta que uma pagina inteira: fatia em paginas.
+          // Secao mais alta que uma pagina inteira: fatia em paginas. Cada
+          // fatia ocupa uma pagina propria; so adicionamos uma nova pagina
+          // ENTRE fatias, nunca depois da ultima, para nao deixar pagina em
+          // branco no final.
           if (alturaMm > CONTEUDO_ALTURA_MM) {
             const escala = CONTEUDO_LARGURA_MM / larguraPx;
             const paginaAlturaPx = CONTEUDO_ALTURA_MM / escala;
             let offsetPx = 0;
+
+            // A verificacao de quebra (acima) ja garante que comecamos no topo
+            // de uma pagina sem conteudo quando necessario.
+            cursorY = MARGEM_MM;
 
             while (offsetPx < alturaPx) {
               const fatiaAlturaPx = Math.min(
@@ -160,11 +167,6 @@ export const useExportarPdf = () => {
 
               const fatiaAlturaMm = fatiaAlturaPx * escala;
 
-              if (cursorY > MARGEM_MM) {
-                doc.addPage();
-                cursorY = MARGEM_MM;
-              }
-
               doc.addImage(
                 fatiaCanvas.toDataURL("image/jpeg", QUALIDADE_JPEG),
                 FORMATO_IMAGEM,
@@ -179,6 +181,8 @@ export const useExportarPdf = () => {
               offsetPx += fatiaAlturaPx;
 
               if (offsetPx < alturaPx) {
+                // Ainda ha conteudo a desenhar: abre uma nova pagina para a
+                // proxima fatia.
                 doc.addPage();
                 cursorY = MARGEM_MM;
               } else {

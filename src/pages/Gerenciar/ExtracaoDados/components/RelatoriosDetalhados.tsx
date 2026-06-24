@@ -31,25 +31,6 @@ const TODAS_DRES = "todas";
 
 const formatNumber = (value: number) => value.toLocaleString("pt-BR");
 
-const renderUltimaAtualizacao = (valor: string) => {
-  if (!valor || valor === "-") {
-    return "-";
-  }
-
-  const [data, hora] = valor.split(" ");
-
-  if (!hora) {
-    return valor;
-  }
-
-  return (
-    <span style={{ display: "inline-flex", flexDirection: "column", lineHeight: 1.35 }}>
-      <span>{data}</span>
-      <span>{hora}</span>
-    </span>
-  );
-};
-
 const renderValorComDetalheAnos = (
   value: number,
   detalhePorAno: RelatorioDetalhadoItem["detalhePorAno"],
@@ -152,35 +133,6 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
         onCell: () => ({ className: "col-numerica-valor" }),
         render: (value: number, record) =>
           renderValorComDetalheAnos(value, record.detalhePorAno, "escolhas"),
-      },
-      {
-        title: "Não Escolhas",
-        dataIndex: "naoEscolhas",
-        key: "naoEscolhas",
-        width: 130,
-        align: "center",
-        onCell: () => ({ className: "col-numerica-valor" }),
-        render: (value: number, record) =>
-          renderValorComDetalheAnos(value, record.detalhePorAno, "naoEscolhas"),
-      },
-      {
-        title: "Autorizações",
-        dataIndex: "autorizacoes",
-        key: "autorizacoes",
-        width: 145,
-        align: "center",
-        onHeaderCell: () => ({ style: { whiteSpace: "nowrap" } }),
-        onCell: () => ({ className: "col-numerica-valor" }),
-        render: (value: number, record) =>
-          renderValorComDetalheAnos(value, record.detalhePorAno, "autorizacoes"),
-      },
-      {
-        title: "Última atualização",
-        dataIndex: "data_autorizacao",
-        key: "data_autorizacao",
-        width: 140,
-        align: "center",
-        render: (value: string) => renderUltimaAtualizacao(value),
       },
     ],
     []

@@ -183,6 +183,40 @@ export const mapCargosParaAutorizacoesPublicadas = (
     data_autorizacao: formatarDataAutorizacao(cargo.data_autorizacao),
   }));
 
+/**
+ * Monta as autorizacoes publicadas a partir do concurso filtrado, cujos cargos
+ * vivem aninhados nos blocos por ano (concurso[ano].cargos) e nao na raiz.
+ *
+ * Gera uma linha por cargo de cada ano selecionado, preservando todas as
+ * secoes de "autorizacoes-publicadas" presentes na resposta (um mesmo cargo
+ * que aparece em dois anos rende duas linhas, uma por ano). Quando nenhum bloco
+ * de ano possui cargos, cai para os cargos da raiz.
+ */
+export const mapConcursoFiltradoParaAutorizacoesPublicadas = (
+  concurso: IExtracaoDadosConcursoFiltrado | undefined,
+  anos: string[]
+): AutorizacaoPublicadaItem[] => {
+  const itens = anos.flatMap((ano) => {
+    const dadosAno = concurso?.[ano];
+    if (!isConcursoAno(dadosAno)) {
+      return [];
+    }
+
+    return (dadosAno.cargos ?? []).map((cargo) => ({
+      key: `${ano}-${cargo.uuid}`,
+      cargo: cargo.nome,
+      quantidade: Number(cargo.autorizacoes) || 0,
+      data_autorizacao: formatarDataAutorizacao(cargo.data_autorizacao),
+    }));
+  });
+
+  if (!itens.length) {
+    return mapCargosParaAutorizacoesPublicadas(concurso?.cargos);
+  }
+
+  return itens;
+};
+
 export const mapDresConcursosParaRelatoriosDetalhados = (
   data: IExtracaoDadosTodosResponse | undefined,
   concursosOptions: ConcursoOption[]
