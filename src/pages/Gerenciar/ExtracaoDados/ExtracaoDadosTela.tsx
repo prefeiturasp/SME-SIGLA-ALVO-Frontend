@@ -405,7 +405,7 @@ const ExtracaoDadosTela: React.FC = () => {
             <Row gutter={[16, 16]} style={{ marginTop: "1.5rem" }}>
               {isComparativo && indicadoresComparativo ? (
                 <>
-                  <Col xs={24} sm={12} lg={6}>
+                  <Col xs={24} sm={12} lg={8}>
                     <IndicadorCardComparativo
                       icon={<TaskAltIcon fontSize="small" />}
                       title="Habilitados"
@@ -417,7 +417,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       description="Total de pessoas aprovadas e consideradas aptas no concurso"
                     />
                   </Col>
-                  <Col xs={24} sm={12} lg={6}>
+                  <Col xs={24} sm={12} lg={8}>
                     <IndicadorCardComparativo
                       icon={<CampaignIcon fontSize="small" />}
                       title="Convocados"
@@ -427,7 +427,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       description="Total de candidatos chamados oficialmente."
                     />
                   </Col>
-                  <Col xs={24} sm={12} lg={6}>
+                  <Col xs={24} sm={12} lg={8}>
                     <IndicadorCardComparativo
                       icon={<PersonOffIcon fontSize="small" />}
                       title="Não convocados"
@@ -437,7 +437,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       description="Habilitados que ainda não foram convocados."
                     />
                   </Col>
-                  <Col xs={24} sm={12} lg={6}>
+                  <Col xs={24} sm={12} lg={8}>
                     <IndicadorCardComparativo
                       icon={<VerifiedUserIcon fontSize="small" />}
                       title="Autorizações"
@@ -447,7 +447,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       description="Autorizações liberadas para continuidade das contratações."
                     />
                   </Col>
-                  <Col xs={24} sm={12} lg={6}>
+                  <Col xs={24} sm={12} lg={8}>
                     <IndicadorCardComparativo
                       icon={<HowToRegIcon fontSize="small" />}
                       title="Escolhas realizadas"
@@ -457,7 +457,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       description="Candidatos que realizaram escolha de vaga ou unidade."
                     />
                   </Col>
-                  <Col xs={24} sm={12} lg={6}>
+                  <Col xs={24} sm={12} lg={8}>
                     <IndicadorCardComparativo
                       icon={<ScheduleIcon fontSize="small" />}
                       title="Não escolha"
@@ -467,7 +467,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       description="Convocados que decidiram pela não escolha."
                     />
                   </Col>
-                  <Col xs={24} sm={12} lg={6}>
+                  <Col xs={24} sm={12} lg={8}>
                     <IndicadorCardComparativo
                       icon={<ReplayIcon fontSize="small" />}
                       title="Reconvocações"
@@ -477,7 +477,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       description="Candidatos que solicitaram participação em nova chamada."
                     />
                   </Col>
-                  <Col xs={24} sm={12} lg={6}>
+                  <Col xs={24} sm={12} lg={8}>
                     <IndicadorCardComparativo
                       icon={<PendingActionsIcon fontSize="small" />}
                       title="Pendentes de escolha"

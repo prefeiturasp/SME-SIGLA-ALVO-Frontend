@@ -105,7 +105,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
           <Row gutter={[16, 16]} style={{ marginTop: "1.5rem" }}>
             {props.isComparativo ? (
               <>
-                <Col xs={24} sm={12} lg={6}>
+                <Col xs={24} sm={12} lg={8}>
                   <IndicadorCardComparativo
                     icon={<TaskAltIcon fontSize="small" />}
                     title="Habilitados"
@@ -117,7 +117,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     description="Total de pessoas aprovadas e consideradas aptas no concurso"
                   />
                 </Col>
-                <Col xs={24} sm={12} lg={6}>
+                <Col xs={24} sm={12} lg={8}>
                   <IndicadorCardComparativo
                     icon={<CampaignIcon fontSize="small" />}
                     title="Convocados"
@@ -127,7 +127,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     description="Total de candidatos chamados oficialmente."
                   />
                 </Col>
-                <Col xs={24} sm={12} lg={6}>
+                <Col xs={24} sm={12} lg={8}>
                   <IndicadorCardComparativo
                     icon={<PersonOffIcon fontSize="small" />}
                     title="Não convocados"
@@ -137,7 +137,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     description="Habilitados que ainda não foram convocados."
                   />
                 </Col>
-                <Col xs={24} sm={12} lg={6}>
+                <Col xs={24} sm={12} lg={8}>
                   <IndicadorCardComparativo
                     icon={<VerifiedUserIcon fontSize="small" />}
                     title="Autorizações"
@@ -147,7 +147,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     description="Autorizações liberadas para continuidade das contratações."
                   />
                 </Col>
-                <Col xs={24} sm={12} lg={6}>
+                <Col xs={24} sm={12} lg={8}>
                   <IndicadorCardComparativo
                     icon={<HowToRegIcon fontSize="small" />}
                     title="Escolhas realizadas"
@@ -157,7 +157,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     description="Candidatos que realizaram escolha de vaga ou unidade."
                   />
                 </Col>
-                <Col xs={24} sm={12} lg={6}>
+                <Col xs={24} sm={12} lg={8}>
                   <IndicadorCardComparativo
                     icon={<ScheduleIcon fontSize="small" />}
                     title="Não escolha"
@@ -167,7 +167,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     description="Convocados que decidiram pela não escolha."
                   />
                 </Col>
-                <Col xs={24} sm={12} lg={6}>
+                <Col xs={24} sm={12} lg={8}>
                   <IndicadorCardComparativo
                     icon={<ReplayIcon fontSize="small" />}
                     title="Reconvocações"
@@ -177,7 +177,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     description="Candidatos que solicitaram participação em nova chamada."
                   />
                 </Col>
-                <Col xs={24} sm={12} lg={6}>
+                <Col xs={24} sm={12} lg={8}>
                   <IndicadorCardComparativo
                     icon={<PendingActionsIcon fontSize="small" />}
                     title="Pendentes de escolha"
