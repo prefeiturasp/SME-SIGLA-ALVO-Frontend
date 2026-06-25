@@ -15,8 +15,6 @@ const relatoriosMock: RelatorioDetalhadoItem[] = [
     dreOriginal: "Diretoria Regional de Educação Butantã",
     escolhas: 10,
     naoEscolhas: 5,
-    autorizacoes: 3,
-    data_autorizacao: "15/06/2025",
   },
   {
     key: "2",
@@ -28,8 +26,6 @@ const relatoriosMock: RelatorioDetalhadoItem[] = [
     dreOriginal: "Diretoria Regional de Educação Centro",
     escolhas: 8,
     naoEscolhas: 2,
-    autorizacoes: 1,
-    data_autorizacao: "20/07/2025",
   },
 ];
 

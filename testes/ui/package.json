@@ -7,18 +7,27 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "cy:run:api": "cypress run --spec 'cypress/e2e/api/**/*.feature'",
+    "cy:run:ui": "cypress run --spec 'cypress/e2e/ui/**/*.feature'",
     "cy:run:chrome": "cypress run --browser chrome",
-    "cy:run:firefox": "cypress run --browser firefox"
+    "cy:run:firefox": "cypress run --browser firefox",
+    "cy:cloud": "cypress-cloud run --parallel --browser chrome --record",
+    "cy:cloud:api": "cypress-cloud run --parallel --browser chrome --record --spec 'cypress/e2e/api/**/*.feature'"
+  },
+  "cypress-cucumber-preprocessor": {
+    "stepDefinitions": [
+      "cypress/support/step_definitions/**/*.js"
+    ]
   },
   "devDependencies": {
     "@badeball/cypress-cucumber-preprocessor": "^20.1.2",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
-    "cypress": "^13.17.0",
+    "@shelex/cypress-allure-plugin": "^2.41.2",
+    "cypress": "13.17.0",
+    "cypress-cloud": "^2.0.0-beta.1",
+    "cypress-xpath": "^2.0.1",
+    "crypto-js": "^4.1.1",
     "dotenv": "^16.6.1",
+    "mocha-allure-reporter": "^1.4.0",
     "multiple-cucumber-html-reporter": "^3.9.3"
-  },
-  "cypress-cucumber-preprocessor": {
-    "nonGlobalStepDefinitions": false,
-    "stepDefinitions": "cypress/support/step_definitions/**/*.js"
   }
 }

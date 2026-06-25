@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Button, Col, Row, Select } from "antd";
+import { Button, Col, Row, Select, Tooltip } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { CustomFormItem } from "../../../../components/FormStyle";
@@ -8,7 +8,11 @@ import {
   TextTitulo,
   TextTituloSecundario,
 } from "../../../../components/EstilosCompartilhados";
-import type { RelatorioDetalhadoItem } from "../utils/mapRelatoriosDetalhados";
+import type {
+  RelatorioDetalhadoDetalheAno,
+  RelatorioDetalhadoItem,
+} from "../utils/mapRelatoriosDetalhados";
+import { montarSubtituloRelatoriosDetalhados } from "../utils/mapRelatoriosDetalhados";
 import {
   FilterActions,
   RelatoriosDetalhadosFilter,
@@ -18,6 +22,8 @@ import {
 
 type RelatoriosDetalhadosProps = {
   data: RelatorioDetalhadoItem[];
+  anos?: string[];
+  mostrarFiltros?: boolean;
 };
 
 const TODOS_CARGOS = "todos";
@@ -25,12 +31,39 @@ const TODAS_DRES = "todas";
 
 const formatNumber = (value: number) => value.toLocaleString("pt-BR");
 
-const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data }) => {
+const renderValorComDetalheAnos = (
+  value: number,
+  detalhePorAno: RelatorioDetalhadoItem["detalhePorAno"],
+  campo: keyof RelatorioDetalhadoDetalheAno
+) => {
+  if (!detalhePorAno || !Object.keys(detalhePorAno).length) {
+    return formatNumber(value);
+  }
+
+  const tooltip = Object.entries(detalhePorAno)
+    .sort(([anoA], [anoB]) => anoA.localeCompare(anoB))
+    .map(([ano, detalhe]) => `${ano}: ${formatNumber(detalhe[campo])}`)
+    .join(" | ");
+
+  return (
+    <Tooltip title={tooltip}>
+      <span>{formatNumber(value)}</span>
+    </Tooltip>
+  );
+};
+
+const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
+  data,
+  anos,
+  mostrarFiltros = true,
+}) => {
   const [cargo, setCargo] = useState<string>(TODOS_CARGOS);
   const [dre, setDre] = useState<string>(TODAS_DRES);
   const [cargoAplicado, setCargoAplicado] = useState<string>(TODOS_CARGOS);
   const [dreAplicado, setDreAplicado] = useState<string>(TODAS_DRES);
   const [paginaAtual, setPaginaAtual] = useState(1);
+
+  const subtitulo = useMemo(() => montarSubtituloRelatoriosDetalhados(anos), [anos]);
 
   const cargoOptions = useMemo(() => {
     const cargos = new Map<string, string>();
@@ -77,6 +110,7 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data }) => 
         dataIndex: "concurso",
         key: "concurso",
         ellipsis: true,
+        render: (value: string) => <strong>{value}</strong>,
       },
       {
         title: "Cargo",
@@ -94,23 +128,11 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data }) => 
         title: "Escolhas",
         dataIndex: "escolhas",
         key: "escolhas",
-        width: 100,
+        width: 110,
+        align: "center",
         onCell: () => ({ className: "col-numerica-valor" }),
-        render: (value: number) => formatNumber(value),
-      },
-      {
-        title: "Autorizações",
-        dataIndex: "autorizacoes",
-        key: "autorizacoes",
-        width: 140,
-        onCell: () => ({ className: "col-numerica-valor" }),
-        render: (value: number) => formatNumber(value),
-      },
-      {
-        title: "Última atualização",
-        dataIndex: "data_autorizacao",
-        key: "data_autorizacao",
-        width: 180,
+        render: (value: number, record) =>
+          renderValorComDetalheAnos(value, record.detalhePorAno, "escolhas"),
       },
     ],
     []
@@ -154,58 +176,62 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({ data }) => 
         Relatórios detalhados
       </TextTitulo>
       <TextTituloSecundario style={{ fontSize: 14, marginTop: 8, marginLeft: 16, display: "block" }}>
-        Lista consolidada por concurso, cargo e DRE.
+        {subtitulo}
       </TextTituloSecundario>
 
-      <RelatoriosDetalhadosFilter>
-        <Row gutter={24}>
-          <Col xs={24} md={12}>
-            <CustomFormItem label="Cargo" labelCol={{ span: 24 }}>
-              <StyledSelect
-                value={cargo}
-                onChange={(value) => setCargo(value as string)}
-                suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
-              >
-                {cargoOptions.map((option) => (
-                  <Select.Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Select.Option>
-                ))}
-              </StyledSelect>
-            </CustomFormItem>
-          </Col>
-          <Col xs={24} md={12}>
-            <CustomFormItem label="DRE" labelCol={{ span: 24 }}>
-              <StyledSelect
-                value={dre}
-                onChange={(value) => setDre(value as string)}
-                suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
-              >
-                {dreOptions.map((option) => (
-                  <Select.Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Select.Option>
-                ))}
-              </StyledSelect>
-            </CustomFormItem>
-          </Col>
-        </Row>
+      {mostrarFiltros && (
+        <>
+          <RelatoriosDetalhadosFilter>
+            <Row gutter={24}>
+              <Col xs={24} md={12}>
+                <CustomFormItem label="Cargo" labelCol={{ span: 24 }}>
+                  <StyledSelect
+                    value={cargo}
+                    onChange={(value) => setCargo(value as string)}
+                    suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
+                  >
+                    {cargoOptions.map((option) => (
+                      <Select.Option key={option.value} value={option.value}>
+                        {option.label}
+                      </Select.Option>
+                    ))}
+                  </StyledSelect>
+                </CustomFormItem>
+              </Col>
+              <Col xs={24} md={12}>
+                <CustomFormItem label="DRE" labelCol={{ span: 24 }}>
+                  <StyledSelect
+                    value={dre}
+                    onChange={(value) => setDre(value as string)}
+                    suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
+                  >
+                    {dreOptions.map((option) => (
+                      <Select.Option key={option.value} value={option.value}>
+                        {option.label}
+                      </Select.Option>
+                    ))}
+                  </StyledSelect>
+                </CustomFormItem>
+              </Col>
+            </Row>
 
-      </RelatoriosDetalhadosFilter>
+          </RelatoriosDetalhadosFilter>
 
-      <FilterActions style={{ marginTop: 20 }}>
-        <Button type="primary" ghost size="large" onClick={handleLimparFiltros}>
-          Limpar filtros
-        </Button>
-        <Button type="primary" size="large" onClick={handleFiltrar}>
-          Filtrar
-        </Button>
-      </FilterActions>
+          <FilterActions style={{ marginTop: 20 }}>
+            <Button type="primary" ghost size="large" onClick={handleLimparFiltros}>
+              Limpar filtros
+            </Button>
+            <Button type="primary" size="large" onClick={handleFiltrar}>
+              Filtrar
+            </Button>
+          </FilterActions>
+        </>
+      )}
 
       <RelatoriosDetalhadosTable
         columns={columns}
-        dataSource={dadosPaginados}
-        pagination={pagination}
+        dataSource={mostrarFiltros ? dadosPaginados : dadosFiltrados}
+        pagination={mostrarFiltros ? pagination : false}
         locale={{ emptyText: "Nenhum dado encontrado" }}
       />
     </TableCard>
