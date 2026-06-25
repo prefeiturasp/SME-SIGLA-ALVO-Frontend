@@ -39,7 +39,7 @@ describe("mapIndicadores", () => {
       );
     });
 
-    it("mapeia corretamente os indicadores filtrados por ano", () => {
+    it("mapeia corretamente os indicadores filtrados por um ano", () => {
       expect(mapExtracaoDadosToIndicadores(extracaoDadosFiltradoMock, "2024")).toEqual({
         habilitados: 200,
         listaEspecifica: 200,
