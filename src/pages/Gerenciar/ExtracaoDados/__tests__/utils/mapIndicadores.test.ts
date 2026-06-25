@@ -44,25 +44,20 @@ describe("mapIndicadores", () => {
       );
     });
 
-    it("mapeia corretamente os indicadores filtrados por ano", () => {
-      expect(mapExtracaoDadosToIndicadores(extracaoDadosFiltradoMock, ["2024"])).toEqual(
-        {
-          modoComparativo: false,
-          habilitados: 200,
-          listaEspecifica: 200,
-          listaGeral: 150,
-          listaPcd: 30,
-          listaNna: 20,
-          convocados: 80,
-          escolhasRealizadas: 60,
-          naoConvocados: 120,
-          reconvocacoes: 10,
-          semEscolha: 20,
-          // pendentes = 80 - 60 - 20 - 10 = 0 (clampado)
-          pendentesEscolha: 0,
-          autorizacoes: 8,
-        }
-      );
+    it("mapeia corretamente os indicadores filtrados por um ano", () => {
+      expect(mapExtracaoDadosToIndicadores(extracaoDadosFiltradoMock, "2024")).toEqual({
+        habilitados: 200,
+        listaEspecifica: 200,
+        listaGeral: 150,
+        listaPcd: 30,
+        listaNna: 20,
+        convocados: 80,
+        escolhasRealizadas: 60,
+        naoConvocados: 120,
+        reconvocacoes: 10,
+        semEscolha: 20,
+        autorizacoes: 8,
+      });
     });
 
     it("retorna zero para ano inexistente nos dados", () => {

@@ -34,7 +34,7 @@ describe("useGetExtracaoDados", () => {
   it("não busca dados quando enabled é false", async () => {
     const { wrapper } = setupWrapper();
     const { result } = renderHook(
-      () => useGetExtracaoDados("uuid-concurso-1", "2024", false),
+      () => useGetExtracaoDados("uuid-concurso-1", ["2024"], false),
       { wrapper }
     );
 
@@ -54,7 +54,7 @@ describe("useGetExtracaoDados", () => {
 
     const { wrapper } = setupWrapper();
     const { result } = renderHook(
-      () => useGetExtracaoDados("uuid-concurso-1", "2024", true),
+      () => useGetExtracaoDados("uuid-concurso-1", ["2024"], true),
       { wrapper }
     );
 
@@ -63,7 +63,7 @@ describe("useGetExtracaoDados", () => {
     });
 
     expect(mockGetExtracaoDados).toHaveBeenCalledWith(
-      { concurso_uuid: "uuid-concurso-1", ano: "2024" },
+      { concurso_uuid: "uuid-concurso-1", ano: ["2024"] },
       expect.objectContaining({ signal: expect.any(AbortSignal) })
     );
     expect(result.current.extracaoDados).toEqual(extracaoDadosFiltradoMock);

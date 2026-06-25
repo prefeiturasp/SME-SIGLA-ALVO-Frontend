@@ -34,19 +34,18 @@ describe("RelatoriosDetalhados", () => {
     render(<RelatoriosDetalhados data={relatoriosMock} />);
 
     expect(screen.getByText("Relatórios detalhados")).toBeInTheDocument();
+    expect(screen.getByText("Lista consolidada por concurso, cargo e DRE.")).toBeInTheDocument();
     expect(screen.getByRole("cell", { name: "Professor" })).toBeInTheDocument();
     expect(screen.getByRole("cell", { name: "Coordenador" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /filtrar/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /limpar filtros/i })).toBeInTheDocument();
   });
 
-  it("não exibe mais as colunas de autorização", () => {
+  it("exibe data da última atualização", () => {
     render(<RelatoriosDetalhados data={relatoriosMock} />);
 
-    expect(screen.queryByRole("columnheader", { name: "Autorizações" })).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("columnheader", { name: "Última atualização" })
-    ).not.toBeInTheDocument();
+    expect(screen.getByText("15/06/2025")).toBeInTheDocument();
+    expect(screen.getByText("20/07/2025")).toBeInTheDocument();
   });
 
   it("mantém todos os registros ao limpar filtros", async () => {
