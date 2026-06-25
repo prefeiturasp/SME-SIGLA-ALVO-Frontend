@@ -3,6 +3,7 @@ import { Card, Row, Col, Typography, Button, Upload, Spin, App } from "antd";
 import ImageIcon from "@mui/icons-material/Image";
 import QuillEditor from "../../../Relatorios/components/QuillEditor";
 import type { UploadFile } from "antd/es/upload/interface";
+import CropImageModal from "../../../../components/CropImageModal";
 import { ModalSaveButton } from "../../../EscolhaCandidatos/styles";
 import { getParametrizacaoRelatorios } from "../hooks/getParametrizacaoRelatorios";
 import { patchParametrizacaoRelatorios } from "../hooks/patchParametrizacaoRelatorios";
@@ -20,6 +21,8 @@ const AbaRelatorios: React.FC<{
   
   const [logoFile, setLogoFile] = useState<UploadFile | null>(null);
   const [logoUrl, setLogoUrl] = useState<string | null>(null); // URL da logo do backend
+  const [cropModalAberto, setCropModalAberto] = useState<boolean>(false);
+  const [imagemParaCrop, setImagemParaCrop] = useState<string | null>(null); // dataURL para o modal de recorte
   const [cabecalhoHtml, setCabecalhoHtml] = useState<string>("");
   const [parametrizacaoUuid, setParametrizacaoUuid] = useState<string | null>(null);
   const [cabecalhoInicial, setCabecalhoInicial] = useState<string>(""); // Valor inicial do cabeçalho
@@ -126,6 +129,21 @@ const AbaRelatorios: React.FC<{
     }
   };
 
+  const handleCropClose = () => {
+    setCropModalAberto(false);
+    setImagemParaCrop(null);
+  };
+
+  const handleCropConfirmar = (file: File) => {
+    setLogoFile({
+      uid: `${Date.now()}`,
+      name: file.name,
+      status: "done",
+      originFileObj: file,
+    } as UploadFile);
+    handleCropClose();
+  };
+
   const getImagePreview = (file: UploadFile | null, backendUrl: string | null = null) => {
     // Prioridade: arquivo selecionado > URL do backend
     if (file && file.originFileObj) {
@@ -191,25 +209,26 @@ const AbaRelatorios: React.FC<{
                     marginBottom: "12px",
                   }}
                 >
-                  Envie uma imagem com um tamanho inferior a 2MB.
+                  Envie uma imagem com um tamanho inferior a 5MB.
                 </Text>
                 <Upload
                   beforeUpload={(file) => {
-                    // Validar tamanho (2MB = 2 * 1024 * 1024 bytes)
-                    if (file.size > 2 * 1024 * 1024) {
+                    // Validar tamanho (5MB = 5 * 1024 * 1024 bytes)
+                    if (file.size > 5 * 1024 * 1024) {
                       notification.error({
-                        message: "O arquivo deve ter um tamanho inferior a 2MB.",
+                        message: "O arquivo deve ter um tamanho inferior a 5MB.",
                         placement: "top",
                         duration: 3,
                       });
                       return Upload.LIST_IGNORE;
                     }
-                    setLogoFile({
-                      uid: file.uid,
-                      name: file.name,
-                      status: "done",
-                      originFileObj: file,
-                    } as UploadFile);
+                    // Ler a imagem e abrir o modal de recorte
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      setImagemParaCrop(reader.result as string);
+                      setCropModalAberto(true);
+                    };
+                    reader.readAsDataURL(file);
                     return false; // Impede upload automático
                   }}
                   showUploadList={false}
@@ -250,6 +269,15 @@ const AbaRelatorios: React.FC<{
           Salvar
         </ModalSaveButton>
       </ButtonContainer>
+
+      <CropImageModal
+        open={cropModalAberto}
+        imagemSrc={imagemParaCrop ?? ""}
+        titulo="Recortar logo"
+        nomeArquivo="logo.png"
+        onClose={handleCropClose}
+        onConfirmar={handleCropConfirmar}
+      />
     </Card>
   );
 };

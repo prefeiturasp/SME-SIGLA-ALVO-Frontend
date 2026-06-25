@@ -39,5 +39,525 @@
       }
     ]
   },
-  "passoPatch": {}
+  "passoPatch": {},
+  "agendaValida": {
+    "processo_convocacao_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "descricao": "Agenda de Teste Automacao",
+    "data_inicio": "2026-06-01T08:00:00",
+    "data_fim": "2026-06-01T18:00:00"
+  },
+  "agendaAtualizada": {
+    "processo_convocacao_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "descricao": "Agenda Atualizada Automacao",
+    "data_inicio": "2026-06-02T08:00:00",
+    "data_fim": "2026-06-02T18:00:00"
+  },
+  "agendaPatch": {
+    "descricao": "Agenda Parcialmente Atualizada"
+  },
+  "candidatoValido": {
+    "nome": "Jose da Silva Teste Automacao",
+    "cpf": "12345678901",
+    "email": "jose.silva@sme.prefeitura.sp.gov.br",
+    "telefone": "11987654321",
+    "celular": "11999998888",
+    "rg": "1234567",
+    "registro_funcional": "RF123456",
+    "vinculo": "60108",
+    "data_nascimento": "1990-05-15",
+    "genero": "M",
+    "endereco": "Rua das Flores",
+    "numero": "123",
+    "complemento": "Apto 456",
+    "bairro": "Vila Mariana",
+    "cidade": "SAO PAULO",
+    "estado": "SP",
+    "cep": "01234567",
+    "status": "ativo"
+  },
+  "candidatoAtualizado": {
+    "nome": "Jose da Silva Teste Automacao Atualizado",
+    "cpf": "12345678901",
+    "email": "jose.silva.novo@sme.prefeitura.sp.gov.br",
+    "telefone": "(11) 97777-1111",
+    "celular": "(11) 99999-9999",
+    "rg": "1234567",
+    "registro_funcional": "RF123456",
+    "vinculo": "EFETIVO",
+    "data_nascimento": "1990-05-15",
+    "genero": "M",
+    "endereco": "Rua das Flores",
+    "numero": "123",
+    "complemento": "Apto 456",
+    "bairro": "Vila Mariana",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "cep": "01234567",
+    "status": "ativo"
+  },
+  "candidatoPatch": {
+    "email": "jose.silva.novo.patch@sme.prefeitura.sp.gov.br",
+    "status": "inativo"
+  },
+  "candidatoFeminino": {
+    "nome": "Maria Santos Teste Automacao",
+    "cpf": "98765432100",
+    "email": "maria.santos@sme.prefeitura.sp.gov.br",
+    "telefone": "1133334444",
+    "celular": "11999554433",
+    "rg": "47613651",
+    "registro_funcional": "RF789456",
+    "vinculo": "60108",
+    "data_nascimento": "1985-10-20",
+    "genero": "F",
+    "endereco": "Avenida Paulista",
+    "numero": "1000",
+    "complemento": "Sala 100",
+    "bairro": "Bela Vista",
+    "cidade": "SAO PAULO",
+    "estado": "SP",
+    "cep": "01310100",
+    "status": "ativo"
+  },
+  "candidatoSemNome": {
+    "cpf": "11111111111",
+    "email": "teste@example.com",
+    "genero": "M",
+    "cidade": "SAO PAULO",
+    "estado": "SP"
+  },
+  "candidatoSemCPF": {
+    "nome": "Teste Sem CPF",
+    "email": "teste.sem.cpf@example.com",
+    "genero": "F",
+    "cidade": "SAO PAULO",
+    "estado": "SP"
+  },
+  "candidatoEmailInvalido": {
+    "nome": "Teste Email Invalido",
+    "cpf": "22222222222",
+    "email": "email-invalido",
+    "genero": "M",
+    "cidade": "SAO PAULO",
+    "estado": "SP"
+  },
+  "candidatoCPFInvalido": {
+    "nome": "Teste CPF Invalido",
+    "cpf": "123",
+    "email": "teste.cpf@example.com",
+    "genero": "F",
+    "cidade": "SAO PAULO",
+    "estado": "SP"
+  },
+  "habilitadoValido": {
+    "codigo_inscricao": "12345678",
+    "pontos": 85.5,
+    "opcao_concurso": "INGRESSO",
+    "codigo_cargo": "3360",
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "cota": "",
+    "descricao_cargo": "PROFESSOR DE EDUCACAO INFANTIL",
+    "df": "",
+    "classificacao": 10,
+    "classificacao_pcd": null,
+    "classificacao_nna": null,
+    "ano_concurso": "2024",
+    "observacao": "Candidato criado por teste automatizado",
+    "foi_convocado": false,
+    "data_convocacao": null,
+    "ranking": 10,
+    "ranking_escolha": 10,
+    "categoria_efetiva": "GERAL",
+    "promovido_para_geral": false,
+    "promovido_de": null,
+    "promovido_em": null,
+    "eliminado": false,
+    "eliminado_em": null,
+    "eliminado_motivo": "",
+    "eliminado_por": "",
+    "numero_lote": 1,
+    "codigo_sigpec": null,
+    "numero_vaga": null,
+    "chave_inscrito": "AUTO123456",
+    "lote": 1
+  },
+  "habilitadoLoteInvalido": {
+    "codigo_inscricao": "99999999",
+    "pontos": 50.0,
+    "opcao_concurso": "INGRESSO",
+    "codigo_cargo": "3360",
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "cota": "",
+    "descricao_cargo": "PROFESSOR",
+    "df": "",
+    "classificacao": 100,
+    "ano_concurso": "2024",
+    "observacao": "",
+    "foi_convocado": false,
+    "ranking": 100,
+    "ranking_escolha": 100,
+    "categoria_efetiva": "GERAL",
+    "lote": 0
+  },
+  "buscarPorUuidsValido": {
+    "uuids": [
+      "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "a8b400ee-acbf-4ff7-90aa-7c62ceda2ee2"
+    ]
+  },
+  "buscarPorUuidsSemCampo": {
+    "outros_campos": "valor"
+  },
+  "autorizacaoPublicadaValida": {
+    "cargo": "7c74d239-bdf4-4d83-a457-7cfb3920c34c",
+    "autorizacoes": 100,
+    "data_autorizacao": "2026-06-01",
+    "observacao": "Autorização criada por teste automatizado"
+  },
+  "autorizacaoPublicadaCargoInvalido": {
+    "cargo": "00000000-0000-0000-0000-000000000000",
+    "autorizacoes": 50,
+    "data_autorizacao": "2026-06-01",
+    "observacao": "Teste com cargo inexistente"
+  },
+  "cargoValido": {
+    "nome": "CARGO TESTE AUTOMACAO CYPRESS",
+    "codigo": 999999
+  },
+  "cargoSemNome": {
+    "codigo": 888888
+  },
+  "concursoValido": {
+    "nome": "CONCURSO TESTE AUTOMACAO CYPRESS 2026",
+    "cargos_ids": ["7c74d239-bdf4-4d83-a457-7cfb3920c34c"],
+    "numero_processo": 999,
+    "codigo": 999
+  },
+  "concursoSemNome": {
+    "cargos_ids": ["7c74d239-bdf4-4d83-a457-7cfb3920c34c"],
+    "numero_processo": 888,
+    "codigo": 888
+  },
+  "escolhaValida": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "candidato_uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "vaga_uuid": "a8b400ee-acbf-4ff7-90aa-7c62ceda2ee2",
+    "status": "PENDENTE"
+  },
+  "escolhaSemProcesso": {
+    "candidato_uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "vaga_uuid": "a8b400ee-acbf-4ff7-90aa-7c62ceda2ee2",
+    "status": "PENDENTE"
+  },
+  "escolhaAtualizada": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "candidato_uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "vaga_uuid": "a8b400ee-acbf-4ff7-90aa-7c62ceda2ee2",
+    "status": "CONFIRMADO"
+  },
+  "escolhaPatch": {
+    "status": "CANCELADO"
+  },
+  "escolhaSemCandidato": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "vaga_uuid": "a8b400ee-acbf-4ff7-90aa-7c62ceda2ee2",
+    "status": "PENDENTE"
+  },
+  "escolhaSemVaga": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "candidato_uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "status": "PENDENTE"
+  },
+  "escolhaUuidInvalido": {
+    "processo_uuid": "uuid-invalido",
+    "candidato_uuid": "outro-uuid-invalido",
+    "vaga_uuid": "mais-um-uuid-invalido",
+    "status": "PENDENTE"
+  },
+  "escolhaStatusInvalido": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "candidato_uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "vaga_uuid": "a8b400ee-acbf-4ff7-90aa-7c62ceda2ee2",
+    "status": "STATUS_INVALIDO_123"
+  },
+  "vagasEscolasInclusaoValida": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "processo_nome": "Processo Teste Automacao",
+    "vagas": [
+      {
+        "data_fechamento_modulo": "2026-06-15",
+        "cargo_codigo": 1001,
+        "cargo_descricao": "ANALISTA DE INF.CULT.E DESP.- ED.FISICA",
+        "vagas_precarias": 5,
+        "vagas_definitivas": 5,
+        "foi_utilizada": false,
+        "esta_checada": true,
+        "status": "1",
+        "escola": {
+          "codigo_eol": "094765",
+          "nome_oficial": "EMEF TESTE AUTOMACAO"
+        }
+      }
+    ]
+  },
+  "vagasEscolasInclusaoSemProcesso": {
+    "vagas": [
+      {
+        "data_fechamento_modulo": "2026-06-15",
+        "cargo_codigo": 1001,
+        "cargo_descricao": "ANALISTA",
+        "vagas_precarias": 5,
+        "vagas_definitivas": 5,
+        "status": "1"
+      }
+    ]
+  },
+  "vagasEscolasInclusaoSemVagas": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "processo_nome": "Processo Teste"
+  },
+  "vagasEscolasInclusaoProcessoInexistente": {
+    "processo_uuid": "00000000-0000-0000-0000-000000000000",
+    "vagas": [
+      {
+        "data_fechamento_modulo": "2026-06-15",
+        "cargo_codigo": 1001,
+        "cargo_descricao": "ANALISTA",
+        "vagas_precarias": 5,
+        "vagas_definitivas": 5,
+        "status": "1"
+      }
+    ]
+  },
+  "vagasEscolasInclusaoVagasVazio": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "vagas": []
+  },
+  "vagasEscolasInclusaoApenasPrecarias": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "vagas": [
+      {
+        "data_fechamento_modulo": "2026-06-15",
+        "cargo_codigo": 1001,
+        "cargo_descricao": "PROFESSOR",
+        "vagas_precarias": 10,
+        "vagas_definitivas": 0,
+        "status": "1"
+      }
+    ]
+  },
+  "vagasEscolasInclusaoApenasDefinitivas": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "vagas": [
+      {
+        "data_fechamento_modulo": "2026-06-15",
+        "cargo_codigo": 1001,
+        "cargo_descricao": "COORDENADOR",
+        "vagas_precarias": 0,
+        "vagas_definitivas": 8,
+        "status": "1"
+      }
+    ]
+  },
+  "vagasEscolasInclusaoCargoInvalido": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "vagas": [
+      {
+        "data_fechamento_modulo": "2026-06-15",
+        "cargo_codigo": -999,
+        "cargo_descricao": "CARGO INVALIDO",
+        "vagas_precarias": 5,
+        "vagas_definitivas": 5,
+        "status": "1"
+      }
+    ]
+  },
+  "vagasEscolasInclusaoMultiplas": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "processo_nome": "Processo Teste Multiplas Vagas",
+    "vagas": [
+      {
+        "data_fechamento_modulo": "2026-06-15",
+        "cargo_codigo": 1001,
+        "cargo_descricao": "ANALISTA",
+        "vagas_precarias": 5,
+        "vagas_definitivas": 5,
+        "status": "1"
+      },
+      {
+        "data_fechamento_modulo": "2026-06-15",
+        "cargo_codigo": 3360,
+        "cargo_descricao": "PROFESSOR",
+        "vagas_precarias": 10,
+        "vagas_definitivas": 10,
+        "status": "1"
+      }
+    ]
+  },
+  "vagasEscolasInclusaoValoresNegativos": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "vagas": [
+      {
+        "data_fechamento_modulo": "2026-06-15",
+        "cargo_codigo": 1001,
+        "cargo_descricao": "ANALISTA",
+        "vagas_precarias": -5,
+        "vagas_definitivas": -5,
+        "status": "1"
+      }
+    ]
+  },
+  "vagasEscolasInclusaoComProcessoNome": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "processo_nome": "Processo Teste Com Nome Opcional",
+    "vagas": [
+      {
+        "data_fechamento_modulo": "2026-06-15",
+        "cargo_codigo": 1001,
+        "cargo_descricao": "DIRETOR",
+        "vagas_precarias": 3,
+        "vagas_definitivas": 3,
+        "status": "1"
+      }
+    ]
+  },
+  "vagasEscolasInclusaoSemEscolaCodigo": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "vagas": [
+      {
+        "data_fechamento_modulo": "2026-06-15",
+        "cargo_codigo": 1001,
+        "cargo_descricao": "ANALISTA",
+        "vagas_precarias": 5,
+        "vagas_definitivas": 5,
+        "status": "1",
+        "escola": {
+          "nome_oficial": "ESCOLA SEM CODIGO EOL"
+        }
+      }
+    ]
+  },
+  "vagasEscolasInclusaoDataInvalida": {
+    "processo_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "vagas": [
+      {
+        "data_fechamento_modulo": "data-invalida-123",
+        "cargo_codigo": 1001,
+        "cargo_descricao": "ANALISTA",
+        "vagas_precarias": 5,
+        "vagas_definitivas": 5,
+        "status": "1",
+        "escola": {
+          "codigo_eol": "094765",
+          "nome_oficial": "EMEF TESTE"
+        }
+      }
+    ]
+  },
+  "cabecalhoLoteValido": {
+    "tipo": "CANDIDATOS",
+    "descricao": "Cabeçalho teste automacao",
+    "campos": ["nome", "cpf", "rg", "email"],
+    "ativo": true
+  },
+  "cabecalhoLoteSemTipo": {
+    "descricao": "Cabeçalho sem tipo",
+    "campos": ["nome", "cpf"],
+    "ativo": true
+  },
+  "cabecalhoLoteSemCampos": {
+    "tipo": "VAGAS",
+    "descricao": "Cabeçalho sem campos",
+    "ativo": true
+  },
+  "exportacaoCandidatosValida": {
+    "processo_uuid": "70ba1cd1-14f9-40b9-b732-a410a91f590d",
+    "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c",
+    "cargo_codigo": 1008,
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "concurso_nome": "ACESSO DIRETOR DE ESCOLA N15 240723"
+  },
+  "exportacaoCandidatosSemProcesso": {
+    "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c",
+    "cargo_codigo": 1008,
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f"
+  },
+  "exportacaoCandidatosSemCargo": {
+    "processo_uuid": "70ba1cd1-14f9-40b9-b732-a410a91f590d",
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f"
+  },
+  "exportacaoLoteValida": {
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c",
+    "numero_lote": 1,
+    "lote_uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  },
+  "exportacaoLoteSemConcurso": {
+    "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c",
+    "numero_lote": 1,
+    "lote_uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  },
+  "exportacaoLoteSemLoteUuid": {
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c",
+    "numero_lote": 1
+  },
+  "exportacaoVagasProcessoValida": {
+    "processo_uuid": "70ba1cd1-14f9-40b9-b732-a410a91f590d",
+    "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c",
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "cargo_codigo": 1008
+  },
+  "exportacaoVagasProcessoSemProcesso": {
+    "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c",
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "cargo_codigo": 1008
+  },
+  "exportacaoVagasSigpecValida": {
+    "processo_uuid": "70ba1cd1-14f9-40b9-b732-a410a91f590d",
+    "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c",
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "cargo_codigo": 1008
+  },
+  "exportacaoVagasSigpecSemProcesso": {
+    "cargo_uuid": "7c74d239-bdf4-4d83-a457-7cfb3920c34c",
+    "cargo_codigo": 1008
+  },
+  "importacaoHabilitadosValida": {
+    "arquivo": "http://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-importa-arquivos/media/importacoes/habilitados_30_1001.csv",
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "concurso_nome": "Concurso Teste Automacao"
+  },
+  "importacaoHabilitadosSemArquivo": {
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f",
+    "concurso_nome": "Concurso Teste"
+  },
+  "importacaoHabilitadosSemConcurso": {
+    "arquivo": "http://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-importa-arquivos/media/importacoes/habilitados_test.csv"
+  },
+  "importacaoVagasValida": {
+    "arquivo": "http://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-importa-arquivos/media/importacoes/vagas_test.csv",
+    "processo_uuid": "70ba1cd1-14f9-40b9-b732-a410a91f590d",
+    "processo_nome": "Processo Teste Automacao"
+  },
+  "importacaoVagasSemArquivo": {
+    "processo_uuid": "70ba1cd1-14f9-40b9-b732-a410a91f590d",
+    "processo_nome": "Processo Teste"
+  },
+  "importacaoVagasSemProcesso": {
+    "arquivo": "http://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-importa-arquivos/media/importacoes/vagas_test.csv"
+  },
+  "importacaoEscolhasValida": {
+    "processo_uuid": "56542c26-1c07-485d-8eb8-c6f117fbd58d",
+    "lote_uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f"
+  },
+  "importacaoEscolhasSemProcesso": {
+    "lote_uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f"
+  },
+  "importacaoEscolhasSemLote": {
+    "processo_uuid": "56542c26-1c07-485d-8eb8-c6f117fbd58d",
+    "concurso_uuid": "cf623db0-29bd-4fb9-9f15-1fb84fccac9f"
+  }
 }
