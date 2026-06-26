@@ -15,8 +15,6 @@ const relatoriosMock: RelatorioDetalhadoItem[] = [
     dreOriginal: "Diretoria Regional de Educação Butantã",
     escolhas: 10,
     naoEscolhas: 5,
-    autorizacoes: 3,
-    data_autorizacao: "15/06/2025",
   },
   {
     key: "2",
@@ -28,8 +26,6 @@ const relatoriosMock: RelatorioDetalhadoItem[] = [
     dreOriginal: "Diretoria Regional de Educação Centro",
     escolhas: 8,
     naoEscolhas: 2,
-    autorizacoes: 1,
-    data_autorizacao: "20/07/2025",
   },
 ];
 
@@ -38,10 +34,18 @@ describe("RelatoriosDetalhados", () => {
     render(<RelatoriosDetalhados data={relatoriosMock} />);
 
     expect(screen.getByText("Relatórios detalhados")).toBeInTheDocument();
+    expect(screen.getByText("Lista consolidada por concurso, cargo e DRE.")).toBeInTheDocument();
     expect(screen.getByRole("cell", { name: "Professor" })).toBeInTheDocument();
     expect(screen.getByRole("cell", { name: "Coordenador" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /filtrar/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /limpar filtros/i })).toBeInTheDocument();
+  });
+
+  it("exibe data da última atualização", () => {
+    render(<RelatoriosDetalhados data={relatoriosMock} />);
+
+    expect(screen.getByText("15/06/2025")).toBeInTheDocument();
+    expect(screen.getByText("20/07/2025")).toBeInTheDocument();
   });
 
   it("mantém todos os registros ao limpar filtros", async () => {

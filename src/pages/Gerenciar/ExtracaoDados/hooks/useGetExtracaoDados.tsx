@@ -4,7 +4,7 @@ import type { IExtracaoDadosResponse } from "../../../../services/resources/rela
 
 export const useGetExtracaoDados = (
   concursoUuid?: string,
-  ano?: string,
+  anos?: string[],
   enabled: boolean = false
 ) => {
   const {
@@ -14,16 +14,16 @@ export const useGetExtracaoDados = (
     refetch,
     error,
   } = useQuery({
-    queryKey: ["getExtracaoDados", concursoUuid, ano],
+    queryKey: ["getExtracaoDados", concursoUuid, anos],
     queryFn: ({ signal }) =>
       API.Relatorios.getExtracaoDados(
         {
           concurso_uuid: concursoUuid!,
-          ano: ano!,
+          ano: anos!,
         },
         { signal }
       ).response as Promise<IExtracaoDadosResponse>,
-    enabled: enabled && Boolean(concursoUuid) && Boolean(ano),
+    enabled: enabled && Boolean(concursoUuid) && Boolean(anos?.length),
     staleTime: 1000 * 60 * 2,
     retry: 1,
   });

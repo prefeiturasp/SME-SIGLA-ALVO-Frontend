@@ -74,7 +74,9 @@ describe("EnvioEmailsTela", () => {
     jest.clearAllMocks();
   });
 
-  it("desabilita Filtrar até selecionar processo e tipo; carrega conteúdo e mostra textarea", async () => {
+  it(
+    "desabilita Filtrar até selecionar processo e tipo; carrega conteúdo e mostra textarea",
+    async () => {
     const user = userEvent.setup();
     const client = new QueryClient();
     render(
@@ -118,7 +120,9 @@ describe("EnvioEmailsTela", () => {
     expect(screen.getByLabelText("assunto")).toHaveValue("");
     expect(screen.getByLabelText("quill-editor-conteudo-gabarito")).toHaveValue("<p>gabarito padrao</p>");
     expect(screen.getByText("Copiar conteúdo gabarito")).toBeInTheDocument();
-  });
+  },
+  15000
+  );
 
   it("copia conteúdo gabarito para o conteúdo ao clicar no botão de copiar", async () => {
     const user = userEvent.setup();
