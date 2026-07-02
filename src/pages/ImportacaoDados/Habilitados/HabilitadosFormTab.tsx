@@ -162,6 +162,7 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                       {...field}
                       disabled={!canImportarHabilitados}
                       rows={4}
+                      autoSize={{ minRows: 4, maxRows: 4 }}
                       maxLength={2000}
                       showCount
                       placeholder="Digite uma observação sobre esta importação (opcional)"
