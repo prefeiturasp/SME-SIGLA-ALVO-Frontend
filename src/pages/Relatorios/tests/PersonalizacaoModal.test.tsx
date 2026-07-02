@@ -190,16 +190,25 @@ describe('PersonalizacaoModal', () => {
 
   describe('Reset quando modal fecha', () => {
     it('deve resetar estados quando open muda para false', async () => {
+      // Carrega com usar_logotipo=false (checkbox desmarcado)
       mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData({ usar_logotipo: false }));
       const { rerender } = setupComponent();
-      await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalled());
+      await waitFor(() =>
+        expect(screen.getAllByRole('checkbox')[0]).not.toBeChecked()
+      );
+
+      // Fecha o modal: o efeito de reset limpa o estado interno e o hasFetchedRef.
       rerender(<PersonalizacaoModal {...defaultProps} open={false} />);
-      await waitFor(() => {
-        const checkboxes = screen.queryAllByRole('checkbox');
-        if (checkboxes.length > 0) {
-          expect(checkboxes[0]).toBeChecked();
-        }
-      });
+
+      // Ao reabrir, o estado deve ter voltado ao padrão (logotipo marcado).
+      // O modal fechado congela o DOM da AntD, entao verificamos o reset pela
+      // reabertura em vez de inspecionar o checkbox do modal ja fechado.
+      mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData());
+      rerender(<PersonalizacaoModal {...defaultProps} open />);
+
+      await waitFor(() =>
+        expect(screen.getAllByRole('checkbox')[0]).toBeChecked()
+      );
     });
   });
 

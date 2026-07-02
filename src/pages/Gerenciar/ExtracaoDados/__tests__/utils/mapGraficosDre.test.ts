@@ -45,6 +45,7 @@ describe("mapGraficosDre", () => {
           escolhas: 50,
           vagas: 100,
           percentualPreenchimento: 50,
+          modoComparativo: false,
         },
         {
           key: "Centro",
@@ -52,6 +53,7 @@ describe("mapGraficosDre", () => {
           escolhas: 30,
           vagas: 80,
           percentualPreenchimento: 38,
+          modoComparativo: false,
         },
       ]);
     });
@@ -64,21 +66,22 @@ describe("mapGraficosDre", () => {
 
   describe("mapeamentos filtrados por ano", () => {
     it("mapeia gráficos e tabela a partir dos dados do ano", () => {
-      expect(mapDresParaGraficoEscolhas(extracaoDadosFiltradoMock, "2024")).toEqual([
+      expect(mapDresParaGraficoEscolhas(extracaoDadosFiltradoMock, ["2024"])).toEqual([
         { nome: "DRE Butantã", valor: 25 },
       ]);
 
-      expect(mapDresParaGraficoVagas(extracaoDadosFiltradoMock, "2024")).toEqual([
+      expect(mapDresParaGraficoVagas(extracaoDadosFiltradoMock, ["2024"])).toEqual([
         { nome: "DRE Butantã", valor: 40 },
       ]);
 
-      expect(mapDresParaTabela(extracaoDadosFiltradoMock, "2024")).toEqual([
+      expect(mapDresParaTabela(extracaoDadosFiltradoMock, ["2024"])).toEqual([
         {
           key: "Butantã",
           nome: "Butantã",
           escolhas: 25,
           vagas: 40,
           percentualPreenchimento: 63,
+          modoComparativo: false,
         },
       ]);
     });
@@ -96,7 +99,7 @@ describe("mapGraficosDre", () => {
         },
       };
 
-      expect(mapDresParaTabela(data, "2024")[0].percentualPreenchimento).toBe(0);
+      expect(mapDresParaTabela(data, ["2024"])[0].percentualPreenchimento).toBe(0);
     });
   });
 });
