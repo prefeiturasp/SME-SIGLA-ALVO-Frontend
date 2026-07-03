@@ -32,8 +32,8 @@ const TabelaConcursos: React.FC<ITabelaProps> = ({
     { title: "Banca responsável", dataIndex: "banca_responsavel", key: "banca_responsavel" },
     {
       title: "Status",
-      key: "ativo",
-      render: (_, row) => (row.ativo ? "Ativo" : "Inativo"),
+      key: "status",
+      render: (_, row) => (row.status === "ATIVO" ? "Ativo" : "Inativo"),
     },
     {
       title: "",
@@ -55,8 +55,7 @@ const TabelaConcursos: React.FC<ITabelaProps> = ({
       rowKey="uuid"
       columns={colunas}
       dataSource={dados}
-      loading={loading}
-      rowClassName={(row) => (row.ativo ? "" : "linha-inativa")}
+      loading={loading}      
       locale={{ emptyText: "Não encontramos dados para esta busca" }}
       pagination={{
         current: page,

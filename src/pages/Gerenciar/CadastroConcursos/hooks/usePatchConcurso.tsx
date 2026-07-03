@@ -3,34 +3,6 @@ import { App } from "antd";
 import { API } from "../../../../services";
 import type { IConcursoPayload } from "../../../../services/resources/concursos/IConcursos";
 
-export const usePostConcurso = () => {
-  const queryClient = useQueryClient();
-  const { notification } = App.useApp();
-
-  return useMutation({
-    mutationFn: (payload: IConcursoPayload) =>
-      API.Concursos.postConcurso(payload).response,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["listarConcursos"] });
-      notification.success({
-        message: "Concurso cadastrado",
-        description: "O concurso foi cadastrado com sucesso!",
-        placement: "top",
-        duration: 3.5,
-      });
-    },
-    onError: () => {
-      notification.error({
-        message: "Erro ao cadastrar",
-        description:
-          "Ocorreu um erro ao cadastrar o concurso. Tente novamente.",
-        placement: "top",
-        duration: 3.5,
-      });
-    },
-  });
-};
-
 export const usePatchConcurso = () => {
   const queryClient = useQueryClient();
   const { notification } = App.useApp();
@@ -43,8 +15,11 @@ export const usePatchConcurso = () => {
       uuid: string;
       payload: Partial<IConcursoPayload>;
     }) => API.Concursos.patchConcurso(uuid, payload).response,
-    onSuccess: () => {
+    onSuccess: (_data, { uuid }) => {
       queryClient.invalidateQueries({ queryKey: ["listarConcursos"] });
+      queryClient.invalidateQueries({
+        queryKey: ["getConcursoByUuid", uuid],
+      });
       notification.success({
         message: "Concurso atualizado",
         description: "As alterações foram salvas com sucesso!",

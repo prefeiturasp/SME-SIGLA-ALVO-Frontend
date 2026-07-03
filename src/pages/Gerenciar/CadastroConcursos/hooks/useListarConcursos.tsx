@@ -16,6 +16,7 @@ export const useListarConcursos = (
       ).response,
     placeholderData: keepPreviousData,
     retry: 0,
+    staleTime: 0,
   });
 
   return {

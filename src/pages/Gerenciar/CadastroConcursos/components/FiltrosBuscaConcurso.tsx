@@ -16,8 +16,18 @@ interface IFiltrosFields {
   numero_processo?: string;
   ano_edital?: number;
   banca_responsavel?: string;
-  ativo?: boolean;
+  status?: string;  
 }
+
+const removerVazios = (valores: IFiltrosFields): IConcursoFiltros => {
+  return Object.fromEntries(
+    Object.entries(valores).filter(([, valor]) => {
+      if (valor === undefined || valor === null) return false;
+      if (typeof valor === "string") return valor.trim() !== "";
+      return true;
+    })
+  ) as IConcursoFiltros;
+};
 
 const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
   onBuscar,
@@ -32,18 +42,7 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
   };
 
   const buscar = handleSubmit((valores) => {
-    const filtros: IConcursoFiltros = {};
-    if (valores.codigo_cargo) filtros.codigo_cargo = valores.codigo_cargo;
-    if (valores.nome) filtros.nome = valores.nome;
-    if (valores.descricao_cargo)
-      filtros.descricao_cargo = valores.descricao_cargo;
-    if (valores.numero_processo)
-      filtros.numero_processo = valores.numero_processo;
-    if (valores.ano_edital) filtros.ano_edital = valores.ano_edital;
-    if (valores.banca_responsavel)
-      filtros.banca_responsavel = valores.banca_responsavel;
-    if (valores.ativo !== undefined) filtros.ativo = valores.ativo;
-    onBuscar(filtros);
+    onBuscar(removerVazios(valores));
   });
 
   return (
@@ -144,7 +143,7 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
         <Col xs={24} md={6}>
           <Controller
             control={control}
-            name="ativo"
+            name="status"
             render={({ field }) => (
               <Form.Item label={<strong>Status</strong>}>
                 <Select
@@ -152,8 +151,8 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
                   allowClear
                   placeholder="Selecione"
                   options={[
-                    { value: true, label: "Ativo" },
-                    { value: false, label: "Inativo" },
+                    { value: "ATIVO", label: "Ativo" },
+                    { value: "INATIVO", label: "Inativo" },
                   ]}
                 />
               </Form.Item>

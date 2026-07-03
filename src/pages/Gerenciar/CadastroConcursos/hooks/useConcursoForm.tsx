@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import type { Resolver } from "react-hook-form";
 import * as yup from "yup";
+import type { ConcursoStatus } from "../../../../services/resources/concursos/IConcursos";
 
 export interface IConcursoFormFields {
   cargos_ids: string[];
@@ -9,7 +10,7 @@ export interface IConcursoFormFields {
   numero_processo: string;
   ano_edital: number;
   banca_responsavel: string;
-  ativo: boolean;
+  status: ConcursoStatus;
 }
 
 const schema = yup.object({
@@ -31,7 +32,10 @@ const schema = yup.object({
     .string()
     .trim()
     .required("Informe a banca responsável"),
-  ativo: yup.boolean().required("Selecione o status"),
+  status: yup
+    .mixed<ConcursoStatus>()
+    .oneOf(["ATIVO", "INATIVO"])
+    .required("Selecione o status"),
 });
 
 const valoresPadrao: IConcursoFormFields = {
@@ -40,7 +44,7 @@ const valoresPadrao: IConcursoFormFields = {
   numero_processo: "",
   ano_edital: new Date().getFullYear(),
   banca_responsavel: "",
-  ativo: true,
+  status: "ATIVO",
 };
 
 export const useConcursoForm = (

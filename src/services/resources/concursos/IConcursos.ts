@@ -26,8 +26,10 @@ export interface IConcursoLista {
   numero_processo: string;
   ano_edital: number | null;
   banca_responsavel: string;
-  ativo: boolean;
+  status: string;
 }
+
+export type ConcursoStatus = "ATIVO" | "INATIVO";
 
 // Retorno do endpoint de detalhe (ConcursoSerializer)
 export interface IConcursoDetalhe {
@@ -38,7 +40,7 @@ export interface IConcursoDetalhe {
   codigo: number | null;
   ano_edital: number | null;
   banca_responsavel: string;
-  ativo: boolean;
+  status: ConcursoStatus;
 }
 
 export interface IConcursoPayload {
@@ -47,7 +49,7 @@ export interface IConcursoPayload {
   numero_processo: string;
   ano_edital: number | null;
   banca_responsavel: string;
-  ativo: boolean;
+  status: ConcursoStatus;
 }
 
 export interface IConcursoFiltros {
@@ -57,5 +59,5 @@ export interface IConcursoFiltros {
   numero_processo?: string;
   ano_edital?: number;
   banca_responsavel?: string;
-  ativo?: boolean;
+  status?: ConcursoStatus;
 }

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import { StyledCardWithoutBorder } from "../../../components/EstilosCompartilhados";
 import FormConcurso from "./components/FormConcurso";
 import { useConcursoForm } from "./hooks/useConcursoForm";
-import { usePostConcurso, usePatchConcurso } from "./hooks/useSalvarConcurso";
-import { API } from "../../../services";
+import { usePostConcurso } from "./hooks/usePostConcurso";
+import { usePatchConcurso } from "./hooks/usePatchConcurso";
+import { useGetConcursoByUuid } from "../../GerenciamentoVagas/hooks/useGetConcursoPorUuid";
 
 const { Text } = Typography;
 
@@ -24,13 +24,7 @@ const AdicionarEditarConcursoTela: React.FC = () => {
     formState: { errors, isValid, isDirty },
   } = useConcursoForm();
 
-  const { data: concurso } = useQuery({
-    queryKey: ["getConcursoByUuid", uuid],
-    queryFn: ({ signal }) =>
-      API.Concursos.getConcursoByUuid(uuid as string, { signal }).response,
-    enabled: isEdicao,
-    retry: 0,
-  });
+  const { concursoData: concurso } = useGetConcursoByUuid(uuid ?? "");
 
   useEffect(() => {
     if (concurso) {
@@ -40,7 +34,7 @@ const AdicionarEditarConcursoTela: React.FC = () => {
         numero_processo: concurso.numero_processo ?? "",
         ano_edital: concurso.ano_edital ?? new Date().getFullYear(),
         banca_responsavel: concurso.banca_responsavel ?? "",
-        ativo: concurso.ativo ?? true,
+        status: concurso.status ?? "ATIVO",
       });
       setCarregado(true);
     }
@@ -71,7 +65,7 @@ const AdicionarEditarConcursoTela: React.FC = () => {
       numero_processo: valores.numero_processo,
       ano_edital: valores.ano_edital,
       banca_responsavel: valores.banca_responsavel,
-      ativo: valores.ativo,
+      status: valores.status,
     };
 
     if (isEdicao && uuid) {

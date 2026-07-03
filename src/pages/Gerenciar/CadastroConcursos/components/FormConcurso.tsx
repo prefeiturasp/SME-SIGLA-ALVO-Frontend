@@ -146,21 +146,21 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
       <Col xs={24} md={8}>
         <Controller
           control={control}
-          name="ativo"
+          name="status"
           render={({ field }) => (
             <Form.Item
               layout="vertical"
               required
               label={<strong>Status do concurso</strong>}
-              validateStatus={erros.ativo ? "error" : undefined}
-              help={erros.ativo?.message}
+              validateStatus={erros.status ? "error" : undefined}
+              help={erros.status?.message}
             >
               <Select
                 {...field}
                 placeholder="Selecione"
                 options={[
-                  { value: true, label: "Ativo" },
-                  { value: false, label: "Inativo" },
+                  { value: "ATIVO", label: "Ativo" },
+                  { value: "INATIVO", label: "Inativo" },
                 ]}
               />
             </Form.Item>
