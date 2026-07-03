@@ -9,6 +9,7 @@ import { StyledTable } from "../../../../components/EstilosCompartilhados";
 import type { IUltimasImportacoesVagas } from "../../../../services/resources/importacaoDados/IImportacaoArquivos";
 import ErroModal from "./ErroModal";
 import { useGetDownloadError, TipoImportacao } from "../../hooks/useGetDownloadError";
+import { formatarStatusImportacao } from "../../utils/statusImportacao";
 
 interface UltimasImportacoesDeVagasTableProps extends TableProps<IUltimasImportacoesVagas> {
   data: IUltimasImportacoesVagas[];
@@ -65,7 +66,7 @@ const UltimasImportacoesDeVagasTable: React.FC<UltimasImportacoesDeVagasTablePro
       dataIndex: "status",
       key: "status",
       align: "center",
-      render: (status: string) => status || "-",
+      render: (status: string) => formatarStatusImportacao(status),
     },
     {
       title: "Ações",

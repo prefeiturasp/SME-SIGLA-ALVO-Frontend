@@ -18,6 +18,7 @@ import { useImportacaoDadosLotes } from "./hooks/useImportacaoDadosLotes";
 import ErroLotesModal from "./components/ErroLotesModal";
 import DetalhesLotesModal from "./components/DetalhesLotesModal";
 import type { IImportacaoLotesResponse, IDetalheLoteAtualizado } from "./hooks/types";
+import { formatarStatusImportacao } from "../utils/statusImportacao";
 
 const { Text } = Typography;
 
@@ -94,7 +95,7 @@ const HistoricoLotesTela: React.FC = () => {
       key: "status",
       align: "center",
       render: (status: string) => (
-        <Tag color={statusColor[status] || "default"}>{status || "-"}</Tag>
+        <Tag color={statusColor[status] || "default"}>{formatarStatusImportacao(status)}</Tag>
       ),
     },
     {

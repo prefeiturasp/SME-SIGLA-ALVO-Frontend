@@ -25,6 +25,17 @@ export interface IUltimasImportacoesVagas {
   erros?: IErroImportacao[] | null;
 }
 
+export interface IUltimasImportacoesHabilitados {
+  uuid: string;
+  nome_arquivo: string;
+  concurso_nome: string | null;
+  criado_em: string;
+  status: string;
+  quantidade: number | null;
+  observacao: string | null;
+  erros?: IErroImportacao[] | null;
+}
+
 
 export interface IGetLayout {    
       atualizado_em: string,

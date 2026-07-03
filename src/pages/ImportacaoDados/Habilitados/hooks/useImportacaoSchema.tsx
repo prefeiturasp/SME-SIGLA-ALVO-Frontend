@@ -13,6 +13,8 @@ const useImportacaoSchema = () => {
         if (!value) return false;
         return value.type === "text/csv" || value.name.endsWith(".csv");
       }),
+
+    observacao: yup.string().optional(),
   });
 };
 

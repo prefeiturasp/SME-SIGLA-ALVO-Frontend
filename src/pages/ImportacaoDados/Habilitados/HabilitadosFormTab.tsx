@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Select, Button, Tooltip, Spin } from "antd";
+import { Row, Col, Select, Button, Tooltip, Spin, Input } from "antd";
 import { Controller } from "react-hook-form";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useImportacaoDados } from "./hooks/useImportacaoDadosHabilitados";
@@ -146,7 +146,32 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
           </Col>
           </Row>
 
-        
+          <Row gutter={40}>
+            <Col xs={24}>
+              <Controller
+                control={control}
+                name="observacao"
+                render={({ field }) => (
+                  <CustomFormItem
+                    label="Observação"
+                    validateStatus={formErrors.observacao ? "error" : undefined}
+                    help={formErrors.observacao?.message}
+                    labelCol={{ span: 24 }}
+                  >
+                    <Input.TextArea
+                      {...field}
+                      disabled={!canImportarHabilitados}
+                      rows={4}
+                      autoSize={{ minRows: 4, maxRows: 4 }}
+                      maxLength={2000}
+                      showCount
+                      placeholder="Digite uma observação sobre esta importação (opcional)"
+                    />
+                  </CustomFormItem>
+                )}
+              />
+            </Col>
+          </Row>
 
       </TabContentContainer>
       <ActionButtonsContainer>

@@ -23,6 +23,7 @@ export const useImportacaoDados = () => {
     concurso: undefined,
     arquivo: null,
     tipo: "HABILITADOS",
+    observacao: "",
   };
 
   const {
@@ -72,6 +73,7 @@ export const useImportacaoDados = () => {
       concurso_uuid: concursoSelecionado.value,
       arquivo: data.arquivo!,
       tipo: "HABILITADOS",
+      observacao: data.observacao?.trim() || undefined,
     };
 
     try {
