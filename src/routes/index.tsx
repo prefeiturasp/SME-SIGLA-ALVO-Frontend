@@ -22,6 +22,8 @@ import EscolhaCandidatosTela from "../pages/EscolhaCandidatos/EscolhaCandidatosT
 import PermissaoUsuarioTela from "../pages/Gerenciar/PermissaoUsuario/PermissaoUsuarioTela";
 import AdicionarUsuarioTela from "../pages/Gerenciar/AdicionarUsuario/AdicionarUsuarioTela";
 import CadastroParametrosTela from "../pages/Gerenciar/Parametros/CadastroParametrosTela";
+import ListagemConcursosTela from "../pages/Gerenciar/CadastroConcursos/ListagemConcursosTela";
+import AdicionarEditarConcursoTela from "../pages/Gerenciar/CadastroConcursos/AdicionarEditarConcursoTela";
 
 import DadosDoProcesso from "../pages/CriarEditarConvocacao/DadosDoProcesso";
 import SelecaoCargosTela from "../pages/CriarEditarConvocacao/SelecaoCargos/SelecaoCargosTela";
@@ -77,6 +79,39 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <PermissionContextGuard model="autorizacaopublicada" permissaoDeExibirATELA="view_autorizacaopublicada">
         <AutorizacoesPublicadasGerenciarTela />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/gerenciar/concursos",
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="concurso" permissaoDeExibirATELA="view_concurso">
+          <ListagemConcursosTela />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/gerenciar/concursos/adicionar",
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="concurso" permissaoDeExibirATELA="add_concurso">
+          <AdicionarEditarConcursoTela />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/gerenciar/concursos/editar/:uuid",
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="concurso" permissaoDeExibirATELA="change_concurso">
+          <AdicionarEditarConcursoTela />
         </PermissionContextGuard>
       </ProtectedRoute>
     ),
