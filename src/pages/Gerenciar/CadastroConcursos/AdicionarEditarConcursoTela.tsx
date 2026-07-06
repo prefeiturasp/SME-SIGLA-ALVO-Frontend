@@ -8,6 +8,7 @@ import { useConcursoForm } from "./hooks/useConcursoForm";
 import { usePostConcurso } from "./hooks/usePostConcurso";
 import { usePatchConcurso } from "./hooks/usePatchConcurso";
 import { useGetConcursoByUuid } from "../../GerenciamentoVagas/hooks/useGetConcursoPorUuid";
+import { obterMensagemNumeroProcessoDuplicado } from "./utils/erroConcurso";
 
 const { Text } = Typography;
 
@@ -21,6 +22,7 @@ const AdicionarEditarConcursoTela: React.FC = () => {
     control,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, isValid, isDirty },
   } = useConcursoForm();
 
@@ -58,6 +60,13 @@ const AdicionarEditarConcursoTela: React.FC = () => {
     { title: isEdicao ? "Editar concurso" : "Adicionar concurso" },
   ] as TitleItem[];
 
+  const tratarErroNumeroProcessoDuplicado = (error: unknown) => {
+    const mensagem = obterMensagemNumeroProcessoDuplicado(error);
+    if (mensagem) {
+      setError("numero_processo", { type: "manual", message: mensagem });
+    }
+  };
+
   const onSubmit = handleSubmit((valores) => {
     const payload = {
       nome: valores.nome,
@@ -71,11 +80,15 @@ const AdicionarEditarConcursoTela: React.FC = () => {
     if (isEdicao && uuid) {
       patchConcurso.mutate(
         { uuid, payload },
-        { onSuccess: () => navigate("/gerenciar/concursos") }
+        {
+          onSuccess: () => navigate("/gerenciar/concursos"),
+          onError: tratarErroNumeroProcessoDuplicado,
+        }
       );
     } else {
       postConcurso.mutate(payload, {
         onSuccess: () => navigate("/gerenciar/concursos"),
+        onError: tratarErroNumeroProcessoDuplicado,
       });
     }
   });

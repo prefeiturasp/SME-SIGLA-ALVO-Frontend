@@ -1,8 +1,9 @@
 import { Col, Form, Input, InputNumber, Row, Select } from "antd";
+import type { DefaultOptionType } from "antd/es/select";
 import { Controller } from "react-hook-form";
 import type { Control, FieldErrors } from "react-hook-form";
 import type { IConcursoFormFields } from "../hooks/useConcursoForm";
-import { useCargosAutocomplete } from "../hooks/useCargosAutocomplete";
+import { useCargos } from "../../../../hooks/useCargos";
 
 interface IOpcaoCargo {
   value: string;
@@ -15,12 +16,21 @@ interface IFormConcursoProps {
   opcoesIniciais?: IOpcaoCargo[];
 }
 
+// Filtragem em memoria: casa contra o label "codigo - nome",
+// entao digitar o codigo ou o nome filtra as opcoes.
+const filtrarPorLabel = (input: string, option?: DefaultOptionType) => {
+  const label = option?.label;
+  return typeof label === "string"
+    ? label.toLowerCase().includes(input.toLowerCase())
+    : false;
+};
+
 const FormConcurso: React.FC<IFormConcursoProps> = ({
   control,
   erros,
   opcoesIniciais = [],
 }) => {
-  const { opcoes, buscar, isFetching } = useCargosAutocomplete();
+  const { opcoes, isLoading } = useCargos();
 
   // Mescla as opcoes ja selecionadas (edicao) com as do autocomplete,
   // para que o Select exiba "codigo - nome" em vez do UUID cru.
@@ -48,12 +58,14 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
               <Select
                 {...field}
                 mode="multiple"
-                placeholder="Digite o código do cargo..."
-                filterOption={false}
-                onSearch={buscar}
-                loading={isFetching}
+                placeholder="Selecione o(s) cargo(s)..."
+                optionFilterProp="label"
+                filterOption={filtrarPorLabel}
+                loading={isLoading}
                 options={opcoesSelect}
-                notFoundContent={isFetching ? "Buscando..." : null}
+                notFoundContent={
+                  isLoading ? "Carregando..." : "Nenhum cargo encontrado"
+                }
               />
             </Form.Item>
           )}

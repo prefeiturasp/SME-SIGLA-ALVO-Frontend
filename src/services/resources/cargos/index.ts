@@ -103,13 +103,19 @@ export interface ICargoAutocomplete {
 
 export const getCargos = (
   search: string,
+  pageSize?: number,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
 
+  const params: Record<string, unknown> = { search };
+  if (pageSize !== undefined) {
+    params.page_size = pageSize;
+  }
+
   const response = appAxiosConcursos
     .get<PaginatedResponse<ICargoAutocomplete>>(URL.getCargos(), {
-      params: { search },
+      params,
       paramsSerializer: queryParamsSerializer,
       signal,
       ...axiosRequestConfig,

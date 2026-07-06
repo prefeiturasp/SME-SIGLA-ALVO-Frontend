@@ -1,12 +1,14 @@
-import { Button, Col, Form, Input, InputNumber, Row, Select } from "antd";
+import { Button, Col, Form, Input, Row, Select } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
+import { useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import type { IConcursoFiltros } from "../../../../services/resources/concursos/IConcursos";
-import { useOpcoesFiltro } from "../hooks/useOpcoesFiltro";
+import { useListarConcursos } from "../hooks/useListarConcursos";
 
 interface IFiltrosProps {
   onBuscar: (filtros: IConcursoFiltros) => void;
   onLimpar: () => void;
+  concursos: ReturnType<typeof useListarConcursos>["concursos"];
 }
 
 interface IFiltrosFields {
@@ -16,7 +18,7 @@ interface IFiltrosFields {
   numero_processo?: string;
   ano_edital?: number;
   banca_responsavel?: string;
-  status?: string;  
+  status?: string;    
 }
 
 const removerVazios = (valores: IFiltrosFields): IConcursoFiltros => {
@@ -32,9 +34,49 @@ const removerVazios = (valores: IFiltrosFields): IConcursoFiltros => {
 const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
   onBuscar,
   onLimpar,
+  concursos
 }) => {
   const { control, handleSubmit, reset } = useForm<IFiltrosFields>();
-  const { opcoesBanca, opcoesAno } = useOpcoesFiltro();
+ // const { concursos } = useListarConcursos({}, 1, 1000);
+
+  const opcoesBanca = useMemo(() => {
+    const bancas = Array.from(
+      new Set(
+        concursos
+          .map((c) => c.banca_responsavel)
+          .filter((banca): banca is string => Boolean(banca && banca.trim()))
+      )
+    ).sort((a, b) => a.localeCompare(b));
+    return bancas.map((banca) => ({ value: banca, label: banca }));
+  }, [concursos]);
+
+  const opcoesAno = useMemo(() => {
+    const anos = Array.from(
+      new Set(
+        concursos
+          .map((c) => c.ano_edital)
+          .filter((ano): ano is number => ano !== null && ano !== undefined)
+      )
+    ).sort((a, b) => b - a);
+    return anos.map((ano) => ({ value: ano, label: String(ano) }));
+  }, [concursos]);
+
+  const opcoesCodigoCargo = useMemo(() => {
+    const cargosPorCodigo = new Map<number, string>();
+    concursos.forEach((c) =>
+      c.cargos?.forEach((cargo) => {
+        if (cargo.codigo !== null && cargo.codigo !== undefined) {
+          cargosPorCodigo.set(cargo.codigo, cargo.nome);
+        }
+      })
+    );
+    return Array.from(cargosPorCodigo.entries())
+      .sort(([a], [b]) => a - b)
+      .map(([codigo, nome]) => ({
+        value: codigo,
+        label: nome ? `${codigo} - ${nome}` : String(codigo),
+      }));
+  }, [concursos]);
 
   const limpar = () => {
     reset({});
@@ -54,11 +96,13 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
             name="codigo_cargo"
             render={({ field }) => (
               <Form.Item label={<strong>Código do cargo</strong>}>
-                <InputNumber
+                <Select
                   {...field}
-                  style={{ width: "100%" }}
-                  controls={false}
-                  placeholder="Digite o código do cargo..."
+                  allowClear
+                  showSearch
+                  optionFilterProp="label"
+                  placeholder="Selecione o código do cargo..."
+                  options={opcoesCodigoCargo}
                 />
               </Form.Item>
             )}

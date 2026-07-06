@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { App } from "antd";
 import { API } from "../../../../services";
 import type { IConcursoPayload } from "../../../../services/resources/concursos/IConcursos";
+import { ehErroNumeroProcessoDuplicado } from "../utils/erroConcurso";
 
 export const usePostConcurso = () => {
   const queryClient = useQueryClient();
@@ -19,7 +20,11 @@ export const usePostConcurso = () => {
         duration: 3.5,
       });
     },
-    onError: () => {
+    onError: (error) => {
+      // Erro de numero de processo duplicado ja e exibido inline no
+      // formulario; nao exibir notificacao generica redundante.
+      if (ehErroNumeroProcessoDuplicado(error)) return;
+
       notification.error({
         message: "Erro ao cadastrar",
         description:

@@ -16,7 +16,9 @@ const ListagemConcursosTela: React.FC = () => {
   const [filtros, setFiltros] = useState<IConcursoFiltros>({});
   const [page, setPage] = useState(1);
 
-  const { concursos, total, isLoading } = useListarConcursos(filtros, page);
+  const { concursos, total, isLoading } = useListarConcursos(filtros, 1, 1000);
+
+  const { concursos: concursosParaFiltros } = useListarConcursos({}, 1, 1000);
 
   const breadcrumbItems = [
     { title: <Text strong>Gerenciar</Text> },
@@ -49,7 +51,11 @@ const ListagemConcursosTela: React.FC = () => {
     >
       <CardBusca>
         <Typography.Title level={5}>Buscar concursos</Typography.Title>
-        <FiltrosBuscaConcurso onBuscar={aoBuscar} onLimpar={aoLimpar} />
+        <FiltrosBuscaConcurso
+          onBuscar={aoBuscar}
+          onLimpar={aoLimpar}
+          concursos={concursosParaFiltros}
+        />
       </CardBusca>
 
       <TabelaWrapper>
