@@ -56,6 +56,54 @@ export type PeriodoItem = {
   nomeacaoEm?: string;
 };
 
+export const MAX_CANDIDATOS_POR_AGENDA = 30;
+
+export const MENSAGEM_LIMITE_REDISTRIBUICAO =
+  "O valor não pode ser alterado pois ultrapassaria o limite de 30 candidatos nas outras agendas.";
+
+export const ordenarSessoesPresenciais = (periodos: PeriodoItem[], cargo: string) =>
+  periodos
+    .filter((periodo) => periodo.cargo === cargo && !periodo.isRetardatario && periodo.tipoEscolha === "PRESENCIAL")
+    .sort((a, b) => {
+      if (a.dataEscolha !== b.dataEscolha) {
+        return a.dataEscolha.localeCompare(b.dataEscolha);
+      }
+      return a.horario.localeCompare(b.horario);
+    });
+
+export const simularRedistribuicaoClassificacao = (
+  sessoesOrdenadas: PeriodoItem[],
+  idxEdicao: number,
+  novaClassificacao: number,
+  maxPorSessao = MAX_CANDIDATOS_POR_AGENDA
+): { valid: boolean; carryRestante: number } => {
+  const sessaoEditada = sessoesOrdenadas[idxEdicao];
+  const novaClassificacaoLimitada = Math.min(novaClassificacao, maxPorSessao);
+
+  if (!sessaoEditada || novaClassificacaoLimitada < 1) {
+    return { valid: false, carryRestante: 0 };
+  }
+
+  let carry = (sessaoEditada.classificacao ?? 0) - novaClassificacaoLimitada;
+
+  for (let i = idxEdicao + 1; i < sessoesOrdenadas.length; i++) {
+    if (carry === 0) break;
+
+    const sessao = sessoesOrdenadas[i];
+    const atual = sessao.classificacao ?? 1;
+
+    if (carry > 0) {
+      const espaco = Math.max(0, maxPorSessao - atual);
+      carry -= Math.min(carry, espaco);
+    } else {
+      const removivel = Math.max(0, atual - 1);
+      carry += Math.min(-carry, removivel);
+    }
+  }
+
+  return { valid: carry === 0, carryRestante: carry };
+};
+
 export const useAgenda = () => {
   const { uuid } = useParams<{ uuid: string }>();
   
@@ -103,7 +151,6 @@ export const useAgenda = () => {
     [uuid, processoConvocacaoData]
   );
   const { agendasData, agendasIsLoading } = useGetAgendas(agendasListRequest);
-  console.log("agendasData", agendasData);
 
   // Quando a primeira agenda for ONLINE, a API pode retornar a lista de candidatos faltantes
   // Preferir a nova chave candidatos_faltantes_uuids; manter compatibilidade com candidatos_uuids_restantes
@@ -789,80 +836,88 @@ export const useAgenda = () => {
   // Função para atualizar período na tabela
   const handleUpdatePeriodo = (id: number, updates: Partial<PeriodoItem>) => {
     setPeriodosList(prev => {
-      // Encontrar o período que está sendo atualizado
       const periodoAtual = prev.find(p => p.id === id);
       if (!periodoAtual) return prev;
 
-      // Se não há mudança na classificação, apenas atualizar normalmente
-      if (!updates.classificacao || updates.classificacao === periodoAtual.classificacao) {
-        return prev.map(periodo => {
-          if (periodo.id === id) {
-            return { ...periodo, ...updates };
-          }
-          return periodo;
-        });
+      const atualizarPeriodo = (lista: PeriodoItem[]) =>
+        lista.map(periodo => (periodo.id === id ? { ...periodo, ...updates } : periodo));
+
+      const deveBalancear =
+        updates.classificacao !== undefined &&
+        updates.classificacao !== periodoAtual.classificacao &&
+        !periodoAtual.isRetardatario &&
+        periodoAtual.tipoEscolha === "PRESENCIAL";
+
+      if (!deveBalancear) {
+        return atualizarPeriodo(prev);
       }
 
-      // Encontrar todos os períodos do mesmo cargo, ordenados por data e horário
-      const periodosMesmoCargo = prev
-        .filter(p => p.cargo === periodoAtual.cargo)
+      const MAX_CANDIDATOS_POR_AGENDA = 30;
+
+      const cargo = cargosAdicionados.find(
+        (item) => item.uuid === periodoAtual.cargoUuid || item.nome === periodoAtual.cargo
+      );
+      const totalCandidatos = cargo?.totalCandidatos ?? 0;
+
+      const sessoesOrdenadas = prev
+        .filter(
+          (periodo) =>
+            periodo.cargo === periodoAtual.cargo &&
+            !periodo.isRetardatario &&
+            periodo.tipoEscolha === "PRESENCIAL"
+        )
         .sort((a, b) => {
-          // Ordenar por data e depois por horário
           if (a.dataEscolha !== b.dataEscolha) {
             return a.dataEscolha.localeCompare(b.dataEscolha);
           }
           return a.horario.localeCompare(b.horario);
         });
 
-      // Encontrar o índice do período atual na lista ordenada
-      const indiceAtual = periodosMesmoCargo.findIndex(p => p.id === id);
-      
-      // Se não há próximo período, apenas atualizar o atual
-      if (indiceAtual === -1 || indiceAtual >= periodosMesmoCargo.length - 1) {
-        return prev.map(periodo => {
-          if (periodo.id === id) {
-            return { ...periodo, ...updates };
-          }
-          return periodo;
-        });
+      const idx = sessoesOrdenadas.findIndex((p) => p.id === id);
+      if (idx === -1) {
+        return atualizarPeriodo(prev);
       }
 
-      // Encontrar o próximo período do mesmo cargo
-      const proximoPeriodo = periodosMesmoCargo[indiceAtual + 1];
-      
-      // Calcular a diferença na classificação
-      const diferenca = periodoAtual.classificacao - updates.classificacao;
+      const anterior = sessoesOrdenadas[idx];
+      const novaClassificacao = updates.classificacao as number;
+      // Garantir o teto de 30 aqui também
+      const novaClassificacaoLimitada = Math.min(novaClassificacao, MAX_CANDIDATOS_POR_AGENDA);
 
-      // Calcular o novo valor de classificação para o próximo período
-      const novaClassificacaoProximo = proximoPeriodo.classificacao + diferenca;
-      
-      // Se a diferença for menor ou igual a 0, apenas atualizar o período atual
-      if (diferenca <= 0) {
-        return prev.map(periodo => {
-          if (periodo.id === id) {
-            return { ...periodo, ...updates };
-          } else if (periodo.id === proximoPeriodo.id) {
-            // Atualizar o próximo período com a classificação ajustada
-            return { 
-              ...periodo, 
-              classificacao: parseInt(novaClassificacaoProximo.toString()) 
-            };
-          }
-          return periodo;
-        });
+      // carry > 0: sobrou candidato (precisa adicionar nas próximas)
+      // carry < 0: faltou candidato (precisa remover das próximas)
+      let carry = (anterior.classificacao ?? 0) - novaClassificacaoLimitada;
+
+      const novosValores = new Map<number, number>();
+
+      for (let i = idx + 1; i < sessoesOrdenadas.length; i++) {
+        if (carry === 0) break;
+
+        const sessao = sessoesOrdenadas[i];
+        const atual = sessao.classificacao ?? 1;
+
+        if (carry > 0) {
+          const espaco = Math.max(0, MAX_CANDIDATOS_POR_AGENDA - atual);
+          const add = Math.min(carry, espaco);
+          novosValores.set(sessao.id, atual + add);
+          carry -= add;
+        } else {
+          const removivel = Math.max(0, atual - 1);
+          const remove = Math.min(-carry, removivel);
+          novosValores.set(sessao.id, atual - remove);
+          carry += remove;
+        }
       }
 
-      // Atualizar ambos os períodos
-      return prev.map(periodo => {
+      // Se ainda sobrar carry, mantém o que deu para fazer (o saveEdit deve impedir casos inválidos)
+      // Reforço: se carry > 0 aqui, significa que não coube nas próximas sem passar de 30.
+      // Se carry < 0, significa que não foi possível tirar o suficiente das próximas sem cair abaixo de 1.
+
+      return prev.map((periodo) => {
         if (periodo.id === id) {
-          // Atualizar o período atual
-          return { ...periodo, ...updates };
-        } else if (periodo.id === proximoPeriodo.id) {
-          // Atualizar o próximo período com a classificação ajustada
-          return { 
-            ...periodo, 
-            classificacao: parseInt(novaClassificacaoProximo.toString()) 
-          };
+          return { ...periodo, ...updates, classificacao: novaClassificacaoLimitada };
+        }
+        if (novosValores.has(periodo.id)) {
+          return { ...periodo, classificacao: novosValores.get(periodo.id)! };
         }
         return periodo;
       });
@@ -1047,6 +1102,52 @@ export const useAgenda = () => {
     return verificarHorarioExistente(key, horaInicio, horaFim);
   };
 
+  const validarRedistribuicaoClassificacao = useCallback(
+    (key: number, periodoDataItem: PeriodoItem, novaClassificacao: number) => {
+      if (periodoDataItem?.tipoEscolha !== "PRESENCIAL" || periodoDataItem?.isRetardatario) {
+        return { valid: true };
+      }
+
+      const classificacaoNumerica = Number(novaClassificacao);
+      if (!Number.isFinite(classificacaoNumerica)) {
+        return { valid: false };
+      }
+
+      if (classificacaoNumerica > MAX_CANDIDATOS_POR_AGENDA) {
+        return {
+          valid: false,
+          message: `Máximo de ${MAX_CANDIDATOS_POR_AGENDA} candidatos por agenda.`,
+        };
+      }
+
+      const sessoesOrdenadas = ordenarSessoesPresenciais(periodosList, periodoDataItem.cargo);
+      const idx = sessoesOrdenadas.findIndex((periodo) => periodo.id === key);
+      if (idx === -1) {
+        return { valid: true };
+      }
+
+      const { valid, carryRestante } = simularRedistribuicaoClassificacao(
+        sessoesOrdenadas,
+        idx,
+        classificacaoNumerica
+      );
+
+      if (!valid) {
+        if (carryRestante > 0) {
+          return { valid: false, message: MENSAGEM_LIMITE_REDISTRIBUICAO };
+        }
+
+        return {
+          valid: false,
+          message: "Valor inválido para redistribuição. Não há candidatos suficientes nas agendas seguintes.",
+        };
+      }
+
+      return { valid: true };
+    },
+    [periodosList]
+  );
+
   // Função para verificar se um período está sendo editado
   const isEditing = (record: PeriodoItem) => record.id === editingKey;
 
@@ -1068,11 +1169,32 @@ export const useAgenda = () => {
         if (!values.horaInicio || !values.horaFim) {
           return { success: false, message: 'Horários são obrigatórios para tipo Presencial.' };
         }
+
+        // Intervalo permitido: somente 1h
+        const inicio = dayjs(`2000-01-01 ${values.horaInicio}`);
+        const fim = dayjs(`2000-01-01 ${values.horaFim}`);
+        if (!inicio.isValid() || !fim.isValid() || fim.diff(inicio, "minute") !== 60) {
+          return { success: false, message: "Intervalo permitido: somente 1h." };
+        }
         
         // Verificar se o horário já existe na mesma data
         if (verificarHorarioExistente(key, values.horaInicio, values.horaFim)) {
           return { success: false, message: 'Este horário já existe na mesma data. Escolha outro horário.' };
         }
+      }
+
+      const classificacaoNumerica = parseInt(values.classificacao);
+
+      const validacaoRedistribuicao = validarRedistribuicaoClassificacao(
+        key,
+        periodoDataItem,
+        classificacaoNumerica
+      );
+      if (!validacaoRedistribuicao.valid) {
+        return {
+          success: false,
+          message: validacaoRedistribuicao.message || "Valor inválido para redistribuição.",
+        };
       }
       
       let horarioFormatado: string;
@@ -1097,7 +1219,7 @@ export const useAgenda = () => {
         horario: horarioFormatado,
         horaInicioOriginal: horaInicioOriginal,
         horaFimOriginal: horaFimOriginal,
-        classificacao: parseInt(values.classificacao)
+        classificacao: classificacaoNumerica
       };
       handleUpdatePeriodo(key, updates);
       
@@ -1309,6 +1431,7 @@ export const useAgenda = () => {
     calcularIntervaloClassificacao,
     verificarHorarioExistente,
     verificarConflitoTempoReal,
+    validarRedistribuicaoClassificacao,
     // Estados e funções para expansão automática
     cargoParaExpandir,
     limparExpansao,

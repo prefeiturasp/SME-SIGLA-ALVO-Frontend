@@ -19,6 +19,9 @@ import { agendaFormStyles } from "../styles";
 
 const { Text } = Typography;
 
+const HORA_INICIO_MIN = 10;
+const HORA_FIM_MAX = 17;
+
 interface AgendaFormProps {
   agendaAberto: any;
   handleFecharAgenda: () => void;
@@ -57,6 +60,29 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
   hasAgendas,
 }) => {
   if (!agendaAberto) return null;
+
+  const disabledTime = (_date: any, type: "start" | "end") => {
+    const disabledHours = () => {
+      const hours: number[] = [];
+      for (let h = 0; h < 24; h++) {
+        const isAllowed = h >= HORA_INICIO_MIN && h <= HORA_FIM_MAX;
+        if (!isAllowed) hours.push(h);
+      }
+      // Para garantir 1h de intervalo, start não pode iniciar às 17 e end não pode terminar às 10
+      if (type === "start") {
+        if (!hours.includes(HORA_FIM_MAX)) hours.push(HORA_FIM_MAX);
+      } else {
+        if (!hours.includes(HORA_INICIO_MIN)) hours.push(HORA_INICIO_MIN);
+      }
+      return hours.sort((a, b) => a - b);
+    };
+
+    // Mantém minutos/segundos livres; a validação do intervalo (1h) acontece no schema.
+    return {
+      disabledHours,
+    };
+  };
+
   return (
     <Card
       style={agendaFormStyles.agendaCard}
@@ -284,6 +310,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                           placeholder={["Início", "Fim"]}
                           style={agendaFormStyles.timePickerRange}
                           format="HH:mm"
+                          disabledTime={disabledTime}
                           onChange={async (times) => {
                             if (times && times.length === 2) {
                               field.onChange(times[0]);

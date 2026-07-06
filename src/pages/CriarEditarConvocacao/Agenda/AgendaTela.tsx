@@ -70,6 +70,7 @@ const AgendaTela: React.FC = () => {
     saveEdit,
     calcularIntervaloClassificacao,
     verificarConflitoTempoReal,
+    validarRedistribuicaoClassificacao,
     cargoParaExpandir,
     limparExpansao,
     salvarAgendasNoBackend,
@@ -88,18 +89,6 @@ const AgendaTela: React.FC = () => {
         <Text
           strong
           style={inlineStyles.breadcrumbItem}
-          onClick={() => navigate("/")}
-        >
-          Home
-        </Text>
-      ),
-    },
-    {
-      title: (
-        <Text
-          strong
-          style={inlineStyles.breadcrumbItem}
-          onClick={() => navigate("/processos")}
         >
           Processos
         </Text>
@@ -146,7 +135,7 @@ const AgendaTela: React.FC = () => {
   };
 
   const prev = () => {
-    navigate(`/processos/convocacao/editar/${uuid}/selecao-cargos`)    
+    navigate(`/processos/convocacao/editar/${uuid}/selecao-cargos`)
   };
 
   const formatDate = (value?: string) => {
@@ -335,6 +324,7 @@ const AgendaTela: React.FC = () => {
               saveEdit={saveEdit}
               calcularIntervaloClassificacao={calcularIntervaloClassificacao}
               verificarConflitoTempoReal={verificarConflitoTempoReal}
+              validarRedistribuicaoClassificacao={validarRedistribuicaoClassificacao}
               cargoParaExpandir={cargoParaExpandir}
               limparExpansao={limparExpansao}
             />
