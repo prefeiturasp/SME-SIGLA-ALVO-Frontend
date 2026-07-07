@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Button, Tooltip, Typography } from "antd";
+import { Typography } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
-import { StyledTabs } from "./styles";
-import { CloudDownloadOutlined, EyeOutlined } from "@ant-design/icons";
-import { ButtonGroup } from "../Processos/ConvocacaoCandidatos/style";
+
+import { CloudDownloadOutlined } from "@ant-design/icons";
+import { ButtonGroup } from "@/components/ui";
 import { useLayoutDownload } from "../../hooks/useLayoutDownload";
 import HabilitadosFormTab from "./Habilitados/HabilitadosFormTab";
 import VagasFormTab from "./Vagas/VagasFormTab";
@@ -12,6 +12,7 @@ import EscolhasFormTab from "./Escolhas/EscolhasFormTab";
 import LotesFormTab from "./Lotes/LotesFormTab";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 
+import { StyledTabs, AppButton, ViewActionIcon } from '@/components/ui';
 const { Text } = Typography;
 
 const breadcrumbItems = [
@@ -112,29 +113,25 @@ const ImportacaoDadosTela: React.FC = () => {
       buttons={
         activeTab !== "ESCOLHAS" && activeTab !== "LOTES" ? (
           <ButtonGroup>
-            <Tooltip title={!canViewLayoutArquivoImportacao?"Você não possui permissão para essa ação":"Ver layout padrão"} arrow={true} >
-            <Button
+            <AppButton
+              variant="secondary"
               disabled={!canViewLayoutArquivoImportacao}
               size="large"
               onClick={() => handleShowLayoutPadrao(activeTab)}
-              style={{ color: "#434343" }}
+              icon={<ViewActionIcon style={{ fontSize: 22 }} />}
             >
-              <EyeOutlined style={{ fontSize: 22, color: "#838383" }} /> Ver
-              layout Padrão
-            </Button>
-            </Tooltip>
+              Ver layout Padrão
+            </AppButton>
 
-            <Tooltip title={!canBaixarLayoutArquivoImportacao?"Você não possui permissão para essa ação":"Baixar layout padrão"} arrow={true} > 
-            <Button
+            <AppButton
+              variant="secondary"
               size="large"
               onClick={() => handleBaixarArquivo(activeTab)}
-              style={{ color: "#434343" }}
               disabled={!canBaixarLayoutArquivoImportacao}
+              icon={<CloudDownloadOutlined style={{ fontSize: 22 }} />}
             >
-              <CloudDownloadOutlined style={{ fontSize: 22, color: "#838383" }} />{" "}
               Baixar layout Padrão
-            </Button>
-            </Tooltip>
+            </AppButton>
           </ButtonGroup>
         ) : undefined
       }

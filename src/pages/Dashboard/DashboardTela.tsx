@@ -1,6 +1,6 @@
 import { Typography } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
-import { PlaceholderTestDashboard } from "./styles";
+import { PlaceholderTestDashboard } from "@/components/ui";
 const { Text } = Typography;
 
 

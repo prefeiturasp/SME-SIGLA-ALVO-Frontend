@@ -1,9 +1,26 @@
 import React, { useMemo } from "react";
 import { Table } from "antd";
 import dayjs from "dayjs";
+import { createGlobalStyle } from "styled-components";
 import type { IAgenda } from "../../../services/resources/agenda/IAgenda";
-import { ResumoTableStyles, resumoAgendaTabelaStyles } from "./styles";
-import { agendaTabelaStyles } from "../Agenda/styles";
+import { agendaTabelaStyles } from "@/design-system/estilos";
+
+const ResumoTableStyles = createGlobalStyle`
+  .resumo-agenda-table .table-row-light td {
+    background-color: #ffffff;
+  }
+
+  .resumo-agenda-table .table-row-dark td {
+    background-color: #f6f6f6;
+  }
+`;
+
+const resumoAgendaTabelaStyles = {
+  emptyMessage: agendaTabelaStyles.emptyMessage,
+  tableContainer: agendaTabelaStyles.expandedTableContainer,
+  table: agendaTabelaStyles.expandedTable,
+  tableHeader: agendaTabelaStyles.expandedTableHeader,
+};
 
 interface ResumoAgendaTabelaProps {
   agendas: IAgenda[];

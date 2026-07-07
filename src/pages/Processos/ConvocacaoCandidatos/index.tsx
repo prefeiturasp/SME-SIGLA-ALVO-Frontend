@@ -1,10 +1,11 @@
-import { Typography, Row, Col, Button, Card } from "antd";
+import { Typography, Row, Col, Card } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import ConvocacaoTable from "./components/ConvocacaoTable";
 import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
 import { useNavigate } from "react-router-dom";
-import { mainCardStyle, buscaProcessosTitleStyle, paginationTextStyle } from "./style";
+import { AppButton, BuscaProcessosTitle } from '@/components/ui';
+import { mainCardStyle, paginationTextStyle } from "@/components/ui";
 
 const { Text } = Typography;
 
@@ -43,18 +44,16 @@ const ConvocacaoCandidatos: React.FC = () => {
     >
       <Card style={mainCardStyle}>
         <Row align="top" justify="space-between">
-          <Typography.Title level={4} style={buscaProcessosTitleStyle}>
-            Busca processos
-          </Typography.Title>
-          <Button
-            type="primary"
+          <BuscaProcessosTitle>Busca processos</BuscaProcessosTitle>
+          <AppButton
+            variant="primary"
             size="large"
             icon={<PlusOutlined />}
             disabled={!concursosOptions}
             onClick={() => navigate("/processos/convocacao/criar",{state:concursosOptions})}
           >
             Nova convocação
-          </Button>
+          </AppButton>
         </Row>
 
         <Row>

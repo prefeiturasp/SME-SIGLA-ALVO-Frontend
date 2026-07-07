@@ -2,11 +2,18 @@ import React from "react";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import dayjs from "dayjs";
 import type { IProcessoConvocacao } from "../../../../services/resources/convocacao/IConvocacao";
-import { CaretUpOutlined, CaretDownOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import { CaretUpOutlined, CaretDownOutlined } from "@ant-design/icons";
 
-import { Button, Space, Tooltip } from "antd";
-import { StyledTable } from "../../../../components/EstilosCompartilhados";
+import { Space } from "antd";
+
 import { useNavigate } from "react-router-dom";
+import {
+  StyledTable,
+  EditActionIcon,
+  ViewActionIcon,
+  DeleteActionIcon,
+  AppIconButton,
+} from '@/components/ui';
 import {
   sortIconContainer,
   sortIconUp,
@@ -15,18 +22,9 @@ import {
   statusDot,
   statusText,
   statusHeaderContainer,
-  editIcon,
-  editIconEnabled,
-  viewIcon,
-  finalizarButton,
-  finalizarButtonHover,
-  finalizarButtonLeave,
-  finalizarButtonDisabled,
+  FinalizarButton,
   emptyTextContainer,
-  deleteIconEnabled,
-} from "./style";
-
-import { deleteIcon } from "../../../../components/EstilosCompartilhados";
+} from "@/components/ui";
 import ConfirmarExclusaoProcessoModal from "./ConfirmarExclusaoProcessoModal";
 import { useDeleteProcessoConvocacao } from "../hooks/useDeleteProcessoConvocacao";
 
@@ -270,53 +268,41 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
 
         return (
           <Space size="small">
-            <Tooltip title={isFinalizado ? "Processo finalizado" : (!canChangeProcessoConvocacao ? "Você não possui permissão para essa ação" : "Editar processo")} arrow={true} >
-              <Button
-                type={"link"}
-                icon={<EditOutlined style={isEditDisabled ? editIcon : editIconEnabled} />}
-                onClick={() => !isFinalizado && handleEdit(record)}
-                disabled={isEditDisabled}
-              />
-            </Tooltip>
+            <AppIconButton
+              type="link"
+              tooltip="Editar"
+              icon={<EditActionIcon disabled={isEditDisabled} />}
+              onClick={() => !isFinalizado && handleEdit(record)}
+              disabled={isEditDisabled}
+            />
 
-            <Tooltip title={!canViewDetailsProcessoConvocacao ? "Você não possui permissão para essa ação" : "Visualizar processo"} arrow={true} >
-              <Button
-                type={"link"}
-                icon={<EyeOutlined style={viewIcon} />}
-                onClick={() => handleView(record)}
-                disabled={!canViewDetailsProcessoConvocacao}
-              />
-            </Tooltip>
+            <AppIconButton
+              type="link"
+              tooltip="Visualizar"
+              icon={<ViewActionIcon />}
+              onClick={() => handleView(record)}
+              disabled={!canViewDetailsProcessoConvocacao}
+            />
 
-            <Tooltip title={isFinalizado ? "Processo finalizado" : (!canDeleteProcessoConvocacao ? "Você não possui permissão para essa ação" : "Excluir processo")} arrow={true} >
-              <Button
-                type={"link"}
-                icon={<DeleteOutlined style={isDeleteDisabled ? deleteIcon : deleteIconEnabled} />}
-                onClick={() => {
-                  if (isFinalizado) return;
-                  setDeletingUuidState(record.uuid);
-                  setDeleteModalOpen(true);
-                }}
-                disabled={isDeleteDisabled}
-              />
-            </Tooltip>
+            <AppIconButton
+              type="link"
+              tooltip="Excluir"
+              icon={<DeleteActionIcon disabled={isDeleteDisabled} />}
+              onClick={() => {
+                if (isFinalizado) return;
+                setDeletingUuidState(record.uuid);
+                setDeleteModalOpen(true);
+              }}
+              disabled={isDeleteDisabled}
+            />
 
-            <Tooltip title={isFinalizado ? "Processo finalizado" : (!canFinalizeProcessoConvocacao ? "Você não possui permissão para essa ação" : "Finalizar processo")} arrow={true} >
-              <Button
-                style={{ ...finalizarButton, ...(isFinalizarDisabled ? finalizarButtonDisabled : {}) }}
-                onMouseEnter={(e) => {
-                  if (!isFinalizarDisabled) Object.assign(e.currentTarget.style, finalizarButtonHover);
-                }}
-                onMouseLeave={(e) => {
-                  Object.assign(e.currentTarget.style, isFinalizarDisabled ? finalizarButtonDisabled : finalizarButtonLeave);
-                }}
-                onClick={() => !isFinalizado && onFinalizar?.(record)}
-                disabled={isFinalizarDisabled}
-                loading={finalizandoUuid === record.uuid}
-              >
-                Finalizar Processo
-              </Button>
-            </Tooltip>
+            <FinalizarButton
+              onClick={() => !isFinalizado && onFinalizar?.(record)}
+              disabled={isFinalizarDisabled}
+              loading={finalizandoUuid === record.uuid}
+            >
+              Finalizar Processo
+            </FinalizarButton>
           </Space>
         );
       },

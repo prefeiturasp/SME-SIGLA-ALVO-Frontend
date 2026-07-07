@@ -1,7 +1,7 @@
-import { Table, Tooltip } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import type { IConcursoLista } from "../../../../services/resources/concursos/IConcursos";
+import { EditActionIcon, StyledTable } from "@/components/ui";
 
 interface ITabelaProps {
   dados: IConcursoLista[];
@@ -39,10 +39,11 @@ const TabelaConcursos: React.FC<ITabelaProps> = ({
       title: "",
       key: "acoes",
       width: 48,
+      align: "center",
       render: (_, row) => (
         <Tooltip title="Editar">
-          <EditOutlined
-            style={{ cursor: "pointer", color: "#1677ff" }}
+          <EditActionIcon
+            style={{ cursor: "pointer" }}
             onClick={() => onEditar(row.uuid)}
           />
         </Tooltip>
@@ -51,11 +52,12 @@ const TabelaConcursos: React.FC<ITabelaProps> = ({
   ];
 
   return (
-    <Table<IConcursoLista>
+    <StyledTable<IConcursoLista>
       rowKey="uuid"
       columns={colunas}
       dataSource={dados}
-      loading={loading}      
+      loading={loading}
+      rowClassName={(record) => (record.status === "INATIVO" ? "linha-inativa" : "")}
       locale={{ emptyText: "Não encontramos dados para esta busca" }}
       pagination={{
         current: page,

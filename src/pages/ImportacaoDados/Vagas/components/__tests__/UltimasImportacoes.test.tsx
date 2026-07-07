@@ -36,15 +36,12 @@ jest.mock('../ErroModal', () => {
 });
 
 // Mock dos componentes de estilo
-jest.mock('../style', () => ({
+jest.mock('@/components/ui', () => ({
   CustomTitle: ({ children, level, ...props }: any) => (
     <h1 data-level={level} {...props}>
       {children}
     </h1>
   ),
-}));
-
-jest.mock('../../../../../components/EstilosCompartilhados', () => ({
   StyledTable: ({ columns, dataSource, rowKey, bordered, rowClassName, ...props }: any) => (
     <table data-testid="styled-table" {...props}>
       <thead>

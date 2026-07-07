@@ -12,7 +12,7 @@ import type {
 } from "./IImportacaoArquivos";
 import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
-import type { IImportacaoVagasPayload } from "../../../pages/Processos/ImportacaoDados/Vagas/hooks/types";
+import type { IImportacaoVagasPayload } from "./IImportacaoArquivos";
 
 export const URL = {
   getLayout: () => `/api/v1/layouts/`,

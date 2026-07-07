@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import { Bar } from "@ant-design/charts";
-import { TextTitulo, TextTituloSecundario } from "../../../../components/EstilosCompartilhados";
+import { TextTitulo, TextTituloSecundario } from '@/components/ui';
 import type { DreGraficoItem } from "../utils/mapGraficosDre";
 import { formatValorComparativo, formatValorNumerico } from "../utils/formatValorIndicador";
-import { ChartCard, ChartContainer } from "../styles";
+import { ChartCard, ChartContainer } from "@/components/ui";
 
 type GraficoBarrasDreProps = {
   title: string;

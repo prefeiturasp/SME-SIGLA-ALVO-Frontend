@@ -258,14 +258,18 @@ jest.mock('dayjs', () => {
 });
 
 // Mock do StyledCardWithoutBorder
-jest.mock('../../../../components/EstilosCompartilhados', () => ({
-  StyledCardWithoutBorder: ({ children, title, style }: any) => (
-    <div data-testid="styled-card" style={style}>
-      {title && <div data-testid="card-title">{title}</div>}
-      {children}
-    </div>
-  ),
-}));
+jest.mock('@/components/ui', () => {
+  const actual = jest.requireActual('@/components/ui');
+  return {
+    ...actual,
+    StyledCardWithoutBorder: ({ children, title, style }: any) => (
+      <div data-testid="styled-card" style={style}>
+        {title && <div data-testid="card-title">{title}</div>}
+        {children}
+      </div>
+    ),
+  };
+});
 
 // Mock do theme.useToken
 jest.mock('antd', () => ({

@@ -1,10 +1,7 @@
 import React from "react";
-import { Row, Col, Button, message, Tooltip } from "antd";
+import { Row, Col, message } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
-import {
-  PrimaryButton,
-  SecondaryButton,
-} from "../../../components/EstilosCompartilhados";
+import { AppButton } from '@/components/ui';
 
 interface StepActionsProps {
   current: number;
@@ -32,84 +29,53 @@ export const StepActions: React.FC<StepActionsProps> = ({
   return (
     <div style={{ marginTop: 24 }}>
       <Row align="middle" justify="space-between">
-        {/* Botão Cancelar à esquerda */}
         <Col>
-        {onCancel && (
-          <Button
-            size="large"
-            style={{ margin: "0 8px" }}
-            onClick={onCancel}
-          >
-            Cancelar
-            </Button>
+          {onCancel && (
+            <AppButton
+              variant="secondary"
+              size="large"
+              style={{ margin: "0 8px" }}
+              onClick={onCancel}
+            >
+              Cancelar
+            </AppButton>
           )}
         </Col>
 
-        {/* Ações à direita */}
         <Col>
           {current > 0 && (
-            <Tooltip
-              title={
-                !canVoltar
-                  ? "Você não possui permissão para essa ação"
-                  : "Voltar"
-              }
-              arrow={true}
+            <AppButton
+              variant="secondary"
+              icon={<LeftOutlined />}
+              style={{ margin: "0 8px" }}
+              onClick={prev}
+              disabled={!canVoltar}
             >
-              <SecondaryButton
-                icon={<LeftOutlined />}
-                style={{ margin: "0 8px" }}
-                onClick={prev}
-                disabled={!canVoltar}
-              >
-                Voltar
-              </SecondaryButton>
-            </Tooltip>
+              Voltar
+            </AppButton>
           )}
 
           {current < steps.length - 1 && (
-            <Tooltip
-              title={
-                !canSalvarEAvancar
-                  ? "Você não possui permissão para essa ação"
-                  : !temPeriodosAgenda
-                  ? "Adicione pelo menos um período de agenda para continuar"
-                  : "Salvar e avançar"
-              }
-              arrow={true}
+            <AppButton
+              iconPosition="end"
+              icon={<RightOutlined />}
+              style={{ margin: "0 8px" }}
+              onClick={next}
+              loading={loading}
+              disabled={!canSalvarEAvancar || !temPeriodosAgenda}
             >
-              <PrimaryButton
-                iconPosition="end"
-                icon={<RightOutlined />}
-                type="primary"
-                style={{ margin: "0 8px" }}
-                onClick={next}
-                loading={loading}
-                disabled={!canSalvarEAvancar || !temPeriodosAgenda}
-              >
-                Salvar e avançar
-              </PrimaryButton>
-            </Tooltip>
+              Salvar e avançar
+            </AppButton>
           )}
 
           {current === steps.length - 1 && (
-            <Tooltip
-              title={
-                !canSalvarEAvancar
-                  ? "Você não possui permissão para essa ação"
-                  : "Finalizar"
-              }
-              arrow={true}
+            <AppButton
+              style={{ margin: "0 8px" }}
+              onClick={next}
+              disabled={!canSalvarEAvancar}
             >
-              <PrimaryButton
-                type="primary"
-                style={{ margin: "0 8px" }}
-                onClick={next}
-                disabled={!canSalvarEAvancar}
-              >
-                Finalizar
-              </PrimaryButton>
-            </Tooltip>
+              Finalizar
+            </AppButton>
           )}
         </Col>
       </Row>

@@ -1,12 +1,13 @@
 import React from "react";
-import { Modal, Typography, Col, Button, Spin } from "antd";
+import { Modal, Typography, Col, Spin } from "antd";
+import { AppButton } from '@/components/ui';
 import {
-  ModalTitle,
-  StyledRow,
-  StyledTextArea,
-  ErroContainer,
-  ButtonsContainer,
-} from "../../Vagas/components/style";
+  ErrorModalTitle as ModalTitle,
+  ErrorModalRow as StyledRow,
+  ErrorModalTextArea as StyledTextArea,
+  ErrorModalContainer as ErroContainer,
+  ErrorModalButtonsContainer as ButtonsContainer,
+} from "@/components/ui";
 
 interface ErroModalProps {
   open: boolean;
@@ -70,15 +71,14 @@ const ErroModal: React.FC<ErroModalProps> = ({
         </StyledRow>
       </Spin>
       <ButtonsContainer>
-        <Button onClick={onClose}>Cancelar</Button>
-        <Button 
-          type="primary" 
+        <AppButton variant="secondary" onClick={onClose}>Cancelar</AppButton>
+        <AppButton 
           onClick={onDownload}
           loading={isDownloading}
           disabled={!importacaoErro}
         >
           Download
-        </Button>
+        </AppButton>
       </ButtonsContainer>
     </Modal>
   );

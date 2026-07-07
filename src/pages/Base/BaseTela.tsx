@@ -1,4 +1,4 @@
-import { Breadcrumb, Col, Row, Tooltip, Typography } from "antd";
+import { Breadcrumb, Col, Tooltip, Typography } from "antd";
 import { SnippetsOutlined } from "@ant-design/icons";
 import type { IProcessoConvocacao } from "../../services/resources/convocacao/IConvocacao";
 import React, { Suspense, useState } from "react";
@@ -29,9 +29,10 @@ import {
   ProcessosIcon,
   GerenciarIcon,
   SidePanelTitle,
-  PageTitle,
+  AppPageTitle as PageTitle,
   PageContentContainer,
-} from "./styles";
+  PageHeaderRow,
+} from "@/components/ui";
 
 export interface INewSampleModalData extends IProcessoConvocacao {
   description: string;
@@ -45,6 +46,32 @@ interface INewSampleModalProps {
   breadcrumbItems: TitleItem[];
   title: string | React.ReactElement;
   buttons?: React.ReactNode;
+}
+
+function extractTextFromReactNode(node: React.ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+  if (Array.isArray(node)) {
+    return node.map(extractTextFromReactNode).join("");
+  }
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+    return extractTextFromReactNode(node.props.children);
+  }
+  return "";
+}
+
+function isHomeBreadcrumbItem(item: TitleItem): boolean {
+  const text =
+    typeof item.title === "string"
+      ? item.title
+      : extractTextFromReactNode(item.title);
+  const normalized = text.trim().toLowerCase();
+  return normalized === "home" || normalized === "início" || normalized === "inicio";
+}
+
+export function filterHomeBreadcrumbItems(items: TitleItem[]): TitleItem[] {
+  return items.filter((item) => !isHomeBreadcrumbItem(item));
 }
 
 const BaseTela: React.FC<INewSampleModalProps> = ({
@@ -63,25 +90,7 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
   const [selectedMenuTitle, setSelectedMenuTitle] = useState("");
   const [selectedMenuKey, setSelectedMenuKey] = useState("");
 
-  const processedBreadcrumbItems = breadcrumbItems
-    .map((item, index) => {
-      if (index === 0 && location.pathname === "/") {
-        return null;
-      }
-
-      if (
-        typeof item.title === "string" &&
-        item.title.toLowerCase() === "home"
-      ) {
-        return {
-          ...item,
-          onClick: () => navigate("/"),
-        } as TitleItem & { onClick: () => void };
-      }
-
-      return item;
-    })
-    .filter((item): item is TitleItem => item !== null);
+  const processedBreadcrumbItems = filterHomeBreadcrumbItems(breadcrumbItems);
 
   const getSelectedKeys = () => {
     const path = location.pathname;
@@ -287,16 +296,15 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
         <StyledContent
           style={{ marginLeft: isSidePanelOpen ? "23.4375rem" : "8.625rem" }}
         >
-          <Row
+          <PageHeaderRow
             align={"middle"}
             justify={"space-between"}
-            style={{ margin: "0 0 2rem 0" }}
           >
             <Col>
               <PageTitle>{title}</PageTitle>
             </Col>
             <Col>{buttons}</Col>
-          </Row>
+          </PageHeaderRow>
 
           <PageContentContainer
             $bgColor={"none"}

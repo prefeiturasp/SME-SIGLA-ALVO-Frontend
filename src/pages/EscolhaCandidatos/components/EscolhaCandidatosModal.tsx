@@ -12,26 +12,23 @@ import type { EscolhaCandidatosModalProps } from "../hooks/types";
 import { API } from "../../../services";
 import { useGetVagasPorProcessoECargo } from "../../CriarEditarConvocacao/SelecaoCargos/hooks/useGetVagasPorProcessoECargo";
 import type { IAgenda } from "../../../services/resources/agenda/IAgenda";
-import {
-  ModalButtonContainer,
-  modalInlineStyles,
-} from "../../CriarEditarConvocacao/SelecaoCargos/styles";
+import { ModalButtonContainer, modalInlineStyles } from "@/components/ui";
 import { usePatchStatusProcessoConvocacao } from "../hooks/usePatchStatusProcessoConvocacao";
 import {
   ModalWrapper,
   ModalHeading,
-  ModalInfoCard,
-  ModalInfoItem,
-  ModalInfoLabel,
-  ModalInfoValue,
   ModalSection,
   ModalRadioGroup,
   ModalFieldsRow,
   ModalSelect,
   ModalRadio,
-  ModalSaveButton,
-  ModalCancelButton,
-} from "../styles";
+  ModalInfoCard,
+  ModalInfoItem,
+  ModalInfoLabel,
+  ModalInfoValue,
+  AppButton,
+  AppFormItem,
+} from '@/components/ui';
 
 const formatVacancyValue = (value: unknown): string => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -667,16 +664,16 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       onCancel={onClose}
       footer={
         <ModalButtonContainer>
-          <ModalCancelButton
+          <AppButton
+            variant="secondary"
             size="large"
             onClick={onClose}
           >
             {isReadOnly ? "Fechar" : "Cancelar"}
-          </ModalCancelButton>
+          </AppButton>
           {!isReadOnly && canAddEscolha && (
-            <ModalSaveButton
+            <AppButton
               size="large"
-              type="primary"
               onClick={handleSalvarEscolha}
               loading={salvarEscolhaIsPending}
               disabled={
@@ -691,7 +688,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
               }
             >
               Salvar
-            </ModalSaveButton>
+            </AppButton>
           )}
         </ModalButtonContainer>
       }
@@ -748,7 +745,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
 
         <ModalSection>
           <Form layout="vertical" disabled={isReadOnly}>
-            <Form.Item label="Situação">
+            <AppFormItem label="Situação">
               <ModalRadioGroup
                 value={modalSituacao}
                 onChange={(event) =>
@@ -761,7 +758,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                 <ModalRadio value="reconvocacao">Reconvocação</ModalRadio>
                 <ModalRadio value="nao-escolha">Não escolha</ModalRadio>
               </ModalRadioGroup>
-            </Form.Item>
+            </AppFormItem>
 
             {/* Removido: Tipo de vaga superior - manter apenas o bloco inferior */}
           </Form>
@@ -773,7 +770,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
               <Form layout="vertical" disabled={isReadOnly}>
                 <ModalFieldsRow gutter={[24, 16]}>
                   <Col xs={24} md={12}>
-                    <Form.Item label="DRE">
+                    <AppFormItem label="DRE">
                       <ModalSelect
                         value={modalDre}
                         placeholder="Selecione a DRE"
@@ -787,10 +784,10 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                         optionFilterProp="label"
                         filterOption={filterOptionByLabel}
                       />
-                    </Form.Item>
+                    </AppFormItem>
                   </Col>
                   <Col xs={24} md={12}>
-                    <Form.Item label="Unidade escolar">
+                    <AppFormItem label="Unidade escolar">
                       <ModalSelect
                         value={modalUnidadeEscolar}
                         placeholder="Selecione a unidade escolar"
@@ -803,7 +800,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                         optionFilterProp="label"
                         filterOption={filterOptionByLabel}
                       />
-                    </Form.Item>
+                    </AppFormItem>
                   </Col>
                 </ModalFieldsRow>
               </Form>
@@ -811,7 +808,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
 
             <ModalSection>
               <Form layout="vertical" disabled={isReadOnly}>
-                <Form.Item label="Tipo de vaga" style={{ marginTop: "0.5rem" }}>
+                <AppFormItem label="Tipo de vaga" style={{ marginTop: "0.5rem" }}>
                   <ModalRadioGroup
                     value={modalTipoVaga}
                     onChange={(event) =>
@@ -833,7 +830,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
                       Precária
                     </ModalRadio>
                   </ModalRadioGroup>
-                </Form.Item>
+                </AppFormItem>
               </Form>
             </ModalSection>
 

@@ -1,11 +1,8 @@
 import React from "react";
-import { Modal, Button, Alert, Form } from "antd";
+import { Modal, Alert, Form } from "antd";
 import { useAlterarEmail } from "../hooks/usePostAlterarEmail";
-import { StandardInput } from "../../../components/EstilosCompartilhados";
-import {
-  ModalTitleStyled,
-  ButtonsContainer,
-} from "./AlterarEmailModal.styles";
+import { AppButton, StandardInput, AppFormItem } from '@/components/ui';
+import { MeusDadosModalTitle as ModalTitleStyled, MeusDadosButtonsContainer as ButtonsContainer } from "@/design-system/estilos";
 
 interface AlterarEmailModalProps {
   open: boolean;
@@ -49,7 +46,7 @@ const AlterarEmailModal: React.FC<AlterarEmailModalProps> = ({ open, onClose }) 
       title={<ModalTitleStyled>Alterar e-mail</ModalTitleStyled>}
     >
       <Form form={form} layout="vertical" requiredMark={false}>
-        <Form.Item
+        <AppFormItem
           name="novo_email"
           label="Novo e-mail"
           required
@@ -59,9 +56,9 @@ const AlterarEmailModal: React.FC<AlterarEmailModalProps> = ({ open, onClose }) 
           ]}
         >
           <StandardInput type="email" placeholder="Digite o novo e-mail" />
-        </Form.Item>
+        </AppFormItem>
 
-        <Form.Item
+        <AppFormItem
           name="confirmacao_novo_email"
           label="Confirmação do novo e-mail"
           required
@@ -82,7 +79,7 @@ const AlterarEmailModal: React.FC<AlterarEmailModalProps> = ({ open, onClose }) 
             type="email"
             placeholder="Digite o novo e-mail novamente"
           />
-        </Form.Item>
+        </AppFormItem>
       </Form>
 
       <Alert
@@ -93,12 +90,12 @@ const AlterarEmailModal: React.FC<AlterarEmailModalProps> = ({ open, onClose }) 
       />
 
       <ButtonsContainer>
-        <Button onClick={handleClose} disabled={isPending}>
+        <AppButton variant="secondary" onClick={handleClose} disabled={isPending}>
           Cancelar
-        </Button>
-        <Button type="primary" onClick={handleSalvar} loading={isPending}>
+        </AppButton>
+        <AppButton onClick={handleSalvar} loading={isPending}>
           Confirmar
-        </Button>
+        </AppButton>
       </ButtonsContainer>
     </Modal>
   );

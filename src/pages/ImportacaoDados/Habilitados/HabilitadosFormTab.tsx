@@ -3,20 +3,13 @@ import { Row, Col, Select, Button, Tooltip, Spin, Input } from "antd";
 import { Controller } from "react-hook-form";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useImportacaoDados } from "./hooks/useImportacaoDadosHabilitados";
-import { CustomFormItem } from "../../../components/FormStyle";
-import {
-  TabContentContainer,
-  StyledSelect,
-  UploadArea,
-  StyledUpload,
-  ActionButtonsContainer,
-  GrupoEsquerda,
-} from "../../../components/EstilosCompartilhados";
+
 import { useConcursos } from "../../../hooks/useConcursos";
 import { CloudUploadOutlined } from "@ant-design/icons";
 import FormItem from "antd/es/form/FormItem";
 import { useNavigate } from "react-router-dom";
 
+import { AppFormItem, AppButton, TabContentContainer, StyledSelect, UploadArea, StyledUpload, ActionButtonsContainer, GrupoEsquerda, selectSuffixIcon } from '@/components/ui';
 interface HabilitadosProps {
   canViewHistoricoHabilitados: boolean;
   canImportarHabilitados: boolean;
@@ -54,7 +47,7 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                 control={control}
                 name="concurso"
                 render={({ field }) => (
-                  <CustomFormItem
+                  <AppFormItem
                     label="Concurso"
                     validateStatus={formErrors.concurso ? "error" : undefined}
                     help={formErrors.concurso?.message}
@@ -66,11 +59,7 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                       placeholder="Selecione o concurso"
                       loading={concursosOptionsIsLoading}
                       allowClear
-                      suffixIcon={
-                        <ExpandMoreIcon
-                          style={{ fontSize: "1.5rem", color: "#032B68" }}
-                        />
-                      }
+                      suffixIcon={<ExpandMoreIcon style={selectSuffixIcon} />}
                     >
                       {Array.isArray(concursosData)
                         ? concursosData.map((concurso: any) => (
@@ -90,7 +79,7 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                             </Select.Option>
                           ))}
                     </StyledSelect>
-                  </CustomFormItem>
+                  </AppFormItem>
                 )}
               />
             </Col>
@@ -103,10 +92,9 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
               render={() => (
                 <FormItem
                   validateStatus={formErrors.arquivo ? "error" : undefined}
-                  help={formErrors.arquivo?.message}                
+                  help={formErrors.arquivo?.message}
                   labelCol={{ span: 24 }}
                 >
-                  
                   <StyledUpload
                     disabled={!canImportarHabilitados}
                     beforeUpload={(file) => {
@@ -117,29 +105,37 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                     showUploadList={false}
                     multiple={false}
                   >
-                    <Tooltip title={!canImportarHabilitados?"Você não possui permissão para essa ação":"Selecionar arquivo"} arrow={true} >
-                    <UploadArea style={{ height: "64px" }} status={formErrors.arquivo ? "error" : undefined}>
-                    <GrupoEsquerda>
-                    <CloudUploadOutlined style={{ fontSize: 38, color: "#838383" }} />
+                    <Tooltip
+                      title={
+                        !canImportarHabilitados
+                          ? "Você não possui permissão para essa ação"
+                          : "Selecionar arquivo"
+                      }
+                      arrow
+                    >
+                      <UploadArea
+                        style={{ height: "64px" }}
+                        status={formErrors.arquivo ? "error" : undefined}
+                      >
+                        <GrupoEsquerda>
+                          <CloudUploadOutlined style={{ fontSize: 38, color: "#838383" }} />
 
-                      <span style={{ color: "#666", fontSize: "14px", textAlign: "left" }}>
-                        {watchedFile
-                          ? watchedFile.name
-                          : <>
-                          Selecione ou arraste e solte aqui <br />o arquivo de importação (.csv)
-                            </>                      
-                          }
-                      </span>
-                      </GrupoEsquerda>
+                          <span style={{ color: "#666", fontSize: "14px", textAlign: "left" }}>
+                            {watchedFile
+                              ? watchedFile.name
+                              : <>
+                                  Selecione ou arraste e solte aqui <br />o arquivo de importação (.csv)
+                                </>
+                            }
+                          </span>
+                        </GrupoEsquerda>
 
-                      <Button type="primary" size="small" style={{ fontSize: "14px" }}>
-                        Selecionar
-                      </Button>
-                    </UploadArea>
+                        <Button type="primary" size="small" style={{ fontSize: "14px" }}>
+                          Selecionar
+                        </Button>
+                      </UploadArea>
                     </Tooltip>
-
                   </StyledUpload>
-                  
                 </FormItem>
               )}
             />
@@ -152,7 +148,7 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                 control={control}
                 name="observacao"
                 render={({ field }) => (
-                  <CustomFormItem
+                  <AppFormItem
                     label="Observação"
                     validateStatus={formErrors.observacao ? "error" : undefined}
                     help={formErrors.observacao?.message}
@@ -167,7 +163,7 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
                       showCount
                       placeholder="Digite uma observação sobre esta importação (opcional)"
                     />
-                  </CustomFormItem>
+                  </AppFormItem>
                 )}
               />
             </Col>
@@ -175,23 +171,23 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
 
       </TabContentContainer>
       <ActionButtonsContainer>
-        <Tooltip title={!canViewHistoricoHabilitados?"Você não possui permissão para essa ação":"Histórico"} arrow={true} >
-      <Button
-        type="primary"
-        ghost
-        size="large"
-        onClick={() => navigate("/processos/importacao-dados/historico-habilitados")}
-        disabled={!canViewHistoricoHabilitados}
-      >
-        Histórico
-      </Button>
-      </Tooltip>
-      <Tooltip title={!canImportarHabilitados?"Você não possui permissão para essa ação":"Importar"} arrow={true} >
-      <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)} disabled={!canImportarHabilitados}>
-      Importar
-      </Button>
-      </Tooltip>
-    </ActionButtonsContainer>
+        <AppButton
+          variant="secondary"
+          size="large"
+          onClick={() => navigate("/processos/importacao-dados/historico-habilitados")}
+          disabled={!canViewHistoricoHabilitados}
+        >
+          Histórico
+        </AppButton>
+        <AppButton
+          variant="primary"
+          size="large"
+          onClick={handleSubmit(handleEnviarForm)}
+          disabled={!canImportarHabilitados}
+        >
+          Importar
+        </AppButton>
+      </ActionButtonsContainer>
     </Spin>
   </>
   );

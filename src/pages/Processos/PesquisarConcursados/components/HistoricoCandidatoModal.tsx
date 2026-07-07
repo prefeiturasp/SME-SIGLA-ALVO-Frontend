@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Button, Col, Modal, Row, Spin, Table, Typography } from "antd";
+import { Col, Modal, Row, Spin, Table, Typography } from "antd";
+import { AppButton, ModalInfoItem, ModalInfoLabel, ModalInfoValue } from '@/components/ui';
 import type { ColumnsType } from "antd/es/table";
 import {
   getListaEscolhas,
@@ -163,16 +164,6 @@ function buildHistoricoSituacoes(results: EscolhaListItem[]): HistoricoSituacaoI
   return linhas;
 }
 
-const labelStyle: React.CSSProperties = {
-  fontWeight: 700,
-  fontSize: 16,
-};
-
-const valueStyle: React.CSSProperties = {
-  fontWeight: 550,
-  fontSize: 16,
-};
-
 const sectionTitleStyle: React.CSSProperties = {
   fontFamily: "Open Sans",
   fontWeight: 700,
@@ -252,14 +243,14 @@ const HistoricoCandidatoModal: React.FC<HistoricoCandidatoModalProps> = ({
       onCancel={onClose}
       footer={
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button
+          <AppButton
+            variant="primary"
             size="large"
-            type="primary"
             style={{ height: 48, minWidth: 120 }}
             onClick={onClose}
           >
             Fechar
-          </Button>
+          </AppButton>
         </div>
       }
       width={1100}
@@ -272,16 +263,22 @@ const HistoricoCandidatoModal: React.FC<HistoricoCandidatoModalProps> = ({
     >
       <Row gutter={[32, 24]} style={{ marginTop: 8, marginBottom: 24 }}>
         <Col span={6}>
-          <div style={labelStyle}>Candidato:</div>
-          <div style={{ ...valueStyle, marginTop: 12 }}>{nomeCandidato || "—"}</div>
+          <ModalInfoItem>
+            <ModalInfoLabel>Candidato:</ModalInfoLabel>
+            <ModalInfoValue>{nomeCandidato || "—"}</ModalInfoValue>
+          </ModalInfoItem>
         </Col>
         <Col span={10}>
-          <div style={labelStyle}>Concurso:</div>
-          <div style={{ ...valueStyle, marginTop: 12 }}>{concurso || "—"}</div>
+          <ModalInfoItem>
+            <ModalInfoLabel>Concurso:</ModalInfoLabel>
+            <ModalInfoValue>{concurso || "—"}</ModalInfoValue>
+          </ModalInfoItem>
         </Col>
         <Col span={8}>
-          <div style={labelStyle}>Cargo:</div>
-          <div style={{ ...valueStyle, marginTop: 12 }}>{cargo || "—"}</div>
+          <ModalInfoItem>
+            <ModalInfoLabel>Cargo:</ModalInfoLabel>
+            <ModalInfoValue>{cargo || "—"}</ModalInfoValue>
+          </ModalInfoItem>
         </Col>
       </Row>
 

@@ -6,12 +6,11 @@ import { Tooltip } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../../services";
 
-import { CustomTitle } from "../../Vagas/components/style";
-import { StyledTable } from "../../../../components/EstilosCompartilhados";
 import type { IImportacaoEscolhasResponse } from "../../../../services/resources/importacaoDados/IImportacaoArquivos";
 import ErroModal from "./ErroModal";
 import { formatarStatusImportacao } from "../../utils/statusImportacao";
 
+import { CustomTitle, StyledTable } from '@/components/ui';
 interface IImportacaoEscolhasResponseComNome extends IImportacaoEscolhasResponse {
   processo_nome?: string;
 }

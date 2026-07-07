@@ -1,12 +1,12 @@
 import React from "react";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import { Modal, Typography, Button } from "antd";
+import { Modal, Typography } from "antd";
 import { CloudDownloadOutlined } from "@ant-design/icons";
-import { StyledTable } from "../../../components/EstilosCompartilhados";
 import { useExportacaoCandidatos } from "../hooks/useExportacaoCandidatos";
 import type { IExportacaoCandidatosListItem } from "../../../services/resources/exportacaoDados/types";
 
+import { AppIconButton, StyledTable } from '@/components/ui';
 interface HistoricoExportacaoCandidatosModalProps {
   open: boolean;
   onClose: () => void;
@@ -63,9 +63,10 @@ const HistoricoExportacaoCandidatosModal: React.FC<HistoricoExportacaoCandidatos
       key: "download",
       align: "center",
       render: (_, record) => (
-        <Button
+        <AppIconButton
           type="link"
           size="small"
+          tooltip="Download"
           icon={<CloudDownloadOutlined />}
           onClick={() => handleDownload(record.uuid)}
           aria-label="Download"

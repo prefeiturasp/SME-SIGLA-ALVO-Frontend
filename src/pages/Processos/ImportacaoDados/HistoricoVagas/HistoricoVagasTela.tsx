@@ -3,19 +3,14 @@ import React from "react";
 import { Row, Col, Typography } from "antd";
 
 import { useImportacaoDadosVagas } from "../Vagas/hooks/useImportacaoDadosVagas";
-import {
-  TabContentContainer,
-  SectionCard,
-  ActionButtonsContainer,
-  SecondaryButton 
-} from "../../../../components/EstilosCompartilhados";
+
  
 import UltimasImportacoesDeVagasTable from "../Vagas/components/UltimasImportacoesDeVagasTable";
 import { Link, useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
 
+import { TabContentContainer, SectionCard, ActionButtonsContainer, AppButton } from '@/components/ui';
 const { Text } = Typography;
-
 
 const HistoricoVagasTela: React.FC = ({  }) => {
 
@@ -26,14 +21,12 @@ const HistoricoVagasTela: React.FC = ({  }) => {
   { title: "Histórico de importação de Vagas" },
 ] as TitleItem[];
 
-
   const {
     importacoesArquivosData,
     importacoesArquivosIsLoading,
     listRequest,
     onAntTableChange
   } = useImportacaoDadosVagas();
-
 
   const navigate=useNavigate();
  
@@ -74,9 +67,9 @@ const HistoricoVagasTela: React.FC = ({  }) => {
 
        <ActionButtonsContainer> 
        <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
-         <SecondaryButton size="large" onClick={()=>navigate(-1)}>
+         <AppButton variant="secondary" size="large" onClick={()=>navigate(-1)}>
            Voltar
-         </SecondaryButton>
+         </AppButton>
        </div>
  
       </ActionButtonsContainer>

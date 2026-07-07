@@ -12,7 +12,7 @@ jest.mock("react-router-dom", () => ({
 }));
 
 // Mock do QuillEditor para um textarea simples
-jest.mock("../../../Relatorios/components/QuillEditor", () => {
+jest.mock("@/components/QuillEditor", () => {
   return function MockQuillEditor(props: {
     value: string;
     onChange: (v: string) => void;

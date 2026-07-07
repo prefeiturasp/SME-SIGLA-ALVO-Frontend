@@ -2,8 +2,7 @@ import React from "react";
 import { Row, Col, Spin } from "antd";
 import dayjs from "dayjs";
 
-import { TextSubHeadingPreto, TextSubTituloCinza, TextTitulo } from "../../../components/EstilosCompartilhados";
-import { resumoDoProcessoStyles } from "./styles";
+import { TextSubHeadingPreto, TextSubTituloCinza, TextTitulo } from '@/components/ui';
 
 import type { IProcessoConvocacaoResumo } from "../../../services/resources/convocacao/IConvocacao";
 
@@ -38,7 +37,7 @@ const ResumoDoProcesso: React.FC<ResumoDoProcessoProps> = ({
   return (
     <Spin spinning={isLoading} tip="Carregando dados do processo..." size="large">
       <Row gutter={30}>
-        <Col xs={24} md={24} style={resumoDoProcessoStyles.colWithMargin}>
+        <Col xs={24} md={24} style={{ marginBottom: 16 }}>
           <TextSubHeadingPreto style={blackStyle}>
             Dados do processo
           </TextSubHeadingPreto>

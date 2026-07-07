@@ -1,8 +1,8 @@
 import React from "react";
-import { Row, Col, Radio, Tooltip } from "antd";
+import { Radio } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { Controller } from "react-hook-form";
-import { CustomFormItem } from "../../../../components/FormStyle";
+import { AppFormItem, FilterActionSlot } from '@/components/ui';
 import type { IFiltroProcessos } from "../../../../services/resources/convocacao/IConvocacao";
 import {
   FieldLabel,
@@ -10,10 +10,13 @@ import {
   CustomRangePicker,
   RadioGroup,
   SearchButton,
-  SearchButtonContainer,
+  ClearButton,
+  FilterInlineRow,
+  FilterFieldCol,
+  FilterActionCol,
+  FilterActionsGroup,
   SearchFieldsContainer,
-  ClearButton
-} from "../style";
+} from "@/components/ui";
 
 interface ConvocacaoFiltrosProps {
   control: any;
@@ -43,13 +46,13 @@ const ConvocacaoFiltros: React.FC<ConvocacaoFiltrosProps> = ({
   };
   return (
     <SearchFieldsContainer>
-      <Row gutter={[16, 0]}>
-        <Col xs={24} md={12}>
+      <FilterInlineRow gutter={[16, 0]}>
+        <FilterFieldCol xs={24} md={12}>
           <Controller
             control={control}
             name="concurso_uuid"
             render={({ field }) => (
-              <CustomFormItem
+              <AppFormItem
                 label={<FieldLabel>Concurso</FieldLabel>}
                 validateStatus={
                   formErrors.concurso_uuid ? "error" : undefined
@@ -64,17 +67,17 @@ const ConvocacaoFiltros: React.FC<ConvocacaoFiltrosProps> = ({
                   loading={concursosOptionsIsLoading}
                   className="custom-select-concurso"
                 />
-              </CustomFormItem>
+              </AppFormItem>
             )}
           />
-        </Col>
+        </FilterFieldCol>
 
-        <Col xs={24} md={12}>
+        <FilterFieldCol xs={24} md={12}>
           <Controller
             control={control}
             name="cargo_uuid"
             render={({ field }) => (
-              <CustomFormItem
+              <AppFormItem
                 label={<FieldLabel>Cargo</FieldLabel>}
                 validateStatus={formErrors.cargo_uuid ? "error" : undefined}
                 help={formErrors.cargo_uuid?.message}
@@ -89,19 +92,19 @@ const ConvocacaoFiltros: React.FC<ConvocacaoFiltrosProps> = ({
                   placeholder="Selecione o cargo"
                   className="custom-select-cargo"
                 />
-              </CustomFormItem>
+              </AppFormItem>
             )}
           />
-        </Col>
-      </Row>
+        </FilterFieldCol>
+      </FilterInlineRow>
 
-      <Row gutter={[16, 8]} align="middle">
-        <Col xs={24} md={7}>
+      <FilterInlineRow gutter={[16, 8]}>
+        <FilterFieldCol xs={24} md={7}>
           <Controller
             control={control}
             name="data_convocacao_inicio"
             render={({ field }) => (
-              <CustomFormItem
+              <AppFormItem
                 label={<FieldLabel>Data de Convocação</FieldLabel>}
                 validateStatus={
                   formErrors.data_convocacao_inicio ? "error" : undefined
@@ -120,10 +123,10 @@ const ConvocacaoFiltros: React.FC<ConvocacaoFiltrosProps> = ({
                   placeholder={["Data inicial", "Data final"]}
                   format="DD/MM/YYYY"
                 />
-              </CustomFormItem>
+              </AppFormItem>
             )}
           />
-        </Col>
+        </FilterFieldCol>
 
         <Controller
           control={control}
@@ -131,12 +134,12 @@ const ConvocacaoFiltros: React.FC<ConvocacaoFiltrosProps> = ({
           render={({ field }) => <input type="hidden" {...field} />}
         />
         
-        <Col xs={24} md={7}>
+        <FilterFieldCol xs={24} md={7}>
           <Controller
             control={control}
             name="status"
             render={({ field }) => (
-              <CustomFormItem
+              <AppFormItem
                 label={<FieldLabel>Status</FieldLabel>}
                 labelCol={{ span: 24 }}
               >
@@ -148,35 +151,32 @@ const ConvocacaoFiltros: React.FC<ConvocacaoFiltrosProps> = ({
                   <Radio value="andamento">Andamento</Radio>
                   <Radio value="finalizado">Finalizado</Radio>
                 </RadioGroup>
-              </CustomFormItem>
+              </AppFormItem>
             )}
           />
-        </Col>
-        <Col xs={24} md={10}>
-          <SearchButtonContainer>
-            <Tooltip title={!canViewProcessoConvocacao?"Você não possui permissão para essa ação":"Limpar filtros"} arrow={true} >      
-            <ClearButton
-              size="large"
-              onClick={handleReset}
-              disabled={!canViewProcessoConvocacao}
-            >
-              Limpar filtros
-            </ClearButton>
-            </Tooltip>
-            <Tooltip title={!canViewProcessoConvocacao?"Você não possui permissão para essa ação":"Buscar processos"} arrow={true} >
-            <SearchButton
-              disabled={!canViewProcessoConvocacao}
-              size="large"
-              type="primary"
-              icon={<SearchOutlined />}
-              onClick={handleSubmit(onSubmit)}
-            >
-              Buscar
-            </SearchButton>
-            </Tooltip>
-          </SearchButtonContainer>
-        </Col>
-      </Row>
+        </FilterFieldCol>
+        <FilterActionCol xs={24} md={10}>
+          <FilterActionSlot>
+            <FilterActionsGroup>
+              <ClearButton
+                size="large"
+                onClick={handleReset}
+                disabled={!canViewProcessoConvocacao}
+              >
+                Limpar filtros
+              </ClearButton>
+              <SearchButton
+                disabled={!canViewProcessoConvocacao}
+                size="large"
+                icon={<SearchOutlined />}
+                onClick={handleSubmit(onSubmit)}
+              >
+                Buscar
+              </SearchButton>
+            </FilterActionsGroup>
+          </FilterActionSlot>
+        </FilterActionCol>
+      </FilterInlineRow>
     </SearchFieldsContainer>
   );
 };

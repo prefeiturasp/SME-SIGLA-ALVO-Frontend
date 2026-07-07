@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Typography, Button, Input, message } from "antd";
-import { StyledSelect } from "../../../components/EstilosCompartilhados";
+import { Modal, Input, message } from "antd";
 import { usePostHabilitadoEliminar } from "../hooks/usePostHabilitadoEliminar";
 import { usePostReclassificarCandidato } from "../hooks/usePostReclassificarCandidato";
 
+import { AppButton, StyledSelect, AppFormItem, ModalInfoLabel, ModalInfoValue, InlineInfoItem } from '@/components/ui';
 type Props = {
   open: boolean;
   nomeCandidato: string;
@@ -87,25 +87,24 @@ const AlterarSituacaiCandidatoModal: React.FC<Props> = ({
       width={720}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <Typography.Text strong>Concurso:</Typography.Text>
-            <Typography.Text>{concursoLabel || concursoUuid || "—"}</Typography.Text>
-          </div>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <Typography.Text strong>Cargo:</Typography.Text>
-            <Typography.Text>{cargoLabel || cargoUuid || "—"}</Typography.Text>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <Typography.Text strong>Candidato:</Typography.Text>
-          <Typography.Text>{nomeCandidato || "—"}</Typography.Text>
-        </div>
+        <InlineInfoItem style={{ gap: 24 }}>
+          <InlineInfoItem>
+            <ModalInfoLabel>Concurso:</ModalInfoLabel>
+            <ModalInfoValue>{concursoLabel || concursoUuid || "—"}</ModalInfoValue>
+          </InlineInfoItem>
+          <InlineInfoItem>
+            <ModalInfoLabel>Cargo:</ModalInfoLabel>
+            <ModalInfoValue>{cargoLabel || cargoUuid || "—"}</ModalInfoValue>
+          </InlineInfoItem>
+        </InlineInfoItem>
+        <InlineInfoItem>
+          <ModalInfoLabel>Candidato:</ModalInfoLabel>
+          <ModalInfoValue>{nomeCandidato || "—"}</ModalInfoValue>
+        </InlineInfoItem>
 
-        <div>
-          <Typography.Text strong>Situação</Typography.Text>
+        <AppFormItem label="Situação" labelCol={{ span: 24 }}>
           <StyledSelect
-            style={{ width: "100%", marginTop: 8 }}
+            style={{ width: "100%" }}
             value={situacao || undefined}
             onChange={(value: unknown) => setSituacao(String(value))}
             placeholder="Selecione a situação"
@@ -124,31 +123,29 @@ const AlterarSituacaiCandidatoModal: React.FC<Props> = ({
               Desclassificar PCD
             </StyledSelect.Option>
           </StyledSelect>
-        </div>
+        </AppFormItem>
 
         {situacao && (
-          <div>
-            <Typography.Text strong>Motivo</Typography.Text>
+          <AppFormItem label="Motivo" labelCol={{ span: 24 }}>
             <Input.TextArea
               rows={4}
-              style={{ width: "100%", marginTop: 8 }}
+              style={{ width: "100%" }}
               value={motivo}
               onChange={(e) => setMotivo(e.target.value)}
               placeholder="Descreva o motivo"
             />
-          </div>
+          </AppFormItem>
         )}
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
-          <Button onClick={onCancel} disabled={submitting}>Cancelar</Button>
-          <Button
-            type="primary"
+          <AppButton variant="secondary" onClick={onCancel} disabled={submitting}>Cancelar</AppButton>
+          <AppButton
             loading={submitting}
             disabled={!situacao}
             onClick={submitAlteracao}
           >
             Salvar
-          </Button>
+          </AppButton>
         </div>
       </div>
     </Modal>

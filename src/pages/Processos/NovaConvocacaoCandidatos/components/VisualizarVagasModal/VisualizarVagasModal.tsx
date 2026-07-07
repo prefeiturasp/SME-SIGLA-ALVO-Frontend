@@ -1,16 +1,16 @@
-import { Button, Select, Space, Typography, Tooltip } from "antd";
+import { Select, Space, Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 
+import { AppButton, CustomModal2 as CustomModal, TextBlue } from '@/components/ui';
 const { Text } = Typography;
 
 import { Col, Divider, Input, Row } from "antd";
 import { Controller, useForm } from "react-hook-form";
-import { ModalCustomFormItem as CustomFormItem } from "../../styles";
+import { ModalCustomFormItem as CustomFormItem } from "@/components/ui";
 import { Content } from "antd/es/layout/layout";
 import type { IConvocacaoFiltros, IOptions, IVaga } from "../../../../../services/resources/convocacao/IConvocacao";
 import UnidadeEscolarTable from "../UnidadeEscolarTable";
-import { CustomModal2 as CustomModal, TextBlue } from '../../../../../components/EstilosCompartilhados';
 import {  useEffect, useState } from "react";
 import AdicionarNovaEscolaModal from "../AdicionarNovaEscolaModal";
  
@@ -146,29 +146,27 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
       footer={
         <Row justify="space-between" align="middle" style={{ width: "100%" }}>
           <Col>
-            <Button size="large" type="primary" icon={<PlusOutlined />} onClick={handleOpenAdicionarEscola}>
+            <AppButton variant="primary" size="large" icon={<PlusOutlined />} onClick={handleOpenAdicionarEscola}>
               Incluir Escola
-            </Button>
+            </AppButton>
           </Col>
 
           <Col>
             <Space size={24}>
-              <Button
-                key="atualizar"
+              <AppButton
+                variant="secondary"
                 size="large"
-                type="primary"
                 onClick={() => handleOnCancel()}
               >
                 Cancelar
-              </Button>
-              <Button
-                key="salvar"
+              </AppButton>
+              <AppButton
+                variant="primary"
                 size="large"
-                type="primary"
                 onClick={handleSubmit(onFinish)}
               >
                 Salvar
-              </Button>
+              </AppButton>
             </Space>
           </Col>
         </Row>
@@ -241,18 +239,15 @@ const AdicionarNovaEscola: React.FC<INewAdicionarNovaEscolaProps> = ({
 
         <Row>
           <Space size={24} style={{ margin: "0" }}>
-            <Tooltip title="Voltar as escolas ao estado inicial">
-              <Button type="primary" ghost size="large" onClick={handleResetar}>
-                Resetar
-              </Button>
-            </Tooltip>
-            <Button type="primary" ghost size="large" onClick={handleLimparFiltros}>
+            <AppButton variant="secondary" size="large" onClick={handleResetar}>
+              Resetar
+            </AppButton>
+            <AppButton variant="secondary" size="large" onClick={handleLimparFiltros}>
               Limpar Filtros
-            </Button>
-            <Button size="large" type="primary" onClick={handleFiltrar}>
+            </AppButton>
+            <AppButton variant="primary" size="large" onClick={handleFiltrar}>
               Filtrar
-            </Button>
-            
+            </AppButton>
           </Space>
         </Row>
 

@@ -2,12 +2,11 @@ import React from "react";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import dayjs from "dayjs";
 
-import { CustomTitle } from "./style";
 
 
-import { StyledTable } from "../../../../../components/EstilosCompartilhados";
 import type { IUltimasImportacoesVagas } from "../../../../../services/resources/importacaoDados/IImportacaoArquivos";
 
+import { CardTitle, StyledTable } from '@/components/ui';
 interface UltimasImportacoesDeVagasTableProps extends TableProps<IUltimasImportacoesVagas> {
   data: IUltimasImportacoesVagas[];
 }
@@ -49,9 +48,9 @@ const UltimasImportacoesDeVagasTable: React.FC<UltimasImportacoesDeVagasTablePro
   return (
     <>
 
-      <CustomTitle level={4} style={{ margin: "1rem 0" }}>
+      <CardTitle style={{ margin: "1rem 0" }}>
         {"Últimas importações"}
-      </CustomTitle>
+      </CardTitle>
 
       <StyledTable
         columns={columns}

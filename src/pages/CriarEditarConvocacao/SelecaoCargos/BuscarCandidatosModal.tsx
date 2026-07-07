@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Modal, Typography, Button, message, Spin, Radio, Divider } from 'antd';
+import { Modal, Typography, message, Spin, Radio, Divider } from 'antd';
+import { AppButton } from '@/components/ui';
 import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
-import { 
-  ModalTitle
-} from '../../Processos/NovaConvocacaoCandidatos/styles';
-import { modalStyles, modalInlineStyles, GlobalStyles } from './styles';
+import { ModalTitle } from "@/components/ui";
+import { modalStyles, modalInlineStyles, BuscarCandidatosGlobalStyles } from "@/components/ui";
 import { Table } from 'antd';
 import { useGetCandidatos } from './hooks/useGetCandidatos';
 import { useGetCandidatosReposicao } from './hooks/useGetCandidatosReposicao';
@@ -576,7 +575,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
 
   return (
     <>
-      <GlobalStyles />
+      <BuscarCandidatosGlobalStyles />
       <Modal
         open={visible}
         onCancel={onClose}
@@ -766,16 +765,14 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
 
         {/* <ButtonContainer> */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
-          <Button
-            // className="modal-buscar-btn modal-action-btn"
-            size="large"
+          <AppButton
+            variant="secondary"
             icon={<SearchOutlined />}
             onClick={handleBuscar}
-            variant="outlined"
             style={{ width: 'fit-content' }}
           >
             Buscar
-          </Button>
+          </AppButton>
         </div>
 
           {mostrarTabelaCandidatos && (
@@ -846,22 +843,16 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
           />
 
           <div style={modalInlineStyles.finalButtonsContainer}>
-            <Button
-              onClick={onClose}
-              size="large"
-              variant="outlined"
-              style={{ width: 'fit-content' }}
-            >Cancelar
-            </Button>
-            <Button
-              type="primary"
-              size="large"
+            <AppButton variant="secondary" onClick={onClose} style={{ width: 'fit-content' }}>
+              Cancelar
+            </AppButton>
+            <AppButton
               onClick={handleSelecionar}
               disabled={isAdicionarDisabilitado}
-              variant="outlined"
               style={{ width: 'fit-content' }}
-            >Adicionar ao cargo
-            </Button>
+            >
+              Adicionar ao cargo
+            </AppButton>
           </div>
         {/* </ButtonContainer> */}
               </div>

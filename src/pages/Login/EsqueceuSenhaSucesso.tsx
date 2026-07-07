@@ -10,13 +10,13 @@ import {
   PrefLogoContainer,
   PrefLogoImage,
   StyledTitle,
-  StyledText,
+  LoginText as StyledText,
   BackToLoginButton,
   StyledAlert,
   SuccessMessage,
   EmailText,
   InstructionsText,
-} from "./style";
+} from "@/design-system/estilos";
 
 const EsqueceuSenhaSucesso: React.FC = () => {
   const {

@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Card, Row, Col, Typography, Button, Upload, Spin, App } from "antd";
+import { Card, Row, Col, Typography, Upload, Spin, App } from "antd";
 import ImageIcon from "@mui/icons-material/Image";
-import QuillEditor from "../../../Relatorios/components/QuillEditor";
+import QuillEditor from "@/components/QuillEditor";
 import type { UploadFile } from "antd/es/upload/interface";
 import CropImageModal from "../../../../components/CropImageModal";
-import { ModalSaveButton } from "../../../EscolhaCandidatos/styles";
+import { AppButton } from '@/components/ui';
 import { getParametrizacaoRelatorios } from "../hooks/getParametrizacaoRelatorios";
 import { patchParametrizacaoRelatorios } from "../hooks/patchParametrizacaoRelatorios";
 import {
   LabelText,
-  ButtonContainer,
+  ParametrosButtonContainer,
   QuillEditorWrapper,
-} from "../styles";
+} from "@/design-system/estilos";
 
 const { Text } = Typography;
 
@@ -234,9 +234,9 @@ const AbaRelatorios: React.FC<{
                   showUploadList={false}
                   accept="image/*"
                 >
-                  <Button type="default" style={{ borderColor: "#0F59C8", color: "#0F59C8" }}>
+                  <AppButton variant="secondary">
                     Escolher imagem
-                  </Button>
+                  </AppButton>
                 </Upload>
               </div>
             </div>
@@ -258,17 +258,17 @@ const AbaRelatorios: React.FC<{
       </div>
 
       {/* Botão Salvar */}
-      <ButtonContainer>
-        <ModalSaveButton
+      <ParametrosButtonContainer>
+        <AppButton
+          variant="primary"
           disabled={!canAddParametrizacao}
           size="large"
-          type="primary"
           onClick={handleSalvar}
           loading={isSaving}
         >
           Salvar
-        </ModalSaveButton>
-      </ButtonContainer>
+        </AppButton>
+      </ParametrosButtonContainer>
 
       <CropImageModal
         open={cropModalAberto}

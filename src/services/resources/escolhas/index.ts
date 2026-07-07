@@ -11,7 +11,7 @@ import type {
 import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 import type {  IVagasResponse } from "../convocacao/IConvocacao";
-import type { IInclusaoVagasEscolasPayload } from "../../../pages/GerenciamentoVagas/hooks/types";
+import type { IInclusaoVagasEscolasPayload } from "./IEscolhas";
 
 export const URL = {
   getVagasEscolas: () => `/api/v1/vagas-escolas/`,

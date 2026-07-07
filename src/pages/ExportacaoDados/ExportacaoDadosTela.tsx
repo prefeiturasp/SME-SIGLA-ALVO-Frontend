@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Typography } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
-import { StyledTabs } from "../ImportacaoDados/styles";
+import { StyledTabs } from '@/components/ui';
 import ExportacaoVagasFormTab from "./components/ExportacaoVagasFormTab";
 import ExportacaoCandidatosFormTab from "./components/ExportacaoCandidatosFormTab";
 import ExportacaoLotesFormTab from "./components/ExportacaoLotesFormTab";

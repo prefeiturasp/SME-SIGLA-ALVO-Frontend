@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import type { TableProps } from "antd";
-import { Flex, Button, Tooltip, InputNumber, Input, Table as AntTable } from "antd";
+import { Flex, InputNumber, Input } from "antd";
 import type { TableColumnsType } from "antd";
 import type { IVaga } from "../../../services/resources/convocacao/IConvocacao";
-import { StyledTable } from "../../../components/EstilosCompartilhados";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { Controller, useForm } from "react-hook-form";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
-
-
+import { AppIconButton, EditActionIcon, StyledTable, editableTableStyles } from '@/components/ui';
 interface VagasEscolasTabelaProps extends TableProps<IVaga> {
   filteredData: IVaga[];
   loading?: boolean;
@@ -18,7 +15,28 @@ interface VagasEscolasTabelaProps extends TableProps<IVaga> {
   cargoUuid?: string | undefined;
 }
 
+const centeredEditableCellStyle = {
+  ...editableTableStyles.flexRowGap8,
+  justifyContent: "center" as const,
+};
 
+const centeredActionsCellStyle = {
+  ...editableTableStyles.actionsCell,
+  margin: "0 auto",
+};
+
+const centeredTextCellStyle = {
+  width: "100%",
+  textAlign: "center" as const,
+};
+
+const renderCenteredTitle = (title: string) => (
+  <div style={centeredTextCellStyle}>{title}</div>
+);
+
+const renderCenteredText = (value: React.ReactNode) => (
+  <div style={centeredTextCellStyle}>{value}</div>
+);
 
 const VagasEscolasTabela: React.FC<VagasEscolasTabelaProps> = ({
   filteredData,
@@ -113,108 +131,110 @@ const VagasEscolasTabela: React.FC<VagasEscolasTabelaProps> = ({
 
   const baseColumns: TableColumnsType<IVaga> = [
     {
-      title: "Código EOL",
+      title: renderCenteredTitle("Código EOL"),
       key: "codigo_eol",
       width: '7%',
-      render: (_: any, record: IVaga) => record.escola?.codigo_eol,
+      align: "center" as const,
+      render: (_: any, record: IVaga) => renderCenteredText(record.escola?.codigo_eol),
     },
     {
-      title: "DRE",
+      title: renderCenteredTitle("DRE"),
       key: "dre_nome",
       width: '38%',
-      render: (_: any, record: IVaga) => record.escola?.dre?.nome,
+      align: "center" as const,
+      render: (_: any, record: IVaga) => renderCenteredText(record.escola?.dre?.nome),
     },
     {
-      title: "Unidade Escolar",
+      title: renderCenteredTitle("Unidade Escolar"),
       key: "nome_oficial",
       width: '30%',
-      render: (_: any, record: IVaga) => record.escola?.nome_oficial,
+      align: "center" as const,
+      render: (_: any, record: IVaga) => renderCenteredText(record.escola?.nome_oficial),
     },
     {
-      title: "Vagas definitivas",
+      title: renderCenteredTitle("Vagas definitivas"),
       dataIndex: "vagas_definitivas",
       width: '10%',
+      align: "center" as const,
       editable: true,
       render: (_: any, record: IVaga) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <InputNumber value={(record as any).vagas_definitivas_utilizadas ?? record.vagas_definitivas} disabled controls={false} style={{ width: 60 }} />
+        <div style={centeredEditableCellStyle}>
+          <InputNumber value={(record as any).vagas_definitivas_utilizadas ?? record.vagas_definitivas} disabled controls={false} style={editableTableStyles.inputEditWidth60} />
           {isEditing(record)
             ? (
             <Controller
               name={`${record.uuid}.vagas_definitivas_extra`}
               control={control}
               render={({ field }) => (
-                <Input {...field} style={{ width: 60, color: '#0A8F3A' }} />
+                <Input {...field} style={editableTableStyles.inputEditGreen} />
               )}
             />
             )
             : ((record as any).vagas_definitivas_extra
-                ? <Input value={(record as any).vagas_definitivas_extra} disabled style={{ width: 60, backgroundColor: '#fff', color: '#0A8F3A' }} />
+                ? <Input value={(record as any).vagas_definitivas_extra} disabled style={editableTableStyles.inputEditGreenDisabled} />
                 : null)
           }
         </div>
       ),
     } as any,
     {
-      title: "Vagas precárias",
+      title: renderCenteredTitle("Vagas precárias"),
       dataIndex: "vagas_precarias",
       width: '10%',
+      align: "center" as const,
       editable: true,
       render: (_: any, record: IVaga) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <InputNumber value={(record as any).vagas_precarias_utilizadas ?? record.vagas_precarias} disabled controls={false} style={{ width: 60 }} />
+        <div style={centeredEditableCellStyle}>
+          <InputNumber value={(record as any).vagas_precarias_utilizadas ?? record.vagas_precarias} disabled controls={false} style={editableTableStyles.inputEditWidth60} />
           {isEditing(record)
             ? (
             <Controller
               name={`${record.uuid}.vagas_precarias_extra`}
               control={control}
               render={({ field }) => (
-                <Input {...field} style={{ width: 60, color: '#0A8F3A' }} />
+                <Input {...field} style={editableTableStyles.inputEditGreen} />
               )}
             />
             )
             : ((record as any).vagas_precarias_extra
-                ? <Input value={(record as any).vagas_precarias_extra} disabled style={{ width: 60, backgroundColor: '#fff', color: '#0A8F3A' }} />
+                ? <Input value={(record as any).vagas_precarias_extra} disabled style={editableTableStyles.inputEditGreenDisabled} />
                 : null)
           }
         </div>
       ),
     } as any,
     {
-      title: "Editar",
+      title: renderCenteredTitle("Editar"),
       key: "editar",
       width: '5%',
       align: "center" as const,
       render: (_: any, record: IVaga) => {
         const editable = isEditing(record);
         return editable ? (
-          <div style={{ width: 56, display: "flex", justifyContent: "center", gap: 2 }}>
-            <Tooltip title="Salvar">
-              <Button
-                type="link"
-                onClick={() => save(record.uuid)}
-                icon={<CheckOutlined style={{ color: "#05409A" }} />}
-              />
-            </Tooltip>
-            <Tooltip title="Cancelar">
-              <Button
-                type="link"
-                onClick={() => cancelFor(record)}
-                icon={<CloseOutlined style={{ color: "#ff4d4f" }} />}
-              />
-            </Tooltip>
+          <div style={centeredActionsCellStyle}>
+            <AppIconButton
+              type="link"
+              tooltip="Salvar"
+              onClick={() => save(record.uuid)}
+              icon={<CheckOutlined style={editableTableStyles.saveIcon} />}
+            />
+            <AppIconButton
+              type="link"
+              tooltip="Cancelar"
+              onClick={() => cancelFor(record)}
+              icon={<CloseOutlined style={editableTableStyles.cancelIcon} />}
+            />
           </div>
         ) : (
-          <div style={{ width: 56, display: "flex", justifyContent: "center", gap: 2 }}>
-            <Tooltip title="Editar vagas">
-              <Button
-                type="link"
-                disabled={editingKey !== ""}
-                onClick={() => edit(record)}
-                icon={<ModeEditOutlineOutlinedIcon style={{ color: "#05409A" }} />}
-              />
-            </Tooltip>
-            <Button type="link" style={{ visibility: "hidden" }} icon={<CloseOutlined />} />
+          <div style={centeredActionsCellStyle}>
+            <AppIconButton
+              type="link"
+              tooltip="Editar"
+              disabled={editingKey !== ""}
+              onClick={() => edit(record)}
+              icon={<EditActionIcon />}
+            />
+            <AppIconButton type="link" style={editableTableStyles.hiddenPlaceholder} icon={<CloseOutlined />} />
           </div>
         );
       },

@@ -1,8 +1,8 @@
 import React from "react";
 import { Modal, Typography, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { ButtonsContainer } from "../../Vagas/components/style";
-import { Button } from "antd";
+import { ErrorModalButtonsContainer as ButtonsContainer } from "@/components/ui";
+import { AppButton } from '@/components/ui';
 import type { IDetalheLoteAtualizado } from "../hooks/types";
 
 interface DetalhesLotesModalProps {
@@ -87,7 +87,7 @@ const DetalhesLotesModal: React.FC<DetalhesLotesModalProps> = ({ open, onClose, 
         scroll={{ x: true }}
       />
       <ButtonsContainer>
-        <Button onClick={onClose}>Fechar</Button>
+        <AppButton variant="secondary" onClick={onClose}>Fechar</AppButton>
       </ButtonsContainer>
     </Modal>
   );

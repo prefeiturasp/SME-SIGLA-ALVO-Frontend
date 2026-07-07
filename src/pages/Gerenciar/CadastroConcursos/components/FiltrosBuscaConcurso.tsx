@@ -1,9 +1,22 @@
-import { Button, Col, Form, Input, Row, Select } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
 import { useMemo } from "react";
+import { SearchOutlined } from "@ant-design/icons";
 import { useForm, Controller } from "react-hook-form";
 import type { IConcursoFiltros } from "../../../../services/resources/concursos/IConcursos";
 import { useListarConcursos } from "../hooks/useListarConcursos";
+import {
+  AppFormItem,
+  FilterInput,
+  ClearButton,
+  FieldLabel,
+  FilterActionCol,
+  FilterActionSlot,
+  FilterActionsGroup,
+  FilterFieldCol,
+  FilterInlineRow,
+  FilterSelect,
+  SearchButton,
+  SearchFieldsContainer,
+} from "@/components/ui";
 
 interface IFiltrosProps {
   onBuscar: (filtros: IConcursoFiltros) => void;
@@ -18,7 +31,7 @@ interface IFiltrosFields {
   numero_processo?: string;
   ano_edital?: number;
   banca_responsavel?: string;
-  status?: string;    
+  status?: string;
 }
 
 const removerVazios = (valores: IFiltrosFields): IConcursoFiltros => {
@@ -34,10 +47,9 @@ const removerVazios = (valores: IFiltrosFields): IConcursoFiltros => {
 const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
   onBuscar,
   onLimpar,
-  concursos
+  concursos,
 }) => {
   const { control, handleSubmit, reset } = useForm<IFiltrosFields>();
- // const { concursos } = useListarConcursos({}, 1, 1000);
 
   const opcoesBanca = useMemo(() => {
     const bancas = Array.from(
@@ -88,15 +100,18 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
   });
 
   return (
-    <Form layout="vertical">
-      <Row gutter={[16, 8]}>
-        <Col xs={24} md={8}>
+    <SearchFieldsContainer>
+      <FilterInlineRow gutter={[16, 0]}>
+        <FilterFieldCol xs={24} md={6}>
           <Controller
             control={control}
             name="codigo_cargo"
             render={({ field }) => (
-              <Form.Item label={<strong>Código do cargo</strong>}>
-                <Select
+              <AppFormItem
+                label={<FieldLabel>Código do cargo</FieldLabel>}
+                labelCol={{ span: 24 }}
+              >
+                <FilterSelect
                   {...field}
                   allowClear
                   showSearch
@@ -104,75 +119,84 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
                   placeholder="Selecione o código do cargo..."
                   options={opcoesCodigoCargo}
                 />
-              </Form.Item>
+              </AppFormItem>
             )}
           />
-        </Col>
-        <Col xs={24} md={8}>
+        </FilterFieldCol>
+        <FilterFieldCol xs={24} md={6}>
           <Controller
             control={control}
             name="nome"
             render={({ field }) => (
-              <Form.Item label={<strong>Nome do concurso</strong>}>
-                <Input {...field} placeholder="Digite o nome do concurso..." />
-              </Form.Item>
+              <AppFormItem
+                label={<FieldLabel>Nome do concurso</FieldLabel>}
+                labelCol={{ span: 24 }}
+              >
+                <FilterInput {...field} placeholder="Digite o nome do concurso..." />
+              </AppFormItem>
             )}
           />
-        </Col>
-        <Col xs={24} md={8}>
+        </FilterFieldCol>
+        <FilterFieldCol xs={24} md={6}>
           <Controller
             control={control}
             name="descricao_cargo"
             render={({ field }) => (
-              <Form.Item label={<strong>Descrição do cargo</strong>}>
-                <Input
-                  {...field}
-                  placeholder="Digite a descrição do cargo..."
-                />
-              </Form.Item>
+              <AppFormItem
+                label={<FieldLabel>Descrição do cargo</FieldLabel>}
+                labelCol={{ span: 24 }}
+              >
+                <FilterInput {...field} placeholder="Digite a descrição do cargo..." />
+              </AppFormItem>
             )}
           />
-        </Col>
-      </Row>
-
-      <Row gutter={[16, 8]}>
-        <Col xs={24} md={6}>
+        </FilterFieldCol>
+        <FilterFieldCol xs={24} md={6}>
           <Controller
             control={control}
             name="numero_processo"
             render={({ field }) => (
-              <Form.Item label={<strong>Número do processo</strong>}>
-                <Input
-                  {...field}
-                  placeholder="Digite o número do processo..."
-                />
-              </Form.Item>
+              <AppFormItem
+                label={<FieldLabel>Número do processo</FieldLabel>}
+                labelCol={{ span: 24 }}
+              >
+                <FilterInput {...field} placeholder="Digite o número do processo..." />
+              </AppFormItem>
             )}
           />
-        </Col>
-        <Col xs={24} md={6}>
+        </FilterFieldCol>
+      </FilterInlineRow>
+
+      <FilterInlineRow gutter={[16, 8]}>
+        <FilterFieldCol xs={24} md={6}>
           <Controller
             control={control}
             name="ano_edital"
             render={({ field }) => (
-              <Form.Item label={<strong>Ano do edital</strong>}>
-                <Select
+              <AppFormItem
+                label={<FieldLabel>Ano do edital</FieldLabel>}
+                labelCol={{ span: 24 }}
+              >
+                <FilterSelect
                   {...field}
                   allowClear
                   placeholder="Selecione"
                   options={opcoesAno}
                 />
-              </Form.Item>
+              </AppFormItem>
             )}
           />
-        </Col>
-        <Col xs={24} md={6}>
+        </FilterFieldCol>
+        <FilterFieldCol xs={24} md={6}>
           <Controller
             control={control}
             name="banca_responsavel"
             render={({ field }) => (
-              <Form.Item label={<strong>Banca responsável</strong>}>
-                <Select
+              <AppFormItem
+                label={<FieldLabel>Banca responsável</FieldLabel>}
+                labelCol={{ span: 24 }}
+              >
+                <FilterSelect
                   {...field}
                   allowClear
                   showSearch
@@ -180,17 +204,20 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
                   placeholder="Selecione"
                   options={opcoesBanca}
                 />
-              </Form.Item>
+              </AppFormItem>
             )}
           />
-        </Col>
-        <Col xs={24} md={6}>
+        </FilterFieldCol>
+        <FilterFieldCol xs={24} md={6}>
           <Controller
             control={control}
             name="status"
             render={({ field }) => (
-              <Form.Item label={<strong>Status</strong>}>
-                <Select
+              <AppFormItem
+                label={<FieldLabel>Status</FieldLabel>}
+                labelCol={{ span: 24 }}
+              >
+                <FilterSelect
                   {...field}
                   allowClear
                   placeholder="Selecione"
@@ -199,23 +226,28 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
                     { value: "INATIVO", label: "Inativo" },
                   ]}
                 />
-              </Form.Item>
+              </AppFormItem>
             )}
           />
-        </Col>
-      </Row>
-
-      <Row justify="end" gutter={8}>
-        <Col>
-          <Button onClick={limpar}>Limpar filtros</Button>
-        </Col>
-        <Col>
-          <Button type="primary" icon={<SearchOutlined />} onClick={buscar}>
-            Buscar
-          </Button>
-        </Col>
-      </Row>
-    </Form>
+        </FilterFieldCol>
+        <FilterActionCol xs={24} md={6}>
+          <FilterActionSlot>
+            <FilterActionsGroup>
+              <ClearButton size="large" onClick={limpar}>
+                Limpar filtros
+              </ClearButton>
+              <SearchButton
+                size="large"
+                icon={<SearchOutlined />}
+                onClick={buscar}
+              >
+                Buscar
+              </SearchButton>
+            </FilterActionsGroup>
+          </FilterActionSlot>
+        </FilterActionCol>
+      </FilterInlineRow>
+    </SearchFieldsContainer>
   );
 };
 

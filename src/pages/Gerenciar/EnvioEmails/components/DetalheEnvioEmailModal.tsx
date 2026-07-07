@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { Descriptions, Typography, Table, Spin, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { EyeOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../../services";
 import type { IHistoricoEnvioEmail, ICandidatoEnvioEmail } from "../../../../services/resources/convocacao/IConvocacao";
-import { CustomModal2 } from "../../../../components/EstilosCompartilhados";
 import ConteudoEmailModal from "./ConteudoEmailModal";
 
+import { ViewActionIcon, CustomModal2 } from '@/components/ui';
 const { Text } = Typography;
 
 interface DetalheCartaConvocacaoModalProps {
@@ -60,8 +59,8 @@ const DetalheCartaConvocacaoModal: React.FC<DetalheCartaConvocacaoModalProps> = 
       width: 100,
       render: (_, record) => (
         <Tooltip title="Visualizar e-mail enviado">
-          <EyeOutlined
-            style={{ cursor: "pointer", fontSize: "18px", color: "#0F59C8" }}
+          <ViewActionIcon
+            style={{ cursor: "pointer", fontSize: "18px" }}
             onClick={() => handleVerEmail(record)}
           />
         </Tooltip>

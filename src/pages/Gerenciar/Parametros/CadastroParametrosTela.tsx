@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import { StyledTabs } from "./styles";
+import { StyledTabs } from '@/components/ui';
 import AbaRelatorios from "./components/AbaRelatorios";
 import AbaConvocacao from "./components/AbaConvocacao";
 import AbaTipoUnidade from "./components/AbaTipoUnidade";

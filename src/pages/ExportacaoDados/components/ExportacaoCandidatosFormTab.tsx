@@ -1,16 +1,12 @@
 import React, { useState } from "react";
-import { Row, Col, Button, Select, Typography } from "antd";
+import { Row, Col, Select, Typography } from "antd";
 import { Controller } from "react-hook-form";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { CustomFormItem } from "../../../components/FormStyle";
-import {
-  TabContentContainer,
-  StyledSelect,
-  ActionButtonsContainer,
-} from "../../../components/EstilosCompartilhados";
+
 import { useExportacaoCandidatos } from "../hooks/useExportacaoCandidatos";
 import HistoricoExportacaoCandidatosModal from "./HistoricoExportacaoCandidatosModal";
 
+import { AppFormItem, AppButton, TabContentContainer, StyledSelect, ActionButtonsContainer, formTabStyles, selectSuffixIcon } from '@/components/ui';
 const { Title } = Typography;
 
 interface ExportacaoCandidatosFormTabProps {
@@ -41,19 +37,19 @@ const ExportacaoCandidatosFormTab: React.FC<ExportacaoCandidatosFormTabProps> = 
   return (
     <>
       <TabContentContainer>
-        <Row style={{ marginBottom: "1.8125rem" }}>
-          <Title level={5} type="secondary" style={{ marginTop: "0" }}>
+        <Row style={formTabStyles.introRow}>
+          <Title level={5} type="secondary" style={formTabStyles.introTitle}>
             Selecione o processo e o cargo para exportar os candidatos
           </Title>
         </Row>
 
-        <Row gutter={40} style={{ marginBottom: "1.8125rem" }}>
+        <Row gutter={40} style={formTabStyles.fieldsRow}>
           <Col xs={24} sm={12}>
             <Controller
               control={control}
               name="processo_uuid"
               render={({ field }) => (
-                <CustomFormItem
+                <AppFormItem
                   label="Processo de convocação"
                   validateStatus={formErrors.processo_uuid ? "error" : undefined}
                   help={formErrors.processo_uuid?.message}
@@ -68,11 +64,7 @@ const ExportacaoCandidatosFormTab: React.FC<ExportacaoCandidatosFormTabProps> = 
                     placeholder="Selecione o processo"
                     loading={processosOptionsLoading}
                     allowClear
-                    suffixIcon={
-                      <ExpandMoreIcon
-                        style={{ fontSize: "1.5rem", color: "#032B68" }}
-                      />
-                    }
+                    suffixIcon={<ExpandMoreIcon style={selectSuffixIcon} />}
                   >
                     {processosOptions.map((opt) => (
                       <Select.Option key={opt.value} value={opt.value}>
@@ -80,7 +72,7 @@ const ExportacaoCandidatosFormTab: React.FC<ExportacaoCandidatosFormTabProps> = 
                       </Select.Option>
                     ))}
                   </StyledSelect>
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
           </Col>
@@ -89,7 +81,7 @@ const ExportacaoCandidatosFormTab: React.FC<ExportacaoCandidatosFormTabProps> = 
               control={control}
               name="cargo_uuid"
               render={({ field }) => (
-                <CustomFormItem
+                <AppFormItem
                   label="Cargo"
                   validateStatus={formErrors.cargo_uuid ? "error" : undefined}
                   help={formErrors.cargo_uuid?.message}
@@ -104,11 +96,7 @@ const ExportacaoCandidatosFormTab: React.FC<ExportacaoCandidatosFormTabProps> = 
                     loading={cargosOptionsLoading}
                     disabled={!processoUuid}
                     allowClear
-                    suffixIcon={
-                      <ExpandMoreIcon
-                        style={{ fontSize: "1.5rem", color: "#032B68" }}
-                      />
-                    }
+                    suffixIcon={<ExpandMoreIcon style={selectSuffixIcon} />}
                   >
                     {cargosOptions.map((opt) => (
                       <Select.Option key={opt.value} value={opt.value}>
@@ -116,7 +104,7 @@ const ExportacaoCandidatosFormTab: React.FC<ExportacaoCandidatosFormTabProps> = 
                       </Select.Option>
                     ))}
                   </StyledSelect>
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
           </Col>
@@ -124,23 +112,22 @@ const ExportacaoCandidatosFormTab: React.FC<ExportacaoCandidatosFormTabProps> = 
       </TabContentContainer>
 
       <ActionButtonsContainer>
-        <Button
-          type="primary"
-          ghost
+        <AppButton
+          variant="secondary"
           size="large"
           onClick={() => setShowHistoricoModal(true)}
         >
           Histórico
-        </Button>
-        <Button
-          disabled={!canAddExportacaoCandidatosProcesso}
-          type="primary"
+        </AppButton>
+        <AppButton
+          variant="primary"
           size="large"
+          disabled={!canAddExportacaoCandidatosProcesso}
           onClick={handleSubmit(handleExportar)}
           loading={isCreating}
         >
           Exportar
-        </Button>
+        </AppButton>
       </ActionButtonsContainer>
 
       <HistoricoExportacaoCandidatosModal

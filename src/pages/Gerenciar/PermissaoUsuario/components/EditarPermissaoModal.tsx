@@ -1,16 +1,8 @@
 import React from "react";
-import { Button, Col, Form, Input, Modal, Row, Select, Typography, message } from "antd";
-
-import { ClearButton } from "../../../Processos/ConvocacaoCandidatos/style";
+import { Col, Form, Input, Modal, Row, Select, Typography, message } from "antd";
+import { AppButton, AppFormItem, FormLabel } from '@/components/ui';
 import type { EditarPermissaoModalProps } from "../../../../services/resources/permissoes/IPermissoes";
 import { patchUsuario } from "../hooks/patchAtualizarPermissoesUsuarios";
-
-const labelStyle: React.CSSProperties = {
-  fontFamily: "Open Sans",
-  fontWeight: 600,
-  fontSize: 16,
-  color: "#515151",
-};
 
 const valueStyle: React.CSSProperties = {
   fontFamily: "Open Sans",
@@ -99,24 +91,25 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
       onCancel={onClose}
       footer={
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 16 }}>
-          <ClearButton
+          <AppButton
+            variant="secondary"
             size="large"
             style={{ height: 48, width: 152, marginTop: 0 }}
             onClick={onClose}
             disabled={saving}
           >
             Cancelar
-          </ClearButton>
+          </AppButton>
           {!isView && (
-            <Button
+            <AppButton
+              variant="primary"
               size="large"
-              type="primary"
               style={{ height: 48, width: 200, marginTop: 0 }}
               loading={saving}
               onClick={handleSalvar}
             >
               Salvar permissão
-            </Button>
+            </AppButton>
           )}
         </div>
       }
@@ -131,17 +124,20 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
       <Form form={form} layout="vertical" requiredMark={false} component={false}>
         <Row gutter={[32, 24]} style={{ marginTop: 8 }}>
           <Col span={6}>
-            <div style={labelStyle}>Login (RF)</div>
+            <FormLabel>Login (RF)</FormLabel>
             <div style={{ ...valueStyle, marginTop: 12 }}>{data?.login ?? ""}</div>
           </Col>
           <Col span={10}>
-            <div style={labelStyle}>Nome</div>
             {isView ? (
-              <div style={{ ...valueStyle, marginTop: 12 }}>{data?.nome ?? ""}</div>
+              <>
+                <FormLabel>Nome</FormLabel>
+                <div style={{ ...valueStyle, marginTop: 12 }}>{data?.nome ?? ""}</div>
+              </>
             ) : (
-              <Form.Item
+              <AppFormItem
                 name="nome"
-                style={{ marginTop: 12, marginBottom: 0 }}
+                label="Nome"
+                style={{ marginBottom: 0 }}
                 rules={[
                   { required: true, whitespace: true, message: "Campo obrigatório." },
                   { min: 3, message: "O nome deve ter ao menos 3 caracteres." },
@@ -153,29 +149,32 @@ const EditarPermissaoModal: React.FC<EditarPermissaoModalProps> = ({
                 ]}
               >
                 <Input size="large" placeholder="Nome" />
-              </Form.Item>
+              </AppFormItem>
             )}
           </Col>
           <Col span={8}>
-            <div style={labelStyle}>E-mail</div>
             {isView ? (
-              <div style={{ ...valueStyle, marginTop: 12 }}>{data?.email ?? ""}</div>
+              <>
+                <FormLabel>E-mail</FormLabel>
+                <div style={{ ...valueStyle, marginTop: 12 }}>{data?.email ?? ""}</div>
+              </>
             ) : (
-              <Form.Item
+              <AppFormItem
                 name="email"
-                style={{ marginTop: 12, marginBottom: 0 }}
+                label="E-mail"
+                style={{ marginBottom: 0 }}
                 rules={[
                   { required: true, whitespace: true, message: "Campo obrigatório." },
                   { type: "email", message: "Informe um e-mail válido." },
                 ]}
               >
                 <Input size="large" placeholder="E-mail" />
-              </Form.Item>
+              </AppFormItem>
             )}
           </Col>
 
           <Col span={12}>
-            <div style={{ ...labelStyle, marginTop: 4 }}>Permissões</div>
+            <FormLabel style={{ marginTop: 4 }}>Permissões</FormLabel>
             <Select
               mode="multiple"
               allowClear

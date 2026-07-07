@@ -302,13 +302,12 @@ jest.mock('../../Base/BaseTela', () => ({
 jest.mock('../../../assets/tela-inicial-escolha-cand.png', () => 'mock-image.png');
 
 // Mock do FilterButton para permitir cliques mesmo quando desabilitado (para testar warnings)
-jest.mock('../styles', () => {
-  const actual = jest.requireActual('../styles');
+jest.mock('@/components/ui', () => {
+  const actual = jest.requireActual('@/components/ui');
   const React = require('react');
-  
+
   const MockFilterButton = ({ onClick, disabled, children, ...props }: any) => {
     const handleClick = (e: any) => {
-      // Sempre chama onClick, mesmo quando disabled, para testar warnings
       if (onClick) {
         onClick(e);
       }
@@ -319,10 +318,10 @@ jest.mock('../styles', () => {
         {...props}
         data-testid="filter-button"
         onClick={handleClick}
-        style={{ 
+        style={{
           ...props.style,
           opacity: disabled ? 0.5 : 1,
-          pointerEvents: 'auto', // Sempre permite cliques para testar warnings
+          pointerEvents: 'auto',
         }}
       >
         {children}

@@ -14,13 +14,15 @@ const mockConcursosOptions = concursosOptionsMock;
 const mockExtracaoDadosTodos = extracaoDadosTodosMock;
 const mockExtracaoDadosFiltrado = extracaoDadosFiltradoMock;
 
-jest.mock("../../../../components/EstilosCompartilhados", () => {
-  const actual = jest.requireActual("../../../../components/EstilosCompartilhados");
+jest.mock("@/components/ui", () => {
+  const actual = jest.requireActual("@/components/ui");
   const { createMockStyledSelect } = jest.requireActual("../testHelpers/testMocks");
+  const MockSelect = createMockStyledSelect();
 
   return {
     ...actual,
-    StyledSelect: createMockStyledSelect(),
+    StyledSelect: MockSelect,
+    FilterSelectMulti: MockSelect,
   };
 });
 

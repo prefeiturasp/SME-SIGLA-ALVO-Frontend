@@ -10,13 +10,13 @@ import {
   LoginCard,
   StyledForm,
   FormField,
-  FieldLabel,
-  ErrorMessage,
+  LoginFieldLabel as FieldLabel,
+  LoginErrorMessage as ErrorMessage,
   StyledButton,
   PrefLogoContainer,
   PrefLogoImage,
   StyledTitle,
-  StyledText,
+  LoginText as StyledText,
   StyledAlert,
   BackToLoginButton,
   ImportantNoticeContainer,
@@ -25,7 +25,7 @@ import {
   PasswordRequirementsList,
   PasswordRequirementTitle,
   RequirementItem,
-} from "./style";
+} from "@/design-system/estilos";
 
 const NovaSenhaTela: React.FC = () => {
   const {

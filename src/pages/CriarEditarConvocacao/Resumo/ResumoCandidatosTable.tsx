@@ -2,7 +2,7 @@ import React from "react";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import { Typography } from "antd";
 
-import { StyledTable } from "../../../components/EstilosCompartilhados";
+import { StyledTable } from '@/components/ui';
 import type { ICandidatosClassificados } from "../../../services/resources/agenda/IAgenda";
 
 const { Text } = Typography;

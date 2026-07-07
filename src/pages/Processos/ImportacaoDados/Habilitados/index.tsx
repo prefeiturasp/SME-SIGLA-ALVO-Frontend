@@ -1,23 +1,13 @@
 import React from "react";
-import { Row, Col, Select, Button } from "antd";
+import { Row, Col, Select } from "antd";
 import { Controller } from "react-hook-form";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useImportacaoDados } from "./hooks/useImportacaoDados";
-import { CustomFormItem } from "../../../../components/FormStyle";
-import {
-  TabContentContainer,
-  SectionCard,
-  SectionTitle,
-  StyledSelect,
-  UploadArea,
-  StyledUpload,
-  ActionButtonsContainer,
-} from "../../../../components/EstilosCompartilhados";
+
 import { useConcursos } from "../../../../hooks/useConcursos";
 
-
-
+import { AppFormItem, AppButton, TabContentContainer, SectionCard, SectionTitle, StyledSelect, UploadArea, StyledUpload, ActionButtonsContainer } from '@/components/ui';
 interface HabilitadosProps {
   onShowHistorico: () => void;
   onShowLayoutPadrao: () => void;
@@ -50,7 +40,7 @@ const Habilitados: React.FC<HabilitadosProps> = ({ onShowHistorico, onShowLayout
               control={control}
               name="concurso"
               render={({ field }) => (
-                <CustomFormItem
+                <AppFormItem
                   label="Concurso"
                   validateStatus={formErrors.concurso ? "error" : undefined}
                   help={formErrors.concurso?.message}
@@ -73,7 +63,7 @@ const Habilitados: React.FC<HabilitadosProps> = ({ onShowHistorico, onShowLayout
                       </Select.Option>
                     ))}
                   </StyledSelect>
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
           </Col>
@@ -85,7 +75,7 @@ const Habilitados: React.FC<HabilitadosProps> = ({ onShowHistorico, onShowLayout
               control={control}
               name="arquivo"
               render={() => (
-                <CustomFormItem
+                <AppFormItem
                   label="Arquivo para importação"
                   validateStatus={formErrors.arquivo ? "error" : undefined}
                   help={formErrors.arquivo?.message}
@@ -107,7 +97,7 @@ const Habilitados: React.FC<HabilitadosProps> = ({ onShowHistorico, onShowLayout
                       <UploadFileIcon style={{ fontSize: '1.50rem', color: '#032B68' }} />
                     </UploadArea>
                   </StyledUpload>
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
           </Col>
@@ -117,42 +107,31 @@ const Habilitados: React.FC<HabilitadosProps> = ({ onShowHistorico, onShowLayout
       
       {/* Botões de Ação */}
       <ActionButtonsContainer>
-        <Button
-          type="primary"
-          ghost
+        <AppButton
+          variant="secondary"
           size="large"
           onClick={onShowHistorico}
-          style={{
-            fontWeight: 700,
-            borderRadius: '0.375rem'
-          }}
         >
           Histórico
-        </Button>
-        <Button
-          type="primary"
-          ghost
+        </AppButton>
+        <AppButton
+          variant="secondary"
           size="large"
           onClick={handleSubmit(handleEnviarForm)}
-          style={{
-            fontWeight: 700,
-            borderRadius: '0.375rem'
-          }}
         >
           Importar
-        </Button>
-        <Button
-          type="primary"
+        </AppButton>
+        <AppButton
+          variant="primary"
           size="large"
           onClick={onShowLayoutPadrao}
         >
           Layout padrão
-        </Button>
+        </AppButton>
       </ActionButtonsContainer>
     </TabContentContainer>
   );
 };
 
 export default Habilitados;
-
 

@@ -1,15 +1,10 @@
 import React, { useMemo, useState } from "react";
-import { Card, Row, Col, Typography, Input, Table, Button, notification, Tooltip } from "antd";
-import { BarsOutlined, EditOutlined } from "@ant-design/icons";
+import { Card, Typography, Input, Table, notification } from "antd";
+import { BarsOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import {
-  PrimaryButton,
-  SecondaryButton,
-  ActionButtonsContainer,
-} from "../../../components/EstilosCompartilhados";
-import { CustomFormItem } from "../../../components/FormStyle";
 import type { ColumnsType } from "antd/es/table";
+import { AppButton, AppIconButton, EditActionIcon, AppFormItem, FilterActionSlot, FilterInlineRow, FilterFieldCol, FilterActionCol, FilterActionsGroup } from '@/components/ui';
 import {
   getBuscarCandidatos,
   type CandidatoConcursoItem,
@@ -254,17 +249,16 @@ const PesquisarConcursadosTela: React.FC = () => {
         key: "alterar",
         align: "center",
         render: (_: unknown, record: RowConcursado) => (
-          <Tooltip title="Alterar">
-            <Button
-              type="link"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={() => {
-                setCandidatoSelecionado(record);
-                setModalAlterarOpen(true);
-              }}
-            />
-          </Tooltip>
+          <AppIconButton
+            type="link"
+            size="small"
+            tooltip="Alterar"
+            icon={<EditActionIcon />}
+            onClick={() => {
+              setCandidatoSelecionado(record);
+              setModalAlterarOpen(true);
+            }}
+          />
         ),
       },
       {
@@ -272,17 +266,16 @@ const PesquisarConcursadosTela: React.FC = () => {
         key: "historico",
         align: "center",
         render: (_: unknown, record: RowConcursado) => (
-          <Tooltip title="Histórico">
-            <Button
-              type="link"
-              size="small"
-              icon={<BarsOutlined />}
-              onClick={() => {
-                setCandidatoHistorico(record);
-                setModalHistoricoOpen(true);
-              }}
-            />
-          </Tooltip>
+          <AppIconButton
+            type="link"
+            size="small"
+            tooltip="Histórico"
+            icon={<BarsOutlined />}
+            onClick={() => {
+              setCandidatoHistorico(record);
+              setModalHistoricoOpen(true);
+            }}
+          />
         ),
       },
     ],
@@ -295,76 +288,64 @@ const PesquisarConcursadosTela: React.FC = () => {
       title="Pesquisar Concursados"
     >
       <Card style={{ marginTop: "1.25rem" }} variant="borderless">
-        <Row gutter={[24, 16]} style={{ textAlign: "left" }}>
-          <Col xs={24} sm={12} md={6}>
-            <CustomFormItem label="Nome" labelCol={{ span: 24 }}>
+        <FilterInlineRow gutter={[24, 16]} style={{ textAlign: "left" }}>
+          <FilterFieldCol xs={24} sm={12} md={6}>
+            <AppFormItem label="Nome" labelCol={{ span: 24 }}>
               <Input
                 value={filtros.nome}
                 onChange={(e) =>
                   setFiltros((prev) => ({ ...prev, nome: e.target.value }))
                 }
-                style={{ marginTop: 6 }}
                 placeholder="Digite o nome"
               />
-            </CustomFormItem>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <CustomFormItem label="RF" labelCol={{ span: 24 }}>
+            </AppFormItem>
+          </FilterFieldCol>
+          <FilterFieldCol xs={24} sm={12} md={6}>
+            <AppFormItem label="RF" labelCol={{ span: 24 }}>
               <Input
                 value={filtros.rf}
                 onChange={(e) =>
                   setFiltros((prev) => ({ ...prev, rf: e.target.value }))
                 }
-                style={{ marginTop: 6 }}
                 placeholder="Digite o RF"
               />
-            </CustomFormItem>
-          </Col>
+            </AppFormItem>
+          </FilterFieldCol>
 
-          <Col xs={24} sm={12} md={6}>
-            <CustomFormItem label="RG" labelCol={{ span: 24 }}>
+          <FilterFieldCol xs={24} sm={12} md={6}>
+            <AppFormItem label="RG" labelCol={{ span: 24 }}>
               <Input
                 value={filtros.rg}
                 onChange={(e) =>
                   setFiltros((prev) => ({ ...prev, rg: e.target.value }))
                 }
-                style={{ marginTop: 6 }}
                 placeholder="Digite o RG"
               />
-            </CustomFormItem>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <CustomFormItem label="CPF" labelCol={{ span: 24 }}>
+            </AppFormItem>
+          </FilterFieldCol>
+          <FilterFieldCol xs={24} sm={12} md={6}>
+            <AppFormItem label="CPF" labelCol={{ span: 24 }}>
               <Input
                 value={filtros.cpf}
                 onChange={(e) =>
                   setFiltros((prev) => ({ ...prev, cpf: e.target.value }))
                 }
-                style={{ marginTop: 6 }}
                 placeholder="Digite o CPF"
               />
-            </CustomFormItem>
-          </Col>
+            </AppFormItem>
+          </FilterFieldCol>
 
-          <Col
-            xs={24}
-            md={24}
-            style={{
-              display: "flex",
-              alignItems: "flex-end",
-              justifyContent: "flex-end",
-            }}
-          >
-            <ActionButtonsContainer
-              style={{ justifyContent: "flex-end", width: "100%" }}
-            >
-              <SecondaryButton onClick={handleLimpar}>Limpar</SecondaryButton>
-              <PrimaryButton onClick={handleFiltrar} disabled={!temFiltro}>
-                Filtrar
-              </PrimaryButton>
-            </ActionButtonsContainer>
-          </Col>
-        </Row>
+          <FilterActionCol xs={24} md={4}>
+            <FilterActionSlot>
+              <FilterActionsGroup>
+                <AppButton variant="secondary" onClick={handleLimpar}>Limpar</AppButton>
+                <AppButton variant="primary" onClick={handleFiltrar} disabled={!temFiltro}>
+                  Filtrar
+                </AppButton>
+              </FilterActionsGroup>
+            </FilterActionSlot>
+          </FilterActionCol>
+        </FilterInlineRow>
       </Card>
 
       <Card style={{ marginTop: "1.25rem" }} variant="borderless">

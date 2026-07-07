@@ -1,13 +1,12 @@
 import React from "react";
-import { DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import dayjs from "dayjs";
-import { Button, Space, Typography } from "antd";
-import { StyledTable } from "../../../../../components/EstilosCompartilhados";
+import { Space, Typography } from "antd";
 import { useImportacaoDados } from "../hooks/useImportacaoDados";
 
 
 
+import { StyledTable, AppButton, DeleteActionIcon, AppIconButton } from '@/components/ui';
 const { Title } = Typography;
 
 interface HistoricoProps extends TableProps<any> {
@@ -61,10 +60,11 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({ data, onVoltar, .
       key: "x",
       render: (_, record) => (
         <Space size="small">
-          <Button
+          <AppIconButton
             type="link"
             danger
-            icon={<DeleteOutlined />}
+            tooltip="Excluir"
+            icon={<DeleteActionIcon />}
             onClick={() => handleDelete(record.id)}
           />
         </Space>
@@ -105,18 +105,13 @@ const HistoricoHabilitadosModal: React.FC<HistoricoProps> = ({ data, onVoltar, .
       />
 
       <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
-        <Button
-          type="primary"
-          ghost
+        <AppButton
+          variant="secondary"
           size="large"
           onClick={handleVoltar}
-          style={{
-            fontWeight: 700,
-            borderRadius: '0.375rem'
-          }}
         >
           Voltar
-        </Button>
+        </AppButton>
       </div>
     </>
   );

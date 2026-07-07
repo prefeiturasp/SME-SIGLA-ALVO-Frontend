@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Button,
   Steps,
   theme,
   Typography,
@@ -12,34 +11,27 @@ import {
   Form,
   message,
 } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Tooltip } from "antd";
+import { SearchOutlined, UserSwitchOutlined } from "@ant-design/icons";
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import StreetviewIcon from '@mui/icons-material/Streetview';
 import AccessibleIcon from '@mui/icons-material/Accessible';
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
-
-import {
-  UserSwitchOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
 import { StepActions } from "../components/StepActions";
 import { steps } from "../components/StepsNames";
-import { ConvocacaoStepsGlobalStyle } from "../components/ConvocacaoStepsStyles";
+import { ConvocacaoStepsGlobalStyle } from "@/components/ui";
 import { useConvocacaoSteps } from "../components/useConvocacaoSteps";
 import BuscarCandidatosModal from "./BuscarCandidatosModal";
 import { useSelecaoCargo } from "./hooks/useSelecaoCargo";
-import { CustomFormItem } from "../../../components/FormStyle";
-import { StyledSelect, StyledCardWithoutBorder } from "../../../components/EstilosCompartilhados";
-import { 
-  StyledCardAmpla, 
-  StyledCardNNA, 
-  StyledCardPCD, 
+import { AppButton, AppIconButton, DeleteActionIcon, EditActionIcon, AppFormItem, StyledSelect, StyledCardWithoutBorder } from '@/components/ui';
+import {
+  StyledCardAmpla,
+  StyledCardNNA,
+  StyledCardPCD,
   commonStyles,
   inlineStyles,
-  processInfoStyles
-} from "./styles";
+  processInfoStyles,
+} from "@/components/ui";
 import dayjs from "dayjs";
 import { useGetPermissions } from "../../../routes/PermissionContextGuard";
 import { usePatchPassoProcessoConvocacao } from "../hooks/usePatchPassoProcessoConvocacao";
@@ -178,17 +170,14 @@ const SelecaoCargos: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
         buttons={
-          <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
-          <Button
-            color="primary"
-            variant="outlined"
+          <AppButton
+            variant="secondary"
             icon={<UserSwitchOutlined />}
             disabled={!canAddImportacaoArquivoVagas}
             onClick={() => navigate('/processos/gerenciamento-vagas')}
           >
             Gerenciamento de vagas
-          </Button>
-          </Tooltip>
+          </AppButton>
         }
       >
         <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
@@ -269,7 +258,7 @@ const SelecaoCargos: React.FC = () => {
             <Row gutter={[16, 16]} align="bottom">
               <Col xs={24} md={12}>
                 <Form layout="vertical">
-                  <CustomFormItem label="Cargo">
+                  <AppFormItem label="Cargo">
                     <StyledSelect
                       placeholder={concursoIsLoading ? "Carregando cargos..." : "Selecione o cargo"}
                       onChange={(value) => handleCargoChange(value as string)}
@@ -282,19 +271,18 @@ const SelecaoCargos: React.FC = () => {
                         </Option>
                       ))}
                     </StyledSelect>
-                  </CustomFormItem>
+                  </AppFormItem>
                 </Form>
               </Col>
               <Col xs={24} md={12} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
-                <Button 
-                  size="large"
+                <AppButton
                   icon={<SearchOutlined />}
                   onClick={handleBuscarCandidatos}
                   disabled={!cargoSelecionado && cargosAdicionados.length === 0}
                   style={{ marginBottom: 3 }}
                 >
                   Buscar candidatos
-                </Button>
+                </AppButton>
               </Col>
             </Row>
           
@@ -388,20 +376,18 @@ const SelecaoCargos: React.FC = () => {
                     align: 'center' as const,
                     render: (_: any, record: any) => (
                       <div style={inlineStyles.tableActions}>
-                        <Tooltip title="Editar">
-                          <Button
-                            type="link"
-                            icon={<EditOutlined style={commonStyles.actionIcon} />}
-                            onClick={() => handleEditarCargo(record.cargoData)}
-                          />
-                        </Tooltip>
-                        <Tooltip title="Excluir">
-                          <Button
-                            type="link"
-                            icon={<DeleteOutlined style={commonStyles.deleteIcon} />}
-                            onClick={() => handleExcluirCargo(record.uuid, record.cargoData.candidatos_uuids, record.cargoData.cargo_uuid)}
-                          />
-                        </Tooltip>
+                        <AppIconButton
+                          type="link"
+                          tooltip="Editar"
+                          icon={<EditActionIcon />}
+                          onClick={() => handleEditarCargo(record.cargoData)}
+                        />
+                        <AppIconButton
+                          type="link"
+                          tooltip="Excluir"
+                          icon={<DeleteActionIcon />}
+                          onClick={() => handleExcluirCargo(record.uuid, record.cargoData.candidatos_uuids, record.cargoData.cargo_uuid)}
+                        />
                       </div>
                     ),
                   },

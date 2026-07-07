@@ -20,7 +20,7 @@ import { patchParametrizacaoRelatorios } from '../../hooks/patchParametrizacaoRe
 jest.mock('../../hooks/getParametrizacaoRelatorios');
 jest.mock('../../hooks/patchParametrizacaoRelatorios');
 
-jest.mock('../../../../Relatorios/components/QuillEditor', () => {
+jest.mock('@/components/QuillEditor', () => {
   return function MockQuillEditor({ value, onChange, placeholder }: any) {
     return (
       <div data-testid="quill-editor">

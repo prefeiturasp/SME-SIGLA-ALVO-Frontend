@@ -1,10 +1,8 @@
 import React from "react";
 import type { ColumnsType } from "antd/es/table";
 import { Button, Space, Switch, Tooltip } from "antd";
-import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 
-import { StyledTable } from "../../../../components/EstilosCompartilhados";
-import { editIcon, viewIcon } from "../../../Processos/ConvocacaoCandidatos/components/style";
+import { StyledTable, EditActionIcon, ViewActionIcon } from '@/components/ui';
 import type {
   IPermissaoUsuarioRow,
   PermissaoUsuarioTableProps,
@@ -62,14 +60,14 @@ const PermissaoUsuarioTable: React.FC<PermissaoUsuarioTableProps> = ({
             <Tooltip title="Editar" arrow={true}>
               <Button
                 type="link"
-                icon={<EditOutlined style={{ ...editIcon, color: "#0F59C8" }} />}
+                icon={<EditActionIcon />}
                 onClick={() => onEdit?.(record)}
               />
             </Tooltip>
             <Tooltip title="Visualizar" arrow={true}>
               <Button
                 type="link"
-                icon={<EyeOutlined style={viewIcon} />}
+                icon={<ViewActionIcon />}
                 onClick={() => onView?.(record)}
               />
             </Tooltip>

@@ -1,8 +1,7 @@
 import React from "react";
-import { Button, Modal } from "antd";
+import { Modal } from "antd";
 import { WarningFilled } from "@ant-design/icons";
-
-import { ClearButton } from "../../../Processos/ConvocacaoCandidatos/style";
+import { AppButton, confirmationModalStyles, confirmationModalWidth } from '@/components/ui';
 
 type ConfirmarExclusaoModalProps = {
   open: boolean;
@@ -15,49 +14,41 @@ const ConfirmarExclusaoModal: React.FC<ConfirmarExclusaoModalProps> = ({
   onCancel,
   onConfirm,
 }) => {
+  const s = confirmationModalStyles;
+
   return (
     <Modal
       open={open}
       title="Excluir autorização"
       onCancel={onCancel}
       centered
-      width={720}
+      width={confirmationModalWidth}
       footer={
-        <div style={{ display: "flex", justifyContent: "center", gap: 48, paddingTop: 8 }}>
-          <ClearButton
+        <div style={s.footerCentered}>
+          <AppButton
+            variant="secondary"
             size="large"
-            style={{ width: 220, height: 52, marginTop: 0 }}
+            style={s.cancelButton}
             onClick={onCancel}
           >
             Cancelar
-          </ClearButton>
-          <Button
+          </AppButton>
+          <AppButton
+            variant="primary"
             size="large"
-            type="primary"
-            style={{ width: 260, height: 52 }}
+            style={s.confirmButton}
             onClick={onConfirm}
           >
             Excluir
-          </Button>
+          </AppButton>
         </div>
       }
-      styles={{
-        body: { padding: "28px 24px 8px 24px" },
-        footer: { padding: "18px 24px 28px 24px" },
-      }}
+      styles={s.antdStyles}
     >
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 22 }}>
-        <WarningFilled style={{ fontSize: 72, color: "#F5B800" }} />
+      <div style={s.contentColumn}>
+        <WarningFilled style={s.warningIconWarning} />
 
-        <div
-          style={{
-            textAlign: "center",
-            fontFamily: "Open Sans",
-            fontSize: 28,
-            lineHeight: "36px",
-            color: "#111111",
-          }}
-        >
+        <div style={s.singleTitleText}>
           Tem certeza que deseja excluir?
         </div>
       </div>
@@ -66,4 +57,3 @@ const ConfirmarExclusaoModal: React.FC<ConfirmarExclusaoModalProps> = ({
 };
 
 export default ConfirmarExclusaoModal;
-

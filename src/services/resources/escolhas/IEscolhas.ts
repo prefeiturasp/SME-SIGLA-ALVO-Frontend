@@ -84,3 +84,17 @@ export interface IBuscarEscolasParams {
   nome?: string;
   page_size?: number;
 }
+
+export interface IInclusaoVagasEscolasPayload {
+  processo_uuid: string;
+  processo_nome: string;
+  vagas: Array<{
+    uuid: string;
+    data_fechamento_modulo: string;
+    cargo_codigo: number;
+    cargo_descricao: string;
+    codigo_eol: string;
+    vagas_precarias: number;
+    vagas_definitivas: number;
+  }>;
+}

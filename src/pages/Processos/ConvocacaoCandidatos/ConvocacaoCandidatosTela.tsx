@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Typography, Row, Col, Button, Tooltip } from "antd";
+import { Typography, Row, Col } from "antd";
 import { UsergroupAddOutlined, UserSwitchOutlined } from "@ant-design/icons";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import ConvocacaoTable from "./components/ConvocacaoTable";
@@ -9,14 +9,14 @@ import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
 import { usePostFinalizarProcessoConvocacao } from "./hooks/usePostFinalizarProcessoConvocacao";
 import { useNavigate } from "react-router-dom";
 import type { IProcessoConvocacao } from "../../../services/resources/convocacao/IConvocacao";
+import { AppButton, BuscaProcessosTitle } from '@/components/ui';
 import {
   PageContainer,
   ActionButton,
   ConteudoPagina,
-  TituloPagina,
-  TableContainer,
+  SearchTableContainer as TableContainer,
   ButtonGroup,
-} from "./style";
+} from "@/components/ui";
 import { useGetPermissions } from "../../../routes/PermissionContextGuard";
 
 const { Text } = Typography;
@@ -106,21 +106,16 @@ const ConvocacaoCandidatosTela: React.FC = () => {
         title="Lista de Convocações"
         buttons={
           <ButtonGroup>
-            <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
             <ActionButton
-              type="primary"
               size="large"
-              ghost={true}
               disabled={!canAddImportacaoArquivoVagas}
               icon={<UserSwitchOutlined />}
               onClick={() => navigate("/processos/gerenciamento-vagas")}
             >
               Gerenciamento de vagas
             </ActionButton>
-            </Tooltip>
-            <Tooltip title={!canAddProcessoConvocacao?"Você não possui permissão para essa ação":"Nova convocação"} arrow={true} >
-            <Button
-              type="primary"
+            <AppButton
+              variant="primary"
               size="large"
               icon={<UsergroupAddOutlined />}
               disabled={!concursosOptions || !canAddProcessoConvocacao}
@@ -131,13 +126,12 @@ const ConvocacaoCandidatosTela: React.FC = () => {
               }
             >
               Nova convocação
-            </Button>
-            </Tooltip>
+            </AppButton>
           </ButtonGroup>
         }
       >
         <ConteudoPagina>
-          <TituloPagina level={4}>Busca processos</TituloPagina>
+          <BuscaProcessosTitle>Busca processos</BuscaProcessosTitle>
 
           <ConvocacaoFiltros
             canViewProcessoConvocacao={canViewProcessoConvocacao}

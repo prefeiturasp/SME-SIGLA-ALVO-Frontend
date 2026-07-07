@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { Button, Col, Row, Select, Spin, Typography } from "antd";
+import { Col, Row, Select, Spin, Typography } from "antd";
 import { BarChartOutlined } from "@ant-design/icons";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
@@ -11,12 +11,7 @@ import ScheduleIcon from "@mui/icons-material/Schedule";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import { CustomFormItem } from "../../../components/FormStyle";
-import {
-  TabContentContainer,
-  TextTitulo,
-  TextTituloSecundario,
-} from "../../../components/EstilosCompartilhados";
+
 import { useConcursos } from "../../../hooks/useConcursos";
 import useConvocacao from "../../Processos/ConvocacaoCandidatos/hooks/useConvocacao";
 import type { IListRequest } from "../../../types/IListRequest";
@@ -31,6 +26,21 @@ import RelatoriosDetalhados from "./components/RelatoriosDetalhados";
 import AutorizacoesPublicadas from "./components/AutorizacoesPublicadas";
 import ConteudoExtracaoPdf from "./components/ConteudoExtracaoPdf";
 import { useExportarPdf } from "./hooks/useExportarPdf";
+import {
+  AppButton,
+  AppFormItem,
+  FilterActionSlot,
+  TabContentContainer,
+  TextTitulo,
+  TextTituloSecundario,
+  FilterActionsGroup,
+  FilterInlineRow,
+  FilterFieldCol,
+  FilterActionCol,
+  FilterCard,
+  IndicatorsCard,
+  FilterSelectMulti,
+} from "@/components/ui";
 import {
   mapExtracaoDadosToIndicadores,
   mapExtracaoDadosTodosToIndicadores,
@@ -53,7 +63,7 @@ import {
   mapDresConcursosParaRelatoriosDetalhados,
   mapDresParaRelatoriosDetalhados,
 } from "./utils/mapRelatoriosDetalhados";
-import { FilterActions, FilterCard, IndicatorsCard, ExtracaoFilterSelect } from "./styles";
+const ExtracaoFilterSelect = FilterSelectMulti;
 
 const { Text } = Typography;
 
@@ -305,15 +315,15 @@ const ExtracaoDadosTela: React.FC = () => {
       breadcrumbItems={breadcrumbItems}
       title="Extração de dados"
       buttons={
-        <Button
-          type="primary"
+        <AppButton
+          variant="primary"
           size="large"
           icon={<BarChartOutlined />}
           loading={isExporting}
           onClick={() => exportarPdf(pdfRef)}
         >
           Gerar relatório
-        </Button>
+        </AppButton>
       }
     >
       <Spin spinning={dadosIsLoading}>
@@ -328,9 +338,9 @@ const ExtracaoDadosTela: React.FC = () => {
               </Col>
             </Row>
 
-            <Row gutter={24} style={{ marginTop: "1.5rem" }}>
-              <Col xs={24} md={12}>
-                <CustomFormItem label="Concurso" labelCol={{ span: 24 }}>
+            <FilterInlineRow gutter={[24, 16]} style={{ marginTop: "1.5rem" }}>
+              <FilterFieldCol xs={24} md={12}>
+                <AppFormItem label="Concurso" labelCol={{ span: 24 }}>
                   <ExtracaoFilterSelect
                     value={concursoUuid}
                     onChange={(value) => {
@@ -349,10 +359,10 @@ const ExtracaoDadosTela: React.FC = () => {
                       </Select.Option>
                     ))}
                   </ExtracaoFilterSelect>
-                </CustomFormItem>
-              </Col>
-              <Col xs={24} md={12}>
-                <CustomFormItem label="Ano" labelCol={{ span: 24 }}>
+                </AppFormItem>
+              </FilterFieldCol>
+              <FilterFieldCol xs={24} md={12}>
+                <AppFormItem label="Ano" labelCol={{ span: 24 }}>
                   <ExtracaoFilterSelect
                     mode="multiple"
                     maxCount={2}
@@ -365,23 +375,26 @@ const ExtracaoDadosTela: React.FC = () => {
                     options={anoOptions}
                     suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
                   />
-                </CustomFormItem>
-              </Col>
-            </Row>
-
-            <FilterActions>
-              <Button type="primary" ghost size="large" onClick={handleLimparFiltros}>
-                Limpar filtros
-              </Button>
-              <Button
-                type="primary"
-                size="large"
-                disabled={!canFilter}
-                onClick={handleFiltrar}
-              >
-                Filtrar
-              </Button>
-            </FilterActions>
+                </AppFormItem>
+              </FilterFieldCol>
+              <FilterActionCol xs={24} md={4}>
+                <FilterActionSlot>
+                  <FilterActionsGroup>
+                    <AppButton variant="secondary" size="large" onClick={handleLimparFiltros}>
+                      Limpar filtros
+                    </AppButton>
+                    <AppButton
+                      variant="primary"
+                      size="large"
+                      disabled={!canFilter}
+                      onClick={handleFiltrar}
+                    >
+                      Filtrar
+                    </AppButton>
+                  </FilterActionsGroup>
+                </FilterActionSlot>
+              </FilterActionCol>
+            </FilterInlineRow>
           </FilterCard>
 
           <IndicatorsCard>

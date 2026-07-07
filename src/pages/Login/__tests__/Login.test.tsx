@@ -54,7 +54,7 @@ jest.mock('../hooks/useLogin', () => ({
 }));
 
 // Mock dos componentes styled
-jest.mock('../style', () => ({
+jest.mock('@/design-system/estilos', () => ({
   LoginContainer: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="login-container">{children}</div>
   ),
@@ -72,10 +72,10 @@ jest.mock('../style', () => ({
   FormField: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="form-field">{children}</div>
   ),
-  FieldLabel: ({ children }: { children: React.ReactNode }) => (
+  LoginFieldLabel: ({ children }: { children: React.ReactNode }) => (
     <label data-testid="field-label">{children}</label>
   ),
-  ErrorMessage: ({ children }: { children: React.ReactNode }) => (
+  LoginErrorMessage: ({ children }: { children: React.ReactNode }) => (
     <span data-testid="error-message">{children}</span>
   ),
   StyledButton: ({ children, onClick, loading, disabled, htmlType, ...props }: any) => (
@@ -103,7 +103,7 @@ jest.mock('../style', () => ({
   StyledTitle: ({ children }: any) => (
     <h2 data-testid="styled-title">{children}</h2>
   ),
-  StyledText: ({ children }: { children: React.ReactNode }) => (
+  LoginText: ({ children }: { children: React.ReactNode }) => (
     <p data-testid="styled-text">{children}</p>
   ),
   StyledAlert: ({ message, type, showIcon, ...props }: any) => (

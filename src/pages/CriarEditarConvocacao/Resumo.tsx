@@ -1,23 +1,39 @@
 import React, { useMemo } from "react";
-import { Button, Collapse, Steps, theme, Tooltip, Typography } from "antd";
+import { Collapse, Steps, theme, Typography } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 import { UserSwitchOutlined } from "@ant-design/icons";
 import { StepActions } from "./components/StepActions";
 import { steps } from "./components/StepsNames";
-import { ConvocacaoStepsGlobalStyle } from "./components/ConvocacaoStepsStyles";
+import { ConvocacaoStepsGlobalStyle } from "@/components/ui";
 import { useConvocacaoSteps } from "./components/useConvocacaoSteps";
-import { StyledCardWithoutBorder } from "../../components/EstilosCompartilhados";
 import ResumoDoProcesso from "./Resumo/ResumoDoProcesso";
 import ResumoAgendaTabela from "./Resumo/ResumoAgendaTabela";
 import useConvocacaoById from "../Processos/ConvocacaoCandidatos/hooks/useConvocacaoById";
 import { useGetAgendas } from "./Agenda/hooks/useGetAgendas";
 import type { IAgenda } from "../../services/resources/agenda/IAgenda";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
-import { resumoStyles } from "./Resumo/styles";
+import { cursorPointer, cardSpacing } from "@/design-system/estilos";
+import { cardTitleStyle } from "@/design-system/estilos";
 import { usePatchPassoProcessoConvocacao } from "./hooks/usePatchPassoProcessoConvocacao";
 
+import { AppButton, StyledCardWithoutBorder } from '@/components/ui';
+
+const resumoStyles = {
+  breadcrumbItem: cursorPointer,
+  cardTitle: (token: { colorTextHeading: string }) => ({
+    ...cardTitleStyle,
+    color: token.colorTextHeading,
+  }),
+  cardWithMarginTop: cardSpacing.marginTop20,
+  collapseLabel: { fontWeight: 600, fontSize: 16 },
+  emptyAgendasMessage: {
+    textAlign: "center" as const,
+    padding: "2rem",
+    color: "#666",
+  },
+};
 const { Text } = Typography;
 
 function normalizeModalidade(value: any): string | undefined {
@@ -201,17 +217,14 @@ const Resumo: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title={isViewOnlyResumo ? "Resumo do processo" : "Nova convocação"}
         buttons={
-          <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
-          <Button
-            color="primary"
-            variant="outlined"
+          <AppButton
+            variant="secondary"
             icon={<UserSwitchOutlined />}
             disabled={!canAddImportacaoArquivoVagas}
             onClick={() => navigate('/processos/gerenciamento-vagas')}
           >
             Gerenciamento de vagas
-          </Button>
-          </Tooltip>
+          </AppButton>
         }
       >
         {!isViewOnlyResumo && (
@@ -274,9 +287,9 @@ const Resumo: React.FC = () => {
 
           {isViewOnlyResumo ? (
             <div style={{ marginTop: 24 }}>
-              <Button size="large" onClick={() => navigate("/processos/convocacao")}>
+              <AppButton variant="secondary" size="large" onClick={() => navigate("/processos/convocacao")}>
                 Voltar
-              </Button>
+              </AppButton>
             </div>
           ) : (
             <StepActions

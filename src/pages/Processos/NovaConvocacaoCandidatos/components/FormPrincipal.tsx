@@ -6,8 +6,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { Controller } from "react-hook-form";
 import type { Control, FieldErrors } from "react-hook-form";
 import type { FormFields } from "../hooks/useNovaConvocacaoCandidatos";
-import { FieldLabel } from "../../ConvocacaoCandidatos/style";
-import FormItem from "antd/es/form/FormItem";
+import { AppFormItem } from "@/components/ui";
 
 const { Text } = Typography;
 
@@ -51,10 +50,10 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           control={control}
           name="concurso"
           render={({ field }) => (
-            <Form.Item
+            <AppFormItem
               layout="vertical"
               required
-              label={<FieldLabel>Concurso</FieldLabel>}
+              label="Concurso"
               validateStatus={
                 formErrors.concurso ? "error" : undefined
               }
@@ -64,7 +63,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                 {...field}
                 data-testid="concurso-select"
                 placeholder="Selecione o concurso"
-                style={{ width: "100%", height: "2.8125rem" }}
+                style={{ width: "100%" }}
                 options={concursosData || []}
                 loading={concursosOptionsIsLoading}
                 disabled={isViewMode}
@@ -76,7 +75,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                   popularSelectDeCargos(value as string);
                 }}
               />
-            </Form.Item>
+            </AppFormItem>
           )}
         />
       </Col>
@@ -85,10 +84,10 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           control={control}
           name="tipo_escolha"
           render={({ field }) => (
-            <Form.Item
+            <AppFormItem
               layout="vertical"
               required
-              label={<FieldLabel>Tipo de Escolha</FieldLabel>}
+              label="Tipo de Escolha"
               validateStatus={
                 formErrors.tipo_escolha ? "error" : undefined
               }
@@ -97,7 +96,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
               <Select
                 {...field}
                 placeholder="Selecione o tipo de escolha"
-                style={{ width: "100%", height: "2.8125rem" }}
+                style={{ width: "100%" }}
                 options={[
                   { value: "NOVA_AUTORIZACAO", label: "Nova Autorização" },
                   { value: "REPOSICAO", label: "Reposição" },
@@ -108,7 +107,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                   <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
                 }
               />
-            </Form.Item>
+            </AppFormItem>
           )}
         />
       </Col>
@@ -117,8 +116,8 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           control={control}
           name="descricao"
           render={({ field }) => (
-            <Form.Item
-              label={<FieldLabel>Descrição</FieldLabel>}
+            <AppFormItem
+              label="Descrição"
               layout="vertical"
               required
               validateStatus={
@@ -129,10 +128,10 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
               <Input
                 {...field}
                 placeholder="Digite a descrição"
-                style={{ width: "100%", height: "2.8125rem" }}
+                style={{ width: "100%" }}
                 disabled={isViewMode}
               />
-            </Form.Item>
+            </AppFormItem>
           )}
         />
       </Col>
@@ -141,8 +140,8 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           control={control}
           name="data_convocacao"
           render={({ field }) => (
-            <Form.Item
-              label={<FieldLabel>Data da convocação</FieldLabel>}
+            <AppFormItem
+              label="Data da convocação"
               layout="vertical"
               required
               validateStatus={
@@ -153,7 +152,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
               <DatePicker
                 {...field}
                 placeholder="Selecione a data da convocação"
-                style={{ width: "100%", height: "2.8125rem" }}
+                style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 disabled={isViewMode}
                 value={field.value ? dayjs(field.value) : undefined}
@@ -161,7 +160,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                   field.onChange(date ? date.toISOString() : "")
                 }
               />
-            </Form.Item>
+            </AppFormItem>
           )}
         />
       </Col>
@@ -170,8 +169,8 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
           control={control}
           name="data_corte_vagas"
           render={({ field }) => (
-            <Form.Item
-              label={<FieldLabel>Data corte de Vagas</FieldLabel>}
+            <AppFormItem
+              label="Data corte de Vagas"
               layout="vertical"
               required
               validateStatus={
@@ -183,7 +182,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
               <DatePicker
                 {...field}
                 placeholder="Selecione a data corte de vagas"
-                style={{ width: "100%", height: "2.8125rem" }}
+                style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 disabled={isViewMode}
                 value={field.value ? dayjs(field.value) : undefined}
@@ -191,7 +190,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                   field.onChange(date ? date.toISOString() : "")
                 }
               />
-            </Form.Item>
+            </AppFormItem>
           )}
         />
       </Col>
