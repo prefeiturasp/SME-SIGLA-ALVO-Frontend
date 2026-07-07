@@ -391,6 +391,11 @@ export const agendaFormStyles = {
     width: '100%',
     height: '2.8125rem'
   },
+
+  // Container de erros do intervalo de horário
+  timeErrorContainer: {
+    marginTop: 4,
+  },
   
   // Informação de candidatos disponíveis
   candidatosDisponiveis: {
@@ -456,6 +461,19 @@ export const agendaTabelaStyles = {
   // Texto de conflito
   conflictText: {
     fontSize: '0.625rem'
+  },
+
+  // Container do horário em edição (campos + mensagens de erro)
+  editHorarioContainer: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    gap: 4,
+  },
+
+  timeErrorContainer: {
+    marginTop: 4,
+    textAlign: 'center' as const,
   },
   
   // Texto online

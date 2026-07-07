@@ -103,6 +103,8 @@ const mockAgendaAberto = {
   cargo_codigo: 'P001',
 };
 
+const mockValidarRedistribuicaoClassificacao = jest.fn(() => ({ valid: true }));
+
 jest.mock('../hooks/useAgenda', () => ({
   useAgenda: jest.fn(() => ({
     processoConvocacaoData: mockProcessoConvocacaoData,
@@ -129,6 +131,7 @@ jest.mock('../hooks/useAgenda', () => ({
     saveEdit: mockSaveEdit,
     calcularIntervaloClassificacao: mockCalcularIntervaloClassificacao,
     verificarConflitoTempoReal: mockVerificarConflitoTempoReal,
+    validarRedistribuicaoClassificacao: mockValidarRedistribuicaoClassificacao,
     cargoParaExpandir: null,
     limparExpansao: mockLimparExpansao,
     salvarAgendasNoBackend: mockSalvarAgendasNoBackend,
@@ -300,8 +303,8 @@ describe('AgendaTela', () => {
       
       const breadcrumb = screen.getByTestId('breadcrumb');
       expect(breadcrumb).toBeInTheDocument();
-      expect(breadcrumb).toHaveAttribute('data-count', '4');
-      expect(screen.getByTestId('breadcrumb-item-3')).toHaveTextContent('Nova Convocação');
+      expect(breadcrumb).toHaveAttribute('data-count', '3');
+      expect(screen.getByTestId('breadcrumb-item-2')).toHaveTextContent('Nova Convocação');
     });
 
     it('deve renderizar o Steps com step atual 2', () => {
@@ -551,24 +554,6 @@ describe('AgendaTela', () => {
   });
 
   describe('Navegação e breadcrumbs', () => {
-    it('deve navegar para Home ao clicar no breadcrumb Home', () => {
-      renderWithProviders(<AgendaTela />);
-      
-      const homeLink = screen.getByText('Home');
-      fireEvent.click(homeLink);
-      
-      expect(mockNavigate).toHaveBeenCalledWith('/');
-    });
-
-    it('deve navegar para Processos ao clicar no breadcrumb Processos', () => {
-      renderWithProviders(<AgendaTela />);
-      
-      const processosLink = screen.getByText('Processos');
-      fireEvent.click(processosLink);
-      
-      expect(mockNavigate).toHaveBeenCalledWith('/processos');
-    });
-
     it('deve navegar para Convocação ao clicar no breadcrumb Convocação de candidatos', () => {
       renderWithProviders(<AgendaTela />);
       
