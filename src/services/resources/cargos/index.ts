@@ -11,6 +11,7 @@ export const URL = {
   postAutorizacaoPublicada: () => `/api/v1/autorizacoes-publicadas/`,
   patchAutorizacaoPublicada: (uuid: string) => `/api/v1/autorizacoes-publicadas/${uuid}/`,
   deleteAutorizacaoPublicada: (uuid: string) => `/api/v1/autorizacoes-publicadas/${uuid}/`,
+  getCargos: () => `/api/v1/cargos/`,
 };
 
 
@@ -92,6 +93,36 @@ export const patchAutorizacaoPublicada = (
     response,
     abort,
   };
+};
+
+export interface ICargoAutocomplete {
+  uuid: string;
+  nome: string;
+  codigo: number;
+}
+
+export const getCargos = (
+  search: string,
+  pageSize?: number,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const params: Record<string, unknown> = { search };
+  if (pageSize !== undefined) {
+    params.page_size = pageSize;
+  }
+
+  const response = appAxiosConcursos
+    .get<PaginatedResponse<ICargoAutocomplete>>(URL.getCargos(), {
+      params,
+      paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return { response, abort };
 };
 
 export const deleteAutorizacaoPublicada = (

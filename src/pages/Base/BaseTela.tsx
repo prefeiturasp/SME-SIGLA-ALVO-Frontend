@@ -214,6 +214,11 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
             label: "Cadastro de Parâmetros",
             onClick: () => navigate("/gerenciar/parametrizacao"),
           },
+          {
+            key: "cadastro-concursos",
+            label: "Cadastro de concursos",
+            onClick: () => navigate("/gerenciar/concursos"),
+          },
         ];
       default:
         return [];
