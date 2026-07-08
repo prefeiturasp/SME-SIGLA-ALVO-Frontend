@@ -7,7 +7,7 @@ import AdicionarNovaEscolaModal from '../components/AdicionarNovaEscolaModal';
 
 describe('AdicionarNovaEscolaModal', () => {
   it('renderiza e chama onCancel ao clicar em Voltar', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onCancel = jest.fn();
     const onConfirm = jest.fn();
 
@@ -34,7 +34,7 @@ describe('AdicionarNovaEscolaModal', () => {
   });
 
   it('chama onConfirm ao clicar em Adicionar escola', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onCancel = jest.fn();
     const onConfirm = jest.fn();
 
@@ -55,7 +55,7 @@ describe('AdicionarNovaEscolaModal', () => {
   });
 
   it('captura erro de onConfirm e não quebra a UI', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onCancel = jest.fn();
     const error = new Error('Falha ao salvar');
     const onConfirm = jest.fn().mockRejectedValue(error);

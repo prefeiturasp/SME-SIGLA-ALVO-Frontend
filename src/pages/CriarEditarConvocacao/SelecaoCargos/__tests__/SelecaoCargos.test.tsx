@@ -192,35 +192,35 @@ jest.mock('dayjs', () => {
 });
 
 // Mock do StyledCardWithoutBorder
-jest.mock('../../../../components/EstilosCompartilhados', () => ({
-  StyledCardWithoutBorder: ({ children, title, style }: any) => (
-    <div data-testid="styled-card" style={style}>
-      {title && <div data-testid="card-title">{title}</div>}
-      {children}
-    </div>
-  ),
-  StyledSelect: ({ children, onChange, placeholder, loading, disabled }: any) => (
-    <select
-      data-testid="cargo-select"
-      onChange={(e) => onChange && onChange(e.target.value)}
-      disabled={disabled}
-      data-loading={loading}
-    >
-      <option value="">{placeholder}</option>
-      {children}
-    </select>
-  ),
-}));
-
-// Mock do CustomFormItem
-jest.mock('../../../../components/FormStyle', () => ({
-  CustomFormItem: ({ children, label }: any) => (
-    <div data-testid="form-item">
-      <label>{label}</label>
-      {children}
-    </div>
-  ),
-}));
+jest.mock('@/components/ui', () => {
+  const actual = jest.requireActual('@/components/ui');
+  return {
+    ...actual,
+    StyledCardWithoutBorder: ({ children, title, style }: any) => (
+      <div data-testid="styled-card" style={style}>
+        {title && <div data-testid="card-title">{title}</div>}
+        {children}
+      </div>
+    ),
+    StyledSelect: ({ children, onChange, placeholder, loading, disabled }: any) => (
+      <select
+        data-testid="cargo-select"
+        onChange={(e) => onChange && onChange(e.target.value)}
+        disabled={disabled}
+        data-loading={loading}
+      >
+        <option value="">{placeholder}</option>
+        {children}
+      </select>
+    ),
+    AppFormItem: ({ children, label }: any) => (
+      <div data-testid="form-item">
+        <label>{label}</label>
+        {children}
+      </div>
+    ),
+  };
+});
 
 // Mock do theme.useToken
 jest.mock('antd', () => ({
@@ -430,15 +430,6 @@ describe('SelecaoCargos', () => {
   });
 
   describe('Navegação e breadcrumbs', () => {
-    it('deve navegar para Home ao clicar no breadcrumb Home', () => {
-      renderWithProviders(<SelecaoCargos />);
-      
-      const homeLink = screen.getByText('Home');
-      fireEvent.click(homeLink);
-      
-      expect(mockNavigate).toHaveBeenCalledWith('/');
-    });
-
     it('deve navegar para Processos ao clicar no breadcrumb Processos', () => {
       renderWithProviders(<SelecaoCargos />);
       

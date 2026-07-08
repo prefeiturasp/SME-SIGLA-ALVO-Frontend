@@ -1,21 +1,20 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Card, Row, Col, Typography, Input, Table, Tooltip, Button } from "antd";
+import { Card, Typography, Input, Table } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
-import { PrimaryButton, SecondaryButton, StyledSelect, ActionButtonsContainer } from "../../components/EstilosCompartilhados";
-import { CustomFormItem } from "../../components/FormStyle";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useConcursos } from "../../hooks/useConcursos";
 import { useGetConcursoByUuid } from "../GerenciamentoVagas/hooks/useGetConcursoPorUuid";
 import type { ColumnsType } from "antd/es/table";
 import { Select } from "antd";
-import { EditOutlined } from "@ant-design/icons";
 import AlterarSituacaiCandidatoModal from "./components/AlterarSituacaoCandidatoModal";
 import { useGetHablitados } from "./hooks/useGetHablitados";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 
 
+import { AppButton, AppIconButton, EditActionIcon, StyledSelect, AppFormItem, FilterActionSlot, FilterInlineRow, FilterFieldCol, FilterActionCol, FilterActionsGroup, selectSuffixIcon } from '@/components/ui';
+import { cursorPointer, cardSpacing } from '@/design-system/estilos';
 type FiltrosForm = {
   concurso?: string;
   cargo?: string;
@@ -54,7 +53,7 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
   const navigate = useNavigate();
   const breadcrumbItems = useMemo<TitleItem[]>(
     () => [
-      { title: <Text strong style={{ cursor: "pointer" }}>Gerenciar</Text> },
+      { title: <Text strong style={cursorPointer}>Gerenciar</Text> },
       { title: "Eliminação e Reclassificação de Candidato" },
     ],
     [navigate]
@@ -165,19 +164,18 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
             const isEliminado = String(record?.situacao || "").toLowerCase() === "eliminado";
             console.log(!canAddReclassificacaoCandidato);
             return (
-              <Tooltip title={isEliminado ? "Candidato eliminado" : "Alterar"}>
-                <Button
-                  type="text"
-                  icon={<EditOutlined />}
-                  disabled={!canAddReclassificacaoCandidato}
-                  onClick={() => {
-                    if (isEliminado) return;
-                    setSelectedRow(record);
-                    setModalOpen(true);
-                  }}
-                  style={{ padding: 0 }} // opcional, para parecer só o ícone
-                />
-            </Tooltip>
+              <AppIconButton
+                type="text"
+                tooltip={isEliminado ? "Candidato eliminado" : "Alterar"}
+                icon={<EditActionIcon disabled={!canAddReclassificacaoCandidato} />}
+                disabled={!canAddReclassificacaoCandidato}
+                onClick={() => {
+                  if (isEliminado) return;
+                  setSelectedRow(record);
+                  setModalOpen(true);
+                }}
+                style={{ padding: 0 }}
+              />
             );
           })()
         ),
@@ -260,16 +258,15 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
       breadcrumbItems={breadcrumbItems}
       title="Eliminação e Reclassificação de Candidato"
     >
-      <Card style={{ marginTop: "1.25rem" }} variant="borderless">
-        <Row gutter={[24, 16]} style={{ textAlign: "left" }}>
-          <Col xs={24} sm={12} md={12}>
+      <Card style={cardSpacing.marginTop20} variant="borderless">
+        <FilterInlineRow gutter={[24, 16]} style={{ textAlign: "left" }}>
+          <FilterFieldCol xs={24} sm={12} md={12}>
             <Controller
               control={control}
               name="concurso"
               render={({ field }) => (
-                <CustomFormItem label="Concurso" labelCol={{ span: 24 }}>
+                <AppFormItem label="Concurso" labelCol={{ span: 24 }}>
                   <StyledSelect
-                    style={{ marginTop: 6 }}
                     value={field.value}
                     onChange={(value: unknown) => {
                       field.onChange(value as string | undefined);
@@ -278,7 +275,7 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
                     }}
                     placeholder="Selecione o concurso"
                     allowClear
-                    suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
+                    suffixIcon={<ExpandMoreIcon style={selectSuffixIcon} />}
                     loading={concursoSelecionado ? concursoIsLoading : concursosOptionsIsLoading}
                   >
                     {(() => {
@@ -298,24 +295,23 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
                       });
                     })()}
                   </StyledSelect>
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
-          </Col>
+          </FilterFieldCol>
 
-          <Col xs={24} sm={12} md={12}>
+          <FilterFieldCol xs={24} sm={12} md={12}>
             <Controller
               control={control}
               name="cargo"
               render={({ field }) => (
-                <CustomFormItem label="Cargo" labelCol={{ span: 24 }}>
+                <AppFormItem label="Cargo" labelCol={{ span: 24 }}>
                   <StyledSelect
-                    style={{ marginTop: 6 }}
                     value={field.value}
                     onChange={(value: unknown) => field.onChange(value as string | undefined)}
                     placeholder="Selecione o cargo"
                     allowClear
-                    suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
+                    suffixIcon={<ExpandMoreIcon style={selectSuffixIcon} />}
                     loading={concursoIsLoading}
                     disabled={!concursoSelecionado}
                   >
@@ -326,69 +322,71 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
                         </Select.Option>
                       ))}
                   </StyledSelect>
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
-          </Col>
+          </FilterFieldCol>
 
-          <Col xs={24} sm={12} md={6}>
+          <FilterFieldCol xs={24} sm={12} md={6}>
             <Controller
               control={control}
               name="nome"
               render={({ field }) => (
-                <CustomFormItem label="Nome" labelCol={{ span: 24 }}>
-                  <Input {...field} style={{ marginTop: 6 }} placeholder="Digite o nome" />
-                </CustomFormItem>
+                <AppFormItem label="Nome" labelCol={{ span: 24 }}>
+                  <Input {...field} placeholder="Digite o nome" />
+                </AppFormItem>
               )}
             />
-          </Col>
-          <Col xs={24} sm={12} md={6}>
+          </FilterFieldCol>
+          <FilterFieldCol xs={24} sm={12} md={6}>
             <Controller
               control={control}
               name="rf"
               render={({ field }) => (
-                <CustomFormItem label="RF" labelCol={{ span: 24 }}>
-                  <Input {...field} style={{ marginTop: 6 }} placeholder="Digite o RF" />
-                </CustomFormItem>
+                <AppFormItem label="RF" labelCol={{ span: 24 }}>
+                  <Input {...field} placeholder="Digite o RF" />
+                </AppFormItem>
               )}
             />
-          </Col>
+          </FilterFieldCol>
 
-          <Col xs={24} sm={12} md={6}>
+          <FilterFieldCol xs={24} sm={12} md={6}>
             <Controller
               control={control}
               name="rg"
               render={({ field }) => (
-                <CustomFormItem label="RG" labelCol={{ span: 24 }}>
-                  <Input {...field} style={{ marginTop: 6 }} placeholder="Digite o RG" />
-                </CustomFormItem>
+                <AppFormItem label="RG" labelCol={{ span: 24 }}>
+                  <Input {...field} placeholder="Digite o RG" />
+                </AppFormItem>
               )}
             />
-          </Col>
-          <Col xs={24} sm={12} md={6}>
+          </FilterFieldCol>
+          <FilterFieldCol xs={24} sm={12} md={6}>
             <Controller
               control={control}
               name="cpf"
               render={({ field }) => (
-                <CustomFormItem label="CPF" labelCol={{ span: 24 }}>
-                  <Input {...field} style={{ marginTop: 6 }} placeholder="Digite o CPF" />
-                </CustomFormItem>
+                <AppFormItem label="CPF" labelCol={{ span: 24 }}>
+                  <Input {...field} placeholder="Digite o CPF" />
+                </AppFormItem>
               )}
             />
-          </Col>
+          </FilterFieldCol>
 
-          <Col xs={24} md={24} style={{ display: "flex", alignItems: "flex-end", justifyContent: "flex-end" }}>
-            <ActionButtonsContainer style={{ justifyContent: "flex-end", width: "100%" }}>
-              <SecondaryButton onClick={handleLimpar}>Limpar</SecondaryButton>
-              <PrimaryButton onClick={handleFiltrar} disabled={!concursoSelecionado || !cargoSelecionadoForm}>
-                Filtrar
-              </PrimaryButton>
-            </ActionButtonsContainer>
-          </Col>
-        </Row>
+          <FilterActionCol xs={24} md={4}>
+            <FilterActionSlot>
+              <FilterActionsGroup>
+                <AppButton variant="secondary" onClick={handleLimpar}>Limpar</AppButton>
+                <AppButton onClick={handleFiltrar} disabled={!concursoSelecionado || !cargoSelecionadoForm}>
+                  Filtrar
+                </AppButton>
+              </FilterActionsGroup>
+            </FilterActionSlot>
+          </FilterActionCol>
+        </FilterInlineRow>
       </Card>
 
-      <Card style={{ marginTop: "1.25rem" }} variant="borderless">
+      <Card style={cardSpacing.marginTop20} variant="borderless">
         <Table
           columns={columns}
           dataSource={filteredRows}

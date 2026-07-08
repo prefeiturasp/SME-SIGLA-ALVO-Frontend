@@ -3,19 +3,14 @@ import React from "react";
 import { Row, Col, Typography } from "antd";
 
 import { useImportacaoDadosEscolhas } from "./hooks/useImportacaoDadosEscolhas";
-import {
-  TabContentContainer,
-  SectionCard,
-  ActionButtonsContainer,
-  SecondaryButton 
-} from "../../../components/EstilosCompartilhados";
+
  
 import UltimasImportacoesDeEscolhasTable from "./components/UltimasImportacoesDeEscolhasTable";
 import { Link, useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 
+import { TabContentContainer, SectionCard, ActionButtonsContainer, AppButton } from '@/components/ui';
 const { Text } = Typography;
-
 
 const HistoricoEscolhasTela: React.FC = ({  }) => {
 
@@ -26,14 +21,12 @@ const HistoricoEscolhasTela: React.FC = ({  }) => {
   { title: "Histórico de importação de Escolhas" },
 ] as TitleItem[];
 
-
   const {
     importacoesArquivosData,
     importacoesArquivosIsLoading,
     listRequest,
     onAntTableChange
   } = useImportacaoDadosEscolhas();
-
 
   const navigate=useNavigate();
  
@@ -74,9 +67,9 @@ const HistoricoEscolhasTela: React.FC = ({  }) => {
 
        <ActionButtonsContainer> 
        <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
-         <SecondaryButton size="large" onClick={() => navigate('/processos/importacao-dados', { state: { tipo: 'ESCOLHAS' } })}>
+         <AppButton variant="secondary" size="large" onClick={() => navigate('/processos/importacao-dados', { state: { tipo: 'ESCOLHAS' } })}>
            Voltar
-         </SecondaryButton>
+         </AppButton>
        </div>
  
       </ActionButtonsContainer>

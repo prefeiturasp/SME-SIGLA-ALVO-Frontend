@@ -11,17 +11,17 @@ import {
   LoginCard,
   StyledForm,
   FormField,
-  FieldLabel,
-  ErrorMessage,
+  LoginFieldLabel as FieldLabel,
+  LoginErrorMessage as ErrorMessage,
   StyledButton,
   ForgotPasswordLink,
   PrefLogoContainer,
   PrefLogoImage,
   StyledTitle,
-  StyledText,
+  LoginText as StyledText,
   StyledAlert,
   StyledTooltipIcon,
-} from "./style";
+} from "@/design-system/estilos";
 
 
 const LoginTela: React.FC = () => {

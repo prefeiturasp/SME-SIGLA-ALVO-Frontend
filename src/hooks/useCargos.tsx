@@ -1,18 +1,19 @@
-// src/pages/Processos/NovaConvocacaoCandidatos/hooks/useConcursos.tsx
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../services";
 
-export const useCargos= () => {
-  const { data: cargosData, isLoading: cargosIsLoading } = useQuery({
+export const useCargos = () => {
+  const { data, isLoading } = useQuery({
     queryKey: ["getCargos"],
     queryFn: ({ signal }) =>
       API.Cargos.getCargos({ signal }).response,
-    staleTime: 1000 * 60 * 5, // 5 minutos
+    staleTime: 0,
     retry: 0,
   });
 
-  return {
-    cargosData: cargosData || [],
-    cargosIsLoading
-  };
+  const opcoes = (data ?? []).map((cargo) => ({
+    value: cargo.uuid,
+    label: `${cargo.codigo} - ${cargo.nome}`,
+  }));
+
+  return { opcoes, isLoading };
 };

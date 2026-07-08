@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { renderWithProviders } from '../../../test-utils';
 import GerenciamentoVagasTela from '../GerenciamentoVagasTela';
 import { App } from 'antd';
@@ -204,8 +204,28 @@ jest.mock('../components/IncluirEscolasModal', () => ({
     ) : null,
 }));
 
-// Mock dos componentes compartilhados
-jest.mock('../../../components/EstilosCompartilhados', () => ({
+// Mock do design system
+jest.mock('@/components/ui', () => {
+  const uiStyleMocks = jest.requireActual('@/test/uiStyleMocks');
+  return {
+  ...uiStyleMocks,
+  AppButton: ({ children, onClick, disabled, variant, loading, ...props }: any) => (
+    <button
+      data-testid={variant === 'secondary' ? 'secondary-button' : 'primary-button'}
+      onClick={onClick}
+      disabled={disabled || loading}
+      {...props}
+    >
+      {loading ? 'Loading' : children}
+    </button>
+  ),
+  AppFormItem: ({ children, label, validateStatus, help }: any) => (
+    <div data-testid="custom-form-item" data-validate-status={validateStatus}>
+      {label && <label data-testid="form-label">{label}</label>}
+      {children}
+      {help && <span data-testid="form-help">{help}</span>}
+    </div>
+  ),
   PrimaryButton: ({ children, onClick, disabled, ...props }: any) => (
     <button data-testid="primary-button" onClick={onClick} disabled={disabled} {...props}>
       {children}
@@ -239,17 +259,13 @@ jest.mock('../../../components/EstilosCompartilhados', () => ({
       {children}
     </div>
   ),
-}));
-
-jest.mock('../../../components/FormStyle', () => ({
-  CustomFormItem: ({ children, label, validateStatus, help }: any) => (
-    <div data-testid="custom-form-item" data-validate-status={validateStatus}>
-      {label && <label data-testid="form-label">{label}</label>}
-      {children}
-      {help && <span data-testid="form-help">{help}</span>}
-    </div>
-  ),
-}));
+  FilterInlineRow: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  FilterFieldCol: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  FilterActionCol: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  FilterActionSlot: ({ children }: any) => <div>{children}</div>,
+  FilterActionsGroup: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  };
+});
 
 // Mock dos ícones
 jest.mock('@mui/icons-material/CloudUpload', () => () => <div data-testid="cloud-upload-icon" />);
@@ -753,21 +769,11 @@ describe('GerenciamentoVagasTela', () => {
   });
 
   describe('Navegação', () => {
-    it('deve navegar para home ao clicar no breadcrumb Home', () => {
-      renderComponent();
-
-      const breadcrumbItems = screen.getAllByTestId(/breadcrumb-item-/);
-      const homeItem = breadcrumbItems[0];
-      fireEvent.click(homeItem);
-
-      expect(mockNavigate).toHaveBeenCalledWith('/');
-    });
-
     it('deve navegar para processos ao clicar no breadcrumb Processos', () => {
       renderComponent();
 
-      const breadcrumbItems = screen.getAllByTestId(/breadcrumb-item-/);
-      const processosItem = breadcrumbItems[1];
+      const breadcrumb = screen.getByTestId('breadcrumb');
+      const processosItem = within(breadcrumb).getByText('Processos');
       fireEvent.click(processosItem);
 
       expect(mockNavigate).toHaveBeenCalledWith('/processos');

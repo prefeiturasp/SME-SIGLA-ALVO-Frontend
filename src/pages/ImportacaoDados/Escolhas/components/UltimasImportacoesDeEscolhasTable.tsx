@@ -6,11 +6,11 @@ import { Tooltip } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../../services";
 
-import { CustomTitle } from "../../Vagas/components/style";
-import { StyledTable } from "../../../../components/EstilosCompartilhados";
 import type { IImportacaoEscolhasResponse } from "../../../../services/resources/importacaoDados/IImportacaoArquivos";
 import ErroModal from "./ErroModal";
+import { formatarStatusImportacao } from "../../utils/statusImportacao";
 
+import { CustomTitle, StyledTable } from '@/components/ui';
 interface IImportacaoEscolhasResponseComNome extends IImportacaoEscolhasResponse {
   processo_nome?: string;
 }
@@ -50,7 +50,7 @@ const UltimasImportacoesDeEscolhasTable: React.FC<UltimasImportacoesDeEscolhasTa
       return processos;
     },
     enabled: processosUuids.length > 0,
-    staleTime: 1000 * 60 * 10,
+    staleTime: 0,
   });
 
   // Enriquecer dados com nomes dos processos
@@ -111,7 +111,7 @@ const UltimasImportacoesDeEscolhasTable: React.FC<UltimasImportacoesDeEscolhasTa
       dataIndex: "status",
       key: "status",
       align: "center",
-      render: (status: string) => status || "-",
+      render: (status: string) => formatarStatusImportacao(status),
     },
     {
       title: "Ações",

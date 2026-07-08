@@ -1,20 +1,15 @@
 import React, { useMemo, useState } from "react";
-import { Row, Col, Typography, Tooltip, Button } from "antd";
+import { Row, Col, Typography, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { EyeOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import {
-  TabContentContainer,
-  SectionCard,
-  StyledTable,
-    ActionButtonsContainer,
-} from "../../../components/EstilosCompartilhados";
+
 import useHistoricoEnvioEmail from "./hooks/useGetHistoricoEnvioEmail";
 import DetalheEnvioEmailModal from "./components/DetalheEnvioEmailModal";
 import type { IHistoricoEnvioEmail } from "../../../services/resources/convocacao/IConvocacao";
 
+import { AppButton, ViewActionIcon, TabContentContainer, SectionCard, StyledTable, ActionButtonsContainer } from '@/components/ui';
 const { Text } = Typography;
 
 const HistoricoEnvioEmailsTela: React.FC = () => {
@@ -97,8 +92,8 @@ const HistoricoEnvioEmailsTela: React.FC = () => {
       align: "center",
       render: (_, record) => (
         <Tooltip title="Visualizar detalhes">
-          <EyeOutlined
-            style={{ cursor: "pointer", fontSize: "18px", color: "#0F59C8" }}
+          <ViewActionIcon
+            style={{ cursor: "pointer", fontSize: "18px" }}
             onClick={() => handleOpenDetalhe(record)}
           />
         </Tooltip>
@@ -146,9 +141,9 @@ const HistoricoEnvioEmailsTela: React.FC = () => {
 
         <ActionButtonsContainer>
           <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
-            <Button type="primary" ghost onClick={() => navigate("/gerenciar/disparo-emails")}>
+            <AppButton variant="secondary" onClick={() => navigate("/gerenciar/disparo-emails")}>
               Voltar
-            </Button>
+            </AppButton>
           </div>
         </ActionButtonsContainer>
       </TabContentContainer>

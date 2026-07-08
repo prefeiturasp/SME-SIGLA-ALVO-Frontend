@@ -14,7 +14,7 @@ export const useGetExtracaoDadosTodos = () => {
     queryFn: ({ signal }) =>
       API.Relatorios.getExtracaoDadosTodos({ signal })
         .response as Promise<IExtracaoDadosTodosResponse>,
-    staleTime: 1000 * 60 * 2,
+    staleTime: 0,
     retry: 1,
   });
 

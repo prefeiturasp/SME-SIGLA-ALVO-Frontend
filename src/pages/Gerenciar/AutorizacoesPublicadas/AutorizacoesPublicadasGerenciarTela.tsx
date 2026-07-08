@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Button, Card, Table, Typography } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Card, Table, Tooltip, Typography } from "antd";
+import { AppButton, DeleteActionIcon, EditActionIcon } from '@/components/ui';
 import { useNavigate, useSearchParams } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import AdicionarAutorizacaoModal from "./components/AdicionarAutorizacaoModal";
@@ -61,7 +61,7 @@ const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
           <Text
             strong
             style={{ cursor: "pointer" }}
-            onClick={() => navigate("/autorizacoes-publicadas")}
+            onClick={() => navigate("/gerenciar/autorizacoes-publicadas")}
           >
             Gestão de Autorizações publicadas
           </Text>
@@ -153,31 +153,33 @@ const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
         render: (_: any, record: ItemRow) => {
           return (
             <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-              <EditOutlined
-                data-testid="edit-btn"
-                style={{ fontSize: 16, color: "#0F59C8", cursor: "pointer" }}
-                title="Editar"
-                onClick={() => {
-                  setEditContext({
-                    mode: "edit",
-                    autorizacaoUuid: record?.uuid,
-                    quantidade: record?.autorizacoes,
-                    dataAutorizacao: record?.dataISO || null,
-                    observacao: record?.observacao || "",
-                  });
-                  setAddOpen(true);
-                }}
-              />
-              <DeleteOutlined
-                data-testid="delete-btn"
-                style={{ fontSize: 16, color: "#C41D7F", cursor: "pointer" }}
-                title="Excluir"
-                onClick={() => {
-                  if (!record?.uuid) return;
-                  setAutorizacaoParaExcluir(record.uuid);
-                  setDeleteModalOpen(true);
-                }}
-              />
+              <Tooltip title="Editar" arrow={true}>
+                <EditActionIcon
+                  data-testid="edit-btn"
+                  style={{ fontSize: 16, cursor: "pointer" }}
+                  onClick={() => {
+                    setEditContext({
+                      mode: "edit",
+                      autorizacaoUuid: record?.uuid,
+                      quantidade: record?.autorizacoes,
+                      dataAutorizacao: record?.dataISO || null,
+                      observacao: record?.observacao || "",
+                    });
+                    setAddOpen(true);
+                  }}
+                />
+              </Tooltip>
+              <Tooltip title="Excluir" arrow={true}>
+                <DeleteActionIcon
+                  data-testid="delete-btn"
+                  style={{ fontSize: 16, cursor: "pointer" }}
+                  onClick={() => {
+                    if (!record?.uuid) return;
+                    setAutorizacaoParaExcluir(record.uuid);
+                    setDeleteModalOpen(true);
+                  }}
+                />
+              </Tooltip>
             </div>
           );
         },
@@ -212,23 +214,24 @@ const AutorizacoesPublicadasGerenciarTela: React.FC = () => {
             }
           />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-            <Button
+            <AppButton
+              variant="secondary"
               onClick={() => {
-                navigate("/autorizacoes-publicadas");
+                navigate("/gerenciar/autorizacoes-publicadas");
               }}
             >
               Voltar
-            </Button>
-            <Button
+            </AppButton>
+            <AppButton
+              variant="primary"
               disabled={!canAddAutorizacoesPublicadas}
-              type="primary"
               onClick={() => {
                 setEditContext({ mode: "create" });
                 setAddOpen(true);
               }}
             >
               Adicionar
-            </Button>
+            </AppButton>
           </div>
         </div>
       </Card>

@@ -16,7 +16,7 @@ export const useGetCandidatos = (
       }
       return API.Candidatos.getCandidatos({ signal }).response;
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
     enabled: buscarCandidatos, // Só executa quando buscarCandidatos for true
   });

@@ -1,20 +1,12 @@
-import { Button, Select, Space, Typography } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Col, Divider, Input, Row, Select, Space, Typography } from "antd";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
-
-const { Text } = Typography;
-
-import { Col, Divider, Input, Row } from "antd";
 import { Controller, useForm } from "react-hook-form";
-import { CustomFormItem } from "../styles";
+import { useTheme } from "styled-components";
+
+import { AppButton, AppFormItem, CustomModal } from "@/components/ui";
 import { Content } from "antd/es/layout/layout";
 import type { IConvocacaoFiltros } from "../../../../services/resources/convocacao/IConvocacao";
 
-
-import { useTheme } from "styled-components";
-import {
-  CustomModal,
-} from "../../../../components/EstilosCompartilhados";
 import AdicionarEscolaTable from "./AdicionarEscolaTable";
 
 interface INewAdicionarNovaEscolaModalProps {
@@ -49,7 +41,7 @@ const AdicionarNovaEscolaModal: React.FC<INewAdicionarNovaEscolaModalProps> = ({
     }
   };
 
-  const theme = useTheme();
+  useTheme();
 
   return (
     <CustomModal
@@ -68,24 +60,21 @@ const AdicionarNovaEscolaModal: React.FC<INewAdicionarNovaEscolaModalProps> = ({
       maskClosable={false}
       okText={"Salvar"}
       footer={
-        <Space  size={24}>
-          <Button
-            key="voltar"
-            type="primary"
-            ghost
+        <Space size={24}>
+          <AppButton
+            variant="secondary"
             size="large"
             onClick={() => onCancel()}
           >
             Voltar
-          </Button>
-          <Button
-            key="adicionar"
-            type="primary"
+          </AppButton>
+          <AppButton
+            variant="primary"
             size="large"
             onClick={handleSubmit(onFinish)}
           >
             Adicionar escola
-          </Button>
+          </AppButton>
         </Space>
       }
     >
@@ -107,7 +96,8 @@ const AdicionarNovaEscolaModal: React.FC<INewAdicionarNovaEscolaModalProps> = ({
               control={control}
               name="dre"
               render={({ field }) => (
-                <CustomFormItem
+                <AppFormItem
+                  colon={false}
                   label={"DRE"}
                   validateStatus={formErrors.dre ? "error" : undefined}
                   help={formErrors.dre?.message}
@@ -122,7 +112,7 @@ const AdicionarNovaEscolaModal: React.FC<INewAdicionarNovaEscolaModalProps> = ({
                       <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
                     }
                   />
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
           </Col>
@@ -131,27 +121,25 @@ const AdicionarNovaEscolaModal: React.FC<INewAdicionarNovaEscolaModalProps> = ({
               control={control}
               name="escola"
               render={({ field }) => (
-                <CustomFormItem
+                <AppFormItem
+                  colon={false}
                   label="Escola"
                   validateStatus={formErrors.escola ? "error" : undefined}
                   help={formErrors.escola?.message}
                   labelCol={{ span: 24 }}
                 >
                   <Input {...field} placeholder="" />
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
           </Col>
         </Row>
 
-        <Button size="large" type="primary">
+        <AppButton variant="primary" size="large">
           Filtrar
-        </Button>
+        </AppButton>
 
-        <AdicionarEscolaTable
-          loading={false}
-     
-        />
+        <AdicionarEscolaTable loading={false} />
       </Content>
       <Divider
         style={{

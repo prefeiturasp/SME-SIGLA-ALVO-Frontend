@@ -1,5 +1,5 @@
 import React from "react";
-import { PlaceholderContainer, PlaceholderText } from "./styles";
+import { PlaceholderContainer, PlaceholderText } from '@/components/ui';
 
 const EscolhasEOL: React.FC = () => {
   return (

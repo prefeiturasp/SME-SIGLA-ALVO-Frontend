@@ -52,10 +52,10 @@ jest.mock('@mui/icons-material/KeyboardArrowRight', () => ({
 }));
 
 // Mock dos styled components para permitir cliques
-jest.mock('../styles', () => {
-  const actual = jest.requireActual('../styles');
+jest.mock('@/components/ui', () => {
+  const actual = jest.requireActual('@/components/ui');
   const React = require('react');
-  
+
   return {
     ...actual,
     CustomMenuItem: ({ children, onClick, ...props }: any) => (
@@ -81,11 +81,11 @@ jest.mock('../styles', () => {
   };
 });
 
-// Mock dos styled components para permitir cliques
-jest.mock('../styles', () => {
-  const actual = jest.requireActual('../styles');
+// Mock dos styled components para permitir cliques (duplicado no arquivo original)
+jest.mock('@/components/ui', () => {
+  const actual = jest.requireActual('@/components/ui');
   const React = require('react');
-  
+
   return {
     ...actual,
     CustomMenuItem: ({ children, onClick, ...props }: any) => (
@@ -160,7 +160,7 @@ describe('BaseTela Component', () => {
       const wrapper = createWrapper();
       render(<BaseTela {...defaultProps} />, { wrapper });
 
-      expect(screen.getByText('Home')).toBeInTheDocument();
+      expect(screen.queryByText('Home')).not.toBeInTheDocument();
       expect(screen.getAllByText('Processos').length).toBeGreaterThan(0);
       expect(screen.getByText('Convocação')).toBeInTheDocument();
     });
@@ -184,7 +184,7 @@ describe('BaseTela Component', () => {
   });
 
   describe('Breadcrumb processing', () => {
-    it('deve filtrar primeiro item quando pathname é "/"', () => {
+    it('deve remover item Home do breadcrumb em qualquer rota', () => {
       mockUseLocation.mockReturnValue({ pathname: '/' });
       const wrapper = createWrapper();
       render(
@@ -199,22 +199,19 @@ describe('BaseTela Component', () => {
       expect(screen.getAllByText('Processos').length).toBeGreaterThan(0);
     });
 
-    it('deve adicionar onClick ao item "Home" no breadcrumb', async () => {
-      const user = userEvent.setup();
-      mockUseLocation.mockReturnValue({ pathname: '/test' });
+    it('deve remover item Início do breadcrumb', () => {
+      mockUseLocation.mockReturnValue({ pathname: '/meus-dados' });
       const wrapper = createWrapper();
       render(
         <BaseTela
           {...defaultProps}
-          breadcrumbItems={[{ title: 'Home' }, { title: 'Processos' }]}
+          breadcrumbItems={[{ title: 'Início' }, { title: 'Meus dados' }]}
         />,
         { wrapper }
       );
 
-      const homeItem = screen.getByText('Home');
-      await user.click(homeItem);
-
-      expect(mockNavigate).toHaveBeenCalledWith('/');
+      expect(screen.queryByText('Início')).not.toBeInTheDocument();
+      expect(screen.getByText('Meus dados')).toBeInTheDocument();
     });
 
     it('deve processar breadcrumb com React element', () => {

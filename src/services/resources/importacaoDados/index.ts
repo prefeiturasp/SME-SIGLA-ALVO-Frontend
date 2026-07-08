@@ -1,9 +1,10 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosImportaArquivos } from "../../axios";
-import type { 
+import type {
   IGetLayout,
   IImportacaoFundacao,
   IUltimasImportacoesVagas,
+  IUltimasImportacoesHabilitados,
   IErroImportacaoResposta,
   IImportacaoEscolhasPayload,
   IImportacaoEscolhasResponse,
@@ -11,7 +12,7 @@ import type {
 } from "./IImportacaoArquivos";
 import type { IListRequest, PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
-import type { IImportacaoVagasPayload } from "../../../pages/Processos/ImportacaoDados/Vagas/hooks/types";
+import type { IImportacaoVagasPayload } from "./IImportacaoArquivos";
 
 export const URL = {
   getLayout: () => `/api/v1/layouts/`,
@@ -59,7 +60,7 @@ export const postImportacaoArquivosVagas = (
 
 // TODO adicionar JWT no header Authorization
 export const postImportacaoArquivosHabilitados = (
-  payload: { cargo?: string; arquivo: File; tipo: string, concurso_uuid:string, concurso_nome: string },
+  payload: { cargo?: string; arquivo: File; tipo: string, concurso_uuid:string, concurso_nome: string, observacao?: string },
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
@@ -70,6 +71,7 @@ export const postImportacaoArquivosHabilitados = (
   formData.append('arquivo', payload.arquivo);
   formData.append('concurso_uuid', payload.concurso_uuid);
   formData.append('concurso_nome', payload.concurso_nome);
+  if (payload.observacao) formData.append('observacao', payload.observacao);
 
   const response = appAxiosImportaArquivos
     .post<IImportacaoFundacao>(URL.postImportacaoArquivosHabilitados(), formData, {
@@ -88,12 +90,12 @@ export const postImportacaoArquivosHabilitados = (
 };
 
 // // TODO adicionar JWT no header Authorization
-export const getImportacaoArquivosHabilitados = ( 
+export const getImportacaoArquivosHabilitados = (
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
   const response = appAxiosImportaArquivos
-    .get<PaginatedResponse<IImportacaoFundacao>>(URL.getImportacaoArquivosHabilitados(), {      
+    .get<IUltimasImportacoesHabilitados[]>(URL.getImportacaoArquivosHabilitados(), {
       paramsSerializer: queryParamsSerializer,
       signal,
       ...axiosRequestConfig,

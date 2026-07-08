@@ -7,7 +7,7 @@ export const useAgenda= (processoUuid: string) => {
     queryKey: ["getAgenda", processoUuid],
     queryFn: ({ signal }) =>
       API.Agenda.getAgenda(processoUuid, { signal }).response,
-    staleTime: 1000 * 60 * 5, // 5 minutos
+    staleTime: 0,
     retry: 0,
   });
   return {

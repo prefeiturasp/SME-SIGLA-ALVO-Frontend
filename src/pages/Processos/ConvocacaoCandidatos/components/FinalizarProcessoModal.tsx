@@ -1,8 +1,8 @@
 import React from "react";
-import { Button, Modal } from "antd";
+import { Modal } from "antd";
 import { WarningFilled } from "@ant-design/icons";
 
-import { ClearButton } from "../style";
+import { AppButton, ClearButton, confirmationModalStyles, confirmationModalWidth } from '@/components/ui';
 
 export interface FinalizarProcessoModalProps {
   open: boolean;
@@ -17,6 +17,8 @@ const FinalizarProcessoModal: React.FC<FinalizarProcessoModalProps> = ({
   onCancel,
   onConfirm,
 }) => {
+  const s = confirmationModalStyles;
+
   return (
     <Modal
       open={open}
@@ -25,56 +27,39 @@ const FinalizarProcessoModal: React.FC<FinalizarProcessoModalProps> = ({
       centered
       closable={!confirmLoading}
       maskClosable={!confirmLoading}
-      width={720}
+      width={confirmationModalWidth}
       footer={
-        <div style={{ display: "flex", justifyContent: "center", gap: 48, paddingTop: 8 }}>
+        <div style={s.footerCentered}>
           <ClearButton
             size="large"
-            style={{ width: 220, height: 52, marginTop: 0 }}
+            style={s.cancelButton}
             onClick={onCancel}
             disabled={confirmLoading}
           >
             Cancelar
           </ClearButton>
-          <Button
+          <AppButton
+            variant="primary"
             size="large"
-            type="primary"
-            style={{ width: 260, height: 52 }}
+            style={s.confirmButton}
             onClick={onConfirm}
             loading={confirmLoading}
             disabled={confirmLoading}
           >
             Finalizar
-          </Button>
+          </AppButton>
         </div>
       }
-      styles={{
-        body: { padding: "28px 24px 8px 24px" },
-        footer: { padding: "18px 24px 28px 24px" },
-      }}
+      styles={s.antdStyles}
     >
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 22 }}>
-        <WarningFilled style={{ fontSize: 72, color: "#F5B800" }} />
+      <div style={s.contentColumn}>
+        <WarningFilled style={s.warningIconWarning} />
 
-        <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 12 }}>
-          <span
-            style={{
-              fontFamily: "Open Sans",
-              fontSize: 28,
-              lineHeight: "36px",
-              color: "#111111",
-            }}
-          >
+        <div style={s.messageBlock}>
+          <span style={s.titleText}>
             Tem certeza que deseja finalizar o processo?
           </span>
-          <span
-            style={{
-              fontFamily: "Open Sans",
-              fontSize: 20,
-              lineHeight: "28px",
-              color: "#111111",
-            }}
-          >
+          <span style={s.subtitleText}>
             Ao realizar essa ação só será permitido a visualização do processo.
           </span>
         </div>

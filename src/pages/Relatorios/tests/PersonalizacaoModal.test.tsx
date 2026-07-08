@@ -19,7 +19,7 @@ import PersonalizacaoModal from '../components/PersonalizacaoModal';
 import { getPersonalizacaoRelatorio } from '../hooks/useGetPersonalizacaoRelatorio';
 import { patchPersonalizacaoRelatorio } from '../hooks/usePatchPersonalizacaoRelatorio';
 
-jest.mock('../components/QuillEditor', () => {
+jest.mock('@/components/QuillEditor', () => {
   return function MockQuillEditor({ value, onChange, placeholder }: any) {
     const testId = placeholder?.includes('texto final')
       ? 'texto-final'
@@ -42,12 +42,16 @@ jest.mock('../components/QuillEditor', () => {
   };
 });
 
-jest.mock('../../EscolhaCandidatos/styles', () => ({
-  ModalInfoCard: ({ children }: any) => <div data-testid="modal-info-card">{children}</div>,
-  ModalInfoItem: ({ children }: any) => <div data-testid="modal-info-item">{children}</div>,
-  ModalInfoLabel: ({ children, ...props }: any) => <label data-testid="modal-info-label" {...props}>{children}</label>,
-  ModalInfoValue: ({ children, ...props }: any) => <span data-testid="modal-info-value" {...props}>{children}</span>,
-}));
+jest.mock('@/components/ui', () => {
+  const actual = jest.requireActual('@/components/ui');
+  return {
+    ...actual,
+    ModalInfoCard: ({ children }: any) => <div data-testid="modal-info-card">{children}</div>,
+    ModalInfoItem: ({ children }: any) => <div data-testid="modal-info-item">{children}</div>,
+    ModalInfoLabel: ({ children, ...props }: any) => <label data-testid="modal-info-label" {...props}>{children}</label>,
+    ModalInfoValue: ({ children, ...props }: any) => <span data-testid="modal-info-value" {...props}>{children}</span>,
+  };
+});
 
 const mockGetPersonalizacaoRelatorio = getPersonalizacaoRelatorio as jest.MockedFunction<typeof getPersonalizacaoRelatorio>;
 const mockPatchPersonalizacaoRelatorio = patchPersonalizacaoRelatorio as jest.MockedFunction<typeof patchPersonalizacaoRelatorio>;
@@ -190,16 +194,22 @@ describe('PersonalizacaoModal', () => {
 
   describe('Reset quando modal fecha', () => {
     it('deve resetar estados quando open muda para false', async () => {
+      // Carrega com usar_logotipo=false (checkbox desmarcado)
       mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData({ usar_logotipo: false }));
       const { rerender } = setupComponent();
-      await waitFor(() => expect(mockGetPersonalizacaoRelatorio).toHaveBeenCalled());
+      await waitFor(() =>
+        expect(screen.getAllByRole('checkbox')[0]).not.toBeChecked()
+      );
+
       rerender(<PersonalizacaoModal {...defaultProps} open={false} />);
-      await waitFor(() => {
-        const checkboxes = screen.queryAllByRole('checkbox');
-        if (checkboxes.length > 0) {
-          expect(checkboxes[0]).toBeChecked();
-        }
-      });
+
+  
+      mockGetPersonalizacaoRelatorio.mockResolvedValue(createMockData());
+      rerender(<PersonalizacaoModal {...defaultProps} open />);
+
+      await waitFor(() =>
+        expect(screen.getAllByRole('checkbox')[0]).toBeChecked()
+      );
     });
   });
 

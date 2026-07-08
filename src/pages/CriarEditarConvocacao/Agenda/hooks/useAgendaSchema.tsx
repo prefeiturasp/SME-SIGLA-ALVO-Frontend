@@ -25,6 +25,10 @@ const useAgendaSchema = (
   isRetardatario?: () => boolean,
   verificarHorarioRetardatario?: () => boolean
 ) => {
+  const MAX_CANDIDATOS_POR_SESSAO = 30;
+  const HORA_INICIO_MIN = 10;
+  const HORA_FIM_MAX = 17;
+
   return yup.object({
     tipoEscolha: yup
       .string()
@@ -200,6 +204,36 @@ const useAgendaSchema = (
           return true;
         }
         return Number.isInteger(value);
+      })
+      .test("max-candidatos-por-sessao", function(value) {
+        const { quantidadeClassificados, tipoEscolha } = this.parent as IAgendaFields;
+        const isRetardatarioValue = isRetardatario?.();
+        // Regra só se aplica para PRESENCIAL não-retardatário.
+        if (isRetardatarioValue || tipoEscolha !== "PRESENCIAL") {
+          return true;
+        }
+
+        if (quantidadeClassificados === null || quantidadeClassificados === undefined) {
+          return true;
+        }
+
+        if (value === null || value === undefined) {
+          return true;
+        }
+
+        if (value <= 0) {
+          return true;
+        }
+
+        const candidatosPorSessao = Math.ceil(Number(quantidadeClassificados) / Number(value));
+        if (candidatosPorSessao <= MAX_CANDIDATOS_POR_SESSAO) {
+          return true;
+        }
+
+        const sugestaoSessoes = Math.ceil(Number(quantidadeClassificados) / MAX_CANDIDATOS_POR_SESSAO);
+        return this.createError({
+          message: `Limite de ${MAX_CANDIDATOS_POR_SESSAO} candidatos por sessão. Sugestão: ${sugestaoSessoes} sessão(ões).`,
+        });
       }),
     
     horaInicio: yup
@@ -211,6 +245,16 @@ const useAgendaSchema = (
           .test("is-valid-time", "Hora de início inválida", (value) => {
             return value && dayjs(value as any).isValid();
           })
+          .test(
+            "is-within-window",
+            `Horário deve estar entre ${HORA_INICIO_MIN}:00 e ${HORA_FIM_MAX}:00`,
+            (value) => {
+              if (!value) return true;
+              const d = dayjs(value as any);
+              const h = d.hour();
+              return h >= HORA_INICIO_MIN && h < HORA_FIM_MAX;
+            }
+          )
           .test("retardatario-deve-ser-ultimo", "O horário do retardatário deve ser depois de todas as outras agendas", function(value) {
             const isRetardatarioValue = isRetardatario?.();
             if (!isRetardatarioValue || !value) {
@@ -242,6 +286,23 @@ const useAgendaSchema = (
             const horaFim = dayjs(value as any);
             const horaInicioTime = dayjs(horaInicio as any);
             return horaFim.isAfter(horaInicioTime);
+          })
+          .test(
+            "is-within-window",
+            `Horário deve estar entre ${HORA_INICIO_MIN}:00 e ${HORA_FIM_MAX}:00`,
+            (value) => {
+              if (!value) return true;
+              const d = dayjs(value as any);
+              const h = d.hour();
+              return h > HORA_INICIO_MIN && h <= HORA_FIM_MAX;
+            }
+          )
+          .test("is-one-hour", "Intervalo permitido: somente 1h", function(value) {
+            const { horaInicio } = this.parent;
+            if (!value || !horaInicio) return true;
+            const fim = dayjs(value as any);
+            const inicio = dayjs(horaInicio as any);
+            return fim.diff(inicio, "minute") === 60;
           }),
         otherwise: (schema) => schema.notRequired(),
       }),

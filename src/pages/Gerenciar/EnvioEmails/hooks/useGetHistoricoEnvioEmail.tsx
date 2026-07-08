@@ -18,7 +18,7 @@ const useHistoricoEnvioEmail = () => {
         return [] as unknown as IHistoricoEnvioEmail[];
       }
     },
-    staleTime: 1000 * 60 * 2,
+    staleTime: 0,
     retry: 1,
   });
 

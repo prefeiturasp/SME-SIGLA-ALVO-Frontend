@@ -92,21 +92,24 @@ jest.mock('../hooks/useNovaConvocacaoCandidatos', () => ({
   useNovaConvocacaoCandidatos: () => mockUseNovaConvocacaoCandidatos,
 }));
 
-jest.mock('../../../Base/BaseTela', () => ({
-  __esModule: true,
-  default: ({ children, title, breadcrumbItems }: any) => (
-    <div data-testid="base-tela">
-      <nav>
-        {breadcrumbItems?.map((item: any, index: number) => (
-          <span key={index}>{typeof item.title === 'string' ? item.title : item.title}</span>
-        ))}
-      </nav>
-      <h1>{title}</h1>
-      <div>Processos</div>
-      {children}
-    </div>
-  ),
-}));
+jest.mock('../../../Base/BaseTela', () => {
+  const { filterHomeBreadcrumbItems } = jest.requireActual('../../../Base/BaseTela');
+  return {
+    __esModule: true,
+    default: ({ children, title, breadcrumbItems }: any) => (
+      <div data-testid="base-tela">
+        <nav>
+          {filterHomeBreadcrumbItems(breadcrumbItems ?? []).map((item: any, index: number) => (
+            <span key={index}>{typeof item.title === 'string' ? item.title : item.title}</span>
+          ))}
+        </nav>
+        <h1>{title}</h1>
+        <div>Processos</div>
+        {children}
+      </div>
+    ),
+  };
+});
 
 jest.mock('../components/FormPrincipal', () => ({
   __esModule: true,
@@ -403,7 +406,7 @@ describe('NovaConvocacaoCandidatos', () => {
   test('deve renderizar breadcrumb corretamente', () => {
     renderWithProviders(<NovaConvocacaoCandidatos />);
     
-    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.queryByText('Home')).not.toBeInTheDocument();
     expect(screen.getAllByText('Processos')).toHaveLength(2);
     expect(screen.getByText('Convocação de candidatos')).toBeInTheDocument();
     expect(screen.getByText('Nova Convocação')).toBeInTheDocument();
@@ -737,9 +740,6 @@ describe('NovaConvocacaoCandidatos', () => {
   test('deve navegar ao clicar nos breadcrumbs', async () => {
     const user = userEvent.setup();
     renderWithProviders(<NovaConvocacaoCandidatos />);
-
-    await user.click(screen.getByText('Home'));
-    expect(mockNavigate).toHaveBeenCalledWith('/');
 
     await user.click(screen.getAllByText('Processos')[0]);
     expect(mockNavigate).toHaveBeenCalledWith('/processos');

@@ -7,13 +7,57 @@ export interface ICargos {
 export interface ICargos2 {
   uuid: string;
   nome: string;
-  codigo: string;
+  codigo: number;
 }
 
+// Retorno do endpoint em formato select (?formato=select)
 export interface IConcurso {
-    label: string;
-    value: string;
-    cargos: ICargos[]; 
-  }
+  label: string;
+  value: string;
+  cargos: ICargos[];
+}
 
+// Retorno da listagem paginada (ConcursoListSerializer)
+export interface IConcursoLista {
+  uuid: string;
+  nome: string;
+  cargos: ICargos2[];
+  cargos_descricao: string[];
+  numero_processo: string;
+  ano_edital: number | null;
+  banca_responsavel: string;
+  status: string;
+}
 
+export type ConcursoStatus = "ATIVO" | "INATIVO";
+
+// Retorno do endpoint de detalhe (ConcursoSerializer)
+export interface IConcursoDetalhe {
+  uuid: string;
+  nome: string;
+  cargos: ICargos2[];
+  numero_processo: string;
+  codigo: number | null;
+  ano_edital: number | null;
+  banca_responsavel: string;
+  status: ConcursoStatus;
+}
+
+export interface IConcursoPayload {
+  nome: string;
+  cargos_ids: string[];
+  numero_processo: string;
+  ano_edital: number | null;
+  banca_responsavel: string;
+  status: ConcursoStatus;
+}
+
+export interface IConcursoFiltros {
+  nome?: string;
+  codigo_cargo?: number;
+  descricao_cargo?: string;
+  numero_processo?: string;
+  ano_edital?: number;
+  banca_responsavel?: string;
+  status?: ConcursoStatus;
+}

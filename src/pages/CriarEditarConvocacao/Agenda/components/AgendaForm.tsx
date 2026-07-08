@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Button,
   Card,
   Form,
   DatePicker,
@@ -13,11 +12,15 @@ import {
   Typography,
 } from "antd";
 import { CalendarOutlined, CloseOutlined, PlusOutlined } from "@ant-design/icons";
+import { AppButton, AppIconButton, AppFormItem } from '@/components/ui';
 import { Controller } from "react-hook-form";
 import type { Control, FieldErrors } from "react-hook-form";
-import { agendaFormStyles } from "../styles";
+import { agendaFormStyles } from "@/design-system/estilos";
 
 const { Text } = Typography;
+
+const HORA_INICIO_MIN = 10;
+const HORA_FIM_MAX = 17;
 
 interface AgendaFormProps {
   agendaAberto: any;
@@ -57,6 +60,29 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
   hasAgendas,
 }) => {
   if (!agendaAberto) return null;
+
+  const disabledTime = (_date: any, type: "start" | "end") => {
+    const disabledHours = () => {
+      const hours: number[] = [];
+      for (let h = 0; h < 24; h++) {
+        const isAllowed = h >= HORA_INICIO_MIN && h <= HORA_FIM_MAX;
+        if (!isAllowed) hours.push(h);
+      }
+      // Para garantir 1h de intervalo, start não pode iniciar às 17 e end não pode terminar às 10
+      if (type === "start") {
+        if (!hours.includes(HORA_FIM_MAX)) hours.push(HORA_FIM_MAX);
+      } else {
+        if (!hours.includes(HORA_INICIO_MIN)) hours.push(HORA_INICIO_MIN);
+      }
+      return hours.sort((a, b) => a - b);
+    };
+
+    // Mantém minutos/segundos livres; a validação do intervalo (1h) acontece no schema.
+    return {
+      disabledHours,
+    };
+  };
+
   return (
     <Card
       style={agendaFormStyles.agendaCard}
@@ -66,8 +92,9 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
             <CalendarOutlined style={agendaFormStyles.agendaCardIcon} />
             <Text strong style={agendaFormStyles.agendaCardTitle}>Agenda</Text>
           </div>
-          <Button
+          <AppIconButton
             type="text"
+            tooltip="Fechar"
             icon={<CloseOutlined />}
             onClick={handleFecharAgenda}
             style={agendaFormStyles.agendaCardCloseButton}
@@ -98,7 +125,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
             </div>
           </Col>
           <Col span={6}>
-            <Form.Item label="Modalidade da Escolha" style={agendaFormStyles.formItemNoMargin}>
+            <AppFormItem label="Modalidade da Escolha" style={agendaFormStyles.formItemNoMargin}>
               <Controller
                 name="tipoEscolha"
                 control={control}
@@ -117,11 +144,11 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                   {getErrorMessage(formErrors.tipoEscolha)}
                 </Text>
               )}
-            </Form.Item>
+            </AppFormItem>
           </Col>
           <Col span={6}>
             {watchedFields.tipoEscolha === "PRESENCIAL" ? (
-              <Form.Item label="Retardatário?" style={agendaFormStyles.formItemNoMargin}>
+              <AppFormItem label="Retardatário?" style={agendaFormStyles.formItemNoMargin}>
                 <Checkbox
                   checked={isRetardatario}
                   onChange={(e) => {
@@ -136,7 +163,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                 >
                   Sim
                 </Checkbox>
-              </Form.Item>
+              </AppFormItem>
             ) : (
               <div></div>
             )}
@@ -152,7 +179,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
         {/* Linha única com todos os 4 campos */}
         <Row gutter={16} style={agendaFormStyles.formRowSecond}>
           <Col span={6}>
-            <Form.Item label="*Escolha em" style={agendaFormStyles.formItemNoMargin}>
+            <AppFormItem label="*Escolha em" style={agendaFormStyles.formItemNoMargin}>
               <Controller
                 name="escolhaEm"
                 control={control}
@@ -183,10 +210,10 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                   {getErrorMessage(formErrors.escolhaEm)}
                 </Text>
               )}
-            </Form.Item>
+            </AppFormItem>
           </Col>
           <Col span={6}>
-            <Form.Item label="*Nomeação em" style={agendaFormStyles.formItemNoMargin}>
+            <AppFormItem label="*Nomeação em" style={agendaFormStyles.formItemNoMargin}>
               <Controller
                 name="nomeacaoEm"
                 control={control}
@@ -205,10 +232,10 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                   {getErrorMessage(formErrors.nomeacaoEm)}
                 </Text>
               )}
-            </Form.Item>
+            </AppFormItem>
           </Col>
           <Col span={6}>
-            <Form.Item label="*Candidatos" style={agendaFormStyles.formItemNoMargin}>
+            <AppFormItem label="*Candidatos" style={agendaFormStyles.formItemNoMargin}>
               <Controller
                 name="quantidadeClassificados"
                 control={control}
@@ -240,10 +267,10 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                   {getErrorMessage(formErrors.quantidadeClassificados)}
                 </Text>
               )}
-            </Form.Item>
+            </AppFormItem>
           </Col>
           <Col span={6}>
-            <Form.Item label="*Sessão" style={agendaFormStyles.formItemNoMargin}>
+            <AppFormItem label="*Sessão" style={agendaFormStyles.formItemNoMargin}>
               <Controller
                 name="sessao"
                 control={control}
@@ -263,7 +290,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                   {getErrorMessage(formErrors.sessao)}
                 </Text>
               )}
-            </Form.Item>
+            </AppFormItem>
           </Col>
         </Row>
 
@@ -271,7 +298,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
         <Row gutter={16} align="middle">
           <Col span={6}>
             {watchedFields.tipoEscolha === "PRESENCIAL" ? (
-              <Form.Item label="*Hora da convocação" style={agendaFormStyles.formItemNoMargin}>
+              <AppFormItem label="*Hora da convocação" style={agendaFormStyles.formItemNoMargin}>
                 <Controller
                   name="horaInicio"
                   control={control}
@@ -284,6 +311,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                           placeholder={["Início", "Fim"]}
                           style={agendaFormStyles.timePickerRange}
                           format="HH:mm"
+                          disabledTime={disabledTime}
                           onChange={async (times) => {
                             if (times && times.length === 2) {
                               field.onChange(times[0]);
@@ -319,7 +347,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                     )}
                   </div>
                 )}
-              </Form.Item>
+              </AppFormItem>
             ) : (
               <div></div>
             )}
@@ -331,14 +359,14 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
             {/* Espaço vazio para alinhar com Classificação */}
           </Col>
           <Col span={6} style={agendaFormStyles.addPeriodButtonCol}>
-            <Button 
+            <AppButton
               className="gerenciamento-vagas-btn adicionar-periodo-btn"
               icon={<PlusOutlined style={agendaFormStyles.addPeriodButtonIcon(!isBotaoAdicionarHabilitado())} />}
               disabled={!isBotaoAdicionarHabilitado()}
               onClick={handleAdicionarPeriodo}
             >
               Adicionar período
-            </Button>
+            </AppButton>
           </Col>
         </Row>
       </Form>

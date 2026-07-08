@@ -1,6 +1,7 @@
 export interface IImportacaoHabilitadosFiltros {
   concurso: string | undefined;
   arquivo: File | null;
+  observacao?: string;
 }
 
 export interface IUltimaImportacaoHabilitados {
@@ -13,4 +14,5 @@ export interface IImportacaoHabilitadosPayload {
   concurso_uuid: string;
   arquivo: File;
   tipo: string;
+  observacao?: string;
 }

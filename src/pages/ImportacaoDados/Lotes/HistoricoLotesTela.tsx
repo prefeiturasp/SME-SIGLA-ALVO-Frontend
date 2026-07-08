@@ -2,23 +2,18 @@ import React, { useState } from "react";
 import { Row, Col, Typography, Space, Tooltip, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import { WarningOutlined, EyeOutlined } from "@ant-design/icons";
+import { WarningOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import {
-  TabContentContainer,
-  SectionCard,
-  ActionButtonsContainer,
-  SecondaryButton,
-  StyledTable,
-} from "../../../components/EstilosCompartilhados";
-import { CustomTitle } from "../Vagas/components/style";
+
 import { useImportacaoDadosLotes } from "./hooks/useImportacaoDadosLotes";
 import ErroLotesModal from "./components/ErroLotesModal";
 import DetalhesLotesModal from "./components/DetalhesLotesModal";
 import type { IImportacaoLotesResponse, IDetalheLoteAtualizado } from "./hooks/types";
+import { formatarStatusImportacao } from "../utils/statusImportacao";
 
+import { ViewActionIcon, AppButton, CustomTitle, TabContentContainer, SectionCard, ActionButtonsContainer, StyledTable } from '@/components/ui';
 const { Text } = Typography;
 
 const statusColor: Record<string, string> = {
@@ -94,7 +89,7 @@ const HistoricoLotesTela: React.FC = () => {
       key: "status",
       align: "center",
       render: (status: string) => (
-        <Tag color={statusColor[status] || "default"}>{status || "-"}</Tag>
+        <Tag color={statusColor[status] || "default"}>{formatarStatusImportacao(status)}</Tag>
       ),
     },
     {
@@ -113,8 +108,8 @@ const HistoricoLotesTela: React.FC = () => {
         <Space size="small">
           {record.status === "CONCLUIDO" && (
             <Tooltip title="Visualizar detalhes da importação">
-              <EyeOutlined
-                style={{ cursor: "pointer", fontSize: "18px", color: "#1890ff" }}
+              <ViewActionIcon
+                style={{ cursor: "pointer" }}
                 onClick={() => handleOpenDetalhesModal(record)}
               />
             </Tooltip>
@@ -171,9 +166,9 @@ const HistoricoLotesTela: React.FC = () => {
 
         <ActionButtonsContainer>
           <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
-            <SecondaryButton size="large" onClick={() => navigate('/processos/importacao-dados', { state: { tipo: 'LOTES' } })}>
+            <AppButton variant="secondary" size="large" onClick={() => navigate('/processos/importacao-dados', { state: { tipo: 'LOTES' } })}>
               Voltar
-            </SecondaryButton>
+            </AppButton>
           </div>
         </ActionButtonsContainer>
 

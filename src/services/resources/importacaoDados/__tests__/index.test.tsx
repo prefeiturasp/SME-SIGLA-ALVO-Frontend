@@ -28,7 +28,7 @@ import type {
   IUltimasImportacoesVagas,
   IErroImportacaoResposta,
 } from '../IImportacaoArquivos';
-import type { IImportacaoVagasPayload } from '../../../../pages/Processos/ImportacaoDados/Vagas/hooks/types';
+import type { IImportacaoVagasPayload } from "../../../services/resources/importacaoDados/IImportacaoArquivos";
 import queryParamsSerializer from '../../../../utils/queryParamsSerializer';
 
 describe('ImportacaoDados Service', () => {

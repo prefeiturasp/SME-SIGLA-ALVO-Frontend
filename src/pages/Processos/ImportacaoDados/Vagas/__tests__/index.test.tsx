@@ -33,7 +33,7 @@ jest.mock('@mui/icons-material/CalendarMonthRounded', () => () => <div data-test
 jest.mock('@mui/icons-material/UploadFile', () => () => <div data-testid="upload-icon" />);
 jest.mock('@mui/icons-material/ExpandMore', () => () => <div data-testid="expand-icon" />);
 
-jest.mock('../../../../../components/EstilosCompartilhados', () => ({
+jest.mock('@/components/ui', () => ({
   TabContentContainer: ({ children }: { children: React.ReactNode }) => <div data-testid="tab-content-container">{children}</div>,
   SectionCard: ({ children }: { children: React.ReactNode }) => <div data-testid="section-card">{children}</div>,
   SectionTitle: ({ children }: { children: React.ReactNode }) => <div data-testid="section-title">{children}</div>,
@@ -41,14 +41,14 @@ jest.mock('../../../../../components/EstilosCompartilhados', () => ({
   UploadArea: ({ children }: { children: React.ReactNode }) => <div data-testid="upload-area">{children}</div>,
   StyledUpload: ({ children, beforeUpload }: any) => <div data-testid="styled-upload" onClick={() => beforeUpload?.(new File(['test'], 'test.csv', { type: 'text/csv' }))}>{children}</div>,
   ActionButtonsContainer: ({ children }: { children: React.ReactNode }) => <div data-testid="action-buttons-container">{children}</div>,
-}));
-
-jest.mock('../../../../../components/FormStyle', () => ({
-  CustomFormItem: ({ children, label, validateStatus, help }: any) => (
+  AppFormItem: ({ children, label, validateStatus, help }: any) => (
     <div data-testid="custom-form-item" data-validate-status={validateStatus}>
       {label && <label>{label}</label>}{children}{help && <span data-testid="form-help">{help}</span>}
     </div>
   ),
+  AppButton: ({ children, onClick, disabled, variant }: any) => (
+    <button type="button" onClick={onClick} disabled={disabled}>{children}</button>
+  )
 }));
 
 jest.mock('../../../../../services', () => ({ 

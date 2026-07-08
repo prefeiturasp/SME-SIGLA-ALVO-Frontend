@@ -9,20 +9,20 @@ import {
   LoginCard,
   StyledForm,
   FormField,
-  FieldLabel,
-  ErrorMessage,
+  LoginFieldLabel as FieldLabel,
+  LoginErrorMessage as ErrorMessage,
   StyledButton,
   PrefLogoContainer,
   PrefLogoImage,
   StyledTitle,
-  StyledText,
+  LoginText as StyledText,
   StyledAlert,
   StyledTooltipIcon,
   BackToLoginButton,
   ImportantNoticeContainer,
   ImportantText,
   NoticeText,
-} from "./style";
+} from "@/design-system/estilos";
 
 const EsqueceuSenhaTela: React.FC = () => {
   const {

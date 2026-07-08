@@ -19,7 +19,7 @@ import {
   IndicatorVariationPill,
   IndicatorYearBox,
   IndicatorYearLabel,
-} from "../styles";
+} from "@/components/ui";
 
 export type IndicadorCardComparativoProps = {
   icon: React.ReactNode;

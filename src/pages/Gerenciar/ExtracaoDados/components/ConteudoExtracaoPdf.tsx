@@ -8,10 +8,8 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
-import {
-  TextTitulo,
-  TextTituloSecundario,
-} from "../../../../components/EstilosCompartilhados";
+
+import { TextTitulo, TextTituloSecundario } from '@/components/ui';
 import type {
   IExtracaoDadosIndicadores,
   IExtracaoDadosIndicadoresComparativo,
@@ -34,7 +32,7 @@ import GraficoBarrasDreComparativo from "./GraficoBarrasDreComparativo";
 import TabelaVagasDre from "./TabelaVagasDre";
 import RelatoriosDetalhados from "./RelatoriosDetalhados";
 import AutorizacoesPublicadas from "./AutorizacoesPublicadas";
-import { IndicatorsCard, PdfHeader } from "../styles";
+import { IndicatorsCard, PdfHeader } from "@/components/ui";
 
 type ConteudoExtracaoPdfPropsBase = {
   relatoriosDetalhados: RelatorioDetalhadoItem[];

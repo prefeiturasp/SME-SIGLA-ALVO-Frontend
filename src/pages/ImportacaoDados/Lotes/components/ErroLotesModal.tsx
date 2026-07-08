@@ -1,6 +1,12 @@
 import React from "react";
-import { Modal, Typography, Col, Button } from "antd";
-import { StyledRow, StyledTextArea, ErroContainer, ButtonsContainer } from "../../Vagas/components/style";
+import { Modal, Typography, Col } from "antd";
+import { AppButton } from '@/components/ui';
+import {
+  ErrorModalRow as StyledRow,
+  ErrorModalTextArea as StyledTextArea,
+  ErrorModalContainer as ErroContainer,
+  ErrorModalButtonsContainer as ButtonsContainer,
+} from "@/components/ui";
 
 interface ErroLotesModalProps {
   open: boolean;
@@ -48,7 +54,7 @@ const ErroLotesModal: React.FC<ErroLotesModalProps> = ({ open, onClose, importac
         </Col>
       </StyledRow>
       <ButtonsContainer>
-        <Button onClick={onClose}>Fechar</Button>
+        <AppButton variant="secondary" onClick={onClose}>Fechar</AppButton>
       </ButtonsContainer>
     </Modal>
   );

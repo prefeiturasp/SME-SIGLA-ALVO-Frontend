@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Card, Row, Col, message, Spin, App } from "antd";
-import { ModalSaveButton } from "../../../EscolhaCandidatos/styles";
+import { AppButton } from '@/components/ui';
 import { getParametrizacaoCandidatos } from "../hooks/getParametrizacaoCandidatos";
 import { patchParametrizacaoCandidatos } from "../hooks/patchParametrizacaoCandidatos";
 import {
   StyledCustomFormItem,
   StyledInputNumber,
-  ButtonContainer,
-  ErrorMessage,
-} from "../styles";
+  ParametrosButtonContainer,
+  ParametrosErrorMessage as ErrorMessage,
+} from "@/design-system/estilos";
 
 const AbaConvocacao: React.FC<{ 
   canAddParametrizacao: boolean }> = ({ canAddParametrizacao }) => {
@@ -191,17 +191,17 @@ const AbaConvocacao: React.FC<{
       )}
 
       {/* Botão Salvar */}
-      <ButtonContainer>
-        <ModalSaveButton
+      <ParametrosButtonContainer>
+        <AppButton
+          variant="primary"
           size="large"
-          type="primary"
           onClick={handleSalvar}
           loading={isSaving}
           disabled={isSomaInvalida || !canAddParametrizacao}
         >
           Salvar
-        </ModalSaveButton>
-      </ButtonContainer>
+        </AppButton>
+      </ParametrosButtonContainer>
     </Card>
   );
 };

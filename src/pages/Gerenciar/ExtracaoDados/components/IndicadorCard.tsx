@@ -7,7 +7,7 @@ import {
   IndicatorIcon,
   IndicatorValue,
   IndicatorValueBox,
-} from "../styles";
+} from "@/components/ui";
 import { formatValorNumerico } from "../utils/formatValorIndicador";
 
 export type IndicadorBreakdownItem = {

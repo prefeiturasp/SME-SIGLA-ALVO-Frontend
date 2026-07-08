@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Typography, Button, Spin, Divider, Select, Input, Row, Col, Checkbox, message } from 'antd';
+import { Modal, Typography, Spin, Divider, Select, Input, Checkbox, message } from 'antd';
+import { AppButton, AppFormItem, FilterActionSlot, FilterInlineRow, FilterFieldCol, FilterActionCol } from '@/components/ui';
 import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
-import { 
-  ModalTitle, 
-  ButtonContainer
-} from '../../Processos/NovaConvocacaoCandidatos/styles';
-import { modalStyles, modalInlineStyles, GlobalStyles } from '../../CriarEditarConvocacao/SelecaoCargos/styles';
+import { ModalTitle, ModalActionButtonContainer as ButtonContainer } from "@/components/ui";
+import { modalStyles, modalInlineStyles, BuscarCandidatosGlobalStyles } from "@/components/ui";
 import { Table } from 'antd';
 import { useGetDREs } from '../hooks/useGetDREs';
 import { useGetEscolasPorDre } from '../hooks/useGetEscolasPorDre';
@@ -391,7 +389,7 @@ const IncluirEscolasModal: React.FC<IncluirEscolasModalProps> = ({
 
   return (
     <>
-      <GlobalStyles />
+      <BuscarCandidatosGlobalStyles />
       <style>
         {`
           .centered-placeholder::placeholder {
@@ -462,12 +460,10 @@ const IncluirEscolasModal: React.FC<IncluirEscolasModalProps> = ({
         </div>
 
         {/* Seção de filtros */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <Row gutter={[16, 0]}>
-            <Col span={10}>
-                <div style={{ marginBottom: '0rem', marginTop: '1.5rem' }}>
-                  <Text strong style={{ fontSize: '14px', color: '#515151' }}>DRE</Text>
-                </div>
+        <div style={{ marginBottom: '1.5rem', marginTop: '1.5rem' }}>
+          <FilterInlineRow gutter={[16, 8]}>
+            <FilterFieldCol xs={24} md={12}>
+              <AppFormItem label="DRE" labelCol={{ span: 24 }}>
                 <Select
                   placeholder="Selecione uma DRE"
                   value={dreSelecionada}
@@ -479,40 +475,38 @@ const IncluirEscolasModal: React.FC<IncluirEscolasModalProps> = ({
                     setEnabledBuscaEscolas(false);
                     setMostrarTabelaEscolas(false);
                   }}
-                  style={{ width: '100%', height: '45px', marginTop: '0.5rem' }}
+                  style={{ width: '100%' }}
                   allowClear
                   loading={dresLoading}
                   options={opcoesDre}
                 />
-            </Col>
-            <Col span={10}>
-               <div style={{ marginBottom: '0rem', marginTop: '1.5rem' }}>
-                 <Text strong style={{ fontSize: '14px', color: '#515151' }}>Escola</Text>
-               </div>
-              <Input
-                placeholder="Es."
-                value={escolaFiltro}
-                onChange={(e) => {
-                  setEscolaFiltro(e.target.value);
-                  handleBuscarEscolasConformeDigita(e.target.value);
-                }}
-                style={{ width: '100%', height: '45px', marginTop: '0.5rem' }}
-              />
-            </Col>
-            <Col span={4}>
-              <div style={{ marginTop: '3.6rem' }}>
-                <Button
-                  className="modal-buscar-btn modal-action-btn"
-                  size="large"
+              </AppFormItem>
+            </FilterFieldCol>
+            <FilterFieldCol xs={24} md={12}>
+              <AppFormItem label="Escola" labelCol={{ span: 24 }}>
+                <Input
+                  placeholder="Es."
+                  value={escolaFiltro}
+                  onChange={(e) => {
+                    setEscolaFiltro(e.target.value);
+                    handleBuscarEscolasConformeDigita(e.target.value);
+                  }}
+                  style={{ width: '100%' }}
+                />
+              </AppFormItem>
+            </FilterFieldCol>
+            <FilterActionCol xs={24} md={4}>
+              <FilterActionSlot>
+                <AppButton
                   icon={<SearchOutlined />}
                   onClick={handleBuscar}
-                  style={{ width: '100%', height: '32px' }}
+                  style={{ width: '100%' }}
                 >
                   Buscar
-                </Button>
-              </div>
-            </Col>
-          </Row>
+                </AppButton>
+              </FilterActionSlot>
+            </FilterActionCol>
+          </FilterInlineRow>
         </div>
 
         <ButtonContainer>
@@ -579,22 +573,12 @@ const IncluirEscolasModal: React.FC<IncluirEscolasModalProps> = ({
           <Divider style={modalInlineStyles.finalDivider} />
 
           <div style={modalInlineStyles.finalButtonsContainer}>
-            <Button
-              onClick={onClose}
-              size="large"
-              className="modal-action-btn modal-cancel-btn"
-              style={modalInlineStyles.cancelButton}
-            >
-              <span className="modal-cancel-label">Cancelar</span>
-            </Button>
-            <Button
-              type="primary"
-              size="large"
-              className="modal-action-btn modal-adicionar-btn"
-              onClick={handleSalvarInclusaoEscola}
-            >
-              <span className="modal-adicionar-label">Salvar</span>
-            </Button>
+            <AppButton variant="secondary" onClick={onClose}>
+              Cancelar
+            </AppButton>
+            <AppButton onClick={handleSalvarInclusaoEscola}>
+              Salvar
+            </AppButton>
           </div>
         </ButtonContainer>
               </div>

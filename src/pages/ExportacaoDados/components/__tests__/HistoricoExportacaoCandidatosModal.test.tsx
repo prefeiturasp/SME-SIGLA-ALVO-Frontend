@@ -34,7 +34,10 @@ jest.mock("../../hooks/useExportacaoCandidatos", () => ({
   })),
 }));
 
-jest.mock("../../../../components/EstilosCompartilhados", () => ({
+jest.mock("@/components/ui", () => ({
+  AppIconButton: ({ onClick, "aria-label": ariaLabel, icon }: any) => (
+    <button type="button" onClick={onClick} aria-label={ariaLabel}>{icon}</button>
+  ),
   StyledTable: ({ columns, dataSource, rowClassName, ...props }: any) => (
     <table data-testid="styled-table" {...props}>
       <thead>

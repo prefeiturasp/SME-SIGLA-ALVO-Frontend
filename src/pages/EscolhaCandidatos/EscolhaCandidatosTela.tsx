@@ -30,16 +30,22 @@ import {
   StyledCardNNA,
   StyledCardPCD,
   commonStyles as selecaoCommonStyles,
-  GlobalStyles as SelecaoGlobalStyles,
-} from "../CriarEditarConvocacao/SelecaoCargos/styles";
+  AgendaGlobalStyles as SelecaoGlobalStyles,
+} from "@/design-system/estilos";
+import {
+  CardsWrapper,
+  SituacaoFiltersRow,
+  SituacaoCheckboxWrapper,
+  ButtonActionsWrapper,
+} from "@/components/ui";
 import {
   FilterSelect,
   FilterButton,
   ContentWrapper,
   FiltersRow,
   FiltersCard,
-  FilterLabel,
-  ButtonCol,
+  AppFormItem,
+  FormLabel,
   EmptyStateCard,
   EmptyStateContent,
   EmptyStateImage,
@@ -47,16 +53,11 @@ import {
   EmptyStateDescription,
   ResultsCard,
   ResultsContent,
-  CardsWrapper,
-  SituacaoFiltersRow,
-  SituacaoCheckboxWrapper,
-  ButtonActionsWrapper,
-} from "./styles";
+} from "@/components/ui";
 import {
-  FieldLabel as ConvocacaoFieldLabel,
   SearchButton as ConvocacaoSearchButton,
   ClearButton as ConvocacaoClearButton,
-} from "../Processos/ConvocacaoCandidatos/style";
+} from "@/components/ui";
 import type {
   IEscolhaCandidato,
   SituacaoEscolha,
@@ -1293,51 +1294,55 @@ const EscolhaCandidatosTela: React.FC = () => {
       <BaseTela breadcrumbItems={breadcrumbItems} title="Escolha de Candidato">
       <ContentWrapper>
         <FiltersCard>
-          <FiltersRow gutter={[24, 16]} align="bottom">
-            <Col xs={24} sm={12} md={11} lg={11} xl={11}>
-              <FilterLabel>Processo</FilterLabel>
-              <FilterSelect
-                value={selectedProcesso}
-                placeholder="Selecione um processo"
-                allowClear
-                loading={processosConvocacaoOptionsIsLoading}
-                onChange={(value, option) =>
-                  handleProcessoChange(value as string | undefined, option)
-                }
-                onClear={() => handleProcessoChange(undefined, null)}
-                options={processosOptions}
-                showSearch
-                optionFilterProp="label"
-                filterOption={filterOptionByLabel}
-              />
+          <FiltersRow gutter={[24, 16]} wrap={false}>
+            <Col flex="1 1 0" style={{ minWidth: 0 }}>
+              <AppFormItem label="Processo" labelCol={{ span: 24 }}>
+                <FilterSelect
+                  value={selectedProcesso}
+                  placeholder="Selecione um processo"
+                  allowClear
+                  loading={processosConvocacaoOptionsIsLoading}
+                  onChange={(value, option) =>
+                    handleProcessoChange(value as string | undefined, option)
+                  }
+                  onClear={() => handleProcessoChange(undefined, null)}
+                  options={processosOptions}
+                  showSearch
+                  optionFilterProp="label"
+                  filterOption={filterOptionByLabel}
+                />
+              </AppFormItem>
             </Col>
-            <Col xs={24} sm={12} md={10} lg={10} xl={10}>
-              <FilterLabel>Período da agenda</FilterLabel>
-              <FilterSelect
-                value={selectedAgenda}
-                placeholder="Selecione um período"
-                allowClear
-                loading={agendasIsLoading}
-                disabled={!selectedProcesso || agendasList.length === 0}
-                onChange={(value) => handleAgendaChange(value as string | undefined)}
-                onClear={() => handleAgendaChange(undefined)}
-                options={agendasOptions}
-                showSearch
-                optionFilterProp="label"
-                filterOption={filterOptionByLabel}
-              />
+            <Col flex="1 1 0" style={{ minWidth: 0 }}>
+              <AppFormItem label="Período da agenda" labelCol={{ span: 24 }}>
+                <FilterSelect
+                  value={selectedAgenda}
+                  placeholder="Selecione um período"
+                  allowClear
+                  loading={agendasIsLoading}
+                  disabled={!selectedProcesso || agendasList.length === 0}
+                  onChange={(value) => handleAgendaChange(value as string | undefined)}
+                  onClear={() => handleAgendaChange(undefined)}
+                  options={agendasOptions}
+                  showSearch
+                  optionFilterProp="label"
+                  filterOption={filterOptionByLabel}
+                />
+              </AppFormItem>
             </Col>
-            <ButtonCol xs={24} sm={24} md={3} lg={3} xl={3}>
-              <FilterButton
-                type="primary"
-                size="large"
-                onClick={handleLoadCandidatos}
-                loading={isFetchingCandidatos && hasSearched}
-                disabled={isCarregarDisabled}
-              >
-                Carregar processo
-              </FilterButton>
-            </ButtonCol>
+            <Col flex="0 0 auto">
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <FilterButton
+                  type="primary"
+                  size="large"
+                  onClick={handleLoadCandidatos}
+                  loading={isFetchingCandidatos && hasSearched}
+                  disabled={isCarregarDisabled}
+                >
+                  Carregar processo
+                </FilterButton>
+              </div>
+            </Col>
           </FiltersRow>
         </FiltersCard>
 
@@ -1396,7 +1401,7 @@ const EscolhaCandidatosTela: React.FC = () => {
               <SituacaoFiltersRow align="middle" justify="space-between">
                 <Col flex="auto">
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <ConvocacaoFieldLabel>Situação</ConvocacaoFieldLabel>
+                    <FormLabel>Situação</FormLabel>
                     <SituacaoCheckboxWrapper>
                     <Checkbox
                       checked={situacaoTodosChecked}

@@ -1,8 +1,9 @@
 import React from "react";
-import { Typography, Card, Row, Col, Button } from "antd";
+import { Typography, Card, Row, Col } from "antd";
 
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
+import { AppButton, BuscaProcessosTitle } from '@/components/ui';
 
 import FormPrincipal from "./components/FormPrincipal";
 import Cargo from "./components/Cargo";
@@ -10,14 +11,10 @@ import AgendaTela from "./components/Agenda/AgendaTela";
 import { useNovaConvocacaoCandidatos } from "./hooks/useNovaConvocacaoCandidatos";
 import {
   breadcrumbItemStyle,
-  mainCardStyle,
-  buscaProcessosTitleStyle,
   buttonsRowStyle,
   viewModeButtonsContainerStyle,
-  voltarButtonStyle,
-  voltarButtonHoverStyle,
-  voltarButtonLeaveStyle
-} from "./styles";
+} from "@/components/ui";
+import { mainCardStyle } from "@/components/ui";
  
 const { Text } = Typography;
 
@@ -88,9 +85,7 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
       title="Processo de convocação de candidatos"
     >
       <Card style={mainCardStyle}>
-        <Typography.Title level={4} style={buscaProcessosTitleStyle}>
-          Busca Processos
-        </Typography.Title>
+        <BuscaProcessosTitle>Busca Processos</BuscaProcessosTitle>
         <FormPrincipal
           control={control}
           concursosData={concursosData}
@@ -132,43 +127,36 @@ export const NovaConvocacaoCandidatosTela: React.FC = () => {
       {!isViewMode && (
         <Row justify="end" gutter={16} style={buttonsRowStyle}>
           <Col>
-            <Button 
-              type="primary" 
-              ghost 
+            <AppButton
+              variant="secondary"
               size="large"
               onClick={() => navigate('/processos/convocacao')}
             >
               Cancelar
-            </Button>
+            </AppButton>
           </Col>
           <Col>
-            <Button 
-              type="primary" 
+            <AppButton
+              variant="primary"
               size="large"
               onClick={handleSubmit(handleSub)}
               loading={postProcessoConvocacaoMutation.isPending}
             >
               Salvar
-            </Button>
+            </AppButton>
           </Col>
         </Row>
       )}
 
       {isViewMode && (
         <div style={viewModeButtonsContainerStyle}>
-          <Button
+          <AppButton
+            variant="secondary"
             size="large"
             onClick={() => navigate(-1)}
-            style={voltarButtonStyle}
-            onMouseEnter={(e) => {
-              Object.assign(e.currentTarget.style, voltarButtonHoverStyle);
-            }}
-            onMouseLeave={(e) => {
-              Object.assign(e.currentTarget.style, voltarButtonLeaveStyle);
-            }}
           >
             Voltar
-          </Button>
+          </AppButton>
         </div>
       )}
     </BaseTela>

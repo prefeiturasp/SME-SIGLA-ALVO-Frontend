@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Progress, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { TextTitulo, TextTituloSecundario } from "../../../../components/EstilosCompartilhados";
+import { TextTitulo, TextTituloSecundario } from '@/components/ui';
 import type {
   TabelaVagasDreComparativoItem,
   TabelaVagasDreItem,
@@ -12,7 +12,7 @@ import {
   PercentualCell,
   TableCard,
   VagasDreTable,
-} from "../styles";
+} from "@/components/ui";
 
 type TabelaVagasDreProps = {
   data?: TabelaVagasDreItem[];

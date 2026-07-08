@@ -6,19 +6,14 @@ import { WarningOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import {
-  TabContentContainer,
-  SectionCard,
-  ActionButtonsContainer,
-  SecondaryButton,
-  StyledTable,
-} from "../../../components/EstilosCompartilhados";
 
-import { CustomTitle } from "../Vagas/components/style";
 import { useImportacaoDados } from "./hooks/useImportacaoDadosHabilitados";
 import ErroModal from "./components/ErroModal";
+import DetalhesHabilitadosModal from "./components/DetalhesHabilitadosModal";
 import { useGetDownloadError, TipoImportacao } from "../hooks/useGetDownloadError";
+import { formatarStatusImportacao } from "../utils/statusImportacao";
 
+import { TabContentContainer, SectionCard, ActionButtonsContainer, StyledTable, AppButton, CustomTitle, ViewActionIcon } from '@/components/ui';
 const { Text } = Typography;
 
 const HistoricoHabilitadosTela: React.FC = () => {
@@ -37,6 +32,7 @@ const HistoricoHabilitadosTela: React.FC = () => {
   } = useImportacaoDados();
 
   const [isErrosModalOpen, setIsErrosModalOpen] = useState(false);
+  const [isDetalhesModalOpen, setIsDetalhesModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null);
   const [tablePagination, setTablePagination] = useState({
     current: 1,
@@ -55,6 +51,16 @@ const HistoricoHabilitadosTela: React.FC = () => {
     setSelectedRecord(null);
   };
 
+  const handleOpenDetalhesModal = (record: any) => {
+    setSelectedRecord(record);
+    setIsDetalhesModalOpen(true);
+  };
+
+  const handleCloseDetalhesModal = () => {
+    setIsDetalhesModalOpen(false);
+    setSelectedRecord(null);
+  };
+
   const handleDownloadClick = () => {
     if (selectedRecord?.uuid) {
       handleDownload(selectedRecord.uuid);
@@ -65,11 +71,12 @@ const HistoricoHabilitadosTela: React.FC = () => {
 
   const columns: ColumnsType<any> = [
     {
-      title: "Data",
+      title: "Data e Hora",
       dataIndex: "criado_em",
       key: "criado_em",
       align: "center",
-      render: (text: string) => (text ? dayjs(text).format("DD/MM/YYYY") : "-"),
+      render: (text: string) =>
+        text ? dayjs(text).format("DD/MM/YYYY HH:mm") : "-",
     },
     {
       title: "Concurso",
@@ -86,11 +93,18 @@ const HistoricoHabilitadosTela: React.FC = () => {
       render: (text: string) => text || "-",
     },
     {
+      title: "Quantidade",
+      dataIndex: "quantidade",
+      key: "quantidade",
+      align: "center",
+      render: (quantidade: number | null) => quantidade ?? "-",
+    },
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
       align: "center",
-      render: (status: string) => status || "-",
+      render: (status: string) => formatarStatusImportacao(status),
     },
     {
       width: "12%",
@@ -99,7 +113,15 @@ const HistoricoHabilitadosTela: React.FC = () => {
       key: "x",
       align: "center",
       render: (_, record) => (
-        <Space size="small">
+        <Space size="middle">
+          {record.status !== "ERRO" && (
+            <Tooltip title="Ver detalhes da importação">
+              <ViewActionIcon
+                style={{ cursor: "pointer" }}
+                onClick={() => handleOpenDetalhesModal(record)}
+              />
+            </Tooltip>
+          )}
           {record.status === "ERRO" && (
             <Tooltip title="Importação com erro, clique para visualizar">
               <WarningOutlined
@@ -167,9 +189,9 @@ const HistoricoHabilitadosTela: React.FC = () => {
               gap: "1rem",
             }}
           >
-            <SecondaryButton size="large" onClick={() => navigate('/processos/importacao-dados', { state: { tipo: 'HABILITADOS' } })}>
+            <AppButton variant="secondary" size="large" onClick={() => navigate('/processos/importacao-dados', { state: { tipo: 'HABILITADOS' } })}>
               Voltar
-            </SecondaryButton>
+            </AppButton>
           </div>
         </ActionButtonsContainer>
 
@@ -180,6 +202,12 @@ const HistoricoHabilitadosTela: React.FC = () => {
           importacaoErro={importacaoErro}
           onDownload={handleDownloadClick}
           isDownloading={isDownloading}
+        />
+
+        <DetalhesHabilitadosModal
+          open={isDetalhesModalOpen}
+          onClose={handleCloseDetalhesModal}
+          record={selectedRecord}
         />
       </TabContentContainer>
     </BaseTela>

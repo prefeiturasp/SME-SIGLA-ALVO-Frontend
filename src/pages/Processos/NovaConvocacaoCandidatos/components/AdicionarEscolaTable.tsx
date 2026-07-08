@@ -1,24 +1,20 @@
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import CheckIcon from "@mui/icons-material/Check";
 import React, { useState } from "react";
 import type { TableProps } from "antd";
 import {
-  Button,
   Flex,
   InputNumber,
   Popconfirm,
   Space,
   Table,
   Typography,
-  Tooltip,
 } from "antd";
 import type { TableColumnsType } from "antd";
 import { Controller, useForm } from "react-hook-form";
-import { useTheme } from "styled-components";
 import type { IUnidadeEscolar } from "../../../../services/resources/convocacao/IConvocacao";
-import { StyledTable } from "../../../../components/EstilosCompartilhados";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 
+import { StyledTable, EditActionIcon, editableTableStyles, AppIconButton } from '@/components/ui';
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: keyof IUnidadeEscolar;
@@ -95,8 +91,6 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
   const [data, setData] = useState<IUnidadeEscolar[]>(initialData);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [editingKey, setEditingKey] = useState("");
-  const theme = useTheme();
-
   const isEditing = (record: IUnidadeEscolar) => record.uuid === editingKey;
 
   const edit = (record: IUnidadeEscolar) => setEditingKey(record.uuid);
@@ -136,37 +130,30 @@ const AdicionarEscolaTable: React.FC<AdicionarEscolaTableProps> = ({
       render: (_: any, record: IUnidadeEscolar) => {
         const editable = isEditing(record);
         return editable ? (
-          <div style={{ width: 56, display: "flex", justifyContent: "center", gap: 2 }}>
-            <Tooltip title="Salvar">
-              <Button
-                type="link"
-                onClick={() => save(record.uuid)}
-                icon={<CheckOutlined style={{ color: theme.token.colorPrimary }} />}
-              />
-            </Tooltip>
-            <Tooltip title="Cancelar">
-              <Button
-                type="link"
-                onClick={cancel}
-                icon={<CloseOutlined style={{ color: "#ff4d4f" }} />}
-              />
-            </Tooltip>
+          <div style={editableTableStyles.actionsCell}>
+            <AppIconButton
+              type="link"
+              tooltip="Salvar"
+              onClick={() => save(record.uuid)}
+              icon={<CheckOutlined style={editableTableStyles.saveIcon} />}
+            />
+            <AppIconButton
+              type="link"
+              tooltip="Cancelar"
+              onClick={cancel}
+              icon={<CloseOutlined style={editableTableStyles.cancelIcon} />}
+            />
           </div>
         ) : (
-          <div style={{ width: 56, display: "flex", justifyContent: "center", gap: 2 }}>
-            <Tooltip title="Editar vagas">
-              <Button
-                type="link"
-                disabled={editingKey !== ""}
-                onClick={() => edit(record)}
-                icon={
-                  <ModeEditOutlineOutlinedIcon
-                    style={{ color: theme.token.colorPrimary }}
-                  />
-                }
-              />
-            </Tooltip>
-            <Button type="link" style={{ visibility: "hidden" }} icon={<CloseOutlined />} />
+          <div style={editableTableStyles.actionsCell}>
+            <AppIconButton
+              type="link"
+              tooltip="Editar"
+              disabled={editingKey !== ""}
+              onClick={() => edit(record)}
+              icon={<EditActionIcon />}
+            />
+            <AppIconButton type="link" style={{ visibility: "hidden" }} icon={<CloseOutlined />} />
           </div>
         );
       },

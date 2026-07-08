@@ -24,7 +24,7 @@ export const useGetExtracaoDados = (
         { signal }
       ).response as Promise<IExtracaoDadosResponse>,
     enabled: enabled && Boolean(concursoUuid) && Boolean(anos?.length),
-    staleTime: 1000 * 60 * 2,
+    staleTime: 0,
     retry: 1,
   });
 

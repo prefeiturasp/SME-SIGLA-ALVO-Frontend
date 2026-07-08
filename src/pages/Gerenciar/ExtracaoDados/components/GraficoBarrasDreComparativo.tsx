@@ -1,13 +1,13 @@
 import React, { useMemo } from "react";
 import { Bar } from "@ant-design/charts";
-import { TextTitulo, TextTituloSecundario } from "../../../../components/EstilosCompartilhados";
+import { TextTitulo, TextTituloSecundario } from '@/components/ui';
 import type {
   DreComparativoResumo,
   DreGraficoComparativoItem,
 } from "../utils/mapGraficosDre";
 import { obterResumoComparativoPorTitulo } from "../utils/mapGraficosDre";
 import { renderTooltipGraficoComparativo } from "../utils/renderTooltipGraficoComparativo";
-import { ChartCard, ChartContainer } from "../styles";
+import { ChartCard, ChartContainer } from "@/components/ui";
 
 export type LayoutBarrasComparativo = "agrupado" | "empilhado";
 

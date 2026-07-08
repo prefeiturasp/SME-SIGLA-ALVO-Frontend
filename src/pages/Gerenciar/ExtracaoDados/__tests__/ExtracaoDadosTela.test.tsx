@@ -14,13 +14,15 @@ const mockConcursosOptions = concursosOptionsMock;
 const mockExtracaoDadosTodos = extracaoDadosTodosMock;
 const mockExtracaoDadosFiltrado = extracaoDadosFiltradoMock;
 
-jest.mock("../../../../components/EstilosCompartilhados", () => {
-  const actual = jest.requireActual("../../../../components/EstilosCompartilhados");
+jest.mock("@/components/ui", () => {
+  const actual = jest.requireActual("@/components/ui");
   const { createMockStyledSelect } = jest.requireActual("../testHelpers/testMocks");
+  const MockSelect = createMockStyledSelect();
 
   return {
     ...actual,
-    StyledSelect: createMockStyledSelect(),
+    StyledSelect: MockSelect,
+    FilterSelectMulti: MockSelect,
   };
 });
 
@@ -101,7 +103,7 @@ describe("ExtracaoDadosTela", () => {
   });
 
   it("desabilita Filtrar até selecionar concurso e ano", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderTela();
 
     const getFiltrarButton = () => screen.getAllByRole("button", { name: /filtrar/i })[0];
@@ -118,7 +120,7 @@ describe("ExtracaoDadosTela", () => {
   });
 
   it("aplica filtro e atualiza indicadores; limpar filtros restaura visão consolidada", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderTela();
 
     await user.selectOptions(screen.getByLabelText("Selecione o concurso"), "uuid-concurso-1");

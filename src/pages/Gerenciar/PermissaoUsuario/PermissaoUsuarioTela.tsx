@@ -1,17 +1,19 @@
 import React from "react";
-import { Col, Input, Row, Select, Typography, Tooltip, message } from "antd";
+import { Input, Select, Typography, message } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
+
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 
 import { Controller } from "react-hook-form";
-import { CustomFormItem } from "../../../components/FormStyle";
+
 import PermissaoUsuarioTable from "./components/PermissaoUsuarioTable";
 import EditarPermissaoModal from "./components/EditarPermissaoModal";
 import AtivacaoModal from "./components/AtivacaoModal";
 import SucessoModal from "./components/SucessoModal";
+import { AppButton, AppFormItem, FilterInlineRow, FilterFieldCol, FilterActionsGroup } from '@/components/ui';
 import type {
   AtivacaoModalMode,
   AtivacaoModalStep,
@@ -24,14 +26,10 @@ import { patchUsuario } from "./hooks/patchAtualizarPermissoesUsuarios";
 import {
   PageContainer,
   ConteudoPagina,
-  TableContainer,
+  SearchTableContainer as TableContainer,
   FieldLabel,
-  SearchButtonContainer,
   SearchFieldsContainer,
-  ClearButton,
-  SearchButton,
-  ActionButton,
-} from "../../Processos/ConvocacaoCandidatos/style";
+} from "@/components/ui";
 
 const { Text } = Typography;
 
@@ -181,14 +179,14 @@ const PermissaoUsuarioTela: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Gerenciamento de usuários"
         buttons={
-          <ActionButton
-            type="primary"
+          <AppButton
+            variant="primary"
             size="large"
             icon={<UserAddOutlined />}
             onClick={() => navigate("/gerenciar/adicao-usuario")}
           >
             Adicionar usuário
-          </ActionButton>
+          </AppButton>
         }
       >
         <SucessoModal
@@ -261,13 +259,13 @@ const PermissaoUsuarioTela: React.FC = () => {
         />
         <ConteudoPagina>
           <SearchFieldsContainer>
-            <Row gutter={[16, 0]}>
-              <Col xs={24} md={8}>
+            <FilterInlineRow gutter={[16, 8]}>
+              <FilterFieldCol xs={24} md={8}>
                 <Controller
                   control={control}
                   name="login_rf"
                   render={({ field }) => (
-                    <CustomFormItem
+                    <AppFormItem
                       label={<FieldLabel>Login (RF)</FieldLabel>}
                       validateStatus={
                         (formState.errors as any).login_rf ? "error" : undefined
@@ -279,17 +277,17 @@ const PermissaoUsuarioTela: React.FC = () => {
                         {...field}
                         placeholder="Entre com o RF"
                       />
-                    </CustomFormItem>
+                    </AppFormItem>
                   )}
                 />
-              </Col>
+              </FilterFieldCol>
 
-              <Col xs={24} md={8}>
+              <FilterFieldCol xs={24} md={8}>
                 <Controller
                   control={control}
                   name="nome"
                   render={({ field }) => (
-                    <CustomFormItem
+                    <AppFormItem
                       label={<FieldLabel>Nome</FieldLabel>}
                       validateStatus={
                         (formState.errors as any).nome ? "error" : undefined
@@ -302,17 +300,17 @@ const PermissaoUsuarioTela: React.FC = () => {
                         {...field}
                         placeholder="Entre com o nome"
                       />
-                    </CustomFormItem>
+                    </AppFormItem>
                   )}
                 />
-              </Col>
+              </FilterFieldCol>
 
-              <Col xs={24} md={8}>
+              <FilterFieldCol xs={24} md={8}>
                 <Controller
                   control={control}
                   name="permissao_tipo"
                   render={({ field }) => (
-                    <CustomFormItem
+                    <AppFormItem
                       label={<FieldLabel>Permissões</FieldLabel>}
                       validateStatus={
                         (formState.errors as any).permissao_tipo
@@ -331,33 +329,24 @@ const PermissaoUsuarioTela: React.FC = () => {
                         allowClear
                         options={gruposOptions}
                       />
-                    </CustomFormItem>
+                    </AppFormItem>
                   )}
                 />
-              </Col>
-            </Row>
+              </FilterFieldCol>
 
-            <Row gutter={[16, 8]} align="middle">
-              <Col xs={24} md={24}>
-                <SearchButtonContainer style={{ marginTop: 30 }}>
-                  <Tooltip title="Limpar filtros" arrow={true}>
-                    <ClearButton size="large" onClick={handleReset}>
-                      Limpar filtros
-                    </ClearButton>
-                  </Tooltip>
-
-                  <Tooltip title="Buscar processos" arrow={true}>
-                    <SearchButton
-                      size="large"
-                      type="primary"
-                      onClick={handleSubmit(handleSub as any)}
-                    >
-                      Buscar
-                    </SearchButton>
-                  </Tooltip>
-                </SearchButtonContainer>
-              </Col>
-            </Row>
+            </FilterInlineRow>
+            <FilterInlineRow gutter={[16, 8]} style={{ marginTop: "1rem" }}>
+              <FilterFieldCol xs={24} md={{ span: 8, offset: 16 }}>
+                <FilterActionsGroup>
+                  <AppButton variant="secondary" size="large" onClick={handleReset}>
+                    Limpar filtros
+                  </AppButton>
+                  <AppButton variant="primary" size="large" onClick={handleSubmit(handleSub as any)}>
+                    Buscar
+                  </AppButton>
+                </FilterActionsGroup>
+              </FilterFieldCol>
+            </FilterInlineRow>
           </SearchFieldsContainer>
         </ConteudoPagina>
 

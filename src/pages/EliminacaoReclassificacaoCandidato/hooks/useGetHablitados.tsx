@@ -11,7 +11,7 @@ export const useGetHablitados = (
     queryKey: ["getHabilitados", params],
     queryFn: ({ signal }) =>
       getCandidatosHabilitados(params, { signal, ...axiosRequestConfig }).response,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
     enabled,
   });

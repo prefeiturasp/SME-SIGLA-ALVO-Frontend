@@ -53,7 +53,7 @@ describe("mapRelatoriosDetalhados", () => {
   it("mapeia relatórios detalhados filtrados por concurso", () => {
     const resultado = mapDresParaRelatoriosDetalhados(
       extracaoDadosFiltradoMock,
-      "2024",
+      ["2024"],
       "uuid-concurso-1",
       concursosOptionsMock
     );
@@ -73,19 +73,21 @@ describe("mapRelatoriosDetalhados", () => {
     });
   });
 
-  it("não inclui campos de autorização nos itens de relatórios detalhados", () => {
+  it("inclui autorizações e data de autorização nos itens de relatórios detalhados", () => {
     const resultado = mapDresConcursosParaRelatoriosDetalhados(
       extracaoDadosTodosMock,
       concursosOptionsMock
     );
 
-    expect(resultado[0]).not.toHaveProperty("autorizacoes");
-    expect(resultado[0]).not.toHaveProperty("data_autorizacao");
+    expect(resultado[0]).toMatchObject({
+      autorizacoes: 5,
+      data_autorizacao: "15/06/2025 10:30",
+    });
   });
 
   it("retorna lista vazia quando não há dres_concursos para o concurso", () => {
     expect(
-      mapDresParaRelatoriosDetalhados(extracaoDadosFiltradoMock, "2024", "uuid-inexistente", [])
+      mapDresParaRelatoriosDetalhados(extracaoDadosFiltradoMock, ["2024"], "uuid-inexistente", [])
     ).toEqual([]);
   });
 });

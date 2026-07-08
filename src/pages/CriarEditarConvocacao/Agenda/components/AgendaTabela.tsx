@@ -1,19 +1,31 @@
 import React, { useState, useEffect } from "react";
 import {
   Table,
-  Button,
   Typography,
-  Tooltip,
   TimePicker,
   message,
 } from "antd";
-import { CalendarOutlined, DownOutlined, DeleteOutlined, CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
+import { CalendarOutlined, DownOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { AppButton, AppIconButton, DeleteActionIcon, EditActionIcon } from '@/components/ui';
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
-import type { PeriodoItem } from "../hooks/useAgenda";
-import { commonStyles, inlineStyles, agendaTabelaStyles } from "../styles";
+import { MENSAGEM_LIMITE_REDISTRIBUICAO, type PeriodoItem } from "../hooks/useAgenda";
+import { commonStyles, inlineStyles, agendaTabelaStyles } from "@/design-system/estilos";
 
 const { Text } = Typography;
+
+const INTERVALO_UMA_HORA_MSG = "Intervalo permitido: somente 1h.";
+
+const isIntervaloUmaHora = (horaInicio?: string, horaFim?: string): boolean => {
+  if (!horaInicio || !horaFim) return true;
+
+  const inicio = dayjs(`2000-01-01 ${horaInicio}`);
+  const fim = dayjs(`2000-01-01 ${horaFim}`);
+
+  if (!inicio.isValid() || !fim.isValid()) return true;
+
+  return fim.diff(inicio, "minute") === 60;
+};
 
 interface FormData {
   [key: string]: {
@@ -35,6 +47,11 @@ interface AgendaTabelaProps {
   saveEdit: (key: number, periodoDataItem: PeriodoItem, values: any) => { success: boolean; message?: string };
   calcularIntervaloClassificacao: (periodo: PeriodoItem) => string;
   verificarConflitoTempoReal: (key: number, horaInicio: string | number | undefined, horaFim: string | number | undefined) => boolean;
+  validarRedistribuicaoClassificacao: (
+    key: number,
+    periodoDataItem: PeriodoItem,
+    novaClassificacao: number
+  ) => { valid: boolean; message?: string };
   cargoParaExpandir: string | null;
   limparExpansao: () => void;
 }
@@ -51,6 +68,7 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
   saveEdit,
   calcularIntervaloClassificacao,
   verificarConflitoTempoReal,
+  validarRedistribuicaoClassificacao,
   cargoParaExpandir,
   limparExpansao,
 }) => {
@@ -137,13 +155,13 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
           width: 120,
           align: 'center' as const,
           render: (_: any, record: any) => (
-            <Button
+            <AppButton
               className="agendar-btn"
               icon={<CalendarOutlined />}
               onClick={() => handleAgendarClick(record.uuid)}
             >
               Agendar
-            </Button>
+            </AppButton>
           ),
         },
         {
@@ -191,6 +209,7 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
             <AgendaTabelaExpandida
               key={formResetKey}
               periodosList={periodosDoCargo}
+              totalCandidatosCargo={record.cargoData?.totalCandidatos ?? 0}
               handleRemoverPeriodo={handleRemoverPeriodo}
               editingKey={editingKey}
               isEditing={isEditing}
@@ -199,6 +218,7 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
               saveEdit={saveEdit}
               calcularIntervaloClassificacao={calcularIntervaloClassificacao}
               verificarConflitoTempoReal={verificarConflitoTempoReal}
+              validarRedistribuicaoClassificacao={validarRedistribuicaoClassificacao}
             />
           );
         },
@@ -229,9 +249,34 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
   );
 };
 
+const getMaxClassificacaoSessao = (
+  totalCandidatosCargo: number,
+  periodosList: PeriodoItem[],
+  record: PeriodoItem
+): number | undefined => {
+  const MAX_CANDIDATOS_POR_AGENDA = 30;
+  if (record.isRetardatario || record.tipoEscolha !== "PRESENCIAL") {
+    return undefined;
+  }
+
+  const numeroSessoes = periodosList.filter(
+    (periodo) => !periodo.isRetardatario && periodo.tipoEscolha === "PRESENCIAL"
+  ).length;
+
+  if (numeroSessoes <= 0 || totalCandidatosCargo <= 0) {
+    return undefined;
+  }
+
+  return Math.min(
+    MAX_CANDIDATOS_POR_AGENDA,
+    Math.max(1, totalCandidatosCargo - (numeroSessoes - 1))
+  );
+};
+
 // Componente da tabela expandida integrado
 const AgendaTabelaExpandida: React.FC<{
   periodosList: PeriodoItem[];
+  totalCandidatosCargo: number;
   handleRemoverPeriodo: (id: number) => void;
   editingKey: number | null;
   isEditing: (record: PeriodoItem) => boolean;
@@ -240,8 +285,14 @@ const AgendaTabelaExpandida: React.FC<{
   saveEdit: (key: number, periodoDataItem: PeriodoItem, values: any) => { success: boolean; message?: string };
   calcularIntervaloClassificacao: (periodo: PeriodoItem) => string;
   verificarConflitoTempoReal: (key: number, horaInicio: string | number | undefined, horaFim: string | number | undefined) => boolean;
+  validarRedistribuicaoClassificacao: (
+    key: number,
+    periodoDataItem: PeriodoItem,
+    novaClassificacao: number
+  ) => { valid: boolean; message?: string };
 }> = ({
   periodosList,
+  totalCandidatosCargo,
   handleRemoverPeriodo,
   editingKey,
   isEditing,
@@ -250,8 +301,9 @@ const AgendaTabelaExpandida: React.FC<{
   saveEdit,
   calcularIntervaloClassificacao,
   verificarConflitoTempoReal,
+  validarRedistribuicaoClassificacao,
 }) => {
-  const { control, getValues, reset } = useForm<FormData>({
+  const { control, getValues, reset, watch } = useForm<FormData>({
     defaultValues: periodosList.reduce((acc, item) => {
       acc[item.id.toString()] = {
         horaInicio: item.horaInicio || '',
@@ -261,6 +313,8 @@ const AgendaTabelaExpandida: React.FC<{
       return acc;
     }, {} as FormData),
   });
+
+  const formValues = watch();
 
   const cancel = () => {
     cancelEdit();
@@ -282,9 +336,17 @@ const AgendaTabelaExpandida: React.FC<{
     };
     
     const result = saveEdit(key, periodoDataItem, values);
-    
+
     if (!result.success) {
-      message.error(result.message || 'Erro ao salvar período.');
+      const errosInline =
+        result.message === INTERVALO_UMA_HORA_MSG ||
+        result.message === 'Este horário já existe na mesma data. Escolha outro horário.' ||
+        result.message === MENSAGEM_LIMITE_REDISTRIBUICAO ||
+        result.message === "Valor inválido para redistribuição. Não há candidatos suficientes nas agendas seguintes.";
+
+      if (!errosInline) {
+        message.error(result.message || 'Erro ao salvar período.');
+      }
     }
   };
 
@@ -298,25 +360,56 @@ const AgendaTabelaExpandida: React.FC<{
       editable: true,
       render: (_: number, record: PeriodoItem) => {
         const editing = isEditing(record);
+        const maxClassificacao = getMaxClassificacaoSessao(totalCandidatosCargo, periodosList, record);
+        const classificacaoAtual = Number(
+          formValues[record.id.toString()]?.classificacao ?? record.classificacao ?? 1
+        );
+        const validacaoRedistribuicao = editing
+          ? validarRedistribuicaoClassificacao(record.id, record, classificacaoAtual)
+          : { valid: true };
+        const temErroClassificacao = !validacaoRedistribuicao.valid;
+
         return editing ? (
-          <div style={agendaTabelaStyles.editContainer}>
-            <Controller
-              name={`${record.id}.classificacao`}
-              control={control}
-              defaultValue={record.classificacao || 1}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="number"
-                  min="1"
-                  style={agendaTabelaStyles.editInput}
-                  placeholder="Quantidade"
-                />
-              )}
-            />
-            <Typography.Text style={agendaTabelaStyles.candidatosText}>
-              candidatos
-            </Typography.Text>
+          <div style={agendaTabelaStyles.editHorarioContainer}>
+            <div style={agendaTabelaStyles.editContainer}>
+              <Controller
+                name={`${record.id}.classificacao`}
+                control={control}
+                defaultValue={record.classificacao || 1}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="number"
+                    min={1}
+                    max={maxClassificacao}
+                    style={{
+                      ...agendaTabelaStyles.editInput,
+                      ...(temErroClassificacao ? { borderColor: '#ff4d4f' } : {}),
+                    }}
+                    onChange={(event) => {
+                      const parsed = Number(event.target.value);
+                      if (!Number.isFinite(parsed)) {
+                        field.onChange(event.target.value);
+                        return;
+                      }
+
+                      const valorLimitado = maxClassificacao
+                        ? Math.min(Math.max(parsed, 1), maxClassificacao)
+                        : Math.max(parsed, 1);
+
+                      field.onChange(valorLimitado);
+                    }}
+                  />
+                )}
+              />
+            </div>
+            {temErroClassificacao && validacaoRedistribuicao.message && (
+              <div style={agendaTabelaStyles.timeErrorContainer}>
+                <Typography.Text type="danger" style={agendaTabelaStyles.conflictText}>
+                  {validacaoRedistribuicao.message}
+                </Typography.Text>
+              </div>
+            )}
           </div>
         ) : (
           <div>
@@ -363,18 +456,23 @@ const AgendaTabelaExpandida: React.FC<{
       editable: true,
       render: (text: string, record: PeriodoItem) => {
         const editing = isEditing(record);
+        const horarioValues = formValues[record.id.toString()];
+        const horaInicio = horarioValues?.horaInicio || '';
+        const horaFim = horarioValues?.horaFim || '';
+        const temConflito = verificarConflitoTempoReal(record.id, horaInicio, horaFim);
+        const intervaloInvalido = Boolean(horaInicio && horaFim && !isIntervaloUmaHora(horaInicio, horaFim));
+        const temErroHorario = temConflito || intervaloInvalido;
+
         return editing ? (
-          <div style={agendaTabelaStyles.editContainer}>
+          <div style={agendaTabelaStyles.editHorarioContainer}>
             {record.tipoEscolha === "PRESENCIAL" ? (
               <>
-                <Controller
-                  name={`${record.id}.horaInicio`}
-                  control={control}
-                  defaultValue={record.horaInicio || ''}
-                  render={({ field }) => {
-                    const values = getValues(record.id.toString());
-                    const temConflito = verificarConflitoTempoReal(record.id, values?.horaInicio || '', values?.horaFim || '');
-                    return (
+                <div style={agendaTabelaStyles.editContainer}>
+                  <Controller
+                    name={`${record.id}.horaInicio`}
+                    control={control}
+                    defaultValue={record.horaInicio || ''}
+                    render={({ field }) => (
                       <TimePicker
                         {...field}
                         style={agendaTabelaStyles.editTimePicker}
@@ -382,21 +480,17 @@ const AgendaTabelaExpandida: React.FC<{
                         placeholder="Início"
                         value={field.value ? dayjs(field.value, 'HH:mm') : null}
                         onChange={(time) => field.onChange(time ? time.format('HH:mm') : '')}
-                        status={temConflito ? 'error' : undefined}
+                        status={temErroHorario ? 'error' : undefined}
                         suffixIcon={null}
                       />
-                    );
-                  }}
-                />
-                <Typography.Text strong style={agendaTabelaStyles.timeSeparator}>às</Typography.Text>
-                <Controller
-                  name={`${record.id}.horaFim`}
-                  control={control}
-                  defaultValue={record.horaFim || ''}
-                  render={({ field }) => {
-                    const values = getValues(record.id.toString());
-                    const temConflito = verificarConflitoTempoReal(record.id, values?.horaInicio || '', values?.horaFim || '');
-                    return (
+                    )}
+                  />
+                  <Typography.Text strong style={agendaTabelaStyles.timeSeparator}>às</Typography.Text>
+                  <Controller
+                    name={`${record.id}.horaFim`}
+                    control={control}
+                    defaultValue={record.horaFim || ''}
+                    render={({ field }) => (
                       <TimePicker
                         {...field}
                         style={agendaTabelaStyles.editTimePicker}
@@ -404,21 +498,26 @@ const AgendaTabelaExpandida: React.FC<{
                         placeholder="Fim"
                         value={field.value ? dayjs(field.value, 'HH:mm') : null}
                         onChange={(time) => field.onChange(time ? time.format('HH:mm') : '')}
-                        status={temConflito ? 'error' : undefined}
+                        status={temErroHorario ? 'error' : undefined}
                         suffixIcon={null}
                       />
-                    );
-                  }}
-                />
-                {(() => {
-                  const values = getValues(record.id.toString());
-                  const temConflito = verificarConflitoTempoReal(record.id, values?.horaInicio || '', values?.horaFim || '');
-                  return temConflito ? (
-                    <Typography.Text type="danger" style={agendaTabelaStyles.conflictText}>
-                      Horário já existe
-                    </Typography.Text>
-                  ) : null;
-                })()}
+                    )}
+                  />
+                </div>
+                {(intervaloInvalido || temConflito) && (
+                  <div style={agendaTabelaStyles.timeErrorContainer}>
+                    {intervaloInvalido && (
+                      <Typography.Text type="danger" style={agendaTabelaStyles.conflictText}>
+                        {INTERVALO_UMA_HORA_MSG}
+                      </Typography.Text>
+                    )}
+                    {temConflito && (
+                      <Typography.Text type="danger" style={agendaTabelaStyles.conflictText}>
+                        Horário já existe
+                      </Typography.Text>
+                    )}
+                  </div>
+                )}
               </>
             ) : (
               <Typography.Text style={agendaTabelaStyles.onlineText}>
@@ -455,38 +554,34 @@ const AgendaTabelaExpandida: React.FC<{
         const editable = isEditing(record);
         return editable ? (
           <div style={agendaTabelaStyles.actionsContainer}>
-            <Tooltip title="Salvar">
-              <Button
-                type="link"
-                onClick={() => salvarAgendaItemTabela(record.id, record)}
-                icon={<CheckOutlined style={agendaTabelaStyles.saveIcon} />}
-              />
-            </Tooltip>
-            <Tooltip title="Cancelar">
-              <Button
-                type="link"
-                onClick={cancel}
-                icon={<CloseOutlined style={agendaTabelaStyles.cancelIcon} />}
-              />
-            </Tooltip>
+            <AppIconButton
+              type="link"
+              tooltip="Salvar"
+              onClick={() => salvarAgendaItemTabela(record.id, record)}
+              icon={<CheckOutlined style={agendaTabelaStyles.saveIcon} />}
+            />
+            <AppIconButton
+              type="link"
+              tooltip="Cancelar"
+              onClick={cancel}
+              icon={<CloseOutlined style={agendaTabelaStyles.cancelIcon} />}
+            />
           </div>
         ) : (
           <div style={agendaTabelaStyles.actionsContainer}>
-            <Tooltip title="Editar">
-              <Button
-                type="link"
-                disabled={editingKey !== null}
-                onClick={() => edit(record)}
-                icon={<EditOutlined style={commonStyles.actionIcon} />}
-              />
-            </Tooltip>
-            <Tooltip title="Excluir">
-              <Button
-                type="link"
-                onClick={() => handleRemoverPeriodo(record.id)}
-                icon={<DeleteOutlined style={commonStyles.deleteIcon} />}
-              />
-            </Tooltip>
+            <AppIconButton
+              type="link"
+              tooltip="Editar"
+              disabled={editingKey !== null}
+              onClick={() => edit(record)}
+              icon={<EditActionIcon />}
+            />
+            <AppIconButton
+              type="link"
+              tooltip="Excluir"
+              onClick={() => handleRemoverPeriodo(record.id)}
+              icon={<DeleteActionIcon />}
+            />
           </div>
         );
       },

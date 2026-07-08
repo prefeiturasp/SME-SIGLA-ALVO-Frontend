@@ -1,5 +1,5 @@
 import React from "react";
-import { CustomModal2 } from "../../../../components/EstilosCompartilhados";
+import { CustomModal2 } from '@/components/ui';
 
 import logoEnvioEmail from "../assets/logo_envio_email.png";
 

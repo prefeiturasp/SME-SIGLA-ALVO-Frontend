@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Button, Card, Col, Input, Row, Table, Typography } from "antd";
+import { Card, Col, Input, Row, Table, Typography } from "antd";
+import { AppButton } from '@/components/ui';
 import { SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
@@ -140,9 +141,9 @@ const AutorizacoesPublicadasTela: React.FC = () => {
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
               />
-              <Button type="primary" onClick={handleBuscar}>
+              <AppButton variant="primary" onClick={handleBuscar}>
                 Filtrar
-              </Button>
+              </AppButton>
             </div>
           </Col>
         </Row>

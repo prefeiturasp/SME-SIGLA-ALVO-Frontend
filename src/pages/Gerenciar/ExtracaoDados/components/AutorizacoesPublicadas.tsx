@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import type { ColumnsType } from "antd/es/table";
-import { TextTitulo, TextTituloSecundario } from "../../../../components/EstilosCompartilhados";
+import { TextTitulo, TextTituloSecundario } from '@/components/ui';
 import type { AutorizacaoPublicadaItem } from "../utils/mapRelatoriosDetalhados";
-import { RelatoriosDetalhadosTable, TableCard } from "../styles";
+import { RelatoriosDetalhadosTable, TableCard } from "@/components/ui";
 
 type AutorizacoesPublicadasProps = {
   data: AutorizacaoPublicadaItem[];

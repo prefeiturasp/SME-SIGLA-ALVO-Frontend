@@ -1,9 +1,10 @@
 import React from "react";
-import { Table, Typography, Button, Tooltip } from "antd";
-import { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from "./styles";
+import { Table } from "antd";
+import { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from '@/components/ui';
 import { API } from "../../../../services";
 import { useQuery } from "@tanstack/react-query";
 import type { ILayout } from "../../../../services/resources/importacaoDados/IImportacaoArquivos";
+import { AppButton, CardTitle } from '@/components/ui';
 
 const columns = [
   {
@@ -45,16 +46,13 @@ const columns = [
   },
 ];
 
- 
-const { Title } = Typography;
-
 interface LayoutPadraoProps {
-  loading:boolean;
+  loading: boolean;
   tipo: string;
   onVoltar: () => void;
-  dataSource: ILayout[],
-  title: string,
-  canExportar: boolean,
+  dataSource: ILayout[];
+  title: string;
+  canExportar: boolean;
 }
 
 const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ loading,tipo, onVoltar, dataSource, title, canExportar }) => {
@@ -83,7 +81,7 @@ const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ loading,tipo, onVoltar, dat
     <div>
       <LayoutContainer>
         <HeaderSection>
-          <Title level={3}>{title}</Title>
+          <CardTitle>{title}</CardTitle>
         </HeaderSection>
 
         <TableContainer>
@@ -99,29 +97,18 @@ const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ loading,tipo, onVoltar, dat
       </LayoutContainer>
 
       <ButtonContainer>
-        <Button
-          type="primary"
-          ghost
-          size="large"
-          onClick={onVoltar}
-          style={{
-            fontWeight: 700,
-            borderRadius: '0.375rem'
-          }}
-        >
+        <AppButton variant="secondary" size="large" onClick={onVoltar}>
           Voltar
-        </Button>
-        <Tooltip title={!canExportar?"Você não possui permissão para essa ação":"Exportar"} arrow={true} >
-        <Button
-          type="primary"
+        </AppButton>
+        <AppButton
+          variant="primary"
           size="large"
           onClick={handleSalvarArquivo}
           loading={isDownloading}
           disabled={!canExportar}
         >
           Exportar
-        </Button>
-        </Tooltip>
+        </AppButton>
       </ButtonContainer>
     </div>
   );

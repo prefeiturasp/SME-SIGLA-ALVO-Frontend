@@ -7,22 +7,25 @@ jest.mock('../hooks/useGetMeusDados', () => ({
   useGetMeusDados: jest.fn(),
 }));
 
-jest.mock('../../Base/BaseTela', () => ({
-  __esModule: true,
-  default: ({ children, breadcrumbItems, title }: any) => (
-    <div data-testid="base-tela">
-      <div data-testid="title">{title}</div>
-      <div data-testid="breadcrumb">
-        {breadcrumbItems?.map((item: any, idx: number) => (
-          <span key={idx} data-testid={`breadcrumb-item-${idx}`}>
-            {item.title}
-          </span>
-        ))}
+jest.mock('../../Base/BaseTela', () => {
+  const { filterHomeBreadcrumbItems } = jest.requireActual('../../Base/BaseTela');
+  return {
+    __esModule: true,
+    default: ({ children, breadcrumbItems, title }: any) => (
+      <div data-testid="base-tela">
+        <div data-testid="title">{title}</div>
+        <div data-testid="breadcrumb">
+          {filterHomeBreadcrumbItems(breadcrumbItems ?? []).map((item: any, idx: number) => (
+            <span key={idx} data-testid={`breadcrumb-item-${idx}`}>
+              {item.title}
+            </span>
+          ))}
+        </div>
+        {children}
       </div>
-      {children}
-    </div>
-  ),
-}));
+    ),
+  };
+});
 
 jest.mock('../components/AlterarSenhaModal', () => ({
   __esModule: true,
@@ -46,7 +49,7 @@ jest.mock('../components/AlterarEmailModal', () => ({
   ),
 }));
 
-jest.mock('../../../components/EstilosCompartilhados', () => ({
+jest.mock('@/components/ui', () => ({
   StandardInput: ({ value, disabled, type, style }: any) => (
     <input
       data-testid="standard-input"
@@ -56,6 +59,9 @@ jest.mock('../../../components/EstilosCompartilhados', () => ({
       readOnly
       style={style}
     />
+  ),
+  AppButton: ({ children, onClick, disabled, variant, ...props }: any) => (
+    <button type="button" onClick={onClick} disabled={disabled} {...props}>{children}</button>
   ),
 }));
 
@@ -87,8 +93,7 @@ describe('MeusDadosTela', () => {
 
       expect(screen.getByTestId('base-tela')).toBeInTheDocument();
       expect(screen.getByTestId('title')).toHaveTextContent('Meus dados');
-      expect(screen.getByTestId('breadcrumb-item-0')).toHaveTextContent('Início');
-      expect(screen.getByTestId('breadcrumb-item-1')).toHaveTextContent('Meus dados');
+      expect(screen.getByTestId('breadcrumb-item-0')).toHaveTextContent('Meus dados');
     });
 
     it('renderiza dados do usuário quando carregados', () => {

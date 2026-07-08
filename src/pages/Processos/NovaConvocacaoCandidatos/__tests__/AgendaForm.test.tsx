@@ -51,9 +51,9 @@ jest.mock('dayjs', () => {
 });
 
 // Mock dos componentes Ant Design
-jest.mock('antd', () => ({
-  ...jest.requireActual('antd'),
-  DatePicker: ({ onChange, value, ...props }: any) => (
+jest.mock('antd', () => {
+  const actual = jest.requireActual('antd');
+  const DatePickerMock = ({ onChange, value, ...props }: any) => (
     <input
       {...props}
       data-testid="date-picker"
@@ -64,8 +64,8 @@ jest.mock('antd', () => ({
         onChange(date);
       }}
     />
-  ),
-  RangePicker: ({ onChange, value, ...props }: any) => (
+  );
+  DatePickerMock.RangePicker = ({ onChange, value, ...props }: any) => (
     <input
       {...props}
       data-testid="range-picker"
@@ -76,8 +76,12 @@ jest.mock('antd', () => ({
         onChange(dates);
       }}
     />
-  ),
-  TimePicker: ({ onChange, value, ...props }: any) => (
+  );
+
+  return {
+    ...actual,
+    DatePicker: DatePickerMock,
+    TimePicker: ({ onChange, value, ...props }: any) => (
     <input
       {...props}
       data-testid="time-picker"
@@ -89,7 +93,8 @@ jest.mock('antd', () => ({
       }}
     />
   ),
-}));
+  };
+});
 
 const mockCargosDisponiveis = [
   { label: 'Professor', value: 'professor' },

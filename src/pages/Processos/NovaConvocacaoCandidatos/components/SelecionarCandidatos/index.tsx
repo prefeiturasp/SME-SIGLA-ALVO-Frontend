@@ -1,18 +1,85 @@
 import React, { useState } from 'react';
-import { Modal, Typography, Col, Button, Space, message, Spin, Alert } from 'antd';
-import { 
-  ModalTitle, 
-  CompetitionInfo, 
-  InfoItem, 
-  InputGroup, 
-  TableContainer, 
-  TableHeader, 
-  TableRow, 
-  TableCell, 
-  ButtonContainer,
+import { Modal, Typography, Col, Space, message, Spin, Alert } from 'antd';
+import { AppButton } from '@/components/ui';
+import {
+  ModalTitle,
+  CompetitionInfo,
+  InfoItem,
+  ModalInputGroup as InputGroup,
+  ModalTableContainer as TableContainer,
+  ModalTableHeader as TableHeader,
+  ModalTableRow as TableRow,
+  ModalTableCell as TableCell,
+  ModalActionButtonContainer as ButtonContainer,
   StyledInput,
-  StyledText
-} from '../../styles';
+  StyledText,
+} from "@/components/ui";
+import { brandHighlightText } from "@/design-system/estilos";
+
+const styles = {
+  modalBody: {
+    padding: "1rem",
+    width: "100%",
+    height: "auto",
+    minHeight: "728px",
+    display: "flex",
+    flexDirection: "column" as const,
+  },
+  modalTitle: { marginTop: "-0.5rem", textAlign: "left" as const },
+  highlightText: brandHighlightText,
+  quantityRow: { display: "flex", gap: "1rem", width: "100%" },
+  quantityField: { width: "40%" },
+  inputNoMarginTop: { marginTop: "0rem" },
+  inputRow: { display: "flex", alignItems: "center", gap: "0.5rem" },
+  alertContainer: { width: "100%", marginBottom: "1rem" },
+  alertFullWidth: { width: "100%" },
+  actionsStart: { display: "flex", justifyContent: "flex-start", width: "100%" },
+  candidatesSection: { marginTop: "0rem", marginBottom: "1rem", width: "100%" },
+  candidatesTitle: { fontSize: "20px", marginBottom: "0.5rem", display: "block" },
+  loadingContainer: { textAlign: "center" as const, padding: "2rem" },
+  loadingText: { marginTop: "1rem" },
+  tableWrapper: {
+    border: "1px solid #d9d9d9",
+    borderRadius: "6px",
+    overflow: "hidden" as const,
+    width: "100%",
+  },
+  tableHeader: {
+    backgroundColor: "#EBEBED",
+    padding: "0.5rem 1rem",
+    borderBottom: "1px solid #d9d9d9",
+    display: "flex",
+    alignItems: "center",
+  },
+  tableHeaderCell: { fontWeight: "bold" as const, fontSize: "1.125rem" },
+  tableRow: (index: number, total: number) => ({
+    display: "flex",
+    alignItems: "center",
+    backgroundColor: index % 2 === 1 ? "#F6F6F6" : "#FFFFFF",
+    borderBottom: index < total - 1 ? "1px solid #f0f0f0" : "none",
+  }),
+  tableCell: {
+    padding: "0.5rem 1rem",
+    minHeight: "3rem",
+    display: "flex",
+    alignItems: "center",
+  },
+  emptyState: {
+    textAlign: "center" as const,
+    padding: "2rem",
+    color: "#666",
+    backgroundColor: "#f5f5f5",
+    border: "1px solid #d9d9d9",
+    borderRadius: "6px",
+  },
+  footerActions: {
+    display: "flex",
+    justifyContent: "flex-end",
+    width: "100%",
+    marginTop: "0.5rem",
+  },
+  columnWidth: { geral: "20%", candidato: "35%", classificacao: "15%" },
+};
 import { useCandidatos } from './useCandidatos';
 
 const { Title, Text } = Typography;
@@ -151,9 +218,9 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
           maxHeight: '100vh'
         }}
       >
-        <div style={{ padding: '1rem', width: '100%', height: 'auto', minHeight: '728px', display: 'flex', flexDirection: 'column' }}>
+        <div style={styles.modalBody}>
         <ModalTitle>
-          <Title level={3} style={{ marginTop: '-0.5rem', textAlign: 'left' }}>
+          <Title level={3} style={styles.modalTitle}>
             Convocar candidatos ao cargo
           </Title>
         </ModalTitle>
@@ -161,33 +228,33 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
         <CompetitionInfo>
           <InfoItem>
             <Text strong>Concurso:</Text>
-            <Text style={{ color: '#05409A' }}>
+            <Text style={styles.highlightText}>
               {concurso}
             </Text>
           </InfoItem>
           <InfoItem>
             <Text strong>Cargo:</Text>
-            <Text style={{ color: '#05409A' }}>
+            <Text style={styles.highlightText}>
               {cargo}
             </Text>
           </InfoItem>
           <InfoItem>
             <Text strong>Vagas:</Text>
-            <Text style={{ color: '#05409A' }}>
+            <Text style={styles.highlightText}>
               {vagas}
             </Text>
           </InfoItem>
           <InfoItem>
             <Text strong>Autorizações:</Text>
-            <Text style={{ color: '#05409A' }}>
+            <Text style={styles.highlightText}>
               {autorizacoes}
             </Text>
           </InfoItem>
         </CompetitionInfo>
 
         <InputGroup>
-          <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
-            <div style={{ width: '40%' }}>
+          <div style={styles.quantityRow}>
+            <div style={styles.quantityField}>
               <StyledText strong>Quantidade:</StyledText>
               <StyledInput
                 type="text"
@@ -196,7 +263,7 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
                 onChange={(e) => handleNumericInput(e.target.value, setQuantidade)}
                 onKeyDown={validateNumericInput}
                 placeholder="0"
-                style={{ marginTop: '0rem' }}
+                style={styles.inputNoMarginTop}
               />
             </div>
           </div>
@@ -222,7 +289,7 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
 
             {/* INPUT + TEXTO AO LADO */}
             <TableCell span={8}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={styles.inputRow}>
                 <StyledInput
                   type="text"
                   inputMode="numeric"
@@ -252,7 +319,7 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
 
             {/* INPUT + TEXTO AO LADO */}
             <TableCell span={8}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={styles.inputRow}>
                 <StyledInput
                   type="text"
                   inputMode="numeric"
@@ -282,7 +349,7 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
 
             {/* INPUT + TEXTO AO LADO */}
             <TableCell span={8}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={styles.inputRow}>
                 <StyledInput
                   type="text"
                   inputMode="numeric"
@@ -307,105 +374,79 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
 
         {/* Alert de validação */}
         {mostrarErroValidacao && (
-          <div style={{ width: '100%', marginBottom: '1rem' }}>
+          <div style={styles.alertContainer}>
             <Alert 
               message="A SOMA dos campos GERAL, DEF. e NNA tem que ser igual ao total inserido em QUANTIDADE." 
               type="error" 
               showIcon
-              style={{ width: '100%' }}
+              style={styles.alertFullWidth}
             />
           </div>
         )}
 
         <ButtonContainer>
-          <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%'}}>
+          <div style={styles.actionsStart}>
             <Space size="middle">
-              <Button
-                type="primary"
+              <AppButton
+                variant="primary"
                 size="large"
                 onClick={handleBuscarPorCalculadas}
-                style={{
-                  backgroundColor: '#05409A',
-                  borderColor: '#05409A',
-                  color: '#fff'
-                }}
               >
                 Buscar candidatos por autorizações calculadas
-              </Button>
-              <Button
-                type="primary"
+              </AppButton>
+              <AppButton
+                variant="primary"
                 size="large"
                 onClick={handleBuscarPorDigitadas}
-                style={{
-                  backgroundColor: '#05409A',
-                  borderColor: '#05409A',
-                  color: '#fff'
-                }}
               >
                 Buscar candidatos por autorizações digitadas
-              </Button>
+              </AppButton>
             </Space>
           </div>
           
           {/* Tabela de candidatos convocados - aparece apenas quando mostrarTabelaCandidatos for true */}
           {mostrarTabelaCandidatos && (
-            <div style={{ marginTop: '0rem', marginBottom: '1rem', width: '100%' }}>
-              <Text strong style={{ fontSize: '20px', marginBottom: '0.5rem', display: 'block' }}>
+            <div style={styles.candidatesSection}>
+              <Text strong style={styles.candidatesTitle}>
                 Convocados por autorizações digitadas
               </Text>
               
               {/* Loading state */}
               {candidatosIsLoading && (
-                <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <div style={styles.loadingContainer}>
                   <Spin size="large" />
-                  <div style={{ marginTop: '1rem' }}>Buscando candidatos...</div>
+                  <div style={styles.loadingText}>Buscando candidatos...</div>
                 </div>
               )}
               
               {/* Tabela de dados */}
               {!candidatosIsLoading && candidatos.length > 0 && (
-                <div style={{ 
-                  border: '1px solid #d9d9d9', 
-                  borderRadius: '6px',
-                  overflow: 'hidden',
-                  width: '100%'
-                }}>
+                <div style={styles.tableWrapper}>
                   {/* Cabeçalho da tabela com mesmo estilo */}
-                  <div style={{
-                    backgroundColor: '#EBEBED',
-                    padding: '0.5rem 1rem',
-                    borderBottom: '1px solid #d9d9d9',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <div style={{ width: '20%', fontWeight: 'bold', fontSize: '1.125rem' }}>Convocado por</div>
-                    <div style={{ width: '35%', fontWeight: 'bold', fontSize: '1.125rem' }}>Candidato</div>
-                    <div style={{ width: '15%', fontWeight: 'bold', fontSize: '1.125rem' }}>Classificação</div>
-                    <div style={{ width: '15%', fontWeight: 'bold', fontSize: '1.125rem' }}>Classificação especial</div>
-                    <div style={{ width: '15%', fontWeight: 'bold', fontSize: '1.125rem' }}>Classificação NNA</div>
+                  <div style={styles.tableHeader}>
+                    <div style={{ ...styles.tableHeaderCell, width: styles.columnWidth.geral }}>Convocado por</div>
+                    <div style={{ ...styles.tableHeaderCell, width: styles.columnWidth.candidato }}>Candidato</div>
+                    <div style={{ ...styles.tableHeaderCell, width: styles.columnWidth.classificacao }}>Classificação</div>
+                    <div style={{ ...styles.tableHeaderCell, width: styles.columnWidth.classificacao }}>Classificação especial</div>
+                    <div style={{ ...styles.tableHeaderCell, width: styles.columnWidth.classificacao }}>Classificação NNA</div>
                   </div>
                   
                   {/* Linhas da tabela com cores alternadas */}
                   {candidatos.map((candidato, index) => (
-                    <div key={index.toString()} style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      backgroundColor: index % 2 === 1 ? '#F6F6F6' : '#FFFFFF',
-                      borderBottom: index < candidatos.length - 1 ? '1px solid #f0f0f0' : 'none'
-                    }}>
-                      <div style={{ width: '20%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
+                    <div key={index.toString()} style={styles.tableRow(index, candidatos.length)}>
+                      <div style={{ ...styles.tableCell, width: styles.columnWidth.geral }}>
                         COGEP
                       </div>
-                      <div style={{ width: '35%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
+                      <div style={{ ...styles.tableCell, width: styles.columnWidth.candidato }}>
                         {candidato.candidato.nome}
                       </div>
-                      <div style={{ width: '15%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
+                      <div style={{ ...styles.tableCell, width: styles.columnWidth.classificacao }}>
                         {candidato.classificacao}
                       </div>
-                      <div style={{ width: '15%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
+                      <div style={{ ...styles.tableCell, width: styles.columnWidth.classificacao }}>
                         {candidato.classificacao_pcd}
                       </div>
-                      <div style={{ width: '15%', padding: '0.5rem 1rem', minHeight: '3rem', display: 'flex', alignItems: 'center' }}>
+                      <div style={{ ...styles.tableCell, width: styles.columnWidth.classificacao }}>
                         {candidato.classificacao_nna}
                       </div>
                     </div>
@@ -415,43 +456,28 @@ const SelecionarCandidatos: React.FC<SelecionarCandidatosProps> = ({
               
               {/* Mensagem quando não há candidatos */}
               {!candidatosIsLoading && candidatos.length === 0 && (
-                <div style={{ 
-                  textAlign: 'center', 
-                  padding: '2rem', 
-                  color: '#666',
-                  backgroundColor: '#f5f5f5',
-                  border: '1px solid #d9d9d9',
-                  borderRadius: '6px'
-                }}>
+                <div style={styles.emptyState}>
                   Nenhum candidato encontrado.
                 </div>
               )}
             </div>
           )}
           
-          <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', marginTop: '0.5rem' }}>
+          <div style={styles.footerActions}>
             <Space size="middle">
-              <Button
+              <AppButton
+                variant="secondary"
                 onClick={onClose}
-                style={{
-                  borderColor: '#05409A',
-                  color: '#05409A'
-                }}
               >
                 Cancelar
-              </Button>
-              <Button
-                type="primary"
+              </AppButton>
+              <AppButton
+                variant="primary"
                 onClick={handleSelecionar}
                 disabled={!isTotalValido}
-                style={{
-                  backgroundColor: isTotalValido ? '#05409A' : '#d9d9d9',
-                  borderColor: isTotalValido ? '#05409A' : '#d9d9d9',
-                  color: isTotalValido ? '#fff' : '#999'
-                }}
               >
                 Selecionar
-              </Button>
+              </AppButton>
             </Space>
           </div>
         </ButtonContainer>

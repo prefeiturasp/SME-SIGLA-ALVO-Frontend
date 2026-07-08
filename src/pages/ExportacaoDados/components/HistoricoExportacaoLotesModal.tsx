@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import { Modal, Typography, Button, Tag } from "antd";
+import { Modal, Typography, Tag } from "antd";
 import { CloudDownloadOutlined } from "@ant-design/icons";
-import { StyledTable } from "../../../components/EstilosCompartilhados";
 import { useExportacaoLotes } from "../hooks/useExportacaoLotes";
 import type { IExportacaoLoteListItem, StatusExportacaoLote } from "../../../services/resources/exportacaoDados/types";
 
+import { AppIconButton, StyledTable } from '@/components/ui';
 const STATUS_CONFIG: Record<StatusExportacaoLote, { color: string; label: string }> = {
   SUCESSO:      { color: "success", label: "Sucesso" },
   ATENCAO:      { color: "processing", label: "Atenção" },
@@ -87,9 +87,10 @@ const HistoricoExportacaoLotesModal: React.FC<HistoricoExportacaoLotesModalProps
       key: "download",
       align: "center",
       render: (_, record) => (
-        <Button
+        <AppIconButton
           type="link"
           size="small"
+          tooltip="Download"
           icon={<CloudDownloadOutlined />}
           onClick={() => handleDownload(record.uuid)}
           aria-label="Download"

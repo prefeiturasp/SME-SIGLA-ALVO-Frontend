@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Modal, Typography } from "antd";
-import { FilterSelect } from "../../EscolhaCandidatos/styles";
+import { Modal } from "antd";
+import { FilterSelect, AppFormItem } from "@/components/ui";
 import { API } from "../../../services";
 
 type CargoItem = { cargo_codigo: string; cargo_nome: string };
@@ -70,17 +70,18 @@ const AtaEscolhaCargoModal: React.FC<Props> = ({
       okButtonProps={{ disabled: !selectedCargoCodigo }}
     >
       <div style={{ padding: 16 }}>
-        <Typography.Text strong>Cargo</Typography.Text>
-        <FilterSelect
-          allowClear
-          placeholder="Selecione um cargo"
-          style={{ width: "100%", marginTop: 8 }}
-          value={selectedCargoCodigo}
-          options={cargoOptions}
-          loading={loading}
-          disabled={!processoUuid}
-          onChange={(value) => setSelectedCargoCodigo(value as string | undefined)}
-        />
+        <AppFormItem label="Cargo" labelCol={{ span: 24 }}>
+          <FilterSelect
+            allowClear
+            placeholder="Selecione um cargo"
+            style={{ width: "100%" }}
+            value={selectedCargoCodigo}
+            options={cargoOptions}
+            loading={loading}
+            disabled={!processoUuid}
+            onChange={(value) => setSelectedCargoCodigo(value as string | undefined)}
+          />
+        </AppFormItem>
       </div>
     </Modal>
   );
