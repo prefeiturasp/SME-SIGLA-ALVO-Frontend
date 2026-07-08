@@ -77,7 +77,7 @@ describe("EnvioEmailsTela", () => {
   it(
     "desabilita Filtrar até selecionar processo e tipo; carrega conteúdo e mostra textarea",
     async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const client = new QueryClient();
     render(
       <QueryClientProvider client={client}>
@@ -125,7 +125,7 @@ describe("EnvioEmailsTela", () => {
   );
 
   it("copia conteúdo gabarito para o conteúdo ao clicar no botão de copiar", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const client = new QueryClient();
     render(
       <QueryClientProvider client={client}>
@@ -166,7 +166,7 @@ describe("EnvioEmailsTela", () => {
   });
 
   it("mantém assunto em branco ao filtrar independentemente da API", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const client = new QueryClient();
     render(
       <QueryClientProvider client={client}>
@@ -200,7 +200,7 @@ describe("EnvioEmailsTela", () => {
   });
 
   it("envia assunto em branco quando o usuário não preenche o campo", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const client = new QueryClient();
     render(
       <QueryClientProvider client={client}>
@@ -245,7 +245,7 @@ describe("EnvioEmailsTela", () => {
   });
 
   it("envia assunto customizado quando o usuário preenche o campo", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const client = new QueryClient();
     render(
       <QueryClientProvider client={client}>
@@ -293,7 +293,7 @@ describe("EnvioEmailsTela", () => {
   });
 
   it("envia conteúdo customizado quando preenchido; caso contrário usa gabarito", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const client = new QueryClient();
     render(
       <QueryClientProvider client={client}>
@@ -339,7 +339,7 @@ describe("EnvioEmailsTela", () => {
   });
 
   it("envia conteúdo editado no segundo textarea quando preenchido", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const client = new QueryClient();
     render(
       <QueryClientProvider client={client}>
@@ -367,6 +367,7 @@ describe("EnvioEmailsTela", () => {
     await user.click(screen.getByRole("button", { name: /filtrar/i }));
 
     await waitFor(() => {
+      expect(screen.getByLabelText("quill-editor-conteudo-gabarito")).toHaveValue("<p>gabarito</p>");
       expect(screen.getByLabelText("quill-editor-conteudo")).toHaveValue("<p>customizado</p>");
     });
 
@@ -384,7 +385,7 @@ describe("EnvioEmailsTela", () => {
   });
 
   it("mostra e esconde o botão Voltar do topo conforme visibilidade do conteúdo", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const client = new QueryClient();
     render(
       <QueryClientProvider client={client}>

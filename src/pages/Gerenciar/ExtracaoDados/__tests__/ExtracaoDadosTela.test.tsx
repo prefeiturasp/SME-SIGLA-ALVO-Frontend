@@ -103,7 +103,7 @@ describe("ExtracaoDadosTela", () => {
   });
 
   it("desabilita Filtrar até selecionar concurso e ano", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderTela();
 
     const getFiltrarButton = () => screen.getAllByRole("button", { name: /filtrar/i })[0];
@@ -120,7 +120,7 @@ describe("ExtracaoDadosTela", () => {
   });
 
   it("aplica filtro e atualiza indicadores; limpar filtros restaura visão consolidada", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderTela();
 
     await user.selectOptions(screen.getByLabelText("Selecione o concurso"), "uuid-concurso-1");

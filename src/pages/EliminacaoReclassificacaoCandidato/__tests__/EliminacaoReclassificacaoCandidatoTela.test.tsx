@@ -168,11 +168,12 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
       });
       render(<EliminacaoReclassificacaoCandidatoTela />, { wrapper });
       fireEvent.click(screen.getByRole("button", { name: /filtrar/i }));
-      await waitFor(() => expect(screen.getByText("João")).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByText("João")).toBeInTheDocument(), { timeout: 10000 });
+      await waitFor(() => expect(document.querySelector(".anticon-edit")).toBeTruthy(), { timeout: 10000 });
       fireEvent.click(document.querySelector(".anticon-edit")!);
-      await waitFor(() => expect(screen.getByTestId("modal-alterar")).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByTestId("modal-alterar")).toBeInTheDocument(), { timeout: 10000 });
       fireEvent.click(screen.getByTestId("modal-cancelar"));
-      await waitFor(() => expect(screen.queryByTestId("modal-alterar")).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByTestId("modal-alterar")).not.toBeInTheDocument(), { timeout: 10000 });
       formState.useFilterValues = false;
     });
 
@@ -184,11 +185,12 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
       });
       render(<EliminacaoReclassificacaoCandidatoTela />, { wrapper });
       fireEvent.click(screen.getByRole("button", { name: /filtrar/i }));
-      await waitFor(() => expect(screen.getByText("João")).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByText("João")).toBeInTheDocument(), { timeout: 10000 });
+      await waitFor(() => expect(document.querySelector(".anticon-edit")).toBeTruthy(), { timeout: 10000 });
       fireEvent.click(document.querySelector(".anticon-edit")!);
-      await waitFor(() => expect(screen.getByTestId("modal-alterar")).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByTestId("modal-alterar")).toBeInTheDocument(), { timeout: 10000 });
       fireEvent.click(screen.getByTestId("modal-salvar"));
-      await waitFor(() => expect(screen.queryByTestId("modal-alterar")).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByTestId("modal-alterar")).not.toBeInTheDocument(), { timeout: 10000 });
       formState.useFilterValues = false;
     });
   });

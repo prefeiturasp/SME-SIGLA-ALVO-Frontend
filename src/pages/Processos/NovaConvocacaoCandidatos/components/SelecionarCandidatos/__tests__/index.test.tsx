@@ -8,12 +8,17 @@ jest.mock('../useCandidatos', () => ({
   useCandidatos: (shouldFetch: boolean) => mockUseCandidatos(shouldFetch),
 }));
 
-jest.mock('antd', () => ({
-  ...jest.requireActual('antd'),
-  message: {
-    warning: jest.fn(),
-  },
-}));
+jest.mock('antd', () => {
+  const actual = jest.requireActual('antd');
+  return {
+    ...actual,
+    message: {
+      ...actual.message,
+      warning: jest.fn(),
+      error: jest.fn(),
+    },
+  };
+});
 
 const mockCandidatosData = {
   results: [
@@ -68,7 +73,7 @@ describe('SelecionarCandidatos', () => {
 
   describe('Testes de digitação nos inputs', () => {
     it('deve permitir apenas números no input de Quantidade inicial', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       render(<SelecionarCandidatos {...defaultProps} />);
 
       const allInputs = screen.getAllByRole('textbox');
@@ -93,7 +98,7 @@ describe('SelecionarCandidatos', () => {
     });
 
     it('deve permitir apenas números no input de Quantidade', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       render(<SelecionarCandidatos {...defaultProps} />);
 
       const allInputs = screen.getAllByRole('textbox');
@@ -120,7 +125,7 @@ describe('SelecionarCandidatos', () => {
     });
 
     it('deve permitir apenas números nos inputs de Autorizações digitadas', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       render(<SelecionarCandidatos {...defaultProps} />);
 
       const autorizacaoInputs = screen.getAllByPlaceholderText('Digite apenas números');
@@ -169,7 +174,7 @@ describe('SelecionarCandidatos', () => {
 
   describe('Teste do botão Buscar Candidatos por autorizações digitadas', () => {
     it('deve mostrar a tabela ao clicar no botão Buscar candidatos por autorizações digitadas', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       
       render(<SelecionarCandidatos {...defaultProps} />);
 
@@ -186,7 +191,7 @@ describe('SelecionarCandidatos', () => {
     });
 
     it('deve mostrar loading ao buscar candidatos', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
 
       mockUseCandidatos.mockImplementation((shouldFetch) => {
         if (shouldFetch) {
@@ -216,7 +221,7 @@ describe('SelecionarCandidatos', () => {
 
   describe('Testes dos botões Cancelar e Selecionar', () => {
     it('deve chamar onClose ao clicar no botão Cancelar', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       const mockOnClose = jest.fn();
       
       render(<SelecionarCandidatos {...defaultProps} onClose={mockOnClose} />);
@@ -230,7 +235,7 @@ describe('SelecionarCandidatos', () => {
     });
 
     it('deve chamar onCandidatosSelecionados e onClose ao clicar no botão Selecionar', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       const mockOnClose = jest.fn();
       const mockOnCandidatosSelecionados = jest.fn();
       
@@ -288,7 +293,7 @@ describe('SelecionarCandidatos', () => {
     });
 
     it('deve chamar onCandidatosSelecionados com 0 quando não há dados de candidatos', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       const mockOnClose = jest.fn();
       const mockOnCandidatosSelecionados = jest.fn();
       

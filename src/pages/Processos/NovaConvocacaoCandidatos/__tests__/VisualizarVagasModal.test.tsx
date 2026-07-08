@@ -16,7 +16,7 @@ describe('VisualizarVagasModal', () => {
   };
 
   it('renderiza concurso e cargo e permite cancelar', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onCancel = jest.fn();
     const onConfirm = jest.fn();
 
@@ -38,7 +38,7 @@ describe('VisualizarVagasModal', () => {
   });
 
   it('abre e fecha o modal aninhado de Adicionar Nova Escola', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onCancel = jest.fn();
     const onConfirm = jest.fn();
 
@@ -60,7 +60,7 @@ describe('VisualizarVagasModal', () => {
   });
 
   it('aciona botões de ação (Resetar e Filtrar)', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onCancel = jest.fn();
     const onConfirm = jest.fn();
 
@@ -84,7 +84,7 @@ describe('VisualizarVagasModal', () => {
   });
 
   it('chama onConfirm ao clicar em Salvar', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onCancel = jest.fn();
     const onConfirm = jest.fn();
 
@@ -101,7 +101,7 @@ describe('VisualizarVagasModal', () => {
   });
 
   it('captura erro de onConfirm ao clicar em Salvar e mantém a UI', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onCancel = jest.fn();
     const error = new Error('Falha ao salvar');
     const onConfirm = jest.fn().mockRejectedValue(error);
@@ -127,7 +127,7 @@ describe('VisualizarVagasModal', () => {
   });
 
   it('trata erro dentro de confirmAdicionarNovaEscola e mantém a UI', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onCancel = jest.fn();
     const onConfirm = jest.fn();
 

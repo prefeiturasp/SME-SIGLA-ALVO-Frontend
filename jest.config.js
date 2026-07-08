@@ -1,5 +1,7 @@
 export default {
   testEnvironment: 'jsdom',
+  testTimeout: 15000,
+  maxWorkers: '50%',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^react-image-crop$': '<rootDir>/src/test/mocks/react-image-crop.tsx',

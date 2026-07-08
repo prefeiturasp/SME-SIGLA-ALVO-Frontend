@@ -14,13 +14,22 @@ jest.mock('react-hook-form', () => ({
     reset: jest.fn(),
     watch: jest.fn(() => mockFormValues),
   }),
-  Controller: ({ render, defaultValue, name }: any) =>
-    render({
+  Controller: ({ render, defaultValue, name }: any) => {
+    const [formKey, field] = name.split('.');
+    const atualizarValor = (valor: unknown) => {
+      if (!mockFormValues[formKey]) {
+        mockFormValues[formKey] = { horaInicio: '', horaFim: '', classificacao: 1 };
+      }
+      mockFormValues[formKey][field as keyof (typeof mockFormValues)[string]] = valor as never;
+    };
+
+    return render({
       field: {
-        value: defaultValue ?? mockFormValues[name.split('.')[0]]?.[name.split('.')[1]],
-        onChange: jest.fn(),
+        value: mockFormValues[formKey]?.[field as keyof (typeof mockFormValues)[string]] ?? defaultValue,
+        onChange: jest.fn(atualizarValor),
       },
-    }),
+    });
+  },
 }));
 
 jest.mock('antd', () => ({
@@ -28,6 +37,17 @@ jest.mock('antd', () => ({
   message: {
     error: jest.fn(),
   },
+  TimePicker: ({ onChange, value, ...props }: any) => (
+    <input
+      data-testid="time-picker"
+      value={value ? value.format('HH:mm') : ''}
+      onChange={(event) => {
+        const dayjsLib = require('dayjs');
+        onChange(event.target.value ? dayjsLib(event.target.value, 'HH:mm') : null);
+      }}
+      {...props}
+    />
+  ),
 }));
 
 import '../testHelpers/useAgendaMocks';
@@ -219,5 +239,226 @@ describe('AgendaTabela - CriarEditarConvocacao', () => {
 
     expect(saveEdit).toHaveBeenCalled();
     expect(message.error).not.toHaveBeenCalled();
+  });
+
+  it('deve exibir mensagem quando não há cargos selecionados', () => {
+    renderWithProviders(
+      <AgendaTabela
+        {...criarProps({
+          cargosAdicionados: [],
+          cargoParaExpandir: null,
+        })}
+      />
+    );
+
+    expect(
+      screen.getByText(/Nenhum cargo foi selecionado no step anterior/)
+    ).toBeInTheDocument();
+  });
+
+  it('deve chamar handleAgendarClick ao clicar em Agendar', () => {
+    const handleAgendarClick = jest.fn();
+
+    renderWithProviders(
+      <AgendaTabela
+        {...criarProps({
+          handleAgendarClick,
+          cargoParaExpandir: null,
+        })}
+      />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /agendar/i }));
+    expect(handleAgendarClick).toHaveBeenCalledWith('cargo-uuid-1');
+  });
+
+  it('deve expandir linha pelo ícone quando iniciada recolhida', async () => {
+    renderWithProviders(
+      <AgendaTabela
+        {...criarProps({
+          cargoParaExpandir: null,
+        })}
+      />
+    );
+
+    expect(screen.queryByText('Agendamentos')).not.toBeInTheDocument();
+
+    const expandIcons = document.querySelectorAll('.anticon-down');
+    fireEvent.click(expandIcons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByText('Agendamentos')).toBeInTheDocument();
+    });
+  });
+
+  it('deve exibir mensagem quando cargo não possui agendas', async () => {
+    renderWithProviders(
+      <AgendaTabela
+        {...criarProps({
+          periodosList: [],
+          cargoParaExpandir: 'Professor',
+        })}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Nenhuma agenda adicionada para este cargo.')).toBeInTheDocument();
+    });
+  });
+
+  it('deve renderizar modalidades, ações e total de candidatos online', async () => {
+    const handleRemoverPeriodo = jest.fn();
+    const edit = jest.fn();
+    const cancelEdit = jest.fn();
+
+    renderWithProviders(
+      <AgendaTabela
+        {...criarProps({
+          periodosList: [
+            criarPeriodo({
+              id: 1,
+              tipoEscolha: 'ONLINE',
+              modalidade: 'ONLINE',
+              horario: 'Online',
+              classificacao: 15,
+            }),
+            criarPeriodo({
+              id: 2,
+              tipoEscolha: 'PRESENCIAL',
+              modalidade: 'Presencial',
+              isRetardatario: true,
+              sessao: 'Retardatário',
+              classificacao: 3,
+            }),
+          ],
+          handleRemoverPeriodo,
+          edit,
+          cancelEdit,
+        })}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Online')).toBeInTheDocument();
+      expect(screen.getByText('Presencial')).toBeInTheDocument();
+      expect(screen.getByText('Total de 15 candidatos adicionados')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getAllByLabelText('edit')[0]);
+    expect(edit).toHaveBeenCalled();
+
+    fireEvent.click(screen.getAllByLabelText('delete')[0]);
+    expect(handleRemoverPeriodo).toHaveBeenCalledWith(1);
+  });
+
+  it('deve exibir conflito de horário e toast para erro genérico ao salvar', async () => {
+    const saveEdit = jest.fn(() => ({
+      success: false,
+      message: 'Erro inesperado ao salvar',
+    }));
+
+    renderWithProviders(
+      <AgendaTabela
+        {...criarProps({
+          periodosList: [criarPeriodo({ id: 1 })],
+          editingKey: 1,
+          isEditing: (record: PeriodoItem) => record.id === 1,
+          verificarConflitoTempoReal: jest.fn(() => true),
+          saveEdit,
+        })}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Horário já existe')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByLabelText('check'));
+    expect(message.error).toHaveBeenCalledWith('Erro inesperado ao salvar');
+  });
+
+  it('deve cancelar edição ao clicar no botão de cancelar', async () => {
+    const cancelEdit = jest.fn();
+
+    renderWithProviders(
+      <AgendaTabela
+        {...criarProps({
+          periodosList: [criarPeriodo({ id: 1, classificacao: 20 })],
+          editingKey: 1,
+          isEditing: (record: PeriodoItem) => record.id === 1,
+          cancelEdit,
+        })}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('close')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByLabelText('close'));
+    expect(cancelEdit).toHaveBeenCalled();
+  });
+
+  it('deve ordenar colunas e exibir horários no modo leitura', async () => {
+    const { container } = renderWithProviders(
+      <AgendaTabela
+        {...criarProps({
+          periodosList: [
+            criarPeriodo({
+              id: 1,
+              modalidade: 'ONLINE',
+              tipoEscolha: 'ONLINE',
+              horario: 'Online',
+            }),
+            criarPeriodo({
+              id: 2,
+              isRetardatario: true,
+              sessao: 'Retardatário',
+              numeroSessao: undefined,
+            }),
+            criarPeriodo({
+              id: 3,
+              modalidade: 'HIBRIDO' as any,
+              tipoEscolha: 'PRESENCIAL',
+            }),
+          ],
+          cargoParaExpandir: 'Professor',
+        })}
+      />
+    );
+
+    const sorters = container.querySelectorAll('.ant-table-column-sorters');
+    sorters.forEach((sorter) => fireEvent.click(sorter));
+
+    await waitFor(() => {
+      expect(screen.getAllByText('10:00 às 11:00').length).toBeGreaterThan(0);
+      expect(screen.getByText('HIBRIDO')).toBeInTheDocument();
+    });
+  });
+
+  it('deve recolher linha expandida e editar horários', async () => {
+    mockFormValues['1'] = { horaInicio: '10:00', horaFim: '11:00', classificacao: 5 };
+
+    renderWithProviders(
+      <AgendaTabela
+        {...criarProps({
+          periodosList: [criarPeriodo({ id: 1, classificacao: 5 })],
+          editingKey: 1,
+          isEditing: (record: PeriodoItem) => record.id === 1,
+          cargoParaExpandir: 'Professor',
+        })}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('time-picker').length).toBeGreaterThan(0);
+    });
+
+    const timePickers = screen.getAllByTestId('time-picker');
+    fireEvent.change(timePickers[0], { target: { value: '' } });
+    fireEvent.change(timePickers[1], { target: { value: '12:00' } });
+
+    const expandIcons = document.querySelectorAll('.anticon-down');
+    fireEvent.click(expandIcons[0]);
   });
 });

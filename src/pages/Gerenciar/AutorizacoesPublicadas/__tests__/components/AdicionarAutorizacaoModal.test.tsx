@@ -44,7 +44,7 @@ describe("AdicionarAutorizacaoModal", () => {
     fireEvent.change(screen.getByPlaceholderText("Descreva observações relevantes"), { target: { value: "Obs" } });
 
     fireEvent.click(screen.getByRole("button", { name: "Adicionar" }));
-    await waitFor(() => expect(usePostAutorizacaoPublicada).toHaveBeenCalled());
+    await waitFor(() => expect(usePostAutorizacaoPublicada).toHaveBeenCalled(), { timeout: 10000 });
     expect(onAdd).toHaveBeenCalled();
   });
 

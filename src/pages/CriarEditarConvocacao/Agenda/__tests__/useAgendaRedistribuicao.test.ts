@@ -93,6 +93,15 @@ describe('simularRedistribuicaoClassificacao', () => {
 
     expect(resultado).toEqual({ valid: true, carryRestante: 0 });
   });
+
+  it('deve rejeitar classificação menor que 1', () => {
+    const sessoes = [criarPeriodo({ id: 1, classificacao: 10 })];
+
+    expect(simularRedistribuicaoClassificacao(sessoes, 0, 0)).toEqual({
+      valid: false,
+      carryRestante: 0,
+    });
+  });
 });
 
 describe('MENSAGEM_LIMITE_REDISTRIBUICAO', () => {
