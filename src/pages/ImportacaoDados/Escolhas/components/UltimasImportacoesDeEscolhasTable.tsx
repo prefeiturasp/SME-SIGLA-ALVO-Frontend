@@ -50,7 +50,7 @@ const UltimasImportacoesDeEscolhasTable: React.FC<UltimasImportacoesDeEscolhasTa
       return processos;
     },
     enabled: processosUuids.length > 0,
-    staleTime: 1000 * 60 * 10,
+    staleTime: 0,
   });
 
   // Enriquecer dados com nomes dos processos

@@ -31,7 +31,7 @@ const DetalheCartaConvocacaoModal: React.FC<DetalheCartaConvocacaoModalProps> = 
         ? API.Convocacao.getDetalheEnvioEmail(registro.uuid, { signal }).response
         : Promise.resolve(null),
     enabled: open && !!registro?.uuid,
-    staleTime: 1000 * 60,
+    staleTime: 0,
   });
 
   const candidatos = detalhe?.candidatos ?? [];

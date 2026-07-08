@@ -10,7 +10,7 @@ export const useGetCargo = (
     queryFn: ({ signal }) =>
       API.Convocacao.getCargosProcesso(processoUuid!, { signal }).response,
     enabled: enabled && !!processoUuid,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
   });
 

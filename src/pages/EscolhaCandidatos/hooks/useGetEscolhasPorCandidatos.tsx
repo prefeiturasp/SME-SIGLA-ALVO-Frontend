@@ -24,7 +24,7 @@ export const useGetEscolhasPorCandidatos = ({
       API.Escolhas.postBuscarEscolhasPorCandidatos(candidatoUuids, { signal })
         .response as Promise<PaginatedResponse<IEscolhaCandidato> | IEscolhaCandidato[]>,
     enabled: queryEnabled,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
   });
 

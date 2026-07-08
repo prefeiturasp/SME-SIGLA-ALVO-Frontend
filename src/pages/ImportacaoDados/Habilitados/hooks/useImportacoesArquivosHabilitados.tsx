@@ -10,7 +10,7 @@ const useImportacoesArquivosHabilitados = (listRequest: IListRequest) => {
       API.ImportacaoDados.getImportacaoArquivosHabilitados(         
          { signal }
       ).response,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
   });
 

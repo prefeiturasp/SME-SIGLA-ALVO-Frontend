@@ -21,7 +21,7 @@ export const useGetCargosPorProcessoConvocacao = (
         CargoProcesso[]
       >,
     enabled: queryEnabled,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
   });
 

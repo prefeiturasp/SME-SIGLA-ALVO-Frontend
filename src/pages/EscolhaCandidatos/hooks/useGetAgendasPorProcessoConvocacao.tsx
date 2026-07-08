@@ -27,7 +27,7 @@ export const useGetAgendasPorProcessoConvocacao = ({
         { signal }
       ).response as Promise<PaginatedResponse<IAgenda>>,
     enabled: queryEnabled,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
   });
 
