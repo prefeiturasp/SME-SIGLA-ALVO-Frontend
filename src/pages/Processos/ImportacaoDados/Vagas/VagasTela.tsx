@@ -1,22 +1,13 @@
 import React from "react";
-import { Row, Col, Select, DatePicker, Radio, Button } from "antd";
+import { Row, Col, Select, DatePicker, Radio } from "antd";
 import { Controller } from "react-hook-form";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useImportacaoDadosVagas } from "./hooks/useImportacaoDadosVagas";
-import { CustomFormItem } from "../../../../components/FormStyle";
-import {
-  TabContentContainer,
-  SectionCard,
-  SectionTitle,
-  StyledSelect,
-  UploadArea,
-  StyledUpload,
-  ActionButtonsContainer,
-} from "../../../../components/EstilosCompartilhados";
+
 import { useNavigate } from "react-router-dom";
 
-
+import { AppFormItem, AppButton, TabContentContainer, SectionCard, SectionTitle, StyledSelect, UploadArea, StyledUpload, ActionButtonsContainer } from '@/components/ui';
 interface VagasProps {
   onShowLayoutPadrao: () => void;
 }
@@ -50,7 +41,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
               control={control}
               name="processo_convocacao"
               render={({ field }) => (
-                <CustomFormItem
+                <AppFormItem
                   label="Processo de convocação"
                   validateStatus={formErrors.processo_convocacao ? "error" : undefined}
                   help={formErrors.processo_convocacao?.message}
@@ -78,7 +69,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
                         ))
                       }
                   </StyledSelect>
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
           </Col>
@@ -90,7 +81,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
               control={control}
               name="arquivo"
               render={() => (
-                <CustomFormItem
+                <AppFormItem
                   label="Arquivo para importação"
                   validateStatus={formErrors.arquivo ? "error" : undefined}
                   help={formErrors.arquivo?.message}
@@ -116,7 +107,7 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
                       />
                     </UploadArea>
                   </StyledUpload>
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
           </Col>
@@ -124,22 +115,21 @@ const Vagas: React.FC<VagasProps> = ({ onShowLayoutPadrao }) => {
       </SectionCard>
 
       <ActionButtonsContainer>
-        <Button type="primary" ghost size="large" onClick={onShowHistorico}>
+        <AppButton variant="secondary" size="large" onClick={onShowHistorico}>
           Histórico
-        </Button>
+        </AppButton>
 
-        <Button
-          type="primary"
-          ghost
+        <AppButton
+          variant="secondary"
           size="large"
           onClick={handleSubmit(handleEnviarForm)}
         >
           Importar
-        </Button>
+        </AppButton>
 
-        <Button type="primary" size="large" onClick={onShowLayoutPadrao}>
+        <AppButton variant="primary" size="large" onClick={onShowLayoutPadrao}>
           Layout padrão
-        </Button>
+        </AppButton>
       </ActionButtonsContainer>
     </TabContentContainer>
   );

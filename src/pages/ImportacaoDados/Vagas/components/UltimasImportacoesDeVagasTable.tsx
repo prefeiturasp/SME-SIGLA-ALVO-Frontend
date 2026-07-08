@@ -4,13 +4,12 @@ import dayjs from "dayjs";
 import { WarningOutlined } from "@ant-design/icons";
 import { Tooltip } from "antd";
 
-import { CustomTitle } from "./style";
-import { StyledTable } from "../../../../components/EstilosCompartilhados";
 import type { IUltimasImportacoesVagas } from "../../../../services/resources/importacaoDados/IImportacaoArquivos";
 import ErroModal from "./ErroModal";
 import { useGetDownloadError, TipoImportacao } from "../../hooks/useGetDownloadError";
 import { formatarStatusImportacao } from "../../utils/statusImportacao";
 
+import { CustomTitle, StyledTable } from '@/components/ui';
 interface UltimasImportacoesDeVagasTableProps extends TableProps<IUltimasImportacoesVagas> {
   data: IUltimasImportacoesVagas[];
 }

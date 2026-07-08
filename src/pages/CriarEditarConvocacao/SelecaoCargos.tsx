@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  Button,
   Card,
   Steps,
   theme,
@@ -9,12 +8,12 @@ import {
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
 
+import { AppButton, StyledCardWithoutBorder } from '@/components/ui';
 import {
   UserSwitchOutlined,
 } from "@ant-design/icons";
 import { StepActions } from "./components/StepActions";
 import { items, steps } from "./components/StepsNames";
-import { StyledCardWithoutBorder } from "../../components/EstilosCompartilhados";
 import { useNovaConvocacaoCandidatos } from "../Processos/NovaConvocacaoCandidatos/hooks/useNovaConvocacaoCandidatos";
 
 const { Text } = Typography;
@@ -100,7 +99,7 @@ const SelecaoCargos: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
         buttons={
-          <Button style={{fontWeight:'400'}} color="primary" variant="outlined" icon={<UserSwitchOutlined />}>Gerenciamento de vagas</Button>
+          <AppButton variant="secondary" icon={<UserSwitchOutlined />}>Gerenciamento de vagas</AppButton>
         }
       >
         <StyledCardWithoutBorder title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Modal, Typography } from "antd";
+import { Modal } from "antd";
 import { useGetAgendasPorProcessoConvocacao } from "../../EscolhaCandidatos/hooks/useGetAgendasPorProcessoConvocacao";
-import { FilterSelect } from "../../EscolhaCandidatos/styles";
+import { FilterSelect, AppFormItem } from "@/components/ui";
 
 type Props = {
   open: boolean;
@@ -60,17 +60,18 @@ const ListaCandidatosSessaoModal: React.FC<Props> = ({
       okText="Gerar"
     >
       <div style={{ padding: 16 }}>
-        <Typography.Text strong>Sessões</Typography.Text>
-        <FilterSelect
-          allowClear
-          placeholder="Todas as sessões"
-          style={{ width: "100%", marginTop: 8 }}
-          value={selectedAgendaUuid}
-          options={agendaOptions}
-          loading={agendasIsLoading}
-          disabled={!processoUuid}
-          onChange={handleChange}
-        />
+        <AppFormItem label="Sessões" labelCol={{ span: 24 }}>
+          <FilterSelect
+            allowClear
+            placeholder="Todas as sessões"
+            style={{ width: "100%" }}
+            value={selectedAgendaUuid}
+            options={agendaOptions}
+            loading={agendasIsLoading}
+            disabled={!processoUuid}
+            onChange={handleChange}
+          />
+        </AppFormItem>
       </div>
     </Modal>
   );

@@ -74,7 +74,7 @@ jest.mock('antd/es/form/FormItem', () => {
 });
 
 // Mock componentes customizados
-jest.mock('../../../../components/EstilosCompartilhados', () => ({
+jest.mock('@/components/ui', () => ({
   TabContentContainer: ({ children }: any) => <div>{children}</div>,
   StyledSelect: ({ children, onChange, loading, disabled, placeholder }: any) => (
     <select 
@@ -103,16 +103,18 @@ jest.mock('../../../../components/EstilosCompartilhados', () => ({
   ),
   ActionButtonsContainer: ({ children }: any) => <div>{children}</div>,
   GrupoEsquerda: ({ children }: any) => <div>{children}</div>,
-}));
-
-jest.mock('../../../../components/FormStyle', () => ({
-  CustomFormItem: ({ children, label, help, validateStatus }: any) => (
+  AppFormItem: ({ children, label, help, validateStatus }: any) => (
     <div data-testid="custom-form-item" data-validate={validateStatus}>
       {label && <label>{label}</label>}
       {help && <span data-testid="help">{help}</span>}
       {children}
     </div>
   ),
+  AppButton: ({ children, onClick, disabled, variant }: any) => (
+    <button type="button" data-testid={variant === 'secondary' ? 'secondary-button' : 'primary-button'} onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
+  )
 }));
 
 // Mock ícones
@@ -329,26 +331,10 @@ describe('HabilitadosFormTab', () => {
       expect(screen.getByTitle('Selecionar arquivo')).toBeInTheDocument();
     });
 
-    it('mostra tooltip de sem permissão para histórico', () => {
-      renderComponent({ canViewHistoricoHabilitados: false });
-      const tooltips = screen.getAllByTitle(/não possui permissão/i);
-      expect(tooltips.length).toBeGreaterThan(0);
-    });
-
-    it('mostra tooltip normal para histórico', () => {
-      renderComponent({ canViewHistoricoHabilitados: true });
-      expect(screen.getByTitle('Histórico')).toBeInTheDocument();
-    });
-
-    it('mostra tooltip de sem permissão para importar', () => {
-      renderComponent({ canImportarHabilitados: false });
-      const tooltips = screen.getAllByTitle(/não possui permissão/i);
-      expect(tooltips.length).toBeGreaterThan(0);
-    });
-
-    it('mostra tooltip normal para importar', () => {
-      renderComponent({ canImportarHabilitados: true });
-      expect(screen.getByTitle('Importar')).toBeInTheDocument();
+    it('não exibe tooltip nos botões Histórico e Importar', () => {
+      renderComponent({ canViewHistoricoHabilitados: true, canImportarHabilitados: true });
+      expect(screen.queryByTitle('Histórico')).not.toBeInTheDocument();
+      expect(screen.queryByTitle('Importar')).not.toBeInTheDocument();
     });
   });
 

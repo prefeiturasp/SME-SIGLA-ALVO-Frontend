@@ -106,7 +106,7 @@ jest.mock('../../ImportacaoDados/Vagas/components/UltimasImportacoesDeVagasTable
 }));
 
 // Mock dos componentes compartilhados
-jest.mock('../../../components/EstilosCompartilhados', () => ({
+jest.mock('@/components/ui', () => ({
   TabContentContainer: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="tab-content-container">{children}</div>
   ),
@@ -116,8 +116,8 @@ jest.mock('../../../components/EstilosCompartilhados', () => ({
   ActionButtonsContainer: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="action-buttons-container">{children}</div>
   ),
-  SecondaryButton: ({ children, onClick, ...props }: any) => (
-    <button data-testid="secondary-button" onClick={onClick} {...props}>
+  AppButton: ({ children, onClick, disabled, variant, ...props }: any) => (
+    <button data-testid={variant === 'secondary' ? 'secondary-button' : 'primary-button'} onClick={onClick} disabled={disabled} {...props}>
       {children}
     </button>
   ),

@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import {
   Table,
-  Button,
   Typography,
-  Tooltip,
   TimePicker,
   message,
 } from "antd";
-import { CalendarOutlined, DownOutlined, DeleteOutlined, CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
+import { CalendarOutlined, DownOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { AppButton, AppIconButton, DeleteActionIcon, EditActionIcon } from '@/components/ui';
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import { MENSAGEM_LIMITE_REDISTRIBUICAO, type PeriodoItem } from "../hooks/useAgenda";
-import { commonStyles, inlineStyles, agendaTabelaStyles } from "../styles";
+import { commonStyles, inlineStyles, agendaTabelaStyles } from "@/design-system/estilos";
 
 const { Text } = Typography;
 
@@ -156,13 +155,13 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
           width: 120,
           align: 'center' as const,
           render: (_: any, record: any) => (
-            <Button
+            <AppButton
               className="agendar-btn"
               icon={<CalendarOutlined />}
               onClick={() => handleAgendarClick(record.uuid)}
             >
               Agendar
-            </Button>
+            </AppButton>
           ),
         },
         {
@@ -555,38 +554,34 @@ const AgendaTabelaExpandida: React.FC<{
         const editable = isEditing(record);
         return editable ? (
           <div style={agendaTabelaStyles.actionsContainer}>
-            <Tooltip title="Salvar">
-              <Button
-                type="link"
-                onClick={() => salvarAgendaItemTabela(record.id, record)}
-                icon={<CheckOutlined style={agendaTabelaStyles.saveIcon} />}
-              />
-            </Tooltip>
-            <Tooltip title="Cancelar">
-              <Button
-                type="link"
-                onClick={cancel}
-                icon={<CloseOutlined style={agendaTabelaStyles.cancelIcon} />}
-              />
-            </Tooltip>
+            <AppIconButton
+              type="link"
+              tooltip="Salvar"
+              onClick={() => salvarAgendaItemTabela(record.id, record)}
+              icon={<CheckOutlined style={agendaTabelaStyles.saveIcon} />}
+            />
+            <AppIconButton
+              type="link"
+              tooltip="Cancelar"
+              onClick={cancel}
+              icon={<CloseOutlined style={agendaTabelaStyles.cancelIcon} />}
+            />
           </div>
         ) : (
           <div style={agendaTabelaStyles.actionsContainer}>
-            <Tooltip title="Editar">
-              <Button
-                type="link"
-                disabled={editingKey !== null}
-                onClick={() => edit(record)}
-                icon={<EditOutlined style={commonStyles.actionIcon} />}
-              />
-            </Tooltip>
-            <Tooltip title="Excluir">
-              <Button
-                type="link"
-                onClick={() => handleRemoverPeriodo(record.id)}
-                icon={<DeleteOutlined style={commonStyles.deleteIcon} />}
-              />
-            </Tooltip>
+            <AppIconButton
+              type="link"
+              tooltip="Editar"
+              disabled={editingKey !== null}
+              onClick={() => edit(record)}
+              icon={<EditActionIcon />}
+            />
+            <AppIconButton
+              type="link"
+              tooltip="Excluir"
+              onClick={() => handleRemoverPeriodo(record.id)}
+              icon={<DeleteActionIcon />}
+            />
           </div>
         );
       },

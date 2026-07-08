@@ -1,7 +1,7 @@
 import React from "react";
 import { Space, Dropdown } from "antd";
 import type { MenuProps } from "antd";
-import { UserLabel, StyledUserAvatar, UserAvatarIcon } from "../pages/Base/styles";
+import { UserLabel, StyledUserAvatar, UserAvatarIcon } from "@/components/ui";
 import { useNavigate } from "react-router-dom";
 
 export const UserAvatar: React.FC = () => {

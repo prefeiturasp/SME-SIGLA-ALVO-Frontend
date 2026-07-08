@@ -7,7 +7,7 @@ import {  Navigate, useNavigate, useParams } from 'react-router-dom';
 import type { IUsuarioPermissoes, IUsuarioPermissoesItem } from '../services/resources/permissoes/IPermissoes';
 import { Spin } from 'antd';
 import { API } from '../services';
-import { LoadingContainer } from '../components/EstilosCompartilhados';
+import { LoadingContainer } from '@/components/ui';
 
 
 

@@ -1,25 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, Col, Input, Modal, notification, Row, Spin, Typography } from "antd";
+import { Col, Input, Modal, notification, Row, Spin, Typography } from "antd";
 
-import { ClearButton } from "../../ConvocacaoCandidatos/style";
+import { AppButton, ClearButton, AppFormItem, ModalInfoItem, ModalInfoLabel, ModalInfoValue } from "@/components/ui";
 import {
   getCandidatoByUuid,
   patchCandidatoByUuid,
 } from "../../../../services/resources/candidatos";
-
-const labelStyle: React.CSSProperties = {
-  fontFamily: "Open Sans",
-  fontWeight: 600,
-  fontSize: 16,
-  color: "#515151",
-};
-
-const valueStyle: React.CSSProperties = {
-  fontFamily: "Open Sans",
-  fontWeight: 400,
-  fontSize: 16,
-  color: "#8C8C8C",
-};
 
 /** Máscara (XX) X XXXX-XXXX — retorna só os dígitos permitidos (máx. 11). */
 function apenasDigitosTelefone(value: string): string {
@@ -201,16 +187,16 @@ const AlterarCandidatoModal: React.FC<AlterarCandidatoModalProps> = ({
           >
             Cancelar
           </ClearButton>
-          <Button
+          <AppButton
+            variant="primary"
             size="large"
-            type="primary"
             style={{ height: 48, width: 200, marginTop: 0 }}
             loading={saving}
             disabled={saving}
             onClick={handleSalvar}
           >
             Salvar
-          </Button>
+          </AppButton>
         </div>
       }
       width={1100}
@@ -229,49 +215,55 @@ const AlterarCandidatoModal: React.FC<AlterarCandidatoModalProps> = ({
         <>
           <Row gutter={[32, 24]} style={{ marginTop: 8 }}>
             <Col span={6}>
-              <div style={labelStyle}>Candidato</div>
-              <div style={{ ...valueStyle, marginTop: 12 }}>{nome}</div>
+              <ModalInfoItem>
+                <ModalInfoLabel>Candidato</ModalInfoLabel>
+                <ModalInfoValue>{nome}</ModalInfoValue>
+              </ModalInfoItem>
             </Col>
             <Col span={10}>
-              <div style={labelStyle}>Concurso</div>
-              <div style={{ ...valueStyle, marginTop: 12 }}>{concursoExibir}</div>
+              <ModalInfoItem>
+                <ModalInfoLabel>Concurso</ModalInfoLabel>
+                <ModalInfoValue>{concursoExibir}</ModalInfoValue>
+              </ModalInfoItem>
             </Col>
             <Col span={8}>
-              <div style={labelStyle}>Cargo</div>
-              <div style={{ ...valueStyle, marginTop: 12 }}>{cargoExibir}</div>
+              <ModalInfoItem>
+                <ModalInfoLabel>Cargo</ModalInfoLabel>
+                <ModalInfoValue>{cargoExibir}</ModalInfoValue>
+              </ModalInfoItem>
             </Col>
 
             <Col span={12}>
-              <div style={{ ...labelStyle, marginTop: 4 }}>Telefone</div>
-              <Input
-                size="large"
-                style={{ marginTop: 12 }}
-                placeholder="(XX) X XXXX-XXXX"
-                value={telefone}
-                onChange={handleTelefoneChange}
-                status={erroTelefone ? "error" : undefined}
-              />
-              {erroTelefone && (
-                <Typography.Text type="danger" style={{ fontSize: 12, display: "block", marginTop: 4 }}>
-                  {erroTelefone}
-                </Typography.Text>
-              )}
+              <AppFormItem
+                label="Telefone"
+                labelCol={{ span: 24 }}
+                validateStatus={erroTelefone ? "error" : undefined}
+                help={erroTelefone}
+              >
+                <Input
+                  size="large"
+                  placeholder="(XX) X XXXX-XXXX"
+                  value={telefone}
+                  onChange={handleTelefoneChange}
+                  status={erroTelefone ? "error" : undefined}
+                />
+              </AppFormItem>
             </Col>
             <Col span={12}>
-              <div style={{ ...labelStyle, marginTop: 4 }}>E-mail</div>
-              <Input
-                size="large"
-                style={{ marginTop: 12 }}
-                placeholder="E-mail"
-                value={email}
-                onChange={handleEmailChange}
-                status={erroEmail ? "error" : undefined}
-              />
-              {erroEmail && (
-                <Typography.Text type="danger" style={{ fontSize: 12, display: "block", marginTop: 4 }}>
-                  {erroEmail}
-                </Typography.Text>
-              )}
+              <AppFormItem
+                label="E-mail"
+                labelCol={{ span: 24 }}
+                validateStatus={erroEmail ? "error" : undefined}
+                help={erroEmail}
+              >
+                <Input
+                  size="large"
+                  placeholder="E-mail"
+                  value={email}
+                  onChange={handleEmailChange}
+                  status={erroEmail ? "error" : undefined}
+                />
+              </AppFormItem>
             </Col>
           </Row>
 

@@ -1,8 +1,7 @@
 import React from "react";
-import { Button, Modal } from "antd";
+import { Modal } from "antd";
 import { CheckCircleFilled, WarningFilled } from "@ant-design/icons";
-
-import { ClearButton } from "../../../Processos/ConvocacaoCandidatos/style";
+import { AppButton, confirmationModalStyles, confirmationModalWidth } from '@/components/ui';
 import type { AtivacaoModalProps } from "../../../../services/resources/permissoes/IPermissoes";
 
 const AtivacaoModal: React.FC<AtivacaoModalProps> = ({
@@ -18,6 +17,7 @@ const AtivacaoModal: React.FC<AtivacaoModalProps> = ({
   const titulo = isAtivar ? "Ativar usuário" : "Desativar usuário";
   const texto = isAtivar ? "Tem certeza que deseja ativar" : "Tem certeza que deseja desativar";
   const cta = isAtivar ? "Ativar usuário" : "Desativar usuário";
+  const s = confirmationModalStyles;
 
   return (
     <Modal
@@ -25,60 +25,50 @@ const AtivacaoModal: React.FC<AtivacaoModalProps> = ({
       title={step === "success" ? "Sucesso" : titulo}
       onCancel={onCancel}
       centered
-      width={720}
+      width={confirmationModalWidth}
       footer={
         step === "success" ? (
-          <div style={{ display: "flex", justifyContent: "center", paddingTop: 8 }}>
-            <Button
+          <div style={s.footerCenteredSingle}>
+            <AppButton
+              variant="primary"
               size="large"
-              type="primary"
-              style={{ width: 260, height: 52 }}
+              style={s.confirmButton}
               onClick={onOk ?? onCancel}
             >
               Ok
-            </Button>
+            </AppButton>
           </div>
         ) : (
-          <div style={{ display: "flex", justifyContent: "center", gap: 48, paddingTop: 8 }}>
-            <ClearButton
+          <div style={s.footerCentered}>
+            <AppButton
+              variant="secondary"
               size="large"
-              style={{ width: 220, height: 52, marginTop: 0 }}
+              style={s.cancelButton}
               onClick={onCancel}
             >
               Cancelar
-            </ClearButton>
-            <Button
+            </AppButton>
+            <AppButton
+              variant="primary"
               size="large"
-              type="primary"
-              style={{ width: 260, height: 52 }}
+              style={s.confirmButton}
               onClick={onConfirm}
             >
               {cta}
-            </Button>
+            </AppButton>
           </div>
         )
       }
-      styles={{
-        body: { padding: "28px 24px 8px 24px" },
-        footer: { padding: "18px 24px 28px 24px" },
-      }}
+      styles={s.antdStyles}
     >
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 22 }}>
+      <div style={s.contentColumn}>
         {step === "success" ? (
-          <CheckCircleFilled style={{ fontSize: 92, color: "#51B05B" }} />
+          <CheckCircleFilled style={s.successIconLarge} />
         ) : (
-          <WarningFilled style={{ fontSize: 72, color: "#F5B800" }} />
+          <WarningFilled style={s.warningIconWarning} />
         )}
 
-        <div
-          style={{
-            textAlign: "center",
-            fontFamily: "Open Sans",
-            fontSize: 28,
-            lineHeight: "36px",
-            color: "#111111",
-          }}
-        >
+        <div style={s.singleTitleText}>
           {step === "success" ? (
             <>
               Usuário <strong>{isAtivar ? "ativado" : "desativado"}</strong> com sucesso!

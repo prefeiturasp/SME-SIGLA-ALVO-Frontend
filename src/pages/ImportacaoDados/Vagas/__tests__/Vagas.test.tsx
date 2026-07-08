@@ -61,7 +61,10 @@ jest.mock('antd', () => {
     },
     Space: ({ children }: any) => <div>{children}</div>,
     DatePicker: ({ onChange }: any) => <input type="date" onChange={(e) => onChange?.(e.target.value)} />,
-    Radio: ({ children }: any) => <div>{children}</div>,
+    Radio: Object.assign(
+      ({ children }: any) => <div>{children}</div>,
+      { Group: ({ children }: any) => <div role="radiogroup">{children}</div> }
+    ),
   };
 });
 
@@ -76,7 +79,28 @@ jest.mock('antd/es/form/FormItem', () => {
 });
 
 // Mock componentes customizados
-jest.mock('../../../../components/EstilosCompartilhados', () => ({
+jest.mock('@/components/ui', () => ({
+  formTabStyles: {
+    introRow: { marginBottom: "1.8125rem" },
+    introTitle: { marginTop: "0" },
+    introDescription: { fontSize: "14px" },
+    fieldsRow: { marginBottom: "1.8125rem" },
+  },
+  confirmationModalStyles: {},
+  confirmationModalWidth: 720,
+  editableTableStyles: {
+    saveIcon: {},
+    cancelIcon: {},
+    editIcon: {},
+    deleteIcon: {},
+    actionsRow: { display: "flex" },
+    editRow: { display: "flex" },
+    actionsCell: { width: 56 },
+    hiddenPlaceholder: { visibility: "hidden" },
+    inputEditWidth60: { width: 60 },
+    inputEditGreen: { width: 60 },
+  },
+  selectSuffixIcon: { fontSize: "1.5rem", color: "#032B68" },
   TabContentContainer: ({ children }: any) => <div data-testid="tab-content">{children}</div>,
   SectionCard: ({ children }: any) => <div>{children}</div>,
   SectionTitle: ({ children }: any) => <h2>{children}</h2>,
@@ -110,15 +134,15 @@ jest.mock('../../../../components/EstilosCompartilhados', () => ({
   ),
   ActionButtonsContainer: ({ children }: any) => <div data-testid="action-buttons">{children}</div>,
   GrupoEsquerda: ({ children }: any) => <div>{children}</div>,
-}));
-
-jest.mock('../../../../components/FormStyle', () => ({
-  CustomFormItem: ({ children, label, help, validateStatus }: any) => (
+  AppFormItem: ({ children, label, help, validateStatus }: any) => (
     <div data-testid="custom-form-item" data-validate={validateStatus}>
       {label && <label>{label}</label>}
       {help && <span data-testid="help">{help}</span>}
       {children}
     </div>
+  ),
+  AppButton: ({ children, onClick, disabled, variant }: any) => (
+    <button type="button" onClick={onClick} disabled={disabled}>{children}</button>
   ),
 }));
 
@@ -378,31 +402,15 @@ describe('VagasFormTab', () => {
       expect(tooltips.length).toBeGreaterThan(0);
     });
 
-    it('deve mostrar tooltip normal para upload', () => {
+    it('não deve exibir tooltip de seleção quando tem permissão', () => {
       renderComponent({ canImportarVagas: true });
-      expect(screen.getByTitle('Selecionar arquivo')).toBeInTheDocument();
+      expect(screen.queryByTitle('Selecionar arquivo')).not.toBeInTheDocument();
     });
 
-    it('deve mostrar tooltip de sem permissão para histórico', () => {
-      renderComponent({ canViewHistoricoVagas: false });
-      const tooltips = screen.getAllByTitle(/não possui permissão/i);
-      expect(tooltips.length).toBeGreaterThan(0);
-    });
-
-    it('deve mostrar tooltip normal para histórico', () => {
-      renderComponent({ canViewHistoricoVagas: true });
-      expect(screen.getByTitle('Histórico')).toBeInTheDocument();
-    });
-
-    it('deve mostrar tooltip de sem permissão para importar', () => {
-      renderComponent({ canImportarVagas: false });
-      const tooltips = screen.getAllByTitle(/não possui permissão/i);
-      expect(tooltips.length).toBeGreaterThan(0);
-    });
-
-    it('deve mostrar tooltip normal para importar', () => {
-      renderComponent({ canImportarVagas: true });
-      expect(screen.getByTitle('Importar')).toBeInTheDocument();
+    it('não deve exibir tooltip nos botões Histórico e Importar', () => {
+      renderComponent({ canViewHistoricoVagas: true, canImportarVagas: true });
+      expect(screen.queryByTitle('Histórico')).not.toBeInTheDocument();
+      expect(screen.queryByTitle('Importar')).not.toBeInTheDocument();
     });
   });
 

@@ -6,13 +6,17 @@ import AtivacaoModal from "../components/AtivacaoModal";
 import type { AtivacaoModalProps } from "../../../../services/resources/permissoes/IPermissoes";
 
 // Mock do ClearButton
-jest.mock("../../../Processos/ConvocacaoCandidatos/style", () => ({
-  ClearButton: ({ children, onClick, ...props }: any) => (
-    <button onClick={onClick} {...props}>
-      {children}
-    </button>
-  ),
-}));
+jest.mock("@/components/ui", () => {
+  const actual = jest.requireActual("@/components/ui");
+  return {
+    ...actual,
+    ClearButton: ({ children, onClick, ...props }: any) => (
+      <button onClick={onClick} {...props}>
+        {children}
+      </button>
+    ),
+  };
+});
 
 const createWrapper = () => {
   return ({ children }: { children: React.ReactNode }) => (

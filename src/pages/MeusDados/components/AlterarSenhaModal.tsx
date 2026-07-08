@@ -1,18 +1,18 @@
 import React, { useState, useMemo } from "react";
-import { App, Modal, Button, Alert, Row, Col } from "antd";
+import { App, Modal, Alert, Row, Col } from "antd";
 import { EyeInvisibleOutlined, EyeOutlined, CheckCircleFilled, CloseCircleFilled } from "@ant-design/icons";
 import { useAlterarSenha } from "../hooks/usePostAlterarSenha";
-import { StandardInput } from "../../../components/EstilosCompartilhados";
+import { AppButton, StandardInput } from '@/components/ui';
 import {
-  ModalTitleStyled,
+  MeusDadosModalTitle as ModalTitleStyled,
   RequisitoItem,
   RequisitosTitulo,
   RequisitosNaoTitulo,
-  FieldLabel,
+  MeusDadosFieldLabel as FieldLabel,
   FieldWrapper,
   ErrorText,
-  ButtonsContainer,
-} from "./AlterarSenhaModal.styles";
+  MeusDadosButtonsContainer as ButtonsContainer,
+} from "@/design-system/estilos";
 
 interface AlterarSenhaModalProps {
   open: boolean;
@@ -280,12 +280,12 @@ const AlterarSenhaModal: React.FC<AlterarSenhaModalProps> = ({ open, onClose }) 
       />
 
       <ButtonsContainer>
-        <Button onClick={handleClose} disabled={isPending}>
+        <AppButton variant="secondary" onClick={handleClose} disabled={isPending}>
           Cancelar
-        </Button>
-        <Button type="primary" onClick={handleSalvar} loading={isPending}>
+        </AppButton>
+        <AppButton onClick={handleSalvar} loading={isPending}>
           Salvar senha
-        </Button>
+        </AppButton>
       </ButtonsContainer>
     </Modal>
   );

@@ -1,13 +1,13 @@
 import React from "react";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import { Modal, Typography, Button } from "antd";
+import { Modal, Typography } from "antd";
 import { CloudDownloadOutlined } from "@ant-design/icons";
-import { StyledTable } from "../../../components/EstilosCompartilhados";
 import { useExportacaoVagas } from "../hooks/useExportacaoVagas";
 import type { ExportacaoTipo } from "../../../services/resources/exportacaoDados/types";
 import type { IExportacaoVagasListItem } from "../../../services/resources/exportacaoDados/types";
 
+import { AppIconButton, StyledTable } from '@/components/ui';
 const TITULOS: Record<ExportacaoTipo, string> = {
   "vagas-processo": "Histórico de exportações - Vagas Processo",
   "vagas-sigpec": "Histórico de exportações - Vagas SIGPEC",
@@ -71,9 +71,10 @@ const HistoricoExportacaoModal: React.FC<HistoricoExportacaoModalProps> = ({
       key: "download",
       align: "center",
       render: (_, record) => (
-        <Button
+        <AppIconButton
           type="link"
           size="small"
+          tooltip="Download"
           icon={<CloudDownloadOutlined />}
           onClick={() => handleDownload(record.uuid)}
           aria-label="Download"

@@ -1,19 +1,19 @@
 import React from "react";
-import { Alert, Button, Col, Input, Row, Typography } from "antd";
+import { Alert, Col, Input, Row, Typography } from "antd";
+
 import { useNavigate } from "react-router-dom";
 
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import { CustomFormItem } from "../../../components/FormStyle";
+
 import { postBuscarUsuarioEol } from "../../../services/resources/usuarios";
 import type { IBuscarUsuarioEolResponse } from "../../../services/resources/usuarios";
 import { usePostCriarUsuario } from "./hooks/usePostCriarUsuario";
 
+import { AppButton, AppFormItem, FieldLabel, FilterActionSlot, FilterInlineRow, FilterFieldCol, FilterActionCol } from '@/components/ui';
 import {
   PageContainer,
   ConteudoPagina,
-  FieldLabel,
-  SearchButton,
-} from "./styles";
+} from "@/components/ui";
 
 const { Text } = Typography;
 
@@ -114,9 +114,9 @@ const AdicionarUsuarioTela: React.FC = () => {
           <Text style={{ display: "block", marginBottom: 16 }}>
             Preencha os campos para adicionar um novo usuário
           </Text>
-          <Row gutter={[16, 0]} style={{ alignItems: "flex-end" }}>
-            <Col xs={24} md={20}>
-              <CustomFormItem
+          <FilterInlineRow gutter={[16, 0]}>
+            <FilterFieldCol xs={24} md={20}>
+              <AppFormItem
                 label={<FieldLabel>Registro funcional (RF)</FieldLabel>}
                 labelCol={{ span: 24 }}
               >
@@ -133,21 +133,22 @@ const AdicionarUsuarioTela: React.FC = () => {
                   onPressEnter={handleBuscar}
                   placeholder="Entre com o RF"
                 />
-              </CustomFormItem>
-            </Col>
-            <Col xs={24} md={4}>
-              <CustomFormItem label={<span style={{ visibility: "hidden" }}>_</span>} labelCol={{ span: 24 }}>
-                <Button                  
+              </AppFormItem>
+            </FilterFieldCol>
+            <FilterActionCol xs={24} md={4}>
+              <FilterActionSlot>
+                <AppButton
+                  variant="secondary"
                   size="large"
                   onClick={handleBuscar}
                   disabled={!rf.trim()}
                   style={{ width: "100%" }}
                 >
                   Buscar usuário
-                </Button>
-              </CustomFormItem>
-            </Col>
-          </Row>
+                </AppButton>
+              </FilterActionSlot>
+            </FilterActionCol>
+          </FilterInlineRow>
 
           {erro && (
             <Alert
@@ -162,20 +163,20 @@ const AdicionarUsuarioTela: React.FC = () => {
             <>
               <Row gutter={[16, 0]} style={{ marginTop: 32 }}>
                 <Col xs={24} md={12}>
-                  <CustomFormItem
+                  <AppFormItem
                     label={<FieldLabel>Nome</FieldLabel>}
                     labelCol={{ span: 24 }}
                   >
                     <Input value={dadosUsuario.nome} disabled />
-                  </CustomFormItem>
+                  </AppFormItem>
                 </Col>
                 <Col xs={24} md={12}>
-                  <CustomFormItem
+                  <AppFormItem
                     label={<FieldLabel>E-mail</FieldLabel>}
                     labelCol={{ span: 24 }}
                   >
                     <Input value={dadosUsuario.email} disabled />
-                  </CustomFormItem>
+                  </AppFormItem>
                 </Col>
               </Row>
 
@@ -189,21 +190,22 @@ const AdicionarUsuarioTela: React.FC = () => {
               )}
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
-                <Button
+                <AppButton
+                  variant="secondary"
                   size="large"
                   onClick={() => navigate("/gerenciar/gerenciamento-usuarios")}
-                  disabled={criarUsuarioMutation.isPending}              
+                  disabled={criarUsuarioMutation.isPending}
                 >
                   Voltar
-                </Button>
-                <Button
-                  type="primary"
+                </AppButton>
+                <AppButton
+                  variant="primary"
                   size="large"
                   onClick={handleAdicionar}
-                  loading={criarUsuarioMutation.isPending}             
+                  loading={criarUsuarioMutation.isPending}
                 >
                   Adicionar usuário
-                </Button>
+                </AppButton>
               </div>
             </>
           )}

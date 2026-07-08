@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Button, Result } from 'antd';
+import { Result } from 'antd';
+import { AppButton } from '@/components/ui';
 
 
 
@@ -12,12 +13,9 @@ const NotFoundTela = () => {
       title="404"
       subTitle="Desculpe, a página que você visitou não existe."
       extra={
-        <Button
-          type="primary"
-          onClick={() => navigate('/')}
-          >
+        <AppButton onClick={() => navigate('/')}>
           Voltar pra Home
-        </Button>
+        </AppButton>
       }
     />
   )

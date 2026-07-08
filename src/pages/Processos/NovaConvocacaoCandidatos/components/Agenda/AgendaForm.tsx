@@ -1,8 +1,36 @@
 import React from "react";
-import { Space, Typography, Select, Row, Col, Button, DatePicker, TimePicker, Checkbox, Radio, Flex, InputNumber } from "antd";
+import { Space, Typography, Select, Row, Col, DatePicker, TimePicker, Checkbox, Radio, Flex, InputNumber } from "antd";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { PlusOutlined } from "@ant-design/icons";
+import { AppButton } from '@/components/ui';
+import {
+  fullWidth,
+  fieldColumn,
+  standardWideControlWithMargin,
+  standardWideControl,
+  standardNarrowControl,
+  formErrorText,
+  formErrorTextInline,
+  brandHighlightText,
+} from "@/design-system/estilos";
+
+const styles = {
+  fullWidth,
+  fieldColumn,
+  fieldControlWide: standardWideControlWithMargin,
+  radioGroup: { width: standardWideControl.width },
+  fieldControlNarrow: standardNarrowControl,
+  sectionSpacing: { marginTop: 16 },
+  timeRow: { marginTop: 4 },
+  timePicker: { width: "17.3125rem", height: standardWideControl.height },
+  timeSeparatorCol: { display: "flex", alignItems: "center", paddingBottom: 0 },
+  errorRow: { marginTop: 8 },
+  errorMessage: formErrorText,
+  errorMessageInline: formErrorTextInline,
+  iconPrimary: brandHighlightText,
+  addButton: { marginTop: 16 },
+};
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import { Controller, type Control, type FieldErrors } from "react-hook-form";
 import { type Option } from "../../hooks/useAgenda";
@@ -36,8 +64,8 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
 }) => {
   return (
     <>
-      <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+      <Space direction="vertical" size="middle" style={styles.fullWidth}>
+        <div style={styles.fieldColumn}>
           <Text strong>Modalidade da Escolha</Text>
           <Controller
             name="tipoEscolha"
@@ -50,19 +78,19 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                     { label: 'Presencial', value: 'Presencial' },
                     { label: 'Online', value: 'Online' }
                   ]}
-                  style={{ width: "36.875rem" }}
+                  style={styles.radioGroup}
                 />
               </Flex>
             )}
           />
           {formErrors.tipoEscolha && (
-            <Text style={{ color: "#ff4d4f", fontSize: "12px", marginTop: 4 }}>
+            <Text style={styles.errorMessage}>
               {getErrorMessage(formErrors.tipoEscolha)}
             </Text>
           )}
         </div>
         
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+        <div style={styles.fieldColumn}>
           <Text strong>Cargo</Text>
           <Controller
             name="cargoAgenda"
@@ -71,7 +99,7 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
               <Select
                 {...field}
                 placeholder="Selecione o cargo"
-                style={{ width: "36.875rem", height: "2.5rem", marginTop: 4 }}
+                style={styles.fieldControlWide}
                 options={cargosDisponiveis}
                 allowClear={false}
                 showSearch={false}
@@ -83,13 +111,13 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
             )}
           />
           {formErrors.cargoAgenda && (
-            <Text style={{ color: "#ff4d4f", fontSize: "12px", marginTop: 4 }}>
+            <Text style={styles.errorMessage}>
               {getErrorMessage(formErrors.cargoAgenda)}
             </Text>
           )}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+        <div style={styles.fieldColumn}>
           <Text strong>Escolha em</Text>
           <Controller
             name="escolhaEm"
@@ -101,8 +129,8 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                   value={field.value}
                   onChange={(dates) => field.onChange(dates)}
                   placeholder={["Data início", "Data fim"]}
-                  style={{ width: "36.875rem", height: "2.5rem", marginTop: 4 }}
-                  suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
+                  style={styles.fieldControlWide}
+                  suffixIcon={<CalendarMonthIcon style={styles.iconPrimary} />}
                   format="DD/MM/YYYY"
                   status={formErrors.escolhaEm ? 'error' : undefined}
                 />
@@ -110,8 +138,8 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                 <DatePicker
                   {...field}
                   placeholder="Insira a data"
-                  style={{ width: "36.875rem", height: "2.5rem", marginTop: 4 }}
-                  suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
+                  style={styles.fieldControlWide}
+                  suffixIcon={<CalendarMonthIcon style={styles.iconPrimary} />}
                   format="DD/MM/YYYY"
                   status={formErrors.escolhaEm ? 'error' : undefined}
                 />
@@ -119,13 +147,13 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
             )}
           />
           {formErrors.escolhaEm && (
-            <Text style={{ color: "#ff4d4f", fontSize: "12px", marginTop: 4 }}>
+            <Text style={styles.errorMessage}>
               {getErrorMessage(formErrors.escolhaEm)}
             </Text>
           )}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+        <div style={styles.fieldColumn}>
           <Text strong>Nomeação em</Text>
           <Controller
             name="nomeacaoEm"
@@ -134,23 +162,23 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
               <DatePicker
                 {...field}
                 placeholder="Insira a data"
-                style={{ width: "36.875rem", height: "2.5rem", marginTop: 4 }}
-                suffixIcon={<CalendarMonthIcon style={{ color: "#05409A" }} />}
+                style={styles.fieldControlWide}
+                suffixIcon={<CalendarMonthIcon style={styles.iconPrimary} />}
                 format="DD/MM/YYYY"
                 status={formErrors.nomeacaoEm ? 'error' : undefined}
               />
             )}
           />
           {formErrors.nomeacaoEm && (
-            <Text style={{ color: "#ff4d4f", fontSize: "12px", marginTop: 4 }}>
+            <Text style={styles.errorMessage}>
               {getErrorMessage(formErrors.nomeacaoEm)}
             </Text>
           )}
         </div>
       </Space>
 
-      <div style={{ marginTop: 16 }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+      <div style={styles.sectionSpacing}>
+        <div style={styles.fieldColumn}>
           <Text strong>Classificação</Text>
           <Controller
             name="quantidadeClassificados"
@@ -159,20 +187,20 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
               <InputNumber
                 {...field}
                 placeholder="Quantidade de classificados"
-                style={{ width: "16rem", height: "2.5rem", marginTop: 4 }}
+                style={styles.fieldControlNarrow}
                 min={1}
                 status={formErrors.quantidadeClassificados ? 'error' : undefined}
               />
             )}
           />
           {formErrors.quantidadeClassificados && (
-            <Text style={{ color: "#ff4d4f", fontSize: "12px", marginTop: 4 }}>
+            <Text style={styles.errorMessage}>
               {getErrorMessage(formErrors.quantidadeClassificados)}
             </Text>
           )}
         </div>
         
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginTop: 16 }}>
+        <div style={{ ...styles.fieldColumn, ...styles.sectionSpacing }}>
           <Text strong>Sessão</Text>
           <Controller
             name="sessao"
@@ -181,14 +209,14 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
               <InputNumber
                 {...field}
                 placeholder="Quantidade de sessões"
-                style={{ width: "16rem", height: "2.5rem", marginTop: 4 }}
+                style={styles.fieldControlNarrow}
                 min={1}
                 status={formErrors.sessao ? 'error' : undefined}
               />
             )}
           />
           {formErrors.sessao && (
-            <Text style={{ color: "#ff4d4f", fontSize: "12px", marginTop: 4 }}>
+            <Text style={styles.errorMessage}>
               {getErrorMessage(formErrors.sessao)}
             </Text>
           )}
@@ -196,9 +224,9 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
       </div>
 
       {tipoEscolha === "Presencial" && (
-        <div style={{ marginTop: 16 }}>
+        <div style={styles.sectionSpacing}>
           <Text strong>Hora da convocação</Text>
-          <Row gutter={[8, 8]} style={{ marginTop: 4 }}>
+          <Row gutter={[8, 8]} style={styles.timeRow}>
             <Col>
               <Controller
                 name="horaInicio"
@@ -207,15 +235,15 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                   <TimePicker
                     {...field}
                     placeholder="Início"
-                    style={{ width: "17.3125rem", height: "2.5rem" }}
-                    suffixIcon={<AccessTimeIcon style={{ color: "#05409A" }} />}
+                    style={styles.timePicker}
+                    suffixIcon={<AccessTimeIcon style={styles.iconPrimary} />}
                     format="HH:mm"
                     status={formErrors.horaInicio ? 'error' : undefined}
                   />
                 )}
               />
             </Col>
-            <Col style={{ display: "flex", alignItems: "center", paddingBottom: 0 }}>
+            <Col style={styles.timeSeparatorCol}>
               <Text strong>às</Text>
             </Col>
             <Col>
@@ -226,15 +254,15 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                   <TimePicker
                     {...field}
                     placeholder="Fim"
-                    style={{ width: "17.3125rem", height: "2.5rem" }}
-                    suffixIcon={<AccessTimeIcon style={{ color: "#05409A" }} />}
+                    style={styles.timePicker}
+                    suffixIcon={<AccessTimeIcon style={styles.iconPrimary} />}
                     format="HH:mm"
                     status={formErrors.horaFim ? 'error' : undefined}
                   />
                 )}
               />
             </Col>
-            <Col style={{ display: "flex", alignItems: "center", paddingBottom: 0 }}>
+            <Col style={styles.timeSeparatorCol}>
               <Checkbox
                 checked={isRetardatario}
                 onChange={(e) => setIsRetardatario(e.target.checked)}
@@ -243,18 +271,17 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
               </Checkbox>
             </Col>
           </Row>
-          {/* Mensagens de erro para horários */}
-          <Row style={{ marginTop: 8 }}>
+          <Row style={styles.errorRow}>
             {formErrors.horaInicio && (
               <Col span={12}>
-                <Text style={{ color: "#ff4d4f", fontSize: "12px" }}>
+                <Text style={styles.errorMessageInline}>
                   {getErrorMessage(formErrors.horaInicio)}
                 </Text>
               </Col>
             )}
             {formErrors.horaFim && (
               <Col span={12}>
-                <Text style={{ color: "#ff4d4f", fontSize: "12px" }}>
+                <Text style={styles.errorMessageInline}>
                   {getErrorMessage(formErrors.horaFim)}
                 </Text>
               </Col>
@@ -263,16 +290,16 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
         </div>
       )}
 
-      <Button 
-        type="primary" 
+      <AppButton 
+        variant="primary"
         icon={<PlusOutlined />} 
         size="large" 
-        style={{ marginTop: 16 }}
+        style={styles.addButton}
         disabled={!isAgendaComplete()}
         onClick={handleAdicionarPeriodo}
       >
         Adicionar Agenda
-      </Button>
+      </AppButton>
     </>
   );
 };

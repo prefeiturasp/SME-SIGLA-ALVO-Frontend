@@ -276,23 +276,6 @@ describe("PermissaoUsuarioTela", () => {
       });
     });
 
-    it("deve navegar ao clicar no breadcrumb Home", async () => {
-      const user = userEvent.setup();
-      const wrapper = createWrapper();
-      render(<PermissaoUsuarioTela />, { wrapper });
-
-      await waitFor(() => {
-        const breadcrumbs = screen.getAllByTestId(/^breadcrumb-/);
-        const homeBreadcrumb = breadcrumbs.find((b) =>
-          b.textContent?.includes("Home")
-        );
-        if (homeBreadcrumb) {
-          fireEvent.click(homeBreadcrumb);
-          expect(mockNavigate).toHaveBeenCalledWith("/");
-        }
-      });
-    });
-
     it("deve navegar ao clicar no breadcrumb Gerenciar", async () => {
       const user = userEvent.setup();
       const wrapper = createWrapper();

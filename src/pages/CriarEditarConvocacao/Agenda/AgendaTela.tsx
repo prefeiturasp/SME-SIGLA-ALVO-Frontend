@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Button,
   Card,
   Alert,
   Steps,
@@ -8,7 +7,6 @@ import {
   Row,
   Col,
   Divider,
-  Tooltip,
   theme,
   message,
 } from "antd";
@@ -20,20 +18,20 @@ import {
 } from "@ant-design/icons";
 import { StepActions } from "../components/StepActions";
 import { steps } from "../components/StepsNames";
-import { ConvocacaoStepsGlobalStyle } from "../components/ConvocacaoStepsStyles";
+import { ConvocacaoStepsGlobalStyle } from "@/components/ui";
 import { useConvocacaoSteps } from "../components/useConvocacaoSteps";
 import { useAgenda } from "./hooks/useAgenda";
-import { 
+import { AppButton, StyledCardWithoutBorder } from '@/components/ui';
+import {
   inlineStyles,
-  GlobalStyles,
+  AgendaGlobalStyles,
   processInfoStyles,
-  agendaTelaStyles
-} from "./styles";
+  agendaTelaStyles,
+} from "@/design-system/estilos";
 import dayjs from "dayjs";
 import AgendaForm from "./components/AgendaForm";
 import AgendaTabela from "./components/AgendaTabela";
 import { useGetPermissions } from "../../../routes/PermissionContextGuard";
-import { StyledCardWithoutBorder } from "../../../components/EstilosCompartilhados";
 import { usePatchPassoProcessoConvocacao } from "../hooks/usePatchPassoProcessoConvocacao";
 
 const { Text } = Typography;
@@ -174,23 +172,19 @@ const AgendaTela: React.FC = () => {
   return (
     <>
       <ConvocacaoStepsGlobalStyle />
-      <GlobalStyles />
+      <AgendaGlobalStyles />
       <BaseTela
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
         buttons={
-          <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
-
-          <Button
-            color="primary"
-            variant="outlined"
+          <AppButton
+            variant="secondary"
             icon={<UserSwitchOutlined />}
             disabled={!canAddImportacaoArquivoVagas}
             onClick={() => navigate('/processos/gerenciamento-vagas')}
           >
             Gerenciamento de vagas
-          </Button>
-          </Tooltip>
+          </AppButton>
         }
       >
         <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">

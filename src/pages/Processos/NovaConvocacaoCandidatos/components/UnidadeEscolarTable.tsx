@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import type { TableProps } from "antd";
-import { Flex, Button, Tooltip, InputNumber } from "antd";
+import { Flex, InputNumber } from "antd";
 import type { TableColumnsType } from "antd";
 import type { IVaga } from "../../../../services/resources/convocacao/IConvocacao";
-import { StyledTable } from "../../../../components/EstilosCompartilhados";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { Controller, useForm } from "react-hook-form";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 
 
+import { StyledTable, EditActionIcon, editableTableStyles, AppIconButton } from '@/components/ui';
 interface UnidadeEscolarTableProps extends TableProps<IVaga> {
   filteredData: IVaga[];
   loading?: boolean;
@@ -129,33 +128,30 @@ const UnidadeEscolarTable: React.FC<UnidadeEscolarTableProps> = ({
       render: (_: any, record: IVaga) => {
         const editable = isEditing(record);
         return editable ? (
-          <div style={{ width: 56, display: "flex", justifyContent: "center", gap: 2 }}>
-            <Tooltip title="Salvar">
-              <Button
-                type="link"
-                onClick={() => save(record.uuid)}
-                icon={<CheckOutlined style={{ color: "#05409A" }} />}
-              />
-            </Tooltip>
-            <Tooltip title="Cancelar">
-              <Button
-                type="link"
-                onClick={cancel}
-                icon={<CloseOutlined style={{ color: "#ff4d4f" }} />}
-              />
-            </Tooltip>
+          <div style={editableTableStyles.actionsCell}>
+            <AppIconButton
+              type="link"
+              tooltip="Salvar"
+              onClick={() => save(record.uuid)}
+              icon={<CheckOutlined style={editableTableStyles.saveIcon} />}
+            />
+            <AppIconButton
+              type="link"
+              tooltip="Cancelar"
+              onClick={cancel}
+              icon={<CloseOutlined style={editableTableStyles.cancelIcon} />}
+            />
           </div>
         ) : (
-          <div style={{ width: 56, display: "flex", justifyContent: "center", gap: 2 }}>
-            <Tooltip title="Editar vagas">
-              <Button
-                type="link"
-                disabled={editingKey !== ""}
-                onClick={() => edit(record)}
-                icon={<ModeEditOutlineOutlinedIcon style={{ color: "#05409A" }} />}
-              />
-            </Tooltip>
-            <Button type="link" style={{ visibility: "hidden" }} icon={<CloseOutlined />} />
+          <div style={editableTableStyles.actionsCell}>
+            <AppIconButton
+              type="link"
+              tooltip="Editar"
+              disabled={editingKey !== ""}
+              onClick={() => edit(record)}
+              icon={<EditActionIcon />}
+            />
+            <AppIconButton type="link" style={editableTableStyles.hiddenPlaceholder} icon={<CloseOutlined />} />
           </div>
         );
       },

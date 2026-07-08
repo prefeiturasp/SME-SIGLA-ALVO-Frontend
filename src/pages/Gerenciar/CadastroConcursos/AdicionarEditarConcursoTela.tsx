@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Button, Typography } from "antd";
+import { Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import { StyledCardWithoutBorder } from "../../../components/EstilosCompartilhados";
 import FormConcurso from "./components/FormConcurso";
 import { useConcursoForm } from "./hooks/useConcursoForm";
 import { usePostConcurso } from "./hooks/usePostConcurso";
 import { usePatchConcurso } from "./hooks/usePatchConcurso";
 import { useGetConcursoByUuid } from "../../GerenciamentoVagas/hooks/useGetConcursoPorUuid";
 import { obterMensagemNumeroProcessoDuplicado } from "./utils/erroConcurso";
+import {
+  ActionButtonsContainer,
+  AppButton,
+  CardTitle,
+  StyledCardWithoutBorder,
+} from "@/components/ui";
 
 const { Text } = Typography;
 
@@ -109,11 +114,11 @@ const AdicionarEditarConcursoTela: React.FC = () => {
       title={isEdicao ? "Editar concurso" : "Adicionar concurso"}
     >
       <StyledCardWithoutBorder>
-        <Typography.Title level={5}>
+        <CardTitle>
           {isEdicao
             ? "Altere as informações do concurso"
             : "Adicione um novo concurso"}
-        </Typography.Title>
+        </CardTitle>
         <Text type="secondary">
           {isEdicao
             ? "Altere as informações necessárias."
@@ -128,26 +133,19 @@ const AdicionarEditarConcursoTela: React.FC = () => {
           />
         )}
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: 8,
-            marginTop: 16,
-          }}
-        >
-          <Button onClick={() => navigate("/gerenciar/concursos")}>
+        <ActionButtonsContainer>
+          <AppButton variant="secondary" onClick={() => navigate("/gerenciar/concursos")}>
             Voltar
-          </Button>
-          <Button
-            type="primary"
+          </AppButton>
+          <AppButton
+            variant="primary"
             disabled={submitDesabilitado}
             loading={salvando}
             onClick={onSubmit}
           >
             {isEdicao ? "Salvar" : "Adicionar concurso"}
-          </Button>
-        </div>
+          </AppButton>
+        </ActionButtonsContainer>
       </StyledCardWithoutBorder>
     </BaseTela>
   );

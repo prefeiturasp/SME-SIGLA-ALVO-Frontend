@@ -1,6 +1,7 @@
 import React from "react";
-import { Table, Typography, Button } from "antd";
-import { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from "./styles";
+import { Table, Typography } from "antd";
+import { LayoutContainer, HeaderSection, TableContainer, ButtonContainer } from '@/components/ui';
+import { AppButton } from '@/components/ui';
 import { API } from "../../../../../../services";
 import { useQuery } from "@tanstack/react-query";
 import type { ILayout } from "../../../../../../services/resources/importacaoDados/IImportacaoArquivos";
@@ -98,26 +99,21 @@ const LayoutPadrao: React.FC<LayoutPadraoProps> = ({ loading,tipo, onVoltar, dat
       </LayoutContainer>
 
       <ButtonContainer>
-        <Button
-          type="primary"
-          ghost
+        <AppButton
+          variant="secondary"
           size="large"
           onClick={onVoltar}
-          style={{
-            fontWeight: 700,
-            borderRadius: '0.375rem'
-          }}
         >
           Voltar
-        </Button>
-        <Button
-          type="primary"
+        </AppButton>
+        <AppButton
+          variant="primary"
           size="large"
           onClick={handleSalvarArquivo}
           loading={isDownloading}
         >
           Exportar
-        </Button>
+        </AppButton>
       </ButtonContainer>
     </div>
   );

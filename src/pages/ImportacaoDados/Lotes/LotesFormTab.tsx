@@ -3,20 +3,13 @@ import { Row, Col, Select, Button } from "antd";
 import { Controller } from "react-hook-form";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useImportacaoDadosLotes } from "./hooks/useImportacaoDadosLotes";
-import { CustomFormItem } from "../../../components/FormStyle";
-import {
-  TabContentContainer,
-  StyledSelect,
-  UploadArea,
-  StyledUpload,
-  ActionButtonsContainer,
-  GrupoEsquerda,
-} from "../../../components/EstilosCompartilhados";
+
 import { useConcursos } from "../../../hooks/useConcursos";
 import { CloudUploadOutlined } from "@ant-design/icons";
 import FormItem from "antd/es/form/FormItem";
 import { useNavigate } from "react-router-dom";
 
+import { AppFormItem, AppButton, TabContentContainer, StyledSelect, UploadArea, StyledUpload, ActionButtonsContainer, GrupoEsquerda, selectSuffixIcon } from '@/components/ui';
 const LotesFormTab: React.FC = () => {
   const { control, formErrors, handleFileUpload, handleSubmit, handleEnviarForm, watch } =
     useImportacaoDadosLotes();
@@ -33,7 +26,7 @@ const LotesFormTab: React.FC = () => {
               control={control}
               name="concurso"
               render={({ field }) => (
-                <CustomFormItem
+                <AppFormItem
                   label="Concurso"
                   validateStatus={formErrors.concurso ? "error" : undefined}
                   help={formErrors.concurso?.message}
@@ -44,9 +37,7 @@ const LotesFormTab: React.FC = () => {
                     placeholder="Selecione o concurso"
                     loading={concursosOptionsIsLoading}
                     allowClear
-                    suffixIcon={
-                      <ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />
-                    }
+                    suffixIcon={<ExpandMoreIcon style={selectSuffixIcon} />}
                   >
                     {Array.isArray(concursosData)
                       ? concursosData.map((concurso: any) => (
@@ -60,7 +51,7 @@ const LotesFormTab: React.FC = () => {
                           </Select.Option>
                         ))}
                   </StyledSelect>
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
           </Col>
@@ -115,21 +106,16 @@ const LotesFormTab: React.FC = () => {
       </TabContentContainer>
 
       <ActionButtonsContainer>
-        <Button
-          type="primary"
-          ghost
+        <AppButton
+          variant="secondary"
           size="large"
           onClick={() => navigate("/processos/importacao-dados/historico-lotes")}
         >
           Histórico
-        </Button>
-        <Button
-          type="primary"
-          size="large"
-          onClick={handleSubmit(handleEnviarForm)}
-        >
+        </AppButton>
+        <AppButton variant="primary" size="large" onClick={handleSubmit(handleEnviarForm)}>
           Importar
-        </Button>
+        </AppButton>
       </ActionButtonsContainer>
     </>
   );

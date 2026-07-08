@@ -1,7 +1,7 @@
 import React from "react";
-import { Modal, Descriptions, Button, Typography } from "antd";
+import { Modal, Descriptions, Typography } from "antd";
 import dayjs from "dayjs";
-import { ButtonsContainer } from "../../Vagas/components/style";
+import { AppButton, ErrorModalButtonsContainer as ButtonsContainer } from "@/components/ui";
 import type { IUltimasImportacoesHabilitados } from "../../../../services/resources/importacaoDados/IImportacaoArquivos";
 import { formatarStatusImportacao } from "../../utils/statusImportacao";
 
@@ -60,7 +60,9 @@ const DetalhesHabilitadosModal: React.FC<DetalhesHabilitadosModalProps> = ({
       </Descriptions>
 
       <ButtonsContainer>
-        <Button onClick={onClose}>Fechar</Button>
+        <AppButton variant="secondary" onClick={onClose}>
+          Fechar
+        </AppButton>
       </ButtonsContainer>
     </Modal>
   );

@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo } from "react";
 import { Alert, Empty } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { EditOutlined } from "@ant-design/icons";
+import { EditActionIcon } from '@/components/ui';
 import type {
   CandidatoTabela,
   EscolhaCandidatosTabelaProps,
 } from "../hooks/types";
 import type { SituacaoEscolha, TipoVagaEscolha } from "../../../services/resources/escolhas/IEscolhas";
-import { StyledCandidatosTable } from "../styles";
+import { StyledCandidatosTable } from "@/components/ui";
 
 const formatClassification = (value: unknown): string => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -98,8 +98,6 @@ const EscolhaCandidatosTabela: React.FC<EscolhaCandidatosTabelaProps> = ({
         dataIndex: "escolha",
         key: "escolha",
         render: (_value: string, record: CandidatoTabela) => {
-          const descricao =
-            typeof record.escolha === "string" ? record.escolha.trim() : "";
           return (
             <div
               style={{
@@ -109,10 +107,9 @@ const EscolhaCandidatosTabela: React.FC<EscolhaCandidatosTabelaProps> = ({
                 gap: "0.5rem",
                 cursor: "pointer",
               }}
-              title={descricao || "Efetuar escolha"}
               onClick={() => onOpenModal(record)}
             >
-              <EditOutlined style={{ color: "#05409A" }} />
+              <EditActionIcon title="Escolha" />
             </div>
           );
         },
@@ -266,7 +263,6 @@ const EscolhaCandidatosTabela: React.FC<EscolhaCandidatosTabelaProps> = ({
               gap: "0.5rem",
               cursor: "pointer",
             }}
-            title={texto || "Efetuar escolha"}
             onClick={() => {
               const candidatoUuidRaw =
                 record.candidato_uuid ??
@@ -346,7 +342,7 @@ const EscolhaCandidatosTabela: React.FC<EscolhaCandidatosTabelaProps> = ({
               });
             }}
           >
-            <EditOutlined style={{ color: "#05409A" }} />
+            <EditActionIcon title="Escolha" />
             <span>{texto}</span>
           </div>
         );

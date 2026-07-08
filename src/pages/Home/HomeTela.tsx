@@ -4,11 +4,11 @@ import {
   HomeContainer,
   PromoCard,
   LogoContainer,
-  AlvoLogo,
+  HomeAlvoLogo as AlvoLogo,
   Tagline,
   DescriptionText,
   FeaturesList,
-} from "./styles";
+} from "@/design-system/estilos";
 import alvoImg from "../../assets/alvo-img.png";
 
 const breadcrumbItems = [

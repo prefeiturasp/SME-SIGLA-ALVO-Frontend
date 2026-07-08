@@ -2,25 +2,18 @@ import React, { useState } from "react";
 import { Row, Col, Typography, Space, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import { WarningOutlined, EyeOutlined } from "@ant-design/icons";
+import { WarningOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import {
-  TabContentContainer,
-  SectionCard,
-  ActionButtonsContainer,
-  SecondaryButton,
-  StyledTable,
-} from "../../../components/EstilosCompartilhados";
 
-import { CustomTitle } from "../Vagas/components/style";
 import { useImportacaoDados } from "./hooks/useImportacaoDadosHabilitados";
 import ErroModal from "./components/ErroModal";
 import DetalhesHabilitadosModal from "./components/DetalhesHabilitadosModal";
 import { useGetDownloadError, TipoImportacao } from "../hooks/useGetDownloadError";
 import { formatarStatusImportacao } from "../utils/statusImportacao";
 
+import { TabContentContainer, SectionCard, ActionButtonsContainer, StyledTable, AppButton, CustomTitle, ViewActionIcon } from '@/components/ui';
 const { Text } = Typography;
 
 const HistoricoHabilitadosTela: React.FC = () => {
@@ -123,8 +116,8 @@ const HistoricoHabilitadosTela: React.FC = () => {
         <Space size="middle">
           {record.status !== "ERRO" && (
             <Tooltip title="Ver detalhes da importação">
-              <EyeOutlined
-                style={{ cursor: "pointer", fontSize: "18px", color: "#032B68" }}
+              <ViewActionIcon
+                style={{ cursor: "pointer" }}
                 onClick={() => handleOpenDetalhesModal(record)}
               />
             </Tooltip>
@@ -196,9 +189,9 @@ const HistoricoHabilitadosTela: React.FC = () => {
               gap: "1rem",
             }}
           >
-            <SecondaryButton size="large" onClick={() => navigate('/processos/importacao-dados', { state: { tipo: 'HABILITADOS' } })}>
+            <AppButton variant="secondary" size="large" onClick={() => navigate('/processos/importacao-dados', { state: { tipo: 'HABILITADOS' } })}>
               Voltar
-            </SecondaryButton>
+            </AppButton>
           </div>
         </ActionButtonsContainer>
 

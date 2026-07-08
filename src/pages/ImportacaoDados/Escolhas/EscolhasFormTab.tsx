@@ -3,18 +3,12 @@ import {
   Row,
   Col,
   Select,
-  Button,
-  Tooltip,
 } from "antd";
 import { Controller } from "react-hook-form";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useImportacaoDadosEscolhas } from "./hooks/useImportacaoDadosEscolhas";
-import { CustomFormItem } from "../../../components/FormStyle";
-import {
-  TabContentContainer,
-  StyledSelect,
-  ActionButtonsContainer,
-} from "../../../components/EstilosCompartilhados";
+import { AppFormItem, AppButton, TabContentContainer, StyledSelect, ActionButtonsContainer, formTabStyles, selectSuffixIcon } from '@/components/ui';
+
 import { useNavigate } from "react-router-dom";
 
 interface EscolhasProps {
@@ -46,13 +40,13 @@ const EscolhasFormTab: React.FC<EscolhasProps> = ({
     <>
       <TabContentContainer>
 
-        <Row gutter={40} style={{ marginBottom: "1.8125rem" }}>
+        <Row gutter={40} style={formTabStyles.fieldsRow}>
           <Col xs={24} sm={12}>
             <Controller
               control={control}
               name="processo_convocacao"
               render={({ field }) => (
-                <CustomFormItem
+                <AppFormItem
                   label="Processo de convocação"
                   validateStatus={
                     formErrors.processo_convocacao ? "error" : undefined
@@ -69,11 +63,7 @@ const EscolhasFormTab: React.FC<EscolhasProps> = ({
                     placeholder="Selecione o processo"
                     loading={processosConvocacaoOptionsIsLoading}
                     allowClear
-                    suffixIcon={
-                      <ExpandMoreIcon
-                        style={{ fontSize: "1.5rem", color: "#032B68" }}
-                      />
-                    }
+                        suffixIcon={<ExpandMoreIcon style={selectSuffixIcon} />}
                   >
                     {Array.isArray(processosConvocacaoOptions) &&
                       processosConvocacaoOptions.map(
@@ -87,43 +77,30 @@ const EscolhasFormTab: React.FC<EscolhasProps> = ({
                         )
                       )}
                   </StyledSelect>
-                </CustomFormItem>
+                </AppFormItem>
               )}
             />
           </Col>
         </Row>
       </TabContentContainer>
       <ActionButtonsContainer>
-        <Tooltip
-          title={
-            !canViewHistoricoEscolhas
-              ? "Você não possui permissão para essa ação"
-              : "Histórico"
-          }
-          arrow={true}
+        <AppButton
+          variant="secondary"
+          size="large"
+          onClick={onShowHistorico}
+          disabled={!canViewHistoricoEscolhas}
         >
-          <Button type="primary" ghost size="large" onClick={onShowHistorico} disabled={!canViewHistoricoEscolhas}>
-            Histórico
-          </Button>
-        </Tooltip>
-        <Tooltip
-          title={
-            !canImportarEscolhas
-              ? "Você não possui permissão para essa ação"
-              : "Importar"
-          }
-          arrow={true}
+          Histórico
+        </AppButton>
+        <AppButton
+          variant="primary"
+          size="large"
+          onClick={handleSubmit(handleEnviarForm)}
+          disabled={!canImportarEscolhas || isSubmitting}
+          loading={isSubmitting}
         >
-          <Button
-            type="primary"
-            size="large"
-            onClick={handleSubmit(handleEnviarForm)}
-            disabled={!canImportarEscolhas || isSubmitting}
-            loading={isSubmitting}
-          >
-            Importar
-          </Button>
-        </Tooltip>
+          Importar
+        </AppButton>
       </ActionButtonsContainer>
     </>
   );

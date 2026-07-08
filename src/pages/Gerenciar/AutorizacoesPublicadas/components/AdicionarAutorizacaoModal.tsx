@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Button, DatePicker, Form, Input, InputNumber, Modal, Row, Col, Typography } from "antd";
+import { DatePicker, Form, Input, InputNumber, Modal, Row, Col, Typography } from "antd";
+import { AppButton, AppFormItem } from '@/components/ui';
 import dayjs, { Dayjs } from "dayjs";
 import { usePostAutorizacaoPublicada } from "../hooks/usePostAutorizacaoPublicada";
 import { usePatchAutorizacaoPublicada } from "../hooks/usePatchAutorizacaoPublicada";
@@ -121,7 +122,7 @@ const AdicionarAutorizacaoModal: React.FC<Props> = ({
       <Form layout="vertical" form={form} requiredMark={false}>
         <Row gutter={16}>
           <Col xs={24} md={12}>
-            <Form.Item
+            <AppFormItem
               label="Quantidade"
               name="quantidade"
               rules={[{ required: true, message: "Informe a quantidade" }]}
@@ -132,10 +133,10 @@ const AdicionarAutorizacaoModal: React.FC<Props> = ({
                 value={quantidade}
                 onChange={(v) => setQuantidade(typeof v === "number" ? v : undefined)}
               />
-            </Form.Item>
+            </AppFormItem>
           </Col>
           <Col xs={24} md={12}>
-            <Form.Item
+            <AppFormItem
               label="Data"
               name="dataAutorizacao"
               rules={[{ required: true, message: "Informe a data" }]}
@@ -146,10 +147,10 @@ const AdicionarAutorizacaoModal: React.FC<Props> = ({
                 value={dataAutorizacao}
                 onChange={(v) => setDataAutorizacao(v as Dayjs | null)}
               />
-            </Form.Item>
+            </AppFormItem>
           </Col>
         </Row>
-        <Form.Item
+        <AppFormItem
           label="Observação"
           name="observacao"
           rules={[{ required: true, message: "Informe a observação" }]}
@@ -160,12 +161,14 @@ const AdicionarAutorizacaoModal: React.FC<Props> = ({
             onChange={(e) => setObservacao(e.target.value)}
             placeholder="Descreva observações relevantes"
           />
-        </Form.Item>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-          <Button onClick={onCancel} disabled={submitting}>Cancelar</Button>
-          <Button type="primary" onClick={handleConfirm} loading={submitting}>
+        </AppFormItem>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
+          <AppButton variant="secondary" onClick={onCancel} disabled={submitting}>
+            Cancelar
+          </AppButton>
+          <AppButton variant="primary" onClick={handleConfirm} loading={submitting}>
             {mode === "edit" ? "Editar" : "Adicionar"}
-          </Button>
+          </AppButton>
         </div>
       </Form>
     </Modal>

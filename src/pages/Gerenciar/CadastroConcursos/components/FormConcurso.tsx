@@ -1,9 +1,10 @@
-import { Col, Form, Input, InputNumber, Row, Select } from "antd";
+import { Col, InputNumber, Row } from "antd";
 import type { DefaultOptionType } from "antd/es/select";
 import { Controller } from "react-hook-form";
 import type { Control, FieldErrors } from "react-hook-form";
 import type { IConcursoFormFields } from "../hooks/useConcursoForm";
 import { useCargos } from "../../../../hooks/useCargos";
+import { AppFormItem, AppInput, FilterSelect, FilterSelectMulti } from "@/components/ui";
 
 interface IOpcaoCargo {
   value: string;
@@ -16,8 +17,6 @@ interface IFormConcursoProps {
   opcoesIniciais?: IOpcaoCargo[];
 }
 
-// Filtragem em memoria: casa contra o label "codigo - nome",
-// entao digitar o codigo ou o nome filtra as opcoes.
 const filtrarPorLabel = (input: string, option?: DefaultOptionType) => {
   const label = option?.label;
   return typeof label === "string"
@@ -32,8 +31,6 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
 }) => {
   const { opcoes, isLoading } = useCargos();
 
-  // Mescla as opcoes ja selecionadas (edicao) com as do autocomplete,
-  // para que o Select exiba "codigo - nome" em vez do UUID cru.
   const opcoesSelect = [
     ...opcoesIniciais,
     ...opcoes.filter(
@@ -48,14 +45,14 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
           control={control}
           name="cargos_ids"
           render={({ field }) => (
-            <Form.Item
-              layout="vertical"
+            <AppFormItem
+              label="Código do cargo"
               required
-              label={<strong>Código do cargo</strong>}
               validateStatus={erros.cargos_ids ? "error" : undefined}
               help={erros.cargos_ids?.message}
+              labelCol={{ span: 24 }}
             >
-              <Select
+              <FilterSelectMulti
                 {...field}
                 mode="multiple"
                 placeholder="Selecione o(s) cargo(s)..."
@@ -67,7 +64,7 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
                   isLoading ? "Carregando..." : "Nenhum cargo encontrado"
                 }
               />
-            </Form.Item>
+            </AppFormItem>
           )}
         />
       </Col>
@@ -77,15 +74,15 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
           control={control}
           name="nome"
           render={({ field }) => (
-            <Form.Item
-              layout="vertical"
+            <AppFormItem
+              label="Nome do concurso"
               required
-              label={<strong>Nome do concurso</strong>}
               validateStatus={erros.nome ? "error" : undefined}
               help={erros.nome?.message}
+              labelCol={{ span: 24 }}
             >
-              <Input {...field} placeholder="Digite o nome do concurso..." />
-            </Form.Item>
+              <AppInput {...field} placeholder="Digite o nome do concurso..." />
+            </AppFormItem>
           )}
         />
       </Col>
@@ -95,18 +92,15 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
           control={control}
           name="numero_processo"
           render={({ field }) => (
-            <Form.Item
-              layout="vertical"
+            <AppFormItem
+              label="Número do processo"
               required
-              label={<strong>Número do processo</strong>}
               validateStatus={erros.numero_processo ? "error" : undefined}
               help={erros.numero_processo?.message}
+              labelCol={{ span: 24 }}
             >
-              <Input
-                {...field}
-                placeholder="Digite o número do processo..."
-              />
-            </Form.Item>
+              <AppInput {...field} placeholder="Digite o número do processo..." />
+            </AppFormItem>
           )}
         />
       </Col>
@@ -116,12 +110,12 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
           control={control}
           name="ano_edital"
           render={({ field }) => (
-            <Form.Item
-              layout="vertical"
+            <AppFormItem
+              label="Ano do edital"
               required
-              label={<strong>Ano do edital</strong>}
               validateStatus={erros.ano_edital ? "error" : undefined}
               help={erros.ano_edital?.message}
+              labelCol={{ span: 24 }}
             >
               <InputNumber
                 {...field}
@@ -129,7 +123,7 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
                 controls={false}
                 placeholder="Exemplo: 2026"
               />
-            </Form.Item>
+            </AppFormItem>
           )}
         />
       </Col>
@@ -139,18 +133,18 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
           control={control}
           name="banca_responsavel"
           render={({ field }) => (
-            <Form.Item
-              layout="vertical"
+            <AppFormItem
+              label="Banca responsável"
               required
-              label={<strong>Banca responsável</strong>}
               validateStatus={erros.banca_responsavel ? "error" : undefined}
               help={erros.banca_responsavel?.message}
+              labelCol={{ span: 24 }}
             >
-              <Input
+              <AppInput
                 {...field}
                 placeholder="Digite o nome da banca responsável..."
               />
-            </Form.Item>
+            </AppFormItem>
           )}
         />
       </Col>
@@ -160,14 +154,14 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
           control={control}
           name="status"
           render={({ field }) => (
-            <Form.Item
-              layout="vertical"
+            <AppFormItem
+              label="Status do concurso"
               required
-              label={<strong>Status do concurso</strong>}
               validateStatus={erros.status ? "error" : undefined}
               help={erros.status?.message}
+              labelCol={{ span: 24 }}
             >
-              <Select
+              <FilterSelect
                 {...field}
                 placeholder="Selecione"
                 options={[
@@ -175,7 +169,7 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
                   { value: "INATIVO", label: "Inativo" },
                 ]}
               />
-            </Form.Item>
+            </AppFormItem>
           )}
         />
       </Col>

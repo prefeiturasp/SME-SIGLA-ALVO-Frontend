@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
-import { Modal, Button } from "antd";
+import { Modal } from "antd";
+import { AppButton, SecondaryButton } from "@/components/ui";
 import ReactCrop, {
   centerCrop,
   makeAspectCrop,
@@ -150,18 +151,17 @@ const CropImageModal: React.FC<CropImageModalProps> = ({
       destroyOnClose
       maskClosable={false}
       footer={[
-        <Button key="cancelar" onClick={handleClose}>
+        <SecondaryButton key="cancelar" onClick={handleClose}>
           Cancelar
-        </Button>,
-        <Button
+        </SecondaryButton>,
+        <AppButton
           key="confirmar"
-          type="primary"
           onClick={handleConfirmar}
           disabled={confirmarDesabilitado}
           loading={carregando || gerando}
         >
           Confirmar
-        </Button>,
+        </AppButton>,
       ]}
     >
       {imagemSrc && (

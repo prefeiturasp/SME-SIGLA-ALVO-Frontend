@@ -1,24 +1,28 @@
 import React, { useMemo, useState } from "react";
-import { Button, Col, Row, Select, Tooltip } from "antd";
+import { Select, Tooltip } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { CustomFormItem } from "../../../../components/FormStyle";
+
 import {
+  AppButton,
+  AppFormItem,
   StyledSelect,
   TextTitulo,
   TextTituloSecundario,
-} from "../../../../components/EstilosCompartilhados";
+  FilterActionSlot,
+  FilterActionsGroup,
+  FilterInlineRow,
+  FilterFieldCol,
+  FilterActionCol,
+  RelatoriosDetalhadosFilter,
+  RelatoriosDetalhadosTable,
+  TableCard,
+} from '@/components/ui';
 import type {
   RelatorioDetalhadoDetalheAno,
   RelatorioDetalhadoItem,
 } from "../utils/mapRelatoriosDetalhados";
 import { montarSubtituloRelatoriosDetalhados } from "../utils/mapRelatoriosDetalhados";
-import {
-  FilterActions,
-  RelatoriosDetalhadosFilter,
-  RelatoriosDetalhadosTable,
-  TableCard,
-} from "../styles";
 
 type RelatoriosDetalhadosProps = {
   data: RelatorioDetalhadoItem[];
@@ -182,9 +186,9 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
       {mostrarFiltros && (
         <>
           <RelatoriosDetalhadosFilter>
-            <Row gutter={24}>
-              <Col xs={24} md={12}>
-                <CustomFormItem label="Cargo" labelCol={{ span: 24 }}>
+            <FilterInlineRow gutter={[24, 16]}>
+              <FilterFieldCol xs={24} md={12}>
+                <AppFormItem label="Cargo" labelCol={{ span: 24 }}>
                   <StyledSelect
                     value={cargo}
                     onChange={(value) => setCargo(value as string)}
@@ -196,10 +200,10 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
                       </Select.Option>
                     ))}
                   </StyledSelect>
-                </CustomFormItem>
-              </Col>
-              <Col xs={24} md={12}>
-                <CustomFormItem label="DRE" labelCol={{ span: 24 }}>
+                </AppFormItem>
+              </FilterFieldCol>
+              <FilterFieldCol xs={24} md={12}>
+                <AppFormItem label="DRE" labelCol={{ span: 24 }}>
                   <StyledSelect
                     value={dre}
                     onChange={(value) => setDre(value as string)}
@@ -211,20 +215,22 @@ const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
                       </Select.Option>
                     ))}
                   </StyledSelect>
-                </CustomFormItem>
-              </Col>
-            </Row>
-
+                </AppFormItem>
+              </FilterFieldCol>
+              <FilterActionCol xs={24} md={4}>
+                <FilterActionSlot>
+                  <FilterActionsGroup>
+                    <AppButton variant="secondary" size="large" onClick={handleLimparFiltros}>
+                      Limpar filtros
+                    </AppButton>
+                    <AppButton variant="primary" size="large" onClick={handleFiltrar}>
+                      Filtrar
+                    </AppButton>
+                  </FilterActionsGroup>
+                </FilterActionSlot>
+              </FilterActionCol>
+            </FilterInlineRow>
           </RelatoriosDetalhadosFilter>
-
-          <FilterActions style={{ marginTop: 20 }}>
-            <Button type="primary" ghost size="large" onClick={handleLimparFiltros}>
-              Limpar filtros
-            </Button>
-            <Button type="primary" size="large" onClick={handleFiltrar}>
-              Filtrar
-            </Button>
-          </FilterActions>
         </>
       )}
 

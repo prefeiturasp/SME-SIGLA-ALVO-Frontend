@@ -3,6 +3,16 @@ import { message } from 'antd';
 import AgendaTabela from '../components/Agenda/AgendaTabela';
 import { renderWithProviders } from '../../../../test-utils';
 
+jest.mock('@/components/ui', () => ({
+  AppIconButton: ({ icon, onClick, ...props }: any) => (
+    <button type="button" onClick={onClick} {...props}>
+      {icon}
+    </button>
+  ),
+  EditActionIcon: () => <span data-testid="edit-action-icon" />,
+  DeleteActionIcon: () => <span data-testid="delete-action-icon" aria-label="delete" />,
+}));
+
 // Mocks simplificados
 jest.mock('antd', () => ({
   ...jest.requireActual('antd'),
@@ -144,8 +154,8 @@ describe('AgendaTabela', () => {
       renderWithProviders(<AgendaTabela {...mockProps} />);
       
       // Verificar botões de ação
-      const editButtons = screen.getAllByTestId('ModeEditOutlineOutlinedIcon');
-      const deleteButtons = screen.getAllByLabelText('delete');
+      const editButtons = screen.getAllByTestId('edit-action-icon');
+      const deleteButtons = screen.getAllByTestId('delete-action-icon');
       expect(editButtons).toHaveLength(2);
       expect(deleteButtons).toHaveLength(2);
       
@@ -167,11 +177,11 @@ describe('AgendaTabela', () => {
       renderWithProviders(<AgendaTabela {...mockProps} />);
       
       // Testar botão editar
-      fireEvent.click(screen.getAllByTestId('ModeEditOutlineOutlinedIcon')[0]);
+      fireEvent.click(screen.getAllByTestId('edit-action-icon')[0]);
       expect(mockProps.edit).toHaveBeenCalledWith(mockPeriodosList[0]);
       
       // Testar botão excluir
-      fireEvent.click(screen.getAllByLabelText('delete')[0]);
+      fireEvent.click(screen.getAllByTestId('delete-action-icon')[0]);
       expect(mockProps.handleRemoverPeriodo).toHaveBeenCalledWith(1);
     });
   });

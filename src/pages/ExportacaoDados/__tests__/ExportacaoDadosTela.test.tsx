@@ -45,7 +45,7 @@ jest.mock("../../Base/BaseTela", () => {
   };
 });
 
-jest.mock("../../ImportacaoDados/styles", () => ({
+jest.mock("@/components/ui", () => ({
   StyledTabs: ({ activeKey, onChange, items }: any) => (
     <div>
       <div data-testid="tabs">
@@ -82,7 +82,6 @@ describe("ExportacaoDadosTela", () => {
     ).toBeInTheDocument();
 
     const breadcrumb = screen.getByTestId("breadcrumb");
-    expect(breadcrumb).toHaveTextContent("Home");
     expect(breadcrumb).toHaveTextContent("Processos");
     expect(breadcrumb).toHaveTextContent("Exportação de Dados");
   });

@@ -9,10 +9,8 @@ import {
   Upload,
   Input,
   message,
-  Tooltip,
 } from "antd";
 import type { UploadProps } from "antd";
-import { Button } from "antd";
 import { SearchOutlined } from '@ant-design/icons';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
@@ -21,19 +19,29 @@ import { Controller } from "react-hook-form";
 import {
   UserSwitchOutlined,
 } from "@ant-design/icons";
-import { PrimaryButton, SecondaryButton, StyledSelect, ActionButtonsContainer } from "../../components/EstilosCompartilhados";
-import { CustomFormItem } from "../../components/FormStyle";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import VagasEscolasTabela from "./components/VagasEscolasTabela";
 import IncluirEscolasModal from "./components/IncluirEscolasModal";
-import styled from "styled-components";
 
 import { useGerenciamentoVagas } from "./hooks/useGerenciamentoVagas";
 import type { IInclusaoVagasEscolasPayload } from "./hooks/types";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 
 
+import {
+  AppButton,
+  StyledSelect,
+  ActionButtonsContainer,
+  AppFormItem,
+  FilterActionSlot,
+  FilterActionsGroup,
+  selectSuffixIcon,
+} from '@/components/ui';
+import { cursorPointer, cardSpacing } from '@/design-system/estilos';
+import { tokens } from '@/design-system/tokens';
+
+const uploadIconStyle = { fontSize: 48, color: tokens.colors.primary };
 const { Text } = Typography;
 
 const GerenciamentoVagasTela: React.FC = () => {
@@ -113,7 +121,7 @@ const GerenciamentoVagasTela: React.FC = () => {
       title: (
         <Text
           strong
-          style={{ cursor: "pointer" }}
+          style={cursorPointer}
           onClick={() => navigate("/")}
         >
           Home
@@ -124,7 +132,7 @@ const GerenciamentoVagasTela: React.FC = () => {
       title: (
         <Text
           strong
-          style={{ cursor: "pointer" }}
+          style={cursorPointer}
           onClick={() => navigate("/processos")}
         >
           Processos
@@ -158,14 +166,18 @@ const GerenciamentoVagasTela: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Gerenciamento de vagas"
         buttons={
-          <Tooltip title={!canAddProcessoConvocacao?"Você não possui permissão para essa ação":"Nova convocação"} arrow={true} >
-          <Button 
-          type="primary" size="large" variant="outlined" icon={<UserSwitchOutlined />} disabled={!canAddProcessoConvocacao} onClick={() => navigate("/processos/convocacao/dados-processo/criar")}>Nova convocação</Button>
-          </Tooltip>
+          <AppButton
+            variant="secondary"
+            icon={<UserSwitchOutlined />}
+            disabled={!canAddProcessoConvocacao}
+            onClick={() => navigate("/processos/convocacao/dados-processo/criar")}
+          >
+            Nova convocação
+          </AppButton>
         }
       >
         <Card
-          style={{ marginTop: "1.25rem" }}
+          style={cardSpacing.marginTop20}
           variant="borderless"
         >
           <div style={contentStyle}>
@@ -175,12 +187,11 @@ const GerenciamentoVagasTela: React.FC = () => {
                   control={control}
                   name="processo_convocacao"
                   render={({ field }) => (
-                  <CustomFormItem
+                  <AppFormItem
                     label="Processo"
                     labelCol={{ span: 24 }}
                   >
                     <StyledSelect
-                       style={{ marginTop: 6 }}
                        value={field.value}
                        onChange={(value: unknown) => {
                          field.onChange(value as string | undefined);
@@ -188,11 +199,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                        }}
                       placeholder="Selecione o processo de convocação"
                       allowClear
-                      suffixIcon={
-                        <ExpandMoreIcon
-                          style={{ fontSize: "1.5rem", color: "#032B68" }}
-                        />
-                      }
+                      suffixIcon={<ExpandMoreIcon style={selectSuffixIcon} />}
                       loading={processosConvocacaoIsLoading}
                     >
                       {Array.isArray(processosConvocacaoData?.results) && processosConvocacaoData?.results.map((processoConvocacao: any) => (
@@ -204,18 +211,17 @@ const GerenciamentoVagasTela: React.FC = () => {
                         </Select.Option>
                       ))}
                     </StyledSelect>
-                  </CustomFormItem>
+                  </AppFormItem>
                   )}
                 />
               </Col>
               {showCargo && (
                 <Col xs={24} md={8}>
-                  <CustomFormItem
+                  <AppFormItem
                     label="Cargo"
                     labelCol={{ span: 24 }}
                   >
                     <StyledSelect
-                      style={{ marginTop: 6 }}
                       placeholder="Selecione o cargo"
                       value={cargoSelecionado}
                       onChange={(value: unknown) => {
@@ -235,7 +241,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                         );
                       })}
                     </StyledSelect>
-                  </CustomFormItem>
+                  </AppFormItem>
                 </Col>
               )}
             </Row>
@@ -244,7 +250,7 @@ const GerenciamentoVagasTela: React.FC = () => {
         </Card>
 
         {(cargoSelecionado && dadosVagasNasEscolas?.vagas?.length && dadosVagasNasEscolas?.vagas?.length > 0) && (
-        <Card style={{ marginTop: "1.25rem" }} variant="borderless">
+        <Card style={cardSpacing.marginTop20} variant="borderless">
           <div style={contentStyle}>
             <Row gutter={[24, 16]} style={{ textAlign: "left" }}>
               <Col xs={24} md={8}>
@@ -252,12 +258,11 @@ const GerenciamentoVagasTela: React.FC = () => {
                   control={controlFiltrar}
                   name="dre"
                   render={({ field }) => (
-                    <CustomFormItem
+                    <AppFormItem
                       label={"DRE"}
                       labelCol={{ span: 24 }}
                     >
                       <StyledSelect
-                        style={{ marginTop: 6 }}
                         {...field}
                         options={optionsDres}
                         placeholder="(Todas)"
@@ -266,7 +271,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                           <KeyboardArrowDownRoundedIcon sx={{ color: "#032B68" }} />
                         }
                       />
-                    </CustomFormItem>
+                    </AppFormItem>
                   )}
                 />
               </Col>
@@ -275,30 +280,32 @@ const GerenciamentoVagasTela: React.FC = () => {
                   name="escola"
                   control={controlFiltrar}
                   render={({ field }) => (
-                    <CustomFormItem
+                    <AppFormItem
                       label="Escola"
                       validateStatus={formErrorsFiltrar.escola ? "error" : undefined}
                       help={formErrorsFiltrar.escola?.message}
                       labelCol={{ span: 24 }}
                     >
-                      <Input {...field} placeholder="" style={{ marginTop: 6, width: "100%", maxWidth: "900px" }} />
-                    </CustomFormItem>
+                      <Input {...field} placeholder="" style={{ width: "100%", maxWidth: "900px" }} />
+                    </AppFormItem>
                   )}
                 />
               </Col>
-              <Col span={8} style={{ display: "flex", alignItems: "flex-start", justifyContent: "flex-end", marginTop: -7 }}>
-                <ActionButtonsContainer style={{ justifyContent: "flex-end" }}>
-                  <SecondaryButton onClick={handleLimparFiltros}>Limpar filtros</SecondaryButton>
-                  <SecondaryButton icon={<SearchOutlined />} onClick={handleFiltrar}>Buscar</SecondaryButton>
-                  <PrimaryButton onClick={handleAbrirModalIncluirEscolas}>Incluir escola</PrimaryButton>
-                </ActionButtonsContainer>
+              <Col xs={24} md={8}>
+                <FilterActionSlot>
+                  <FilterActionsGroup>
+                    <AppButton variant="secondary" onClick={handleLimparFiltros}>Limpar filtros</AppButton>
+                    <AppButton variant="secondary" icon={<SearchOutlined />} onClick={handleFiltrar}>Buscar</AppButton>
+                    <AppButton onClick={handleAbrirModalIncluirEscolas}>Incluir escola</AppButton>
+                  </FilterActionsGroup>
+                </FilterActionSlot>
               </Col>
             </Row>
           </div>
         </Card>
         )}
          {(cargoSelecionado && dadosVagasNasEscolas?.vagas?.length && dadosVagasNasEscolas?.vagas?.length > 0) && (
-        <Card style={{ marginTop: "1.25rem" }} variant="borderless">
+        <Card style={cardSpacing.marginTop20} variant="borderless">
           <div style={contentStyle}>
             <Text strong style={{ display: "block", marginBottom: 8, textAlign: "left" }}>Vagas por unidade escolar</Text>
             <VagasEscolasTabela
@@ -314,12 +321,12 @@ const GerenciamentoVagasTela: React.FC = () => {
         )}
          {(cargoSelecionado && dadosVagasNasEscolas?.vagas?.length && dadosVagasNasEscolas?.vagas?.length > 0) && (
         <ActionButtonsContainer>
-          <Button type="primary" size="large" onClick={handleSalvar}>Salvar</Button>
+          <AppButton onClick={handleSalvar}>Salvar</AppButton>
         </ActionButtonsContainer>
         )}
         {!uploadConcluido && (
         <Card
-          style={{ marginTop: "1.25rem" }}
+          style={cardSpacing.marginTop20}
           variant="borderless"
         >
           <div style={contentStyle}>
@@ -330,7 +337,7 @@ const GerenciamentoVagasTela: React.FC = () => {
                   control={control}
                   name="arquivo"
                    render={() => (
-                    <CustomFormItem
+                    <AppFormItem
                     
                       labelCol={{ span: 24 }}
                     >
@@ -341,20 +348,16 @@ const GerenciamentoVagasTela: React.FC = () => {
                         
                       
                       <p className="ant-upload-drag-icon">
-                          <CloudUploadIcon style={{ fontSize: "4.5rem", color: "#032B68" }} />
+                          <CloudUploadIcon style={uploadIconStyle} />
                       </p>
                         <p className="ant-upload-text">Clique ou arraste o arquivo para esta área</p>
                         <p className="ant-upload-hint" style={{ color: '#727679' }}>Apenas 1 arquivo CSV</p>
-                        <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Selecionar arquivo"} arrow={true} > 
-                        <PrimaryButton disabled={!canAddImportacaoArquivoVagas} style={{ marginTop: 12 }}>Selecionar arquivo</PrimaryButton>
-                        </Tooltip>
+                        <AppButton disabled={!canAddImportacaoArquivoVagas} style={{ marginTop: 12 }}>Selecionar arquivo</AppButton>
                       </Dragger>
                       <ActionButtonsContainer>
-                      <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Importar vagas"} arrow={true} > 
-                        <PrimaryButton disabled={!canAddImportacaoArquivoVagas} onClick={handleSubmit(handleEnviarForm)}>Importar</PrimaryButton>
-                        </Tooltip>
+                        <AppButton disabled={!canAddImportacaoArquivoVagas} onClick={handleSubmit(handleEnviarForm)}>Importar</AppButton>
                       </ActionButtonsContainer>
-                    </CustomFormItem>
+                    </AppFormItem>
                     )}
                   />
                 </Col>

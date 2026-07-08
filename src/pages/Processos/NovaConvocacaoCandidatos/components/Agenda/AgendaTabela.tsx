@@ -1,7 +1,40 @@
 import React from "react";
-import { Table, Button, Tooltip, TimePicker, Typography, message } from "antd";
-import { DeleteOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
+import { Table, TimePicker, Typography, message } from "antd";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { AppIconButton, DeleteActionIcon, EditActionIcon } from '@/components/ui';
+import {
+  editRowCentered,
+  editNumberInput,
+  mutedHelperText,
+  actionsRowCenter,
+  tableConfirmIcon,
+  tableCancelIcon,
+  brandHighlightText,
+  formErrorTextInline,
+} from "@/design-system/estilos";
+
+const tableStyles = {
+  container: { marginTop: 24 },
+  table: { backgroundColor: "#fff" },
+  editRow: editRowCentered,
+  numberInput: editNumberInput,
+  helperText: mutedHelperText,
+  intervalTitle: { fontWeight: "bold" as const, marginBottom: 4 },
+  intervalSubtitle: mutedHelperText,
+  timePicker: { width: 80 },
+  separatorText: mutedHelperText,
+  conflictText: { fontSize: "10px" },
+  onlineText: mutedHelperText,
+  actionsRow: actionsRowCenter,
+  saveIcon: tableConfirmIcon,
+  cancelIcon: tableCancelIcon,
+  rowBackground: (isDark: boolean) => ({
+    backgroundColor: isDark ? "#f5f5f5" : "#fff",
+  }),
+};
+
+const highlightText = brandHighlightText;
+const errorMessageInline = formErrorTextInline;
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
 
@@ -99,7 +132,7 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
       render: (_: number, record: PeriodoItem) => {
         const editing = isEditing(record);
         return editing ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+          <div style={tableStyles.editRow}>
             <Controller
               name={`${record.id}.classificacao`}
               control={control}
@@ -109,27 +142,21 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
                   {...field}
                   type="number"
                   min="1"
-                  style={{ 
-                    width: 80, 
-                    textAlign: 'center',
-                    border: '1px solid #d9d9d9',
-                    borderRadius: '4px',
-                    padding: '4px 8px'
-                  }}
+                  style={tableStyles.numberInput}
                   placeholder="Quantidade"
                 />
               )}
             />
-            <Typography.Text style={{ fontSize: '12px' }}>
+            <Typography.Text style={tableStyles.helperText}>
               candidatos
             </Typography.Text>
           </div>
         ) : (
           <div>
-            <div style={{ fontWeight: 'bold', marginBottom: 4 }}>
+            <div style={tableStyles.intervalTitle}>
               {calcularIntervaloClassificacao(record)}
             </div>
-            <div style={{ fontSize: '12px', color: '#666' }}>
+            <div style={tableStyles.intervalSubtitle}>
               ({record.classificacao} candidatos)
             </div>
           </div>
@@ -157,7 +184,7 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
       render: (text: string, record: PeriodoItem) => {
         const editing = isEditing(record);
         return editing ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+          <div style={tableStyles.editRow}>
             {record.tipoEscolha === "Presencial" ? (
               <>
                 <Controller
@@ -170,7 +197,7 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
                     return (
                       <TimePicker
                         {...field}
-                        style={{ width: 80 }}
+                        style={tableStyles.timePicker}
                         format="HH:mm"
                         placeholder="Início"
                         value={field.value ? dayjs(field.value, 'HH:mm') : null}
@@ -181,7 +208,7 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
                     );
                   }}
                 />
-                <Typography.Text strong style={{ fontSize: '12px' }}>às</Typography.Text>
+                <Typography.Text strong style={tableStyles.helperText}>às</Typography.Text>
                 <Controller
                   name={`${record.id}.horaFim`}
                   control={control}
@@ -192,7 +219,7 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
                     return (
                       <TimePicker
                         {...field}
-                        style={{ width: 80 }}
+                        style={tableStyles.timePicker}
                         format="HH:mm"
                         placeholder="Fim"
                         value={field.value ? dayjs(field.value, 'HH:mm') : null}
@@ -207,14 +234,14 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
                   const values = getValues(record.id.toString());
                   const temConflito = verificarConflitoTempoReal(record.id, values?.horaInicio || '', values?.horaFim || '');
                   return temConflito ? (
-                    <Typography.Text type="danger" style={{ fontSize: '10px' }}>
+                    <Typography.Text type="danger" style={tableStyles.conflictText}>
                       Horário já existe
                     </Typography.Text>
                   ) : null;
                 })()}
               </>
             ) : (
-              <Typography.Text style={{ fontSize: '12px', color: '#666' }}>
+              <Typography.Text style={tableStyles.intervalSubtitle}>
                 Online
               </Typography.Text>
             )}
@@ -232,39 +259,35 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
       render: (_: any, record: PeriodoItem) => {
         const editable = isEditing(record);
         return editable ? (
-          <div style={{ display: "flex", justifyContent: "center", gap: 4 }}>
-            <Tooltip title="Salvar">
-              <Button
-                type="link"
-                onClick={() => salvarAgendaItemTabela(record.id, record)}
-                icon={<CheckOutlined style={{ color: "#05409A" }} />}
-              />
-            </Tooltip>
-            <Tooltip title="Cancelar">
-              <Button
-                type="link"
-                onClick={cancel}
-                icon={<CloseOutlined style={{ color: "#ff4d4f" }} />}
-              />
-            </Tooltip>
+          <div style={tableStyles.actionsRow}>
+            <AppIconButton
+              type="link"
+              tooltip="Salvar"
+              onClick={() => salvarAgendaItemTabela(record.id, record)}
+              icon={<CheckOutlined style={tableStyles.saveIcon} />}
+            />
+            <AppIconButton
+              type="link"
+              tooltip="Cancelar"
+              onClick={cancel}
+              icon={<CloseOutlined style={tableStyles.cancelIcon} />}
+            />
           </div>
         ) : (
-          <div style={{ display: "flex", justifyContent: "center", gap: 4 }}>
-            <Tooltip title="Editar">
-              <Button
-                type="link"
-                disabled={editingKey !== null}
-                onClick={() => edit(record)}
-                icon={<ModeEditOutlineOutlinedIcon style={{ color: "#05409A" }} />}
-              />
-            </Tooltip>
-            <Tooltip title="Excluir">
-              <Button
-                type="link"
-                onClick={() => handleRemoverPeriodo(record.id)}
-                icon={<DeleteOutlined style={{ color: '#ff4d4f' }} />}
-              />
-            </Tooltip>
+          <div style={tableStyles.actionsRow}>
+            <AppIconButton
+              type="link"
+              tooltip="Editar"
+              disabled={editingKey !== null}
+              onClick={() => edit(record)}
+              icon={<EditActionIcon />}
+            />
+            <AppIconButton
+              type="link"
+              tooltip="Excluir"
+              onClick={() => handleRemoverPeriodo(record.id)}
+              icon={<DeleteActionIcon />}
+            />
           </div>
         );
       },
@@ -276,24 +299,20 @@ const AgendaTabela: React.FC<AgendaTabelaProps> = ({
   }
 
   return (
-    <div style={{ marginTop: 24 }}>
+    <div style={tableStyles.container}>
       <Table
         dataSource={periodosList}
         columns={columns}
         rowKey="id"
         pagination={false}
-        style={{
-          backgroundColor: '#fff',
-        }}
+        style={tableStyles.table}
         rowClassName={(_: any, index: number) => index % 2 === 0 ? 'table-row-light' : 'table-row-dark'}
         components={{
           body: {
             row: (props: any) => (
               <tr 
                 {...props} 
-                style={{
-                  backgroundColor: props.className?.includes('table-row-dark') ? '#f5f5f5' : '#fff'
-                }}
+                style={tableStyles.rowBackground(props.className?.includes('table-row-dark'))}
               />
             )
           }

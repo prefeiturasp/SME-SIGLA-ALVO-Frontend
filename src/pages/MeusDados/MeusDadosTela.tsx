@@ -1,20 +1,20 @@
 import React, { useState } from "react";
-import { Button, Avatar, Spin } from "antd";
+import { Avatar, Spin } from "antd";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import BaseTela from "../Base/BaseTela";
 import AlterarSenhaModal from "./components/AlterarSenhaModal";
 import AlterarEmailModal from "./components/AlterarEmailModal";
 import { useGetMeusDados } from "./hooks/useGetMeusDados";
-import { StandardInput } from "../../components/EstilosCompartilhados";
+import { AppButton, StandardInput } from '@/components/ui';
 import {
   CardContainer,
   AvatarCard,
   NomeUsuario,
   InfoLine,
   FieldsContainer,
-  FieldLabel,
+  ProfileFieldLabel as FieldLabel,
   FieldRow,
-} from "./MeusDadosTela.styles";
+} from "@/design-system/estilos";
 
 const MeusDadosTela: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,9 +57,9 @@ const MeusDadosTela: React.FC = () => {
               <FieldLabel>E-mail</FieldLabel>
               <FieldRow>
                 <StandardInput value={email} disabled style={{ flex: 1 }} />
-                <Button onClick={() => setIsEmailModalOpen(true)}>
+                <AppButton variant="secondary" onClick={() => setIsEmailModalOpen(true)}>
                   Alterar e-mail
-                </Button>
+                </AppButton>
               </FieldRow>
             </div>
 
@@ -72,9 +72,9 @@ const MeusDadosTela: React.FC = () => {
                   disabled
                   style={{ flex: 1 }}
                 />
-                <Button onClick={() => setIsModalOpen(true)}>
+                <AppButton variant="secondary" onClick={() => setIsModalOpen(true)}>
                   Alterar senha
-                </Button>
+                </AppButton>
               </FieldRow>
             </div>
 

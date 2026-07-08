@@ -1,19 +1,18 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { Row, Col, Button, Typography, Select, Card, Alert, Spin } from "antd";
+import { Row, Col, Typography, Select, Card, Alert, Spin } from "antd";
 import { SaveOutlined } from "@ant-design/icons";
-import { TextTitulo, TextTituloSecundario } from "../../../components/EstilosCompartilhados";
 import { Controller } from "react-hook-form";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import { CustomFormItem } from "../../../components/FormStyle";
-import { TabContentContainer, StyledSelect, ActionButtonsContainer, StandardInput } from "../../../components/EstilosCompartilhados";
-import { ModalInfoLabel } from "../../EscolhaCandidatos/styles";
+import { ModalInfoLabel } from "@/components/ui";
 import useEnvioEmails, { type TipoEnvio } from "./hooks/useEnvioEmails";
 import useGetEnvioEmailConteudo, {
   type EnvioEmailConteudoRegistro,
 } from "./hooks/useGetEnvioEmailConteudo";
-import QuillEditor from "../../Relatorios/components/QuillEditor";
+import { AppButton, TextTitulo, TextTituloSecundario, AppFormItem, TabContentContainer, StyledSelect, ActionButtonsContainer, StandardInput, FilterActionSlot, FilterInlineRow, FilterFieldCol, FilterActionCol, FilterActionsGroup } from '@/components/ui';
+import { cardSpacing, selectSuffixIcon } from '@/design-system/estilos';
+import QuillEditor from "@/components/QuillEditor";
 
 const { Text } = Typography;
 
@@ -99,7 +98,7 @@ const EnvioEmailsTela: React.FC = () => {
       <>
         <Spin spinning={enviando}>
         <TabContentContainer>
-          <Card style={{ marginBottom: 16 }}>
+          <Card style={cardSpacing.marginBottom16}>
             <Row>
               <Col span={24}>
                 <TextTitulo>
@@ -112,78 +111,70 @@ const EnvioEmailsTela: React.FC = () => {
               </Col>
             </Row>
             <br />
-            <Row style={{ marginBottom: "1.5rem" }}>
-              <Col span={24}>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 16,
-                    alignItems: "end",
-                    width: "100%",
-                  }}
-                >
-                  <div style={{ flex: 1 }}>
-                    <Controller
-                      control={control}
-                      name="processo_convocacao"
-                      render={({ field }) => (
-                        <CustomFormItem
-                          label="Processo de convocação"
-                          validateStatus={formErrors.processo_convocacao ? "error" : undefined}
-                          help={formErrors.processo_convocacao?.message}
-                          labelCol={{ span: 24 }}
-                        >
-                          <StyledSelect
-                            value={field.value}
-                            onChange={(value: unknown) => field.onChange(value as string | undefined)}
-                            placeholder="Selecione o processo"
-                            loading={processosConvocacaoIsLoading}
-                            allowClear
-                            suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
-                          >
-                            {Array.isArray(processosConvocacaoOptions) &&
-                              processosConvocacaoOptions.map(
-                                (processoConvocacao: { value: string; label: string }) => (
-                                  <Select.Option key={processoConvocacao.value} value={processoConvocacao.value}>
-                                    {processoConvocacao.label}
-                                  </Select.Option>
-                                )
-                              )}
-                          </StyledSelect>
-                        </CustomFormItem>
-                      )}
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <Controller
-                      control={control}
-                      name="tipo"
-                      render={({ field }) => (
-                        <CustomFormItem
-                          label="Tipo"
-                          validateStatus={formErrors.tipo ? "error" : undefined}
-                          help={formErrors.tipo?.message}
-                          labelCol={{ span: 24 }}
-                        >
-                          <StyledSelect
-                            value={field.value}
-                            onChange={(value: unknown) => field.onChange(value as TipoEnvio | undefined)}
-                            placeholder="Selecione o tipo"
-                            allowClear
-                            suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
-                          >
-                            <Select.Option value="CONVOCACAO">Convocação</Select.Option>
-                            <Select.Option value="VAGAS">Vagas</Select.Option>
-                            <Select.Option value="RESULTADOS">Resultados</Select.Option>
-                          </StyledSelect>
-                        </CustomFormItem>
-                      )}
-                    />
-                  </div>
-                  <div>
-                    <Button
-                      type="primary"
-                      ghost
+            <FilterInlineRow gutter={[16, 8]} style={{ marginBottom: "1.5rem" }}>
+              <FilterFieldCol xs={24} md={11}>
+                <Controller
+                  control={control}
+                  name="processo_convocacao"
+                  render={({ field }) => (
+                    <AppFormItem
+                      label="Processo de convocação"
+                      validateStatus={formErrors.processo_convocacao ? "error" : undefined}
+                      help={formErrors.processo_convocacao?.message}
+                      labelCol={{ span: 24 }}
+                    >
+                      <StyledSelect
+                        value={field.value}
+                        onChange={(value: unknown) => field.onChange(value as string | undefined)}
+                        placeholder="Selecione o processo"
+                        loading={processosConvocacaoIsLoading}
+                        allowClear
+                        suffixIcon={<ExpandMoreIcon style={selectSuffixIcon} />}
+                      >
+                        {Array.isArray(processosConvocacaoOptions) &&
+                          processosConvocacaoOptions.map(
+                            (processoConvocacao: { value: string; label: string }) => (
+                              <Select.Option key={processoConvocacao.value} value={processoConvocacao.value}>
+                                {processoConvocacao.label}
+                              </Select.Option>
+                            )
+                          )}
+                      </StyledSelect>
+                    </AppFormItem>
+                  )}
+                />
+              </FilterFieldCol>
+              <FilterFieldCol xs={24} md={11}>
+                <Controller
+                  control={control}
+                  name="tipo"
+                  render={({ field }) => (
+                    <AppFormItem
+                      label="Tipo"
+                      validateStatus={formErrors.tipo ? "error" : undefined}
+                      help={formErrors.tipo?.message}
+                      labelCol={{ span: 24 }}
+                    >
+                      <StyledSelect
+                        value={field.value}
+                        onChange={(value: unknown) => field.onChange(value as TipoEnvio | undefined)}
+                        placeholder="Selecione o tipo"
+                        allowClear
+                        suffixIcon={<ExpandMoreIcon style={selectSuffixIcon} />}
+                      >
+                        <Select.Option value="CONVOCACAO">Convocação</Select.Option>
+                        <Select.Option value="VAGAS">Vagas</Select.Option>
+                        <Select.Option value="RESULTADOS">Resultados</Select.Option>
+                      </StyledSelect>
+                    </AppFormItem>
+                  )}
+                />
+              </FilterFieldCol>
+              <FilterActionCol xs={24} md={2} style={{ minWidth: "auto" }}>
+                <FilterActionSlot>
+                  <FilterActionsGroup>
+                    <AppButton
+                      variant="secondary"
                       disabled={!canFilter}
                       onClick={async () => {
                         if (!canFilter) return;
@@ -213,11 +204,11 @@ const EnvioEmailsTela: React.FC = () => {
                       loading={enviando}
                     >
                       Filtrar
-                    </Button>
-                  </div>
-                </div>
-              </Col>
-            </Row>
+                    </AppButton>
+                  </FilterActionsGroup>
+                </FilterActionSlot>
+              </FilterActionCol>
+            </FilterInlineRow>
             <Row style={{ marginBottom: 8 }}>
               <Col span={24}>
                 <Alert
@@ -244,18 +235,17 @@ const EnvioEmailsTela: React.FC = () => {
                 style={{ display: "flex", justifyContent: "flex-end", marginTop: 16, gap: 8 }}
               >
                 {!conteudoVisivel && (
-                  <Button
-                    type="primary"
-                    ghost
+                  <AppButton
+                    variant="secondary"
                     size="large"
                     onClick={() => navigate("/processos/convocacao")}
                   >
                     Voltar
-                  </Button>
+                  </AppButton>
                 )}
-                <Button type="primary" ghost size="large" onClick={onShowHistorico}>
+                <AppButton variant="secondary" size="large" onClick={onShowHistorico}>
                   Histórico
-                </Button>
+                </AppButton>
               </Col>
             </Row>
           </Card>
@@ -264,7 +254,7 @@ const EnvioEmailsTela: React.FC = () => {
             <Card>
               <Row gutter={24}>
                 <Col span={24}>
-                  <CustomFormItem
+                  <AppFormItem
                     label={`E-mail de ${tipoEmailLabel}`}
                     labelCol={{ span: 24 }}
                   >
@@ -287,7 +277,7 @@ const EnvioEmailsTela: React.FC = () => {
                       name="assunto"
                       render={({ field }) => (
                         <div style={{ width: "100%", marginTop: 16, marginBottom: 16 }}>
-                          <ModalInfoLabel style={{ display: "block", marginBottom: 12, color: "#000000" }}>
+                          <ModalInfoLabel style={{ display: "block", marginBottom: 12 }}>
                             Assunto do E-mail:
                           </ModalInfoLabel>
                           <StandardInput
@@ -312,7 +302,7 @@ const EnvioEmailsTela: React.FC = () => {
                             isolation: "isolate",
                           }}
                         >
-                          <ModalInfoLabel style={{ display: "block", marginBottom: 12, color: "#000000" }}>
+                          <ModalInfoLabel style={{ display: "block", marginBottom: 12 }}>
                             Conteúdo gabarito:
                           </ModalInfoLabel>
                           <QuillEditor
@@ -334,13 +324,13 @@ const EnvioEmailsTela: React.FC = () => {
                         background: "#fff",
                       }}
                     >
-                      <Button
-                        type="primary"
+                      <AppButton
+                        variant="primary"
                         icon={<SaveOutlined />}
                         onClick={handleCopyConteudoGabarito}
                       >
                         Copiar conteúdo gabarito
-                      </Button>
+                      </AppButton>
                     </div>
                     <Controller
                       control={control}
@@ -359,7 +349,6 @@ const EnvioEmailsTela: React.FC = () => {
                             style={{
                               display: "block",
                               marginBottom: 12,
-                              color: "#000000",
                               position: "relative",
                               zIndex: 2,
                               background: "#fff",
@@ -381,7 +370,7 @@ const EnvioEmailsTela: React.FC = () => {
                         </div>
                       )}
                     />
-                  </CustomFormItem>
+                  </AppFormItem>
                 </Col>
               </Row>
             </Card>
@@ -390,12 +379,12 @@ const EnvioEmailsTela: React.FC = () => {
         </Spin>
         {conteudoVisivel && (
           <ActionButtonsContainer>
-            <Button type="primary" ghost size="large" onClick={() => navigate("/processos/convocacao")}>
+            <AppButton variant="secondary" size="large" onClick={() => navigate("/processos/convocacao")}>
               Voltar
-            </Button>
-            <Button type="primary" size="large" onClick={handleSubmit(handleEnviarForm)} loading={enviando} disabled={enviando}>
+            </AppButton>
+            <AppButton variant="primary" size="large" onClick={handleSubmit(handleEnviarForm)} loading={enviando} disabled={enviando}>
               Enviar
-            </Button>
+            </AppButton>
           </ActionButtonsContainer>
         )}
       </>

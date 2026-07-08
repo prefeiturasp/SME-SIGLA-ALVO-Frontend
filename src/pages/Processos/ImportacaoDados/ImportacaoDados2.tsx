@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { Typography } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
-import {
-  StyledTabs,
-} from "./styles";
+import { StyledTabs } from '@/components/ui';
 
 // Importar os componentes das abas
 import Vagas from "./Vagas/VagasTela";

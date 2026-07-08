@@ -9,18 +9,10 @@ import {
   Spin,
 } from "antd";
 import { Controller } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useImportacaoDadosVagas } from "./hooks/useImportacaoDadosVagas";
-import { CustomFormItem } from "../../../components/FormStyle";
-import {
-  TabContentContainer,
-  StyledSelect,
-  UploadArea,
-  StyledUpload,
-  ActionButtonsContainer,
-  GrupoEsquerda,
-} from "../../../components/EstilosCompartilhados";
-import { useNavigate } from "react-router-dom";
+import { AppFormItem, AppButton, TabContentContainer, StyledSelect, UploadArea, StyledUpload, ActionButtonsContainer, GrupoEsquerda, formTabStyles, selectSuffixIcon } from '@/components/ui';
 
 import { CloudUploadOutlined } from "@ant-design/icons";
 import FormItem from "antd/es/form/FormItem";
@@ -57,12 +49,12 @@ const VagasFormTab: React.FC<VagasProps> = ({
     <>
       <Spin spinning={isCreatingImportacao}>
         <TabContentContainer>
-          <Row style={{ marginBottom: "1.8125rem" }}>
-            <Title level={5} type="secondary" style={{ marginTop: "0" }}>
+          <Row style={formTabStyles.introRow}>
+            <Title level={5} type="secondary" style={formTabStyles.introTitle}>
               Selecione abaixo o tipo de arquivo que deseja carregar
             </Title>
 
-            <Text style={{ fontSize: "14px" }}>
+            <Text style={formTabStyles.introDescription}>
               Nesta aba, você pode consultar as vagas atualmente disponíveis nas
               escolas da rede. As vagas são atualizadas conforme a movimentação de
               servidores e a necessidade das unidades. Utilize os filtros para
@@ -71,13 +63,13 @@ const VagasFormTab: React.FC<VagasProps> = ({
             </Text>
           </Row>
 
-          <Row gutter={40} style={{ marginBottom: "1.8125rem" }}>
+          <Row gutter={40} style={formTabStyles.fieldsRow}>
             <Col xs={24} sm={12}>
               <Controller
                 control={control}
                 name="processo_convocacao"
                 render={({ field }) => (
-                  <CustomFormItem
+                  <AppFormItem
                     label="Processo de convocação"
                     validateStatus={
                       formErrors.processo_convocacao ? "error" : undefined
@@ -94,11 +86,7 @@ const VagasFormTab: React.FC<VagasProps> = ({
                       placeholder="Selecione o processo"
                       loading={processosConvocacaoOptionsIsLoading}
                       allowClear
-                      suffixIcon={
-                        <ExpandMoreIcon
-                          style={{ fontSize: "1.5rem", color: "#032B68" }}
-                        />
-                      }
+                          suffixIcon={<ExpandMoreIcon style={selectSuffixIcon} />}
                     >
                       {Array.isArray(processosConvocacaoOptions) &&
                         processosConvocacaoOptions.map(
@@ -112,7 +100,7 @@ const VagasFormTab: React.FC<VagasProps> = ({
                           )
                         )}
                     </StyledSelect>
-                  </CustomFormItem>
+                  </AppFormItem>
                 )}
               />
             </Col>
@@ -136,46 +124,56 @@ const VagasFormTab: React.FC<VagasProps> = ({
                       showUploadList={false}
                       multiple={false}
                     >
-                      <Tooltip title={!canImportarVagas?"Você não possui permissão para essa ação":"Selecionar arquivo"} arrow={true} >
-                      
-
-                      <UploadArea
-                        style={{ height: "64px" }}
-                        status={formErrors.arquivo ? "error" : undefined}
-                      >
-                        <GrupoEsquerda>
-                          <CloudUploadOutlined
-                            style={{ fontSize: 38, color: "#838383" }}
-                          />
-
-                          <span
-                            style={{
-                              color: "#666",
-                              fontSize: "14px",
-                              textAlign: "left",
-                            }}
+                      {(() => {
+                        const uploadArea = (
+                          <UploadArea
+                            style={{ height: "64px" }}
+                            status={formErrors.arquivo ? "error" : undefined}
                           >
-                            {watchedFile ? (
-                              watchedFile.name
-                            ) : (
-                              <>
-                                Selecione ou arraste e solte aqui <br />o arquivo
-                                de importação (.csv)
-                              </>
-                            )}
-                          </span>
-                        </GrupoEsquerda>
+                            <GrupoEsquerda>
+                              <CloudUploadOutlined
+                                style={{ fontSize: 38, color: "#838383" }}
+                              />
 
-                        <Button
-                          disabled={!canImportarVagas}
-                          type="primary"
-                          size="small"
-                          style={{ fontSize: "14px" }}
-                        >
-                          Selecionar
-                        </Button>
-                      </UploadArea>
-                      </Tooltip>
+                              <span
+                                style={{
+                                  color: "#666",
+                                  fontSize: "14px",
+                                  textAlign: "left",
+                                }}
+                              >
+                                {watchedFile ? (
+                                  watchedFile.name
+                                ) : (
+                                  <>
+                                    Selecione ou arraste e solte aqui <br />o arquivo
+                                    de importação (.csv)
+                                  </>
+                                )}
+                              </span>
+                            </GrupoEsquerda>
+
+                            <Button
+                              disabled={!canImportarVagas}
+                              type="primary"
+                              size="small"
+                              style={{ fontSize: "14px" }}
+                            >
+                              Selecionar
+                            </Button>
+                          </UploadArea>
+                        );
+
+                        if (!canImportarVagas) {
+                          return (
+                            <Tooltip title="Você não possui permissão para essa ação" arrow>
+                              {uploadArea}
+                            </Tooltip>
+                          );
+                        }
+
+                        return uploadArea;
+                      })()}
                     </StyledUpload>
                   </FormItem>
                 )}
@@ -184,35 +182,22 @@ const VagasFormTab: React.FC<VagasProps> = ({
           </Row>
         </TabContentContainer>
         <ActionButtonsContainer>
-          <Tooltip
-            title={
-              !canViewHistoricoVagas
-                ? "Você não possui permissão para essa ação"
-                : "Histórico"
-            }
-            arrow={true}
+          <AppButton
+            variant="secondary"
+            size="large"
+            onClick={onShowHistorico}
+            disabled={!canViewHistoricoVagas}
           >
-            <Button type="primary" ghost size="large" onClick={onShowHistorico} disabled={!canViewHistoricoVagas}>
-              Histórico
-            </Button>
-          </Tooltip>
-          <Tooltip
-            title={
-              !canImportarVagas
-                ? "Você não possui permissão para essa ação"
-                : "Importar"
-            }
-            arrow={true}
+            Histórico
+          </AppButton>
+          <AppButton
+            variant="primary"
+            size="large"
+            onClick={handleSubmit(handleEnviarForm)}
+            disabled={!canImportarVagas}
           >
-            <Button
-              type="primary"
-              size="large"
-              onClick={handleSubmit(handleEnviarForm)}
-              disabled={!canImportarVagas}
-            >
-              Importar
-            </Button>
-          </Tooltip>
+            Importar
+          </AppButton>
         </ActionButtonsContainer>
       </Spin>
     </>

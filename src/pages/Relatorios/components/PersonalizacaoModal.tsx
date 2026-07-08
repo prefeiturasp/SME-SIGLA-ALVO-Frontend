@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Modal, Button, Checkbox, Spin, App } from "antd";
+import { Modal, Checkbox, Spin, App } from "antd";
 import { SaveOutlined } from "@ant-design/icons";
-import QuillEditor from "./QuillEditor";
-import { ModalInfoCard, ModalInfoItem, ModalInfoLabel, ModalInfoValue } from "../../EscolhaCandidatos/styles";
+import { AppButton } from '@/components/ui';
+import QuillEditor from "@/components/QuillEditor";
+import { ModalInfoCard, ModalInfoItem, ModalInfoLabel, ModalInfoValue } from "@/components/ui";
 import { getPersonalizacaoRelatorio } from "../hooks/useGetPersonalizacaoRelatorio";
 import { patchPersonalizacaoRelatorio } from "../hooks/usePatchPersonalizacaoRelatorio";
 import type { PersonalizacaoModalProps } from "../../../services/resources/relatorios/IRelatorios";
@@ -197,18 +198,17 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
           },
         }}
         footer={[
-          <Button key="cancel" onClick={handleCancel}>
+          <AppButton key="cancel" variant="secondary" onClick={handleCancel}>
             Cancelar
-          </Button>,
-          <Button
+          </AppButton>,
+          <AppButton
             key="save"
-            type="primary"
             icon={<SaveOutlined />}
             onClick={handleSave}
             disabled={isSaving || isLoadingPersonalizacao}
           >
             Salvar
-          </Button>,
+          </AppButton>,
         ]}
       >
       <Spin spinning={isLoadingPersonalizacao || isSaving}>
@@ -237,8 +237,8 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
             }
           >
             <ModalInfoItem>
-              <ModalInfoLabel style={{ color: "#000000" }}>Processo</ModalInfoLabel>
-              <ModalInfoValue style={{ color: "#515151" }}>
+              <ModalInfoLabel>Processo</ModalInfoLabel>
+              <ModalInfoValue>
                 {processoNome || "—"}
               </ModalInfoValue>
             </ModalInfoItem>
@@ -254,7 +254,7 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
                 padding: "1.5rem 1.75rem",
               }}
             >
-              <ModalInfoLabel style={{ color: "#000000" }}>Usar logotipo?</ModalInfoLabel>
+              <ModalInfoLabel>Usar logotipo?</ModalInfoLabel>
               <Checkbox
                 checked={usarLogotipo}
                 onChange={(e) => setUsarLogotipo(e.target.checked)}
@@ -270,7 +270,7 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
             <div style={{ display: "flex", gap: 150, alignItems: "flex-start", flexWrap: "wrap" }}>
               {!usaLogotipoLateral && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  <ModalInfoLabel style={{ color: "#000000" }}>Usar logotipo?</ModalInfoLabel>
+                  <ModalInfoLabel>Usar logotipo?</ModalInfoLabel>
                   <Checkbox
                     checked={usarLogotipo}
                     onChange={(e) => setUsarLogotipo(e.target.checked)}
@@ -286,7 +286,7 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
         {/* Seção Cabeçalho da capa (somente para ATA_ESCOLHA) */}
         {selectedRelatorio?.key === "ATA_ESCOLHA" && (
           <div>
-            <ModalInfoLabel style={{ display: "block", marginBottom: 12, color: "#000000" }}>
+            <ModalInfoLabel style={{ display: "block", marginBottom: 12 }}>
               Cabeçalho da capa (Ata):
             </ModalInfoLabel>
             <QuillEditor
@@ -302,7 +302,7 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
         {usaCabecalhoGabarito && (
           <>
             <div>
-              <ModalInfoLabel style={{ display: "block", marginBottom: 12, color: "#000000" }}>Cabeçalho gabarito:</ModalInfoLabel>
+              <ModalInfoLabel style={{ display: "block", marginBottom: 12 }}>Cabeçalho gabarito:</ModalInfoLabel>
               <QuillEditor
                 value={cabecalhoGabaritoHtml}
                 onChange={setCabecalhoGabaritoHtml}
@@ -312,20 +312,19 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
             </div>
 
             <div style={{ marginTop: 4, marginBottom: 0, position: "relative", zIndex: 1 }}>
-              <Button
-                type="primary"
+              <AppButton
                 icon={<SaveOutlined />}
                 onClick={handleCopyCabecalhoGabarito}
                 disabled={isSaving || isLoadingPersonalizacao}
               >
                 Copiar cabeçalho gabarito
-              </Button>
+              </AppButton>
             </div>
           </>
         )}
 
         <div style={{ marginTop: 4 }}>
-          <ModalInfoLabel style={{ display: "block", marginBottom: 12, color: "#000000" }}>Cabeçalho:</ModalInfoLabel>
+          <ModalInfoLabel style={{ display: "block", marginBottom: 12 }}>Cabeçalho:</ModalInfoLabel>
           <QuillEditor
             value={cabecalhoHtml}
             onChange={setCabecalhoHtml}
@@ -336,7 +335,7 @@ const PersonalizacaoModal: React.FC<PersonalizacaoModalProps> = ({
 
         {/* Seção Texto padrão final */}
         <div>
-          <ModalInfoLabel style={{ display: "block", marginBottom: 12, color: "#000000" }}>Texto final:</ModalInfoLabel>
+          <ModalInfoLabel style={{ display: "block", marginBottom: 12 }}>Texto final:</ModalInfoLabel>
           <QuillEditor
             value={textoPadraoFinalHtml}
             onChange={setTextoPadraoFinalHtml}

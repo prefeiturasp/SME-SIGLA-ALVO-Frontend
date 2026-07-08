@@ -1,19 +1,19 @@
 import React from "react";
-import { Button, Steps, theme, Tooltip, Typography, message } from "antd";
+import { Steps, theme, Typography, message } from "antd";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
 import { useNavigate } from "react-router-dom";
 
 import { UserSwitchOutlined } from "@ant-design/icons";
 import { StepActions } from "./components/StepActions";
 import { steps } from "./components/StepsNames";
-import { ConvocacaoStepsGlobalStyle } from "./components/ConvocacaoStepsStyles";
+import { ConvocacaoStepsGlobalStyle } from "@/components/ui";
 import { useConvocacaoSteps } from "./components/useConvocacaoSteps";
-import { StyledCardWithoutBorder } from "../../components/EstilosCompartilhados";
 import FormPrincipal from "../Processos/NovaConvocacaoCandidatos/components/FormPrincipal";
 import { useNovaConvocacaoCandidatos } from "../Processos/NovaConvocacaoCandidatos/hooks/useNovaConvocacaoCandidatos";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 import { usePatchPassoProcessoConvocacao } from "./hooks/usePatchPassoProcessoConvocacao";
 
+import { AppButton, StyledCardWithoutBorder } from '@/components/ui';
 const { Text } = Typography;
 
 const DadosDoProcesso: React.FC = () => {
@@ -132,18 +132,14 @@ const DadosDoProcesso: React.FC = () => {
         breadcrumbItems={breadcrumbItems}
         title="Nova convocação"
         buttons={
-          <Tooltip title={!canAddImportacaoArquivoVagas?"Você não possui permissão para essa ação":"Gerenciamento de vagas"} arrow={true} >
-
-          <Button
-            color="primary"
-            variant="outlined"
+          <AppButton
+            variant="secondary"
             icon={<UserSwitchOutlined />}
             disabled={!canAddImportacaoArquivoVagas}
             onClick={() => navigate("/processos/gerenciamento-vagas")}
           >
             Gerenciamento de vagas
-          </Button>
-          </Tooltip>
+          </AppButton>
         }
       >
         <StyledCardWithoutBorder  title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">

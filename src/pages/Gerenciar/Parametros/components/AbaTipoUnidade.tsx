@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Card, Row, Col, App } from "antd";
-import { ModalSaveButton } from "../../../EscolhaCandidatos/styles";
+import { AppButton } from '@/components/ui';
 import {
   ColumnContainer,
   CheckboxItem,
-  ButtonContainer,
-} from "../styles";
+  ParametrosButtonContainer,
+} from "@/design-system/estilos";
 import { getParametrizacaoEscolhas, type ParametrizacaoTipoUnidade } from "../hooks/getParametrizacaoEscolhas";
 import { patchParametrizacaoEscolhas } from "../hooks/patchParametrizacaoEscolhas";
 
@@ -176,17 +176,17 @@ const AbaTipoUnidade: React.FC<{
       </Row>
 
       {/* Botão Salvar */}
-      <ButtonContainer>
-        <ModalSaveButton
+      <ParametrosButtonContainer>
+        <AppButton
+          variant="primary"
           size="large"
-          type="primary"
           onClick={handleSalvar}
           loading={isSaving}
           disabled={!canAddParametrizacao}
         >
           Salvar
-        </ModalSaveButton>
-      </ButtonContainer>
+        </AppButton>
+      </ParametrosButtonContainer>
     </Card>
   );
 };

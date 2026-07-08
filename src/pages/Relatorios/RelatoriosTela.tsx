@@ -1,14 +1,16 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Col, Row, Radio, Table, Typography, Card, Modal, Spin, message } from "antd";
+import { Col, Row, Radio, Table, Typography, Card, Modal, Spin, message, Tooltip } from "antd";
 import type { RadioChangeEvent } from "antd";
-import { EyeOutlined, FileExcelOutlined, FilePdfOutlined, FileWordOutlined, EditOutlined } from "@ant-design/icons";
+import { FileExcelOutlined, FilePdfOutlined, FileWordOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../Base/BaseTela";
+import { EditActionIcon, ViewActionIcon } from '@/components/ui';
+import { cursorPointer, shadowCard } from '@/design-system/estilos';
 import { useRelatorios } from "./hooks/useRelatorios";
 import ListaCandidatosSessaoModal from "./components/ListaCandidatosSessaoModal";
 import AtaEscolhaCargoModal from "./components/AtaEscolhaCargoModal";
 import { usePostRelatorio } from "./hooks/usePostRelatorio";
-import { FilterSelect, FilterLabel } from "../EscolhaCandidatos/styles";
+import { FilterSelect, AppFormItem } from "@/components/ui";
 import PersonalizacaoModal from "./components/PersonalizacaoModal";
 import ShadowContent from "./components/ShadowContent";
 import type { RelatorioLinha } from "../../services/resources/relatorios/IRelatorios";
@@ -30,7 +32,7 @@ const RelatoriosTela: React.FC = () => {
         title: (
           <Text
             strong
-            style={{ cursor: "pointer" }}
+            style={cursorPointer}
             onClick={() => navigate("/")}
           >
             Home
@@ -345,10 +347,12 @@ const RelatoriosTela: React.FC = () => {
         key: "visualizar",
         align: "center" as const,
         render: (_: any, record: RelatorioLinha) => (
-          <EyeOutlined
-            style={{ fontSize: 18, color: "#0F59C8", cursor: "pointer" }}
-            onClick={() => handleVisualizar(record)}
-          />
+          <Tooltip title="Visualizar" arrow>
+            <ViewActionIcon
+              style={{ fontSize: 18, cursor: "pointer" }}
+              onClick={() => handleVisualizar(record)}
+            />
+          </Tooltip>
         ),
       },
       {
@@ -360,25 +364,28 @@ const RelatoriosTela: React.FC = () => {
           return (
             <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
               {formats.includes("xls") && (
-                <FileExcelOutlined
-                  style={{ fontSize: 18, color: "#08979C", cursor: "pointer" }}
-                  onClick={() => handleExport(record, "xls")}
-                  title="Exportar para Excel"
-                />
+                <Tooltip title="Exportar para Excel" arrow>
+                  <FileExcelOutlined
+                    style={{ fontSize: 18, color: "#08979C", cursor: "pointer" }}
+                    onClick={() => handleExport(record, "xls")}
+                  />
+                </Tooltip>
               )}
               {formats.includes("pdf") && (
-                <FilePdfOutlined
-                  style={{ fontSize: 18, color: "#C41D7F", cursor: "pointer" }}
-                  onClick={() => handleExport(record, "pdf")}
-                  title="Exportar para PDF"
-                />
+                <Tooltip title="Exportar para PDF" arrow>
+                  <FilePdfOutlined
+                    style={{ fontSize: 18, color: "#C41D7F", cursor: "pointer" }}
+                    onClick={() => handleExport(record, "pdf")}
+                  />
+                </Tooltip>
               )}
               {formats.includes("docx") && (
-                <FileWordOutlined
-                  style={{ fontSize: 18, color: "#2B579A", cursor: "pointer" }}
-                  onClick={() => handleExport(record, "docx")}
-                  title="Exportar para Word"
-                />
+                <Tooltip title="Exportar para Word" arrow>
+                  <FileWordOutlined
+                    style={{ fontSize: 18, color: "#2B579A", cursor: "pointer" }}
+                    onClick={() => handleExport(record, "docx")}
+                  />
+                </Tooltip>
               )}
             </div>
           );
@@ -389,17 +396,19 @@ const RelatoriosTela: React.FC = () => {
         key: "personalizacao",
         align: "center" as const,
         render: (_: any, record: RelatorioLinha) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-            }}
-            onClick={() => handlePersonalizacao(record)}
-          >
-            <EditOutlined style={{ color: "#05409A" }} />
-          </div>
+          <Tooltip title="Personalizar" arrow>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+              onClick={() => handlePersonalizacao(record)}
+            >
+              <EditActionIcon />
+            </div>
+          </Tooltip>
         ),
       },
     ],
@@ -409,11 +418,10 @@ const RelatoriosTela: React.FC = () => {
   return (
     <BaseTela breadcrumbItems={breadcrumbItems} title="Relatórios">
       <Spin spinning={isPostingRelatorio}>
-      <Card style={{ border: "none", borderRadius: 12, marginBottom: 16 }}>
+      <Card style={shadowCard}>
         <Row gutter={[16, 12]} align="middle">
           <Col xs={24} md={12}>
-            <FilterLabel>Situação</FilterLabel>
-            <div style={{ marginTop: 8 }}>
+            <AppFormItem label="Situação" labelCol={{ span: 24 }}>
               <Radio.Group
                 value={tipoRelatorio}
                 onChange={handleTipoChange}
@@ -421,28 +429,29 @@ const RelatoriosTela: React.FC = () => {
                 <Radio value="EM_ANDAMENTO">Em andamento</Radio>
                 <Radio value="FINALIZADO">Finalizados</Radio>
               </Radio.Group>
-            </div>
+            </AppFormItem>
           </Col>
           <Col xs={24} md={12}>
-            <FilterLabel>Processo</FilterLabel>
-            <FilterSelect
-              allowClear
-              placeholder="Selecione um processo"
-              style={{ width: "100%", marginTop: 8 }}
-              value={filtroSelect}
-              loading={processosConvocacaoOptionsIsLoading}
-              options={processosConvocacaoOptions as any}
-              onChange={(value) => {
-                setFiltroSelect(value as string | undefined);
-                setProcessoError(undefined);
-              }}
-              status={processoError ? "error" : undefined}
-            />
-            {processoError && (
-              <div style={{ color: "#ff4d4f", fontSize: "14px", marginTop: "4px" }}>
-                {processoError}
-              </div>
-            )}
+            <AppFormItem
+              label="Processo"
+              labelCol={{ span: 24 }}
+              validateStatus={processoError ? "error" : undefined}
+              help={processoError}
+            >
+              <FilterSelect
+                allowClear
+                placeholder="Selecione um processo"
+                style={{ width: "100%" }}
+                value={filtroSelect}
+                loading={processosConvocacaoOptionsIsLoading}
+                options={processosConvocacaoOptions as any}
+                onChange={(value) => {
+                  setFiltroSelect(value as string | undefined);
+                  setProcessoError(undefined);
+                }}
+                status={processoError ? "error" : undefined}
+              />
+            </AppFormItem>
           </Col>
         </Row>
       </Card>

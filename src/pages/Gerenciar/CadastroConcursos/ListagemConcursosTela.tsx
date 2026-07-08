@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Button, Typography } from "antd";
+import { Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import FiltrosBuscaConcurso from "./components/FiltrosBuscaConcurso";
 import TabelaConcursos from "./components/TabelaConcursos";
 import { useListarConcursos } from "./hooks/useListarConcursos";
-import { CardBusca, TabelaWrapper } from "./styles";
+import { AppButton, BuscaProcessosTitle, ConteudoPagina } from "@/components/ui";
+import { ConcursoTabelaWrapper } from "@/design-system/estilos";
 import type { IConcursoFiltros } from "../../../services/resources/concursos/IConcursos";
 
 const { Text } = Typography;
@@ -17,7 +18,6 @@ const ListagemConcursosTela: React.FC = () => {
   const [page, setPage] = useState(1);
 
   const { concursos, total, isLoading } = useListarConcursos(filtros, 1, 1000);
-
   const { concursos: concursosParaFiltros } = useListarConcursos({}, 1, 1000);
 
   const breadcrumbItems = [
@@ -40,25 +40,25 @@ const ListagemConcursosTela: React.FC = () => {
       breadcrumbItems={breadcrumbItems}
       title="Cadastro de concursos"
       buttons={
-        <Button
-          type="primary"
+        <AppButton
+          variant="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate("/gerenciar/concursos/adicionar")}
         >
           Adicionar concurso
-        </Button>
+        </AppButton>
       }
     >
-      <CardBusca>
-        <Typography.Title level={5}>Buscar concursos</Typography.Title>
+      <ConteudoPagina>
+        <BuscaProcessosTitle>Buscar concursos</BuscaProcessosTitle>
         <FiltrosBuscaConcurso
           onBuscar={aoBuscar}
           onLimpar={aoLimpar}
           concursos={concursosParaFiltros}
         />
-      </CardBusca>
+      </ConteudoPagina>
 
-      <TabelaWrapper>
+      <ConcursoTabelaWrapper>
         <TabelaConcursos
           dados={concursos}
           total={total}
@@ -67,7 +67,7 @@ const ListagemConcursosTela: React.FC = () => {
           onPageChange={setPage}
           onEditar={(uuid) => navigate(`/gerenciar/concursos/editar/${uuid}`)}
         />
-      </TabelaWrapper>
+      </ConcursoTabelaWrapper>
     </BaseTela>
   );
 };

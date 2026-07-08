@@ -46,7 +46,10 @@ jest.mock("react-hook-form", () => ({
   ),
 }));
 
-jest.mock("../../../../components/EstilosCompartilhados", () => ({
+jest.mock('@/components/ui', () => {
+  const uiStyleMocks = jest.requireActual('@/test/uiStyleMocks');
+  return {
+  ...uiStyleMocks,
   TabContentContainer: ({ children }: any) => (
     <div data-testid="tab-content">{children}</div>
   ),
@@ -87,17 +90,18 @@ jest.mock("../../../../components/EstilosCompartilhados", () => ({
       </tbody>
     </table>
   ),
-}));
-
-jest.mock("../../../../components/FormStyle", () => ({
-  CustomFormItem: ({ children, label, help }: any) => (
+  AppFormItem: ({ children, label, help }: any) => (
     <div data-testid="custom-form-item">
       {label && <label>{label}</label>}
       {help && <span data-testid="help">{help}</span>}
       {children}
     </div>
   ),
-}));
+  AppButton: ({ children, onClick, disabled, variant }: any) => (
+    <button type="button" onClick={onClick} disabled={disabled}>{children}</button>
+  ),
+  };
+});
 
 jest.mock("antd", () => {
   const actual = jest.requireActual("antd");
