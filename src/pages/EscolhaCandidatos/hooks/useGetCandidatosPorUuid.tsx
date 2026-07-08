@@ -34,7 +34,7 @@ export const useGetCandidatosPorUuid = (
         { signal }
       ).response as Promise<IBuscarPorUuidsResponse>,
     enabled: queryEnabled,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
   });
 

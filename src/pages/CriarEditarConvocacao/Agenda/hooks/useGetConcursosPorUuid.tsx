@@ -7,7 +7,7 @@ export const useGetConcursoByUuid = (uuid: string, axiosRequestConfig?: AxiosReq
     queryKey: ["getConcursoByUuid", uuid],
     queryFn: ({ signal }) =>
       API.Concursos.getConcursoByUuid(uuid, { signal, ...axiosRequestConfig }).response,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
     enabled: !!uuid, // Só executa se uuid não for vazio/undefined
   });

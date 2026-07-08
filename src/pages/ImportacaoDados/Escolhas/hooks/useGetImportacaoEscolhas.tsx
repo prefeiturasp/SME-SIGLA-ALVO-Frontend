@@ -12,7 +12,7 @@ const useGetImportacaoEscolhas = (listRequest: IListRequest<unknown>) => {
         listRequest,
         { signal }
       ).response,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
   });
 

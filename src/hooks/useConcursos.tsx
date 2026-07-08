@@ -7,7 +7,7 @@ export const useConcursos = () => {
     queryKey: ["getConcursos"],
     queryFn: ({ signal }) =>
       API.Concursos.getConcursos({ signal }).response,
-    staleTime: 1000 * 60 * 5, // 5 minutos
+    staleTime: 0,
     retry: 0,
   });
 

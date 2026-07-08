@@ -15,7 +15,7 @@ export const useGetAgendas = (
     queryKey: ["getAgendas", pcUuid, page, pageSize],
     queryFn: ({ signal }) =>
       API.Agenda.getAgendas(listRequest, { signal }).response,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 0,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
