@@ -18,8 +18,6 @@ const IdentificacaoTela: React.FC = () => {
   const navigate = useNavigate();
   const current = 0;
 
-  // Passo 1 "cria" o concurso gerando um uuid no cliente, que é carregado
-  // por parâmetro nos passos seguintes. Nenhum request ao backend nesta fase.
   const [uuidConcurso] = useState(() => uuidv4());
 
   const { stepItems, handleStepChange } = useConcursoSteps({

@@ -39,7 +39,6 @@ const VigenciaTela: React.FC = () => {
     { title: "Adicionar concurso" },
   ] as TitleItem[];
 
-  // Nesta fase "Finalizar" apenas retorna à listagem, sem request ao backend.
   const next = () => {
     navigate("/gerenciar/concursos");
   };

@@ -14,10 +14,6 @@ interface StepActionsConcursoProps {
   canVoltar?: boolean;
 }
 
-/**
- * Botões de navegação do cadastro de concurso: "Cancelar", "Anterior",
- * "Próximo" e, no último passo, "Adicionar concurso".
- */
 export const StepActionsConcurso: React.FC<StepActionsConcursoProps> = ({
   current,
   steps,

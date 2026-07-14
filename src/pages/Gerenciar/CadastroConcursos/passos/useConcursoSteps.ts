@@ -9,13 +9,6 @@ type UseConcursoStepsParams = {
   onNavigate: (path: string) => void;
 };
 
-/**
- * Monta os itens do stepper de cadastro de concurso e a lógica de navegação
- * entre passos. Espelha o comportamento visual de useConvocacaoSteps, porém
- * sem dependência de progresso vindo do backend: enquanto não existe um uuid
- * (passo 1), os passos 2 e 3 ficam bloqueados; após o uuid, todos os passos
- * ficam navegáveis.
- */
 export function useConcursoSteps(params: UseConcursoStepsParams) {
   const { uuid, currentStepIndex, onNavigate } = params;
 
