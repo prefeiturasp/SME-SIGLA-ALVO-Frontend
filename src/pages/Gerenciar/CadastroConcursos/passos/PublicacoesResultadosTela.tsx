@@ -2,9 +2,11 @@ import React from "react";
 import { Steps, Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
-import { StepActionsConcurso } from "./StepActionsConcurso";
-import { steps } from "./stepsConcurso";
-import { useConcursoSteps } from "./useConcursoSteps";
+import FormPublicacoesResultados from "../components/FormPublicacoesResultados";
+import { usePublicacoesResultadosForm } from "../hooks/usePublicacoesResultadosForm";
+import { StepActionsConcurso } from "../components/StepActionsConcurso";
+import { steps } from "../components/stepsConcurso";
+import { useConcursoSteps } from "../components/useConcursoSteps";
 import {
   CardTitle,
   ConvocacaoStepsGlobalStyle,
@@ -13,10 +15,18 @@ import {
 
 const { Text } = Typography;
 
+const CHAVE_PASSO_2 = "concurso-wizard-passo-2";
+
 const PublicacoesResultadosTela: React.FC = () => {
   const navigate = useNavigate();
   const { uuid } = useParams();
   const current = 1;
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = usePublicacoesResultadosForm();
 
   const { stepItems, handleStepChange } = useConcursoSteps({
     uuid,
@@ -39,9 +49,10 @@ const PublicacoesResultadosTela: React.FC = () => {
     { title: "Adicionar concurso" },
   ] as TitleItem[];
 
-  const next = () => {
+  const next = handleSubmit((valores) => {
+    sessionStorage.setItem(CHAVE_PASSO_2, JSON.stringify(valores));
     navigate(`/gerenciar/concursos/adicionar/${uuid}/passo-3`);
-  };
+  });
 
   const prev = () => {
     navigate("/gerenciar/concursos/adicionar/passo-1");
@@ -69,10 +80,15 @@ const PublicacoesResultadosTela: React.FC = () => {
           variant="borderless"
         >
           <CardTitle>Publicações e resultados</CardTitle>
-          <Text type="secondary" style={{ display: "block", marginTop: 8 }}>
+          <Text
+            type="secondary"
+            style={{ display: "block", marginTop: 8, marginBottom: 24 }}
+          >
             Registre as principais publicações e os resultados divulgados ao
             longo do concurso.
           </Text>
+
+          <FormPublicacoesResultados control={control} erros={errors} />
 
           <StepActionsConcurso
             current={current}
@@ -80,6 +96,7 @@ const PublicacoesResultadosTela: React.FC = () => {
             next={next}
             prev={prev}
             onCancel={cancel}
+            canAvancar={isValid}
           />
         </StyledCardWithoutBorder>
       </BaseTela>

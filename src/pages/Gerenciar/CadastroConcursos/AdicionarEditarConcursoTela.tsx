@@ -39,7 +39,6 @@ const AdicionarEditarConcursoTela: React.FC = () => {
         cargos_ids: (concurso.cargos ?? []).map((c) => c.uuid),
         nome: concurso.nome,
         numero_processo: concurso.numero_processo ?? "",
-        ano_edital: concurso.ano_edital ?? new Date().getFullYear(),
         banca_responsavel: concurso.banca_responsavel ?? "",
         status: concurso.status ?? "ATIVO",
       });
@@ -77,7 +76,6 @@ const AdicionarEditarConcursoTela: React.FC = () => {
       nome: valores.nome,
       cargos_ids: valores.cargos_ids,
       numero_processo: valores.numero_processo,
-      ano_edital: valores.ano_edital,
       banca_responsavel: valores.banca_responsavel,
       status: valores.status,
     };

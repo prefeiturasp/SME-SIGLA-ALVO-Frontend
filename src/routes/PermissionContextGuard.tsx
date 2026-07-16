@@ -73,7 +73,7 @@ export interface PermissionContextGuardProps {
     return  <LoadingContainer data-testid="@loading-element"><Spin size="large" spinning/></LoadingContainer>   
   }
 
-  if (!can(permissaoDeExibirATELA) && !isLoading && !isError) {
+  if (!can(permissaoDeExibirATELA) && !isLoading && !isError) { 
     const to = redirectTo || '/403';
     return <Navigate to={to} replace />;
   }

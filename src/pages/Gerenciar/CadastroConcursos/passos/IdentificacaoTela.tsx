@@ -3,9 +3,11 @@ import { Steps, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
-import { StepActionsConcurso } from "./StepActionsConcurso";
-import { steps } from "./stepsConcurso";
-import { useConcursoSteps } from "./useConcursoSteps";
+import FormConcurso from "../components/FormConcurso";
+import { useConcursoForm } from "../hooks/useConcursoForm";
+import { StepActionsConcurso } from "../components/StepActionsConcurso";
+import { steps } from "../components/stepsConcurso";
+import { useConcursoSteps } from "../components/useConcursoSteps";
 import {
   CardTitle,
   ConvocacaoStepsGlobalStyle,
@@ -14,11 +16,19 @@ import {
 
 const { Text } = Typography;
 
+const CHAVE_PASSO_1 = "concurso-wizard-passo-1";
+
 const IdentificacaoTela: React.FC = () => {
   const navigate = useNavigate();
   const current = 0;
 
   const [uuidConcurso] = useState(() => uuidv4());
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useConcursoForm();
 
   const { stepItems, handleStepChange } = useConcursoSteps({
     uuid: uuidConcurso,
@@ -41,9 +51,10 @@ const IdentificacaoTela: React.FC = () => {
     { title: "Adicionar concurso" },
   ] as TitleItem[];
 
-  const next = () => {
+  const next = handleSubmit((valores) => {
+    sessionStorage.setItem(CHAVE_PASSO_1, JSON.stringify(valores));
     navigate(`/gerenciar/concursos/adicionar/${uuidConcurso}/passo-2`);
-  };
+  });
 
   const prev = () => {
     navigate("/gerenciar/concursos");
@@ -71,10 +82,15 @@ const IdentificacaoTela: React.FC = () => {
           variant="borderless"
         >
           <CardTitle>Identificação do concurso</CardTitle>
-          <Text type="secondary" style={{ display: "block", marginTop: 8 }}>
+          <Text
+            type="secondary"
+            style={{ display: "block", marginTop: 8, marginBottom: 24 }}
+          >
             Informe os dados que identificam o concurso e o processo
             administrativo correspondente.
           </Text>
+
+          <FormConcurso control={control} erros={errors} />
 
           <StepActionsConcurso
             current={current}
@@ -82,6 +98,7 @@ const IdentificacaoTela: React.FC = () => {
             next={next}
             prev={prev}
             onCancel={cancel}
+            canAvancar={isValid}
           />
         </StyledCardWithoutBorder>
       </BaseTela>

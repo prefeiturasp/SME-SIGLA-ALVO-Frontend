@@ -47,7 +47,6 @@ export interface IConcursoPayload {
   nome: string;
   cargos_ids: string[];
   numero_processo: string;
-  ano_edital: number | null;
   banca_responsavel: string;
   status: ConcursoStatus;
 }
@@ -57,7 +56,6 @@ export interface IConcursoFiltros {
   codigo_cargo?: number;
   descricao_cargo?: string;
   numero_processo?: string;
-  ano_edital?: number;
   banca_responsavel?: string;
   status?: ConcursoStatus;
 }
