@@ -12,6 +12,8 @@ interface StepActionsConcursoProps {
   loading?: boolean;
   canAvancar?: boolean;
   canVoltar?: boolean;
+  /** Texto do botão do último passo (ex.: "Salvar" na edição). */
+  labelFinal?: string;
 }
 
 export const StepActionsConcurso: React.FC<StepActionsConcursoProps> = ({
@@ -23,6 +25,7 @@ export const StepActionsConcurso: React.FC<StepActionsConcursoProps> = ({
   loading,
   canAvancar = true,
   canVoltar = true,
+  labelFinal = "Adicionar concurso",
 }) => {
   const isUltimoPasso = current === steps.length - 1;
 
@@ -68,7 +71,7 @@ export const StepActionsConcurso: React.FC<StepActionsConcursoProps> = ({
               loading={loading}
               disabled={!canAvancar}
             >
-              Adicionar concurso
+              {labelFinal}
             </AppButton>
           )}
         </Col>

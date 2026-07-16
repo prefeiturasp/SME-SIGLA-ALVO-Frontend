@@ -1,12 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Steps, Typography } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
 import FormPublicacoesResultados from "../components/FormPublicacoesResultados";
 import { usePublicacoesResultadosForm } from "../hooks/usePublicacoesResultadosForm";
+import { useModoConcurso } from "../hooks/useModoConcurso";
+import { usePatchConcurso } from "../hooks/usePatchConcurso";
+import { useGetConcursoByUuid } from "../../../GerenciamentoVagas/hooks/useGetConcursoPorUuid";
 import { StepActionsConcurso } from "../components/StepActionsConcurso";
 import { steps } from "../components/stepsConcurso";
 import { useConcursoSteps } from "../components/useConcursoSteps";
+import { CHAVE_PASSO_2 } from "../utils/wizardStorage";
+import {
+  detalheParaPasso2,
+  montarPayloadPasso2,
+} from "../utils/montarPayloadConcurso";
 import {
   CardTitle,
   ConvocacaoStepsGlobalStyle,
@@ -15,23 +23,40 @@ import {
 
 const { Text } = Typography;
 
-const CHAVE_PASSO_2 = "concurso-wizard-passo-2";
-
 const PublicacoesResultadosTela: React.FC = () => {
   const navigate = useNavigate();
-  const { uuid } = useParams();
   const current = 1;
+
+  const { isEdicao, uuidRota, getStepPath, labelTela } = useModoConcurso();
+  const uuid = uuidRota;
 
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isValid },
   } = usePublicacoesResultadosForm();
+
+  const { concursoData: concurso } = useGetConcursoByUuid(
+    isEdicao ? uuidRota ?? "" : ""
+  );
+
+  useEffect(() => {
+    if (isEdicao && concurso) {
+      reset(detalheParaPasso2(concurso));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdicao, concurso]);
+
+  // Silencioso: a notificação de sucesso aparece só no último passo.
+  const patchConcurso = usePatchConcurso(true);
 
   const { stepItems, handleStepChange } = useConcursoSteps({
     uuid,
     currentStepIndex: current,
     onNavigate: (path) => navigate(path),
+    getStepPath,
+    liberarTodos: isEdicao,
   });
 
   const breadcrumbItems = [
@@ -46,16 +71,28 @@ const PublicacoesResultadosTela: React.FC = () => {
         </Text>
       ),
     },
-    { title: "Adicionar concurso" },
+    { title: labelTela },
   ] as TitleItem[];
 
+  const irParaPasso3 = () => {
+    navigate(getStepPath(2, uuid) ?? "/gerenciar/concursos");
+  };
+
   const next = handleSubmit((valores) => {
+    if (isEdicao && uuidRota) {
+      patchConcurso.mutate(
+        { uuid: uuidRota, payload: montarPayloadPasso2(valores) },
+        { onSuccess: () => irParaPasso3() }
+      );
+      return;
+    }
+
     sessionStorage.setItem(CHAVE_PASSO_2, JSON.stringify(valores));
-    navigate(`/gerenciar/concursos/adicionar/${uuid}/passo-3`);
+    irParaPasso3();
   });
 
   const prev = () => {
-    navigate("/gerenciar/concursos/adicionar/passo-1");
+    navigate(getStepPath(0, uuid) ?? "/gerenciar/concursos");
   };
 
   const cancel = () => {
@@ -65,7 +102,7 @@ const PublicacoesResultadosTela: React.FC = () => {
   return (
     <>
       <ConvocacaoStepsGlobalStyle />
-      <BaseTela breadcrumbItems={breadcrumbItems} title="Adicionar concurso">
+      <BaseTela breadcrumbItems={breadcrumbItems} title={labelTela}>
         <StyledCardWithoutBorder variant="borderless">
           <Steps
             className="convocacao-steps"
@@ -97,6 +134,7 @@ const PublicacoesResultadosTela: React.FC = () => {
             prev={prev}
             onCancel={cancel}
             canAvancar={isValid}
+            loading={patchConcurso.isPending}
           />
         </StyledCardWithoutBorder>
       </BaseTela>

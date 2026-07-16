@@ -4,7 +4,11 @@ import { API } from "../../../../services";
 import type { IConcursoPayload } from "../../../../services/resources/concursos/IConcursos";
 import { ehErroNumeroProcessoDuplicado } from "../utils/erroConcurso";
 
-export const usePatchConcurso = () => {
+/**
+ * @param silencioso Quando true, não exibe a notificação de sucesso (útil no
+ *   PATCH parcial de cada passo da edição, onde só o passo final deve notificar).
+ */
+export const usePatchConcurso = (silencioso = false) => {
   const queryClient = useQueryClient();
   const { notification } = App.useApp();
 
@@ -21,6 +25,7 @@ export const usePatchConcurso = () => {
       queryClient.invalidateQueries({
         queryKey: ["getConcursoByUuid", uuid],
       });
+      if (silencioso) return;
       notification.success({
         message: "Concurso atualizado",
         description: "As alterações foram salvas com sucesso!",
