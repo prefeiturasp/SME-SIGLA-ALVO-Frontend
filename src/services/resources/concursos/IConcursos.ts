@@ -10,14 +10,12 @@ export interface ICargos2 {
   codigo: number;
 }
 
-// Retorno do endpoint em formato select (?formato=select)
 export interface IConcurso {
   label: string;
   value: string;
   cargos: ICargos[];
 }
 
-// Retorno da listagem paginada (ConcursoListSerializer)
 export interface IConcursoLista {
   uuid: string;
   nome: string;
@@ -31,11 +29,6 @@ export interface IConcursoLista {
 
 export type ConcursoStatus = "ATIVO" | "INATIVO";
 
-// Situacao do ciclo de vida do concurso (distinta de status ATIVO/INATIVO).
-// INCOMPLETO: cadastro iniciado (passo 1) e nao finalizado.
-// COMPLETO: cadastro finalizado (ultimo passo do wizard).
-// EM_ANDAMENTO: houve convocacao; edicao bloqueada.
-// FINALIZADO / CANCELADO: reservados para uso futuro.
 export type ConcursoSituacao =
   | "INCOMPLETO"
   | "COMPLETO"
@@ -43,9 +36,7 @@ export type ConcursoSituacao =
   | "FINALIZADO"
   | "CANCELADO";
 
-// Campos de publicacoes, resultados e vigencia (passos 2 e 3 do wizard).
-// Todos opcionais/nullable, espelhando o backend (ConcursoSerializer).
-export interface IConcursoCamposDetalhados {
+  export interface IConcursoCamposDetalhados {
   data_autorizacao: string | null;
   data_abertura: string | null;
   classificacao_final: string | null;
@@ -60,7 +51,6 @@ export interface IConcursoCamposDetalhados {
   vigencia_fim: string | null;
 }
 
-// Retorno do endpoint de detalhe (ConcursoSerializer)
 export interface IConcursoDetalhe extends IConcursoCamposDetalhados {
   uuid: string;
   nome: string;

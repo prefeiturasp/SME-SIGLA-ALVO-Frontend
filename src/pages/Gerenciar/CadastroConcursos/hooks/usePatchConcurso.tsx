@@ -30,9 +30,7 @@ export const usePatchConcurso = (silencioso = false) => {
       });
     },
     onError: (error) => {
-
       if (ehErroNumeroProcessoDuplicado(error)) return;
-
       notification.error({
         message: "Erro ao salvar",
         description:

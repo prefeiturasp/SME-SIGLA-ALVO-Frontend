@@ -2,14 +2,10 @@ import { useMemo } from "react";
 import { items } from "./stepsConcurso";
 
 type UseConcursoStepsParams = {
-
   uuid?: string;
-
   currentStepIndex: number;
   onNavigate: (path: string) => void;
-
   getStepPath: (stepIndex: number, uuid?: string) => string | null;
-
   liberarTodos?: boolean;
 };
 

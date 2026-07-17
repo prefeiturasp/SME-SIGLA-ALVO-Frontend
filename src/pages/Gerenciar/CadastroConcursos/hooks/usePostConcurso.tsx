@@ -22,9 +22,7 @@ export const usePostConcurso = (silencioso = false) => {
       });
     },
     onError: (error) => {
-
       if (ehErroNumeroProcessoDuplicado(error)) return;
-
       notification.error({
         message: "Erro ao cadastrar",
         description:
