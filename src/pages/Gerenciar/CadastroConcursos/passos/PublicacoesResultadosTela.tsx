@@ -10,7 +10,6 @@ import { useGetConcursoByUuid } from "../../../GerenciamentoVagas/hooks/useGetCo
 import { StepActionsConcurso } from "../components/StepActionsConcurso";
 import { steps } from "../components/stepsConcurso";
 import { useConcursoSteps } from "../components/useConcursoSteps";
-import { CHAVE_PASSO_2 } from "../utils/wizardStorage";
 import {
   detalheParaPasso2,
   montarPayloadPasso2,
@@ -37,16 +36,16 @@ const PublicacoesResultadosTela: React.FC = () => {
     formState: { errors, isValid },
   } = usePublicacoesResultadosForm();
 
-  const { concursoData: concurso } = useGetConcursoByUuid(
-    isEdicao ? uuidRota ?? "" : ""
-  );
+  // O concurso já existe desde o passo 1 (POST) tanto no cadastro quanto na
+  // edição; carrega para popular o formulário deste passo.
+  const { concursoData: concurso } = useGetConcursoByUuid(uuidRota ?? "");
 
   useEffect(() => {
-    if (isEdicao && concurso) {
+    if (concurso) {
       reset(detalheParaPasso2(concurso));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEdicao, concurso]);
+  }, [concurso]);
 
   // Silencioso: a notificação de sucesso aparece só no último passo.
   const patchConcurso = usePatchConcurso(true);
@@ -79,16 +78,11 @@ const PublicacoesResultadosTela: React.FC = () => {
   };
 
   const next = handleSubmit((valores) => {
-    if (isEdicao && uuidRota) {
-      patchConcurso.mutate(
-        { uuid: uuidRota, payload: montarPayloadPasso2(valores) },
-        { onSuccess: () => irParaPasso3() }
-      );
-      return;
-    }
-
-    sessionStorage.setItem(CHAVE_PASSO_2, JSON.stringify(valores));
-    irParaPasso3();
+    if (!uuidRota) return;
+    patchConcurso.mutate(
+      { uuid: uuidRota, payload: montarPayloadPasso2(valores) },
+      { onSuccess: () => irParaPasso3() }
+    );
   });
 
   const prev = () => {

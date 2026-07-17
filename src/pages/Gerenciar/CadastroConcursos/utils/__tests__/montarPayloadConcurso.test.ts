@@ -3,14 +3,10 @@ import {
   detalheParaPasso2,
   detalheParaPasso3,
   formatarDataApi,
-  montarPayloadConcurso,
   montarPayloadPasso1,
   montarPayloadPasso2,
   montarPayloadPasso3,
 } from "../montarPayloadConcurso";
-import type { IConcursoFormFields } from "../../hooks/useConcursoForm";
-import type { IPublicacoesResultadosFormFields } from "../../hooks/usePublicacoesResultadosForm";
-import type { IVigenciaFormFields } from "../../hooks/useVigenciaForm";
 import type { IConcursoDetalhe } from "../../../../../services/resources/concursos/IConcursos";
 
 describe("formatarDataApi", () => {
@@ -24,76 +20,6 @@ describe("formatarDataApi", () => {
   });
 });
 
-describe("montarPayloadConcurso", () => {
-  const passo1: IConcursoFormFields = {
-    nome: "Concurso 2026",
-    cargos_ids: ["c1", "c2"],
-    numero_processo: "6016202200779764",
-    banca_responsavel: "FGV",
-    status: "ATIVO",
-  };
-  const passo2: IPublicacoesResultadosFormFields = {
-    data_autorizacao: dayjs("2026-01-10"),
-    classificacao_final: dayjs("2026-06-30"),
-    data_abertura: dayjs("2026-02-15"),
-    link_edital: "https://exemplo.gov.br/edital.pdf",
-    habilitados_geral: 100,
-    habilitados_nna: 20,
-    habilitados_pcd: 5,
-    retificacoes: "Retificacao 01/2026.",
-  };
-  const passo3: IVigenciaFormFields = {
-    data_homologacao: dayjs("2026-07-01"),
-    data_prorrogacao: dayjs("2028-07-01"),
-    vigencia: [dayjs("2026-07-01"), dayjs("2028-07-01")],
-  };
-
-  it("monta o payload completo convertendo datas e vigencia", () => {
-    const payload = montarPayloadConcurso(passo1, passo2, passo3);
-
-    expect(payload).toEqual({
-      nome: "Concurso 2026",
-      cargos_ids: ["c1", "c2"],
-      numero_processo: "6016202200779764",
-      banca_responsavel: "FGV",
-      status: "ATIVO",
-      data_autorizacao: "2026-01-10",
-      data_abertura: "2026-02-15",
-      classificacao_final: "2026-06-30",
-      link_edital: "https://exemplo.gov.br/edital.pdf",
-      habilitados_geral: 100,
-      habilitados_nna: 20,
-      habilitados_pcd: 5,
-      retificacoes: "Retificacao 01/2026.",
-      data_homologacao: "2026-07-01",
-      data_prorrogacao: "2028-07-01",
-      vigencia_inicio: "2026-07-01",
-      vigencia_fim: "2028-07-01",
-    });
-  });
-
-  it("trata campos opcionais ausentes como null/vazio", () => {
-    const payload = montarPayloadConcurso(
-      passo1,
-      {
-        ...passo2,
-        data_autorizacao: undefined as never,
-        link_edital: "",
-        retificacoes: undefined,
-      },
-      { data_homologacao: undefined as never, vigencia: undefined as never }
-    );
-
-    expect(payload.data_autorizacao).toBeNull();
-    expect(payload.link_edital).toBe("");
-    expect(payload.retificacoes).toBe("");
-    expect(payload.data_homologacao).toBeNull();
-    expect(payload.data_prorrogacao).toBeNull();
-    expect(payload.vigencia_inicio).toBeNull();
-    expect(payload.vigencia_fim).toBeNull();
-  });
-});
-
 describe("detalheParaPasso2 / detalheParaPasso3", () => {
   const detalhe: IConcursoDetalhe = {
     uuid: "u1",
@@ -103,6 +29,7 @@ describe("detalheParaPasso2 / detalheParaPasso3", () => {
     codigo: null,
     banca_responsavel: "FGV",
     status: "ATIVO",
+    situacao: "COMPLETO",
     data_autorizacao: "2026-01-10",
     data_abertura: "2026-02-15",
     classificacao_final: "2026-06-30",

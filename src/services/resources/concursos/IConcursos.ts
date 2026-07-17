@@ -26,9 +26,22 @@ export interface IConcursoLista {
   numero_processo: string;
   banca_responsavel: string;
   status: string;
+  situacao: ConcursoSituacao;
 }
 
 export type ConcursoStatus = "ATIVO" | "INATIVO";
+
+// Situacao do ciclo de vida do concurso (distinta de status ATIVO/INATIVO).
+// INCOMPLETO: cadastro iniciado (passo 1) e nao finalizado.
+// COMPLETO: cadastro finalizado (ultimo passo do wizard).
+// EM_ANDAMENTO: houve convocacao; edicao bloqueada.
+// FINALIZADO / CANCELADO: reservados para uso futuro.
+export type ConcursoSituacao =
+  | "INCOMPLETO"
+  | "COMPLETO"
+  | "EM_ANDAMENTO"
+  | "FINALIZADO"
+  | "CANCELADO";
 
 // Campos de publicacoes, resultados e vigencia (passos 2 e 3 do wizard).
 // Todos opcionais/nullable, espelhando o backend (ConcursoSerializer).
@@ -56,6 +69,7 @@ export interface IConcursoDetalhe extends IConcursoCamposDetalhados {
   codigo: number | null;
   banca_responsavel: string;
   status: ConcursoStatus;
+  situacao: ConcursoSituacao;
 }
 
 export interface IConcursoPayload extends IConcursoCamposDetalhados {
@@ -64,6 +78,7 @@ export interface IConcursoPayload extends IConcursoCamposDetalhados {
   numero_processo: string;
   banca_responsavel: string;
   status: ConcursoStatus;
+  situacao?: ConcursoSituacao;
 }
 
 export interface IConcursoFiltros {

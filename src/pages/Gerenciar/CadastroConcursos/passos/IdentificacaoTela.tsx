@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Steps, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
 import FormConcurso from "../components/FormConcurso";
 import { useConcursoForm } from "../hooks/useConcursoForm";
 import { useModoConcurso } from "../hooks/useModoConcurso";
+import { usePostConcurso } from "../hooks/usePostConcurso";
 import { usePatchConcurso } from "../hooks/usePatchConcurso";
 import { useGetConcursoByUuid } from "../../../GerenciamentoVagas/hooks/useGetConcursoPorUuid";
 import { StepActionsConcurso } from "../components/StepActionsConcurso";
 import { steps } from "../components/stepsConcurso";
 import { useConcursoSteps } from "../components/useConcursoSteps";
-import { CHAVE_PASSO_1 } from "../utils/wizardStorage";
 import { montarPayloadPasso1 } from "../utils/montarPayloadConcurso";
 import { obterMensagemNumeroProcessoDuplicado } from "../utils/erroConcurso";
 import {
@@ -27,10 +26,6 @@ const IdentificacaoTela: React.FC = () => {
   const current = 0;
 
   const { isEdicao, uuidRota, getStepPath, labelTela } = useModoConcurso();
-
-  // Ao adicionar, gera um uuid novo; ao editar, usa o uuid da rota.
-  const [uuidGerado] = useState(() => uuidv4());
-  const uuidConcurso = isEdicao ? uuidRota : uuidGerado;
 
   const {
     control,
@@ -57,11 +52,13 @@ const IdentificacaoTela: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdicao, concurso]);
 
-  // Silencioso: a notificação de sucesso aparece só no último passo.
+  // Passo 1: no cadastro cria via POST (silencioso); na edição atualiza via
+  // PATCH (silencioso). A notificação de sucesso só aparece no último passo.
+  const postConcurso = usePostConcurso(true);
   const patchConcurso = usePatchConcurso(true);
 
   const { stepItems, handleStepChange } = useConcursoSteps({
-    uuid: uuidConcurso,
+    uuid: uuidRota,
     currentStepIndex: current,
     onNavigate: (path) => navigate(path),
     getStepPath,
@@ -83,32 +80,39 @@ const IdentificacaoTela: React.FC = () => {
     { title: labelTela },
   ] as TitleItem[];
 
-  const irParaPasso2 = () => {
-    navigate(getStepPath(1, uuidConcurso) ?? "/gerenciar/concursos");
+  const irParaPasso2 = (uuid: string) => {
+    navigate(getStepPath(1, uuid) ?? "/gerenciar/concursos");
+  };
+
+  const tratarErroProcessoDuplicado = (error: unknown) => {
+    const mensagem = obterMensagemNumeroProcessoDuplicado(error);
+    if (mensagem) {
+      setError("numero_processo", { type: "manual", message: mensagem });
+    }
   };
 
   const next = handleSubmit((valores) => {
+    const payload = montarPayloadPasso1(valores);
+
     if (isEdicao && uuidRota) {
       patchConcurso.mutate(
-        { uuid: uuidRota, payload: montarPayloadPasso1(valores) },
+        { uuid: uuidRota, payload },
         {
-          onSuccess: () => irParaPasso2(),
-          onError: (error) => {
-            const mensagem = obterMensagemNumeroProcessoDuplicado(error);
-            if (mensagem) {
-              setError("numero_processo", {
-                type: "manual",
-                message: mensagem,
-              });
-            }
-          },
+          onSuccess: () => irParaPasso2(uuidRota),
+          onError: tratarErroProcessoDuplicado,
         }
       );
       return;
     }
 
-    sessionStorage.setItem(CHAVE_PASSO_1, JSON.stringify(valores));
-    irParaPasso2();
+    // Cadastro: cria o concurso (INCOMPLETO) e segue com o UUID do backend.
+    postConcurso.mutate(
+      { ...payload, situacao: "INCOMPLETO" },
+      {
+        onSuccess: (data) => irParaPasso2(data.uuid),
+        onError: tratarErroProcessoDuplicado,
+      }
+    );
   });
 
   const prev = () => {
@@ -163,7 +167,7 @@ const IdentificacaoTela: React.FC = () => {
             prev={prev}
             onCancel={cancel}
             canAvancar={isValid}
-            loading={patchConcurso.isPending}
+            loading={postConcurso.isPending || patchConcurso.isPending}
           />
         </StyledCardWithoutBorder>
       </BaseTela>

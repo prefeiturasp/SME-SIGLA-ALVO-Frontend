@@ -4,15 +4,20 @@ import { API } from "../../../../services";
 import type { IConcursoPayload } from "../../../../services/resources/concursos/IConcursos";
 import { ehErroNumeroProcessoDuplicado } from "../utils/erroConcurso";
 
-export const usePostConcurso = () => {
+/**
+ * @param silencioso Quando true, não exibe a notificação de sucesso (útil no
+ *   POST do passo 1 do wizard, onde só o passo final deve notificar).
+ */
+export const usePostConcurso = (silencioso = false) => {
   const queryClient = useQueryClient();
   const { notification } = App.useApp();
 
   return useMutation({
-    mutationFn: (payload: IConcursoPayload) =>
+    mutationFn: (payload: Partial<IConcursoPayload>) =>
       API.Concursos.postConcurso(payload).response,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listarConcursos"] });
+      if (silencioso) return;
       notification.success({
         message: "Concurso cadastrado",
         description: "O concurso foi cadastrado com sucesso!",

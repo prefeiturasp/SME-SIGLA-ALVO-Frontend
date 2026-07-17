@@ -22,41 +22,6 @@ export const formatarDataApi = (
 };
 
 /**
- * Monta o payload completo do concurso a partir dos valores dos três passos
- * do wizard (identificação, publicações/resultados e vigência).
- *
- * Converte as datas Dayjs para o formato da API e desmembra o intervalo de
- * vigência (`[inicio, fim]`) nos campos `vigencia_inicio`/`vigencia_fim`.
- */
-export const montarPayloadConcurso = (
-  passo1: IConcursoFormFields,
-  passo2: IPublicacoesResultadosFormFields,
-  passo3: IVigenciaFormFields
-): IConcursoPayload => {
-  const [vigenciaInicio, vigenciaFim] = passo3.vigencia ?? [];
-
-  return {
-    nome: passo1.nome,
-    cargos_ids: passo1.cargos_ids,
-    numero_processo: passo1.numero_processo,
-    banca_responsavel: passo1.banca_responsavel,
-    status: passo1.status,
-    data_autorizacao: formatarDataApi(passo2.data_autorizacao),
-    data_abertura: formatarDataApi(passo2.data_abertura),
-    classificacao_final: formatarDataApi(passo2.classificacao_final),
-    link_edital: passo2.link_edital ?? "",
-    habilitados_geral: passo2.habilitados_geral ?? null,
-    habilitados_nna: passo2.habilitados_nna ?? null,
-    habilitados_pcd: passo2.habilitados_pcd ?? null,
-    retificacoes: passo2.retificacoes ?? "",
-    data_homologacao: formatarDataApi(passo3.data_homologacao),
-    data_prorrogacao: formatarDataApi(passo3.data_prorrogacao),
-    vigencia_inicio: formatarDataApi(vigenciaInicio),
-    vigencia_fim: formatarDataApi(vigenciaFim),
-  };
-};
-
-/**
  * Monta o payload parcial do passo 1 (identificação) — usado no PATCH
  * incremental da edição, que salva apenas os campos do passo atual.
  */

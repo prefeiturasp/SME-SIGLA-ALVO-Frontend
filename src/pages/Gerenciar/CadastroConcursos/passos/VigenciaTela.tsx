@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
-import { Steps, Typography, App } from "antd";
+import { Steps, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
 import FormVigencia from "../components/FormVigencia";
 import { useVigenciaForm } from "../hooks/useVigenciaForm";
-import type { IVigenciaFormFields } from "../hooks/useVigenciaForm";
 import { useModoConcurso } from "../hooks/useModoConcurso";
-import { usePostConcurso } from "../hooks/usePostConcurso";
 import { usePatchConcurso } from "../hooks/usePatchConcurso";
 import { useGetConcursoByUuid } from "../../../GerenciamentoVagas/hooks/useGetConcursoPorUuid";
 import { StepActionsConcurso } from "../components/StepActionsConcurso";
@@ -14,16 +12,8 @@ import { steps } from "../components/stepsConcurso";
 import { useConcursoSteps } from "../components/useConcursoSteps";
 import {
   detalheParaPasso3,
-  montarPayloadConcurso,
   montarPayloadPasso3,
 } from "../utils/montarPayloadConcurso";
-import {
-  CHAVE_PASSO_3,
-  lerPasso1,
-  lerPasso2,
-  limparWizard,
-} from "../utils/wizardStorage";
-import { obterMensagemNumeroProcessoDuplicado } from "../utils/erroConcurso";
 import {
   CardTitle,
   ConvocacaoStepsGlobalStyle,
@@ -34,7 +24,6 @@ const { Text } = Typography;
 
 const VigenciaTela: React.FC = () => {
   const navigate = useNavigate();
-  const { notification } = App.useApp();
   const current = 2;
 
   const { isEdicao, uuidRota, getStepPath, labelTela, labelBotaoFinal } =
@@ -48,18 +37,17 @@ const VigenciaTela: React.FC = () => {
     formState: { errors, isValid },
   } = useVigenciaForm();
 
-  const { concursoData: concurso } = useGetConcursoByUuid(
-    isEdicao ? uuidRota ?? "" : ""
-  );
+  // O concurso já existe desde o passo 1; carrega para popular este passo.
+  const { concursoData: concurso } = useGetConcursoByUuid(uuidRota ?? "");
 
   useEffect(() => {
-    if (isEdicao && concurso) {
+    if (concurso) {
       reset(detalheParaPasso3(concurso));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEdicao, concurso]);
+  }, [concurso]);
 
-  const postConcurso = usePostConcurso();
+  // Passo final: notifica o sucesso (os passos anteriores são silenciosos).
   const patchConcurso = usePatchConcurso();
 
   const { stepItems, handleStepChange } = useConcursoSteps({
@@ -85,64 +73,25 @@ const VigenciaTela: React.FC = () => {
     { title: labelTela },
   ] as TitleItem[];
 
-  // Edição: PATCH parcial do passo 3 e volta à listagem.
-  const salvarEdicao = (passo3: IVigenciaFormFields) => {
+  // Passo final (cadastro e edição): salva a vigência e marca o concurso como
+  // COMPLETO. Reenviar COMPLETO é idempotente; concursos EM_ANDAMENTO nem
+  // chegam aqui (edição bloqueada na listagem).
+  const next = handleSubmit((valores) => {
     if (!uuidRota) return;
     patchConcurso.mutate(
-      { uuid: uuidRota, payload: montarPayloadPasso3(passo3) },
+      {
+        uuid: uuidRota,
+        payload: { ...montarPayloadPasso3(valores), situacao: "COMPLETO" },
+      },
       { onSuccess: () => navigate("/gerenciar/concursos") }
     );
-  };
-
-  // Adição: monta o payload completo dos 3 passos e faz o POST único.
-  const finalizarCadastro = (passo3: IVigenciaFormFields) => {
-    sessionStorage.setItem(CHAVE_PASSO_3, JSON.stringify(passo3));
-
-    const passo1 = lerPasso1();
-    const passo2 = lerPasso2();
-
-    if (!passo1 || !passo2) {
-      notification.error({
-        message: "Cadastro incompleto",
-        description:
-          "Alguns dados do concurso não foram encontrados. " +
-          "Recomece o cadastro do início.",
-        placement: "top",
-        duration: 3.5,
-      });
-      navigate("/gerenciar/concursos/adicionar/passo-1");
-      return;
-    }
-
-    const payload = montarPayloadConcurso(passo1, passo2, passo3);
-
-    postConcurso.mutate(payload, {
-      onSuccess: () => {
-        limparWizard();
-        navigate("/gerenciar/concursos");
-      },
-      onError: (error) => {
-        const mensagem = obterMensagemNumeroProcessoDuplicado(error);
-        if (mensagem) {
-          notification.error({
-            message: "Erro ao cadastrar",
-            description: mensagem,
-            placement: "top",
-            duration: 3.5,
-          });
-        }
-      },
-    });
-  };
-
-  const next = handleSubmit(isEdicao ? salvarEdicao : finalizarCadastro);
+  });
 
   const prev = () => {
     navigate(getStepPath(1, uuid) ?? "/gerenciar/concursos");
   };
 
   const cancel = () => {
-    if (!isEdicao) limparWizard();
     navigate("/gerenciar/concursos");
   };
 
@@ -180,7 +129,7 @@ const VigenciaTela: React.FC = () => {
             prev={prev}
             onCancel={cancel}
             canAvancar={isValid}
-            loading={postConcurso.isPending || patchConcurso.isPending}
+            loading={patchConcurso.isPending}
             labelFinal={labelBotaoFinal}
           />
         </StyledCardWithoutBorder>
