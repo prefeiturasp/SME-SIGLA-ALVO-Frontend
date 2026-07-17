@@ -12,7 +12,7 @@ interface StepActionsConcursoProps {
   loading?: boolean;
   canAvancar?: boolean;
   canVoltar?: boolean;
-  /** Texto do botão do último passo (ex.: "Salvar" na edição). */
+
   labelFinal?: string;
 }
 

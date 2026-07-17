@@ -4,10 +4,6 @@ import { API } from "../../../../services";
 import type { IConcursoPayload } from "../../../../services/resources/concursos/IConcursos";
 import { ehErroNumeroProcessoDuplicado } from "../utils/erroConcurso";
 
-/**
- * @param silencioso Quando true, não exibe a notificação de sucesso (útil no
- *   PATCH parcial de cada passo da edição, onde só o passo final deve notificar).
- */
 export const usePatchConcurso = (silencioso = false) => {
   const queryClient = useQueryClient();
   const { notification } = App.useApp();
@@ -34,8 +30,7 @@ export const usePatchConcurso = (silencioso = false) => {
       });
     },
     onError: (error) => {
-      // Erro de numero de processo duplicado ja e exibido inline no
-      // formulario; nao exibir notificacao generica redundante.
+
       if (ehErroNumeroProcessoDuplicado(error)) return;
 
       notification.error({

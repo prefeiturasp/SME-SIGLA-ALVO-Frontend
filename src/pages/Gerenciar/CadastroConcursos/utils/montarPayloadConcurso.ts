@@ -8,23 +8,14 @@ import type {
   IConcursoPayload,
 } from "../../../../services/resources/concursos/IConcursos";
 
-/** Formato de data aceito pela API (ISO simples, sem horário). */
 const FORMATO_DATA_API = "YYYY-MM-DD";
 
-/**
- * Converte um valor de data (Dayjs) para o formato da API, ou null quando
- * ausente. Aceita `null`/`undefined` para os campos opcionais.
- */
 export const formatarDataApi = (
   data?: Dayjs | null
 ): string | null => {
   return data ? data.format(FORMATO_DATA_API) : null;
 };
 
-/**
- * Monta o payload parcial do passo 1 (identificação) — usado no PATCH
- * incremental da edição, que salva apenas os campos do passo atual.
- */
 export const montarPayloadPasso1 = (
   passo1: IConcursoFormFields
 ): Partial<IConcursoPayload> => ({
@@ -35,20 +26,18 @@ export const montarPayloadPasso1 = (
   status: passo1.status,
 });
 
-/**
- * Payload do passo 1 quando o concurso está EM_ANDAMENTO: apenas `status` é
- * editável; os demais campos ficam bloqueados e não são reenviados.
- */
 export const montarPayloadStatus = (
   passo1: IConcursoFormFields
 ): Partial<IConcursoPayload> => ({
   status: passo1.status,
 });
 
-/**
- * Payload do passo 3 quando o concurso está EM_ANDAMENTO: apenas
- * `data_prorrogacao` e o intervalo de vigência são editáveis.
- */
+export const montarPayloadRetificacoesLiberada = (
+  passo2: IPublicacoesResultadosFormFields
+): Partial<IConcursoPayload> => ({
+  retificacoes: passo2.retificacoes ?? "",
+});
+
 export const montarPayloadVigenciaLiberada = (
   passo3: IVigenciaFormFields
 ): Partial<IConcursoPayload> => {
@@ -61,10 +50,6 @@ export const montarPayloadVigenciaLiberada = (
   };
 };
 
-/**
- * Monta o payload parcial do passo 2 (publicações e resultados), convertendo
- * as datas Dayjs para o formato da API — usado no PATCH incremental da edição.
- */
 export const montarPayloadPasso2 = (
   passo2: IPublicacoesResultadosFormFields
 ): Partial<IConcursoPayload> => ({
@@ -78,10 +63,6 @@ export const montarPayloadPasso2 = (
   retificacoes: passo2.retificacoes ?? "",
 });
 
-/**
- * Monta o payload parcial do passo 3 (vigência), desmembrando o intervalo
- * `vigencia` — usado no PATCH incremental da edição.
- */
 export const montarPayloadPasso3 = (
   passo3: IVigenciaFormFields
 ): Partial<IConcursoPayload> => {
@@ -95,14 +76,9 @@ export const montarPayloadPasso3 = (
   };
 };
 
-/** Converte uma data ISO da API em Dayjs, ou undefined quando ausente. */
 const dataApiParaDayjs = (data: string | null): Dayjs | undefined =>
   data ? dayjs(data) : undefined;
 
-/**
- * Extrai os campos de publicações/resultados (passo 2) do detalhe da API,
- * reidratando as datas para Dayjs — usado para popular o formulário de edição.
- */
 export const detalheParaPasso2 = (
   detalhe: IConcursoDetalhe
 ): Partial<IPublicacoesResultadosFormFields> => ({
@@ -116,10 +92,6 @@ export const detalheParaPasso2 = (
   retificacoes: detalhe.retificacoes ?? "",
 });
 
-/**
- * Extrai os campos de vigência (passo 3) do detalhe da API, reidratando as
- * datas para Dayjs e remontando o intervalo de vigência.
- */
 export const detalheParaPasso3 = (
   detalhe: IConcursoDetalhe
 ): Partial<IVigenciaFormFields> => ({

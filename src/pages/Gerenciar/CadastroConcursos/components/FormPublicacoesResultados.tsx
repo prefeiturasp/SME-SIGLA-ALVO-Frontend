@@ -7,7 +7,7 @@ import { AppFormItem, AppInput } from "@/components/ui";
 interface IFormPublicacoesResultadosProps {
   control: Control<IPublicacoesResultadosFormFields>;
   erros: FieldErrors<IPublicacoesResultadosFormFields>;
-  /** Concurso EM_ANDAMENTO: bloqueia todos os campos deste passo. */
+
   bloqueado?: boolean;
 }
 
@@ -193,7 +193,6 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
             >
               <Input.TextArea
                 {...field}
-                disabled={bloqueado}
                 rows={4}
                 placeholder="Informe as retificações publicadas para este concurso, se houver..."
               />

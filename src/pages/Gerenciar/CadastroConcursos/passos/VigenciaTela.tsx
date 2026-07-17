@@ -38,17 +38,15 @@ const VigenciaTela: React.FC = () => {
     formState: { errors, isValid },
   } = useVigenciaForm();
 
-  // O concurso já existe desde o passo 1; carrega para popular este passo.
   const { concursoData: concurso } = useGetConcursoByUuid(uuidRota ?? "");
 
   useEffect(() => {
     if (concurso) {
       reset(detalheParaPasso3(concurso));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [concurso]);
 
-  // Passo final: notifica o sucesso (os passos anteriores são silenciosos).
   const patchConcurso = usePatchConcurso();
 
   const { stepItems, handleStepChange } = useConcursoSteps({
@@ -74,13 +72,8 @@ const VigenciaTela: React.FC = () => {
     { title: labelTela },
   ] as TitleItem[];
 
-  // Concurso EM_ANDAMENTO: só data de prorrogação e vigência são editáveis;
-  // a situação não é alterada (não regride para COMPLETO).
   const bloqueado = concurso?.situacao === "EM_ANDAMENTO";
 
-  // Passo final: no fluxo normal salva a vigência e marca COMPLETO (reenviar
-  // COMPLETO é idempotente); quando bloqueado, salva apenas prorrogação e
-  // vigência mantendo a situação EM_ANDAMENTO.
   const next = handleSubmit((valores) => {
     if (!uuidRota) return;
     const payload = bloqueado

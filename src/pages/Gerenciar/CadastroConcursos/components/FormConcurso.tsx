@@ -15,7 +15,7 @@ interface IFormConcursoProps {
   control: Control<IConcursoFormFields>;
   erros: FieldErrors<IConcursoFormFields>;
   opcoesIniciais?: IOpcaoCargo[];
-  /** Concurso EM_ANDAMENTO: bloqueia tudo exceto o status. */
+
   bloqueado?: boolean;
 }
 

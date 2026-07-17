@@ -52,11 +52,9 @@ const IdentificacaoTela: React.FC = () => {
         status: concurso.status ?? "ATIVO",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [isEdicao, concurso]);
 
-  // Passo 1: no cadastro cria via POST (silencioso); na edição atualiza via
-  // PATCH (silencioso). A notificação de sucesso só aparece no último passo.
   const postConcurso = usePostConcurso(true);
   const patchConcurso = usePatchConcurso(true);
 
@@ -94,7 +92,6 @@ const IdentificacaoTela: React.FC = () => {
     }
   };
 
-  // Concurso EM_ANDAMENTO: só o status é editável neste passo.
   const bloqueado = concurso?.situacao === "EM_ANDAMENTO";
 
   const next = handleSubmit((valores) => {
@@ -113,7 +110,6 @@ const IdentificacaoTela: React.FC = () => {
       return;
     }
 
-    // Cadastro: cria o concurso (INCOMPLETO) e segue com o UUID do backend.
     postConcurso.mutate(
       { ...payload, situacao: "INCOMPLETO" },
       {

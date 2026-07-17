@@ -7,8 +7,7 @@ import { AppFormItem } from "@/components/ui";
 interface IFormVigenciaProps {
   control: Control<IVigenciaFormFields>;
   erros: FieldErrors<IVigenciaFormFields>;
-  /** Concurso EM_ANDAMENTO: bloqueia a homologação; prorrogação e vigência
-   * permanecem editáveis. */
+
   bloqueado?: boolean;
 }
 

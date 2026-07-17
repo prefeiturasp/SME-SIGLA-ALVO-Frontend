@@ -13,6 +13,7 @@ import { useConcursoSteps } from "../components/useConcursoSteps";
 import {
   detalheParaPasso2,
   montarPayloadPasso2,
+  montarPayloadRetificacoesLiberada,
 } from "../utils/montarPayloadConcurso";
 import {
   CardTitle,
@@ -36,18 +37,15 @@ const PublicacoesResultadosTela: React.FC = () => {
     formState: { errors, isValid },
   } = usePublicacoesResultadosForm();
 
-  // O concurso já existe desde o passo 1 (POST) tanto no cadastro quanto na
-  // edição; carrega para popular o formulário deste passo.
   const { concursoData: concurso } = useGetConcursoByUuid(uuidRota ?? "");
 
   useEffect(() => {
     if (concurso) {
       reset(detalheParaPasso2(concurso));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [concurso]);
 
-  // Silencioso: a notificação de sucesso aparece só no último passo.
   const patchConcurso = usePatchConcurso(true);
 
   const { stepItems, handleStepChange } = useConcursoSteps({
@@ -73,7 +71,6 @@ const PublicacoesResultadosTela: React.FC = () => {
     { title: labelTela },
   ] as TitleItem[];
 
-  // Concurso EM_ANDAMENTO: nenhum campo deste passo é editável.
   const bloqueado = concurso?.situacao === "EM_ANDAMENTO";
 
   const irParaPasso3 = () => {
@@ -82,13 +79,13 @@ const PublicacoesResultadosTela: React.FC = () => {
 
   const next = handleSubmit((valores) => {
     if (!uuidRota) return;
-    // Bloqueado: nada a salvar neste passo, apenas avança.
-    if (bloqueado) {
-      irParaPasso3();
-      return;
-    }
+
+    const payload = bloqueado
+      ? montarPayloadRetificacoesLiberada(valores)
+      : montarPayloadPasso2(valores);
+
     patchConcurso.mutate(
-      { uuid: uuidRota, payload: montarPayloadPasso2(valores) },
+      { uuid: uuidRota, payload },
       { onSuccess: () => irParaPasso3() }
     );
   });

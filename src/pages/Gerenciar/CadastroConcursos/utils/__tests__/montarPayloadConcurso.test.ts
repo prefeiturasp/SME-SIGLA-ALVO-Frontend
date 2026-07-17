@@ -163,7 +163,7 @@ describe("payloads do modo EM_ANDAMENTO (campos liberados)", () => {
       vigencia_inicio: "2026-07-01",
       vigencia_fim: "2028-07-01",
     });
-    // não inclui data_homologacao nem situacao
+
     expect("data_homologacao" in payload).toBe(false);
     expect("situacao" in payload).toBe(false);
   });

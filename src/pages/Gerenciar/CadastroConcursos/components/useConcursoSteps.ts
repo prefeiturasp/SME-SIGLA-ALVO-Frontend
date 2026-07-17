@@ -2,20 +2,14 @@ import { useMemo } from "react";
 import { items } from "./stepsConcurso";
 
 type UseConcursoStepsParams = {
-  /** UUID do concurso. Ausente enquanto no passo 1 do fluxo de adicionar. */
+
   uuid?: string;
-  /** Índice 0-based do passo atual. */
+
   currentStepIndex: number;
   onNavigate: (path: string) => void;
-  /**
-   * Monta o path de um passo respeitando o modo (adicionar/editar).
-   * Fornecido por `useModoConcurso`.
-   */
+
   getStepPath: (stepIndex: number, uuid?: string) => string | null;
-  /**
-   * Quando true, todos os passos ficam desbloqueados (edição — o concurso já
-   * existe). Quando false, os passos 2/3 dependem do uuid (adicionar).
-   */
+
   liberarTodos?: boolean;
 };
 

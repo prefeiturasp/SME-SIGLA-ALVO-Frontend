@@ -3,8 +3,6 @@ import { renderHook } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { useModoConcurso } from "../useModoConcurso";
 
-// Envolve o hook numa rota que casa com o path informado, para que
-// useParams()/useLocation() resolvam como em produção.
 const wrapperPara = (initialPath: string, routePath: string) => {
   const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <MemoryRouter initialEntries={[initialPath]}>
@@ -34,7 +32,7 @@ describe("useModoConcurso", () => {
     expect(result.current.getStepPath(1, "u1")).toBe(
       "/gerenciar/concursos/adicionar/u1/passo-2"
     );
-    // passo 2/3 sem uuid ficam bloqueados
+
     expect(result.current.getStepPath(1)).toBeNull();
   });
 
