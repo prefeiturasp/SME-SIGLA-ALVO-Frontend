@@ -13,6 +13,7 @@ import { useConcursoSteps } from "../components/useConcursoSteps";
 import {
   detalheParaPasso3,
   montarPayloadPasso3,
+  montarPayloadVigenciaLiberada,
 } from "../utils/montarPayloadConcurso";
 import {
   CardTitle,
@@ -73,16 +74,20 @@ const VigenciaTela: React.FC = () => {
     { title: labelTela },
   ] as TitleItem[];
 
-  // Passo final (cadastro e edição): salva a vigência e marca o concurso como
-  // COMPLETO. Reenviar COMPLETO é idempotente; concursos EM_ANDAMENTO nem
-  // chegam aqui (edição bloqueada na listagem).
+  // Concurso EM_ANDAMENTO: só data de prorrogação e vigência são editáveis;
+  // a situação não é alterada (não regride para COMPLETO).
+  const bloqueado = concurso?.situacao === "EM_ANDAMENTO";
+
+  // Passo final: no fluxo normal salva a vigência e marca COMPLETO (reenviar
+  // COMPLETO é idempotente); quando bloqueado, salva apenas prorrogação e
+  // vigência mantendo a situação EM_ANDAMENTO.
   const next = handleSubmit((valores) => {
     if (!uuidRota) return;
+    const payload = bloqueado
+      ? montarPayloadVigenciaLiberada(valores)
+      : { ...montarPayloadPasso3(valores), situacao: "COMPLETO" as const };
     patchConcurso.mutate(
-      {
-        uuid: uuidRota,
-        payload: { ...montarPayloadPasso3(valores), situacao: "COMPLETO" },
-      },
+      { uuid: uuidRota, payload },
       { onSuccess: () => navigate("/gerenciar/concursos") }
     );
   });
@@ -120,7 +125,7 @@ const VigenciaTela: React.FC = () => {
             Informe as datas que definem a validade e a vigência do concurso.
           </Text>
 
-          <FormVigencia control={control} erros={errors} />
+          <FormVigencia control={control} erros={errors} bloqueado={bloqueado} />
 
           <StepActionsConcurso
             current={current}

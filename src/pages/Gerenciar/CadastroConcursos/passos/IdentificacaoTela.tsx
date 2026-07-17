@@ -11,7 +11,10 @@ import { useGetConcursoByUuid } from "../../../GerenciamentoVagas/hooks/useGetCo
 import { StepActionsConcurso } from "../components/StepActionsConcurso";
 import { steps } from "../components/stepsConcurso";
 import { useConcursoSteps } from "../components/useConcursoSteps";
-import { montarPayloadPasso1 } from "../utils/montarPayloadConcurso";
+import {
+  montarPayloadPasso1,
+  montarPayloadStatus,
+} from "../utils/montarPayloadConcurso";
 import { obterMensagemNumeroProcessoDuplicado } from "../utils/erroConcurso";
 import {
   CardTitle,
@@ -91,8 +94,13 @@ const IdentificacaoTela: React.FC = () => {
     }
   };
 
+  // Concurso EM_ANDAMENTO: só o status é editável neste passo.
+  const bloqueado = concurso?.situacao === "EM_ANDAMENTO";
+
   const next = handleSubmit((valores) => {
-    const payload = montarPayloadPasso1(valores);
+    const payload = bloqueado
+      ? montarPayloadStatus(valores)
+      : montarPayloadPasso1(valores);
 
     if (isEdicao && uuidRota) {
       patchConcurso.mutate(
@@ -158,6 +166,7 @@ const IdentificacaoTela: React.FC = () => {
             control={control}
             erros={errors}
             opcoesIniciais={opcoesIniciais}
+            bloqueado={bloqueado}
           />
 
           <StepActionsConcurso

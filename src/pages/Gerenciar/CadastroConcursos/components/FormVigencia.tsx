@@ -7,9 +7,16 @@ import { AppFormItem } from "@/components/ui";
 interface IFormVigenciaProps {
   control: Control<IVigenciaFormFields>;
   erros: FieldErrors<IVigenciaFormFields>;
+  /** Concurso EM_ANDAMENTO: bloqueia a homologação; prorrogação e vigência
+   * permanecem editáveis. */
+  bloqueado?: boolean;
 }
 
-const FormVigencia: React.FC<IFormVigenciaProps> = ({ control, erros }) => {
+const FormVigencia: React.FC<IFormVigenciaProps> = ({
+  control,
+  erros,
+  bloqueado = false,
+}) => {
   return (
     <Row gutter={[16, 8]}>
       <Col xs={24} md={8}>
@@ -25,6 +32,7 @@ const FormVigencia: React.FC<IFormVigenciaProps> = ({ control, erros }) => {
             >
               <DatePicker
                 {...field}
+                disabled={bloqueado}
                 style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 placeholder="00/00/0000"

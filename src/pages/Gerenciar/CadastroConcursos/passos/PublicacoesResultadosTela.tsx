@@ -73,12 +73,20 @@ const PublicacoesResultadosTela: React.FC = () => {
     { title: labelTela },
   ] as TitleItem[];
 
+  // Concurso EM_ANDAMENTO: nenhum campo deste passo é editável.
+  const bloqueado = concurso?.situacao === "EM_ANDAMENTO";
+
   const irParaPasso3 = () => {
     navigate(getStepPath(2, uuid) ?? "/gerenciar/concursos");
   };
 
   const next = handleSubmit((valores) => {
     if (!uuidRota) return;
+    // Bloqueado: nada a salvar neste passo, apenas avança.
+    if (bloqueado) {
+      irParaPasso3();
+      return;
+    }
     patchConcurso.mutate(
       { uuid: uuidRota, payload: montarPayloadPasso2(valores) },
       { onSuccess: () => irParaPasso3() }
@@ -119,7 +127,11 @@ const PublicacoesResultadosTela: React.FC = () => {
             longo do concurso.
           </Text>
 
-          <FormPublicacoesResultados control={control} erros={errors} />
+          <FormPublicacoesResultados
+            control={control}
+            erros={errors}
+            bloqueado={bloqueado}
+          />
 
           <StepActionsConcurso
             current={current}

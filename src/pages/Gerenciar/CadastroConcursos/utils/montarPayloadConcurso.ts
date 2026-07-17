@@ -36,6 +36,32 @@ export const montarPayloadPasso1 = (
 });
 
 /**
+ * Payload do passo 1 quando o concurso está EM_ANDAMENTO: apenas `status` é
+ * editável; os demais campos ficam bloqueados e não são reenviados.
+ */
+export const montarPayloadStatus = (
+  passo1: IConcursoFormFields
+): Partial<IConcursoPayload> => ({
+  status: passo1.status,
+});
+
+/**
+ * Payload do passo 3 quando o concurso está EM_ANDAMENTO: apenas
+ * `data_prorrogacao` e o intervalo de vigência são editáveis.
+ */
+export const montarPayloadVigenciaLiberada = (
+  passo3: IVigenciaFormFields
+): Partial<IConcursoPayload> => {
+  const [vigenciaInicio, vigenciaFim] = passo3.vigencia ?? [];
+
+  return {
+    data_prorrogacao: formatarDataApi(passo3.data_prorrogacao),
+    vigencia_inicio: formatarDataApi(vigenciaInicio),
+    vigencia_fim: formatarDataApi(vigenciaFim),
+  };
+};
+
+/**
  * Monta o payload parcial do passo 2 (publicações e resultados), convertendo
  * as datas Dayjs para o formato da API — usado no PATCH incremental da edição.
  */

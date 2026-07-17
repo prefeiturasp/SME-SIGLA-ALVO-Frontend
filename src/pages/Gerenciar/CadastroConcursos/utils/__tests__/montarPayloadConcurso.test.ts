@@ -6,6 +6,8 @@ import {
   montarPayloadPasso1,
   montarPayloadPasso2,
   montarPayloadPasso3,
+  montarPayloadStatus,
+  montarPayloadVigenciaLiberada,
 } from "../montarPayloadConcurso";
 import type { IConcursoDetalhe } from "../../../../../services/resources/concursos/IConcursos";
 
@@ -135,5 +137,45 @@ describe("payloads parciais (PATCH por passo na edição)", () => {
     expect(payload.vigencia_inicio).toBeNull();
     expect(payload.vigencia_fim).toBeNull();
     expect(payload.data_homologacao).toBeNull();
+  });
+});
+
+describe("payloads do modo EM_ANDAMENTO (campos liberados)", () => {
+  it("montarPayloadStatus envia apenas o status", () => {
+    const payload = montarPayloadStatus({
+      nome: "Concurso",
+      cargos_ids: ["c1"],
+      numero_processo: "123",
+      banca_responsavel: "FGV",
+      status: "INATIVO",
+    });
+    expect(payload).toEqual({ status: "INATIVO" });
+  });
+
+  it("montarPayloadVigenciaLiberada envia só prorrogação e vigência", () => {
+    const payload = montarPayloadVigenciaLiberada({
+      data_homologacao: dayjs("2026-07-01"),
+      data_prorrogacao: dayjs("2028-07-01"),
+      vigencia: [dayjs("2026-07-01"), dayjs("2028-07-01")],
+    });
+    expect(payload).toEqual({
+      data_prorrogacao: "2028-07-01",
+      vigencia_inicio: "2026-07-01",
+      vigencia_fim: "2028-07-01",
+    });
+    // não inclui data_homologacao nem situacao
+    expect("data_homologacao" in payload).toBe(false);
+    expect("situacao" in payload).toBe(false);
+  });
+
+  it("montarPayloadVigenciaLiberada trata vigência ausente como null", () => {
+    const payload = montarPayloadVigenciaLiberada({
+      data_homologacao: undefined as never,
+      data_prorrogacao: null,
+      vigencia: undefined as never,
+    });
+    expect(payload.data_prorrogacao).toBeNull();
+    expect(payload.vigencia_inicio).toBeNull();
+    expect(payload.vigencia_fim).toBeNull();
   });
 });

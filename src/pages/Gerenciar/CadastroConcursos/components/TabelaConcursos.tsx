@@ -39,28 +39,14 @@ const TabelaConcursos: React.FC<ITabelaProps> = ({
       key: "acoes",
       width: 48,
       align: "center",
-      render: (_, row) => {
-        const bloqueado = row.situacao === "EM_ANDAMENTO";
-        return (
-          <Tooltip
-            title={
-              bloqueado
-                ? "Concurso em andamento — edição bloqueada"
-                : "Editar"
-            }
-          >
-            <EditActionIcon
-              style={{
-                cursor: bloqueado ? "not-allowed" : "pointer",
-                opacity: bloqueado ? 0.4 : 1,
-              }}
-              onClick={() => {
-                if (!bloqueado) onEditar(row.uuid);
-              }}
-            />
-          </Tooltip>
-        );
-      },
+      render: (_, row) => (
+        <Tooltip title="Editar">
+          <EditActionIcon
+            style={{ cursor: "pointer" }}
+            onClick={() => onEditar(row.uuid)}
+          />
+        </Tooltip>
+      ),
     },
   ];
 

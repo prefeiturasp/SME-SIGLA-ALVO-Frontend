@@ -7,11 +7,14 @@ import { AppFormItem, AppInput } from "@/components/ui";
 interface IFormPublicacoesResultadosProps {
   control: Control<IPublicacoesResultadosFormFields>;
   erros: FieldErrors<IPublicacoesResultadosFormFields>;
+  /** Concurso EM_ANDAMENTO: bloqueia todos os campos deste passo. */
+  bloqueado?: boolean;
 }
 
 const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
   control,
   erros,
+  bloqueado = false,
 }) => {
   return (
     <Row gutter={[16, 8]}>
@@ -28,6 +31,7 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
             >
               <DatePicker
                 {...field}
+                disabled={bloqueado}
                 style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 placeholder="00/00/0000"
@@ -50,6 +54,7 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
             >
               <DatePicker
                 {...field}
+                disabled={bloqueado}
                 style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 placeholder="00/00/0000"
@@ -72,6 +77,7 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
             >
               <DatePicker
                 {...field}
+                disabled={bloqueado}
                 style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 placeholder="00/00/0000"
@@ -92,7 +98,11 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
               help={erros.link_edital?.message}
               labelCol={{ span: 24 }}
             >
-              <AppInput {...field} placeholder="Cole o link do edital..." />
+              <AppInput
+                {...field}
+                disabled={bloqueado}
+                placeholder="Cole o link do edital..."
+              />
             </AppFormItem>
           )}
         />
@@ -111,6 +121,7 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
             >
               <InputNumber
                 {...field}
+                disabled={bloqueado}
                 style={{ width: "100%" }}
                 min={0}
                 controls={false}
@@ -134,6 +145,7 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
             >
               <InputNumber
                 {...field}
+                disabled={bloqueado}
                 style={{ width: "100%" }}
                 min={0}
                 controls={false}
@@ -157,6 +169,7 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
             >
               <InputNumber
                 {...field}
+                disabled={bloqueado}
                 style={{ width: "100%" }}
                 min={0}
                 controls={false}
@@ -180,6 +193,7 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
             >
               <Input.TextArea
                 {...field}
+                disabled={bloqueado}
                 rows={4}
                 placeholder="Informe as retificações publicadas para este concurso, se houver..."
               />

@@ -4,7 +4,6 @@ import { Controller } from "react-hook-form";
 import type { Control, FieldErrors } from "react-hook-form";
 import type { IConcursoFormFields } from "../hooks/useConcursoForm";
 import { useCargos } from "../../../../hooks/useCargos";
-import { apenasDigitos } from "../utils/processoSei";
 import { AppFormItem, AppInput, FilterSelect, FilterSelectMulti } from "@/components/ui";
 
 interface IOpcaoCargo {
@@ -16,6 +15,8 @@ interface IFormConcursoProps {
   control: Control<IConcursoFormFields>;
   erros: FieldErrors<IConcursoFormFields>;
   opcoesIniciais?: IOpcaoCargo[];
+  /** Concurso EM_ANDAMENTO: bloqueia tudo exceto o status. */
+  bloqueado?: boolean;
 }
 
 const filtrarPorLabel = (input: string, option?: DefaultOptionType) => {
@@ -29,6 +30,7 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
   control,
   erros,
   opcoesIniciais = [],
+  bloqueado = false,
 }) => {
   const { opcoes, isLoading } = useCargos();
 
@@ -55,6 +57,7 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
               <FilterSelectMulti
                 {...field}
                 mode="multiple"
+                disabled={bloqueado}
                 placeholder="Selecione o(s) cargo(s)..."
                 optionFilterProp="label"
                 filterOption={filtrarPorLabel}
@@ -80,7 +83,11 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
               help={erros.nome?.message}
               labelCol={{ span: 24 }}
             >
-              <AppInput {...field} placeholder="Digite o nome do concurso..." />
+              <AppInput
+                {...field}
+                disabled={bloqueado}
+                placeholder="Digite o nome do concurso..."
+              />
             </AppFormItem>
           )}
         />
@@ -123,6 +130,7 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
             >
               <AppInput
                 {...field}
+                disabled={bloqueado}
                 placeholder="Digite o nome da banca responsável..."
               />
             </AppFormItem>
@@ -144,9 +152,10 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
               <AppInput
                 {...field}
                 inputMode="numeric"
+                disabled={bloqueado}
                 placeholder="Digite o número do Processo SEI..."
                 onChange={(e) =>
-                  field.onChange(apenasDigitos(e.target.value))
+                  field.onChange(e.target.value.replace(/\D/g, ""))
                 }
               />
             </AppFormItem>

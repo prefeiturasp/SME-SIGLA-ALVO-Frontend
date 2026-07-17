@@ -3,7 +3,6 @@ import { SearchOutlined } from "@ant-design/icons";
 import { useForm, Controller } from "react-hook-form";
 import type { IConcursoFiltros } from "../../../../services/resources/concursos/IConcursos";
 import { useListarConcursos } from "../hooks/useListarConcursos";
-import { apenasDigitos } from "../utils/processoSei";
 import {
   AppFormItem,
   FilterInput,
@@ -156,7 +155,7 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
                   inputMode="numeric"
                   placeholder="Digite o número do Processo SEI..."
                   onChange={(e) =>
-                    field.onChange(apenasDigitos(e.target.value))
+                    field.onChange(e.target.value.replace(/\D/g, ""))
                   }
                 />
               </AppFormItem>
