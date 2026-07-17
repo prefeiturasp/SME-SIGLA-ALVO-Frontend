@@ -23,7 +23,7 @@ import PermissaoUsuarioTela from "../pages/Gerenciar/PermissaoUsuario/PermissaoU
 import AdicionarUsuarioTela from "../pages/Gerenciar/AdicionarUsuario/AdicionarUsuarioTela";
 import CadastroParametrosTela from "../pages/Gerenciar/Parametros/CadastroParametrosTela";
 import ListagemConcursosTela from "../pages/Gerenciar/CadastroConcursos/ListagemConcursosTela";
-import AdicionarEditarConcursoTela from "../pages/Gerenciar/CadastroConcursos/AdicionarEditarConcursoTela";
+import RedirecionarEdicaoConcurso from "../pages/Gerenciar/CadastroConcursos/RedirecionarEdicaoConcurso";
 import IdentificacaoTela from "../pages/Gerenciar/CadastroConcursos/passos/IdentificacaoTela";
 import PublicacoesResultadosTela from "../pages/Gerenciar/CadastroConcursos/passos/PublicacoesResultadosTela";
 import VigenciaTela from "../pages/Gerenciar/CadastroConcursos/passos/VigenciaTela";
@@ -141,7 +141,40 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <PermissionContextGuard model="concurso" permissaoDeExibirATELA="change_concurso">
-          <AdicionarEditarConcursoTela />
+          <RedirecionarEdicaoConcurso />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/gerenciar/concursos/editar/:uuid/passo-1",
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="concurso" permissaoDeExibirATELA="change_concurso">
+          <IdentificacaoTela />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/gerenciar/concursos/editar/:uuid/passo-2",
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="concurso" permissaoDeExibirATELA="change_concurso">
+          <PublicacoesResultadosTela />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/gerenciar/concursos/editar/:uuid/passo-3",
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="concurso" permissaoDeExibirATELA="change_concurso">
+          <VigenciaTela />
         </PermissionContextGuard>
       </ProtectedRoute>
     ),

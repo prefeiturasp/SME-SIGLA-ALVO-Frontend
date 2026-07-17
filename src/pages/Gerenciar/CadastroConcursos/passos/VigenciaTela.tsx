@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Steps, Typography } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
-import { StepActionsConcurso } from "./StepActionsConcurso";
-import { steps } from "./stepsConcurso";
-import { useConcursoSteps } from "./useConcursoSteps";
+import FormVigencia from "../components/FormVigencia";
+import { useVigenciaForm } from "../hooks/useVigenciaForm";
+import { useModoConcurso } from "../hooks/useModoConcurso";
+import { usePatchConcurso } from "../hooks/usePatchConcurso";
+import { useGetConcursoByUuid } from "../../../GerenciamentoVagas/hooks/useGetConcursoPorUuid";
+import { StepActionsConcurso } from "../components/StepActionsConcurso";
+import { steps } from "../components/stepsConcurso";
+import { useConcursoSteps } from "../components/useConcursoSteps";
+import {
+  detalheParaPasso3,
+  montarPayloadPasso3,
+  montarPayloadVigenciaLiberada,
+} from "../utils/montarPayloadConcurso";
 import {
   CardTitle,
   ConvocacaoStepsGlobalStyle,
@@ -15,13 +25,36 @@ const { Text } = Typography;
 
 const VigenciaTela: React.FC = () => {
   const navigate = useNavigate();
-  const { uuid } = useParams();
   const current = 2;
+
+  const { isEdicao, uuidRota, getStepPath, labelTela, labelBotaoFinal } =
+    useModoConcurso();
+  const uuid = uuidRota;
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = useVigenciaForm();
+
+  const { concursoData: concurso } = useGetConcursoByUuid(uuidRota ?? "");
+
+  useEffect(() => {
+    if (concurso) {
+      reset(detalheParaPasso3(concurso));
+    }
+
+  }, [concurso]);
+
+  const patchConcurso = usePatchConcurso();
 
   const { stepItems, handleStepChange } = useConcursoSteps({
     uuid,
     currentStepIndex: current,
     onNavigate: (path) => navigate(path),
+    getStepPath,
+    liberarTodos: isEdicao,
   });
 
   const breadcrumbItems = [
@@ -36,15 +69,24 @@ const VigenciaTela: React.FC = () => {
         </Text>
       ),
     },
-    { title: "Adicionar concurso" },
+    { title: labelTela },
   ] as TitleItem[];
 
-  const next = () => {
-    navigate("/gerenciar/concursos");
-  };
+  const bloqueado = concurso?.situacao === "EM_ANDAMENTO";
+
+  const next = handleSubmit((valores) => {
+    if (!uuidRota) return;
+    const payload = bloqueado
+      ? montarPayloadVigenciaLiberada(valores)
+      : { ...montarPayloadPasso3(valores), situacao: "COMPLETO" as const };
+    patchConcurso.mutate(
+      { uuid: uuidRota, payload },
+      { onSuccess: () => navigate("/gerenciar/concursos") }
+    );
+  });
 
   const prev = () => {
-    navigate(`/gerenciar/concursos/adicionar/${uuid}/passo-2`);
+    navigate(getStepPath(1, uuid) ?? "/gerenciar/concursos");
   };
 
   const cancel = () => {
@@ -54,7 +96,7 @@ const VigenciaTela: React.FC = () => {
   return (
     <>
       <ConvocacaoStepsGlobalStyle />
-      <BaseTela breadcrumbItems={breadcrumbItems} title="Adicionar concurso">
+      <BaseTela breadcrumbItems={breadcrumbItems} title={labelTela}>
         <StyledCardWithoutBorder variant="borderless">
           <Steps
             className="convocacao-steps"
@@ -69,9 +111,14 @@ const VigenciaTela: React.FC = () => {
           variant="borderless"
         >
           <CardTitle>Vigência</CardTitle>
-          <Text type="secondary" style={{ display: "block", marginTop: 8 }}>
+          <Text
+            type="secondary"
+            style={{ display: "block", marginTop: 8, marginBottom: 24 }}
+          >
             Informe as datas que definem a validade e a vigência do concurso.
           </Text>
+
+          <FormVigencia control={control} erros={errors} bloqueado={bloqueado} />
 
           <StepActionsConcurso
             current={current}
@@ -79,6 +126,9 @@ const VigenciaTela: React.FC = () => {
             next={next}
             prev={prev}
             onCancel={cancel}
+            canAvancar={isValid}
+            loading={patchConcurso.isPending}
+            labelFinal={labelBotaoFinal}
           />
         </StyledCardWithoutBorder>
       </BaseTela>

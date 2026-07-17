@@ -9,7 +9,6 @@ import {
   ClearButton,
   FieldLabel,
   FilterActionCol,
-  FilterActionSlot,
   FilterActionsGroup,
   FilterFieldCol,
   FilterInlineRow,
@@ -29,7 +28,6 @@ interface IFiltrosFields {
   nome?: string;
   descricao_cargo?: string;
   numero_processo?: string;
-  ano_edital?: number;
   banca_responsavel?: string;
   status?: string;
 }
@@ -62,17 +60,6 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
     return bancas.map((banca) => ({ value: banca, label: banca }));
   }, [concursos]);
 
-  const opcoesAno = useMemo(() => {
-    const anos = Array.from(
-      new Set(
-        concursos
-          .map((c) => c.ano_edital)
-          .filter((ano): ano is number => ano !== null && ano !== undefined)
-      )
-    ).sort((a, b) => b - a);
-    return anos.map((ano) => ({ value: ano, label: String(ano) }));
-  }, [concursos]);
-
   const opcoesCodigoCargo = useMemo(() => {
     const cargosPorCodigo = new Map<number, string>();
     concursos.forEach((c) =>
@@ -102,7 +89,7 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
   return (
     <SearchFieldsContainer>
       <FilterInlineRow gutter={[16, 0]}>
-        <FilterFieldCol xs={24} md={6}>
+        <FilterFieldCol xs={24} md={8}>
           <Controller
             control={control}
             name="codigo_cargo"
@@ -123,7 +110,7 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
             )}
           />
         </FilterFieldCol>
-        <FilterFieldCol xs={24} md={6}>
+        <FilterFieldCol xs={24} md={8}>
           <Controller
             control={control}
             name="nome"
@@ -137,7 +124,7 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
             )}
           />
         </FilterFieldCol>
-        <FilterFieldCol xs={24} md={6}>
+        <FilterFieldCol xs={24} md={8}>
           <Controller
             control={control}
             name="descricao_cargo"
@@ -151,43 +138,31 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
             )}
           />
         </FilterFieldCol>
-        <FilterFieldCol xs={24} md={6}>
+      </FilterInlineRow>
+
+      <FilterInlineRow gutter={[16, 0]}>
+        <FilterFieldCol xs={24} md={8}>
           <Controller
             control={control}
             name="numero_processo"
             render={({ field }) => (
               <AppFormItem
-                label={<FieldLabel>Número do processo</FieldLabel>}
+                label={<FieldLabel>Processo SEI</FieldLabel>}
                 labelCol={{ span: 24 }}
               >
-                <FilterInput {...field} placeholder="Digite o número do processo..." />
-              </AppFormItem>
-            )}
-          />
-        </FilterFieldCol>
-      </FilterInlineRow>
-
-      <FilterInlineRow gutter={[16, 8]}>
-        <FilterFieldCol xs={24} md={6}>
-          <Controller
-            control={control}
-            name="ano_edital"
-            render={({ field }) => (
-              <AppFormItem
-                label={<FieldLabel>Ano do edital</FieldLabel>}
-                labelCol={{ span: 24 }}
-              >
-                <FilterSelect
+                <FilterInput
                   {...field}
-                  allowClear
-                  placeholder="Selecione"
-                  options={opcoesAno}
+                  inputMode="numeric"
+                  placeholder="Digite o número do Processo SEI..."
+                  onChange={(e) =>
+                    field.onChange(e.target.value.replace(/\D/g, ""))
+                  }
                 />
               </AppFormItem>
             )}
           />
         </FilterFieldCol>
-        <FilterFieldCol xs={24} md={6}>
+        <FilterFieldCol xs={24} md={8}>
           <Controller
             control={control}
             name="banca_responsavel"
@@ -208,7 +183,7 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
             )}
           />
         </FilterFieldCol>
-        <FilterFieldCol xs={24} md={6}>
+        <FilterFieldCol xs={24} md={8}>
           <Controller
             control={control}
             name="status"
@@ -230,21 +205,22 @@ const FiltrosBuscaConcurso: React.FC<IFiltrosProps> = ({
             )}
           />
         </FilterFieldCol>
-        <FilterActionCol xs={24} md={6}>
-          <FilterActionSlot>
-            <FilterActionsGroup>
-              <ClearButton size="large" onClick={limpar}>
-                Limpar filtros
-              </ClearButton>
-              <SearchButton
-                size="large"
-                icon={<SearchOutlined />}
-                onClick={buscar}
-              >
-                Buscar
-              </SearchButton>
-            </FilterActionsGroup>
-          </FilterActionSlot>
+      </FilterInlineRow>
+
+      <FilterInlineRow gutter={[16, 8]}>
+        <FilterActionCol xs={24} md={24}>
+          <FilterActionsGroup>
+            <ClearButton size="large" onClick={limpar}>
+              Limpar filtros
+            </ClearButton>
+            <SearchButton
+              size="large"
+              icon={<SearchOutlined />}
+              onClick={buscar}
+            >
+              Buscar
+            </SearchButton>
+          </FilterActionsGroup>
         </FilterActionCol>
       </FilterInlineRow>
     </SearchFieldsContainer>

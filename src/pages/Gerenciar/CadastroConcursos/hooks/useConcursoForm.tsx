@@ -8,7 +8,6 @@ export interface IConcursoFormFields {
   cargos_ids: string[];
   nome: string;
   numero_processo: string;
-  ano_edital: number;
   banca_responsavel: string;
   status: ConcursoStatus;
 }
@@ -24,10 +23,6 @@ const schema = yup.object({
     .string()
     .trim()
     .required("Informe o número do processo"),
-  ano_edital: yup
-    .number()
-    .typeError("Informe o ano do edital")
-    .required("Informe o ano do edital"),
   banca_responsavel: yup
     .string()
     .trim()
@@ -42,7 +37,6 @@ const valoresPadrao: IConcursoFormFields = {
   cargos_ids: [],
   nome: "",
   numero_processo: "",
-  ano_edital: new Date().getFullYear(),
   banca_responsavel: "",
   status: "ATIVO",
 };

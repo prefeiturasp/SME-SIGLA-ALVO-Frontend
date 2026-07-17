@@ -4,15 +4,16 @@ import { API } from "../../../../services";
 import type { IConcursoPayload } from "../../../../services/resources/concursos/IConcursos";
 import { ehErroNumeroProcessoDuplicado } from "../utils/erroConcurso";
 
-export const usePostConcurso = () => {
+export const usePostConcurso = (silencioso = false) => {
   const queryClient = useQueryClient();
   const { notification } = App.useApp();
 
   return useMutation({
-    mutationFn: (payload: IConcursoPayload) =>
+    mutationFn: (payload: Partial<IConcursoPayload>) =>
       API.Concursos.postConcurso(payload).response,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listarConcursos"] });
+      if (silencioso) return;
       notification.success({
         message: "Concurso cadastrado",
         description: "O concurso foi cadastrado com sucesso!",
@@ -21,10 +22,7 @@ export const usePostConcurso = () => {
       });
     },
     onError: (error) => {
-      // Erro de numero de processo duplicado ja e exibido inline no
-      // formulario; nao exibir notificacao generica redundante.
       if (ehErroNumeroProcessoDuplicado(error)) return;
-
       notification.error({
         message: "Erro ao cadastrar",
         description:

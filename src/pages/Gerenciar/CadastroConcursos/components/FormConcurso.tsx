@@ -1,4 +1,4 @@
-import { Col, InputNumber, Row } from "antd";
+import { Col, Row } from "antd";
 import type { DefaultOptionType } from "antd/es/select";
 import { Controller } from "react-hook-form";
 import type { Control, FieldErrors } from "react-hook-form";
@@ -15,6 +15,8 @@ interface IFormConcursoProps {
   control: Control<IConcursoFormFields>;
   erros: FieldErrors<IConcursoFormFields>;
   opcoesIniciais?: IOpcaoCargo[];
+
+  bloqueado?: boolean;
 }
 
 const filtrarPorLabel = (input: string, option?: DefaultOptionType) => {
@@ -28,6 +30,7 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
   control,
   erros,
   opcoesIniciais = [],
+  bloqueado = false,
 }) => {
   const { opcoes, isLoading } = useCargos();
 
@@ -40,14 +43,13 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
 
   return (
     <Row gutter={[16, 8]}>
-      <Col xs={24} md={8}>
+      <Col xs={24} md={12}>
         <Controller
           control={control}
           name="cargos_ids"
           render={({ field }) => (
             <AppFormItem
               label="Código do cargo"
-              required
               validateStatus={erros.cargos_ids ? "error" : undefined}
               help={erros.cargos_ids?.message}
               labelCol={{ span: 24 }}
@@ -55,6 +57,7 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
               <FilterSelectMulti
                 {...field}
                 mode="multiple"
+                disabled={bloqueado}
                 placeholder="Selecione o(s) cargo(s)..."
                 optionFilterProp="label"
                 filterOption={filtrarPorLabel}
@@ -69,80 +72,21 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
         />
       </Col>
 
-      <Col xs={24} md={8}>
+      <Col xs={24} md={12}>
         <Controller
           control={control}
           name="nome"
           render={({ field }) => (
             <AppFormItem
               label="Nome do concurso"
-              required
               validateStatus={erros.nome ? "error" : undefined}
               help={erros.nome?.message}
               labelCol={{ span: 24 }}
             >
-              <AppInput {...field} placeholder="Digite o nome do concurso..." />
-            </AppFormItem>
-          )}
-        />
-      </Col>
-
-      <Col xs={24} md={8}>
-        <Controller
-          control={control}
-          name="numero_processo"
-          render={({ field }) => (
-            <AppFormItem
-              label="Número do processo"
-              required
-              validateStatus={erros.numero_processo ? "error" : undefined}
-              help={erros.numero_processo?.message}
-              labelCol={{ span: 24 }}
-            >
-              <AppInput {...field} placeholder="Digite o número do processo..." />
-            </AppFormItem>
-          )}
-        />
-      </Col>
-
-      <Col xs={24} md={8}>
-        <Controller
-          control={control}
-          name="ano_edital"
-          render={({ field }) => (
-            <AppFormItem
-              label="Ano do edital"
-              required
-              validateStatus={erros.ano_edital ? "error" : undefined}
-              help={erros.ano_edital?.message}
-              labelCol={{ span: 24 }}
-            >
-              <InputNumber
-                {...field}
-                style={{ width: "100%" }}
-                controls={false}
-                placeholder="Exemplo: 2026"
-              />
-            </AppFormItem>
-          )}
-        />
-      </Col>
-
-      <Col xs={24} md={8}>
-        <Controller
-          control={control}
-          name="banca_responsavel"
-          render={({ field }) => (
-            <AppFormItem
-              label="Banca responsável"
-              required
-              validateStatus={erros.banca_responsavel ? "error" : undefined}
-              help={erros.banca_responsavel?.message}
-              labelCol={{ span: 24 }}
-            >
               <AppInput
                 {...field}
-                placeholder="Digite o nome da banca responsável..."
+                disabled={bloqueado}
+                placeholder="Digite o nome do concurso..."
               />
             </AppFormItem>
           )}
@@ -156,7 +100,6 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
           render={({ field }) => (
             <AppFormItem
               label="Status do concurso"
-              required
               validateStatus={erros.status ? "error" : undefined}
               help={erros.status?.message}
               labelCol={{ span: 24 }}
@@ -168,6 +111,52 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
                   { value: "ATIVO", label: "Ativo" },
                   { value: "INATIVO", label: "Inativo" },
                 ]}
+              />
+            </AppFormItem>
+          )}
+        />
+      </Col>
+
+      <Col xs={24} md={8}>
+        <Controller
+          control={control}
+          name="banca_responsavel"
+          render={({ field }) => (
+            <AppFormItem
+              label="Banca responsável"
+              validateStatus={erros.banca_responsavel ? "error" : undefined}
+              help={erros.banca_responsavel?.message}
+              labelCol={{ span: 24 }}
+            >
+              <AppInput
+                {...field}
+                disabled={bloqueado}
+                placeholder="Digite o nome da banca responsável..."
+              />
+            </AppFormItem>
+          )}
+        />
+      </Col>
+
+      <Col xs={24} md={8}>
+        <Controller
+          control={control}
+          name="numero_processo"
+          render={({ field }) => (
+            <AppFormItem
+              label="Processo SEI"
+              validateStatus={erros.numero_processo ? "error" : undefined}
+              help={erros.numero_processo?.message}
+              labelCol={{ span: 24 }}
+            >
+              <AppInput
+                {...field}
+                inputMode="numeric"
+                disabled={bloqueado}
+                placeholder="Digite o número do Processo SEI..."
+                onChange={(e) =>
+                  field.onChange(e.target.value.replace(/\D/g, ""))
+                }
               />
             </AppFormItem>
           )}

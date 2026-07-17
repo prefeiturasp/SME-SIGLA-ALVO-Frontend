@@ -1,11 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { Steps, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
-import { StepActionsConcurso } from "./StepActionsConcurso";
-import { steps } from "./stepsConcurso";
-import { useConcursoSteps } from "./useConcursoSteps";
+import FormConcurso from "../components/FormConcurso";
+import { useConcursoForm } from "../hooks/useConcursoForm";
+import { useModoConcurso } from "../hooks/useModoConcurso";
+import { usePostConcurso } from "../hooks/usePostConcurso";
+import { usePatchConcurso } from "../hooks/usePatchConcurso";
+import { useGetConcursoByUuid } from "../../../GerenciamentoVagas/hooks/useGetConcursoPorUuid";
+import { StepActionsConcurso } from "../components/StepActionsConcurso";
+import { steps } from "../components/stepsConcurso";
+import { useConcursoSteps } from "../components/useConcursoSteps";
+import {
+  montarPayloadPasso1,
+  montarPayloadStatus,
+} from "../utils/montarPayloadConcurso";
+import { obterMensagemNumeroProcessoDuplicado } from "../utils/erroConcurso";
 import {
   CardTitle,
   ConvocacaoStepsGlobalStyle,
@@ -18,12 +28,42 @@ const IdentificacaoTela: React.FC = () => {
   const navigate = useNavigate();
   const current = 0;
 
-  const [uuidConcurso] = useState(() => uuidv4());
+  const { isEdicao, uuidRota, getStepPath, labelTela } = useModoConcurso();
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors, isValid },
+  } = useConcursoForm();
+
+  const { concursoData: concurso } = useGetConcursoByUuid(
+    isEdicao ? uuidRota ?? "" : ""
+  );
+
+  useEffect(() => {
+    if (isEdicao && concurso) {
+      reset({
+        cargos_ids: (concurso.cargos ?? []).map((c) => c.uuid),
+        nome: concurso.nome,
+        numero_processo: concurso.numero_processo ?? "",
+        banca_responsavel: concurso.banca_responsavel ?? "",
+        status: concurso.status ?? "ATIVO",
+      });
+    }
+
+  }, [isEdicao, concurso]);
+
+  const postConcurso = usePostConcurso(true);
+  const patchConcurso = usePatchConcurso(true);
 
   const { stepItems, handleStepChange } = useConcursoSteps({
-    uuid: uuidConcurso,
+    uuid: uuidRota,
     currentStepIndex: current,
     onNavigate: (path) => navigate(path),
+    getStepPath,
+    liberarTodos: isEdicao,
   });
 
   const breadcrumbItems = [
@@ -38,12 +78,46 @@ const IdentificacaoTela: React.FC = () => {
         </Text>
       ),
     },
-    { title: "Adicionar concurso" },
+    { title: labelTela },
   ] as TitleItem[];
 
-  const next = () => {
-    navigate(`/gerenciar/concursos/adicionar/${uuidConcurso}/passo-2`);
+  const irParaPasso2 = (uuid: string) => {
+    navigate(getStepPath(1, uuid) ?? "/gerenciar/concursos");
   };
+
+  const tratarErroProcessoDuplicado = (error: unknown) => {
+    const mensagem = obterMensagemNumeroProcessoDuplicado(error);
+    if (mensagem) {
+      setError("numero_processo", { type: "manual", message: mensagem });
+    }
+  };
+
+  const bloqueado = concurso?.situacao === "EM_ANDAMENTO";
+
+  const next = handleSubmit((valores) => {
+    const payload = bloqueado
+      ? montarPayloadStatus(valores)
+      : montarPayloadPasso1(valores);
+
+    if (isEdicao && uuidRota) {
+      patchConcurso.mutate(
+        { uuid: uuidRota, payload },
+        {
+          onSuccess: () => irParaPasso2(uuidRota),
+          onError: tratarErroProcessoDuplicado,
+        }
+      );
+      return;
+    }
+
+    postConcurso.mutate(
+      { ...payload, situacao: "INCOMPLETO" },
+      {
+        onSuccess: (data) => irParaPasso2(data.uuid),
+        onError: tratarErroProcessoDuplicado,
+      }
+    );
+  });
 
   const prev = () => {
     navigate("/gerenciar/concursos");
@@ -53,10 +127,15 @@ const IdentificacaoTela: React.FC = () => {
     navigate("/gerenciar/concursos");
   };
 
+  const opcoesIniciais = (concurso?.cargos ?? []).map((c) => ({
+    value: c.uuid,
+    label: `${c.codigo} - ${c.nome}`,
+  }));
+
   return (
     <>
       <ConvocacaoStepsGlobalStyle />
-      <BaseTela breadcrumbItems={breadcrumbItems} title="Adicionar concurso">
+      <BaseTela breadcrumbItems={breadcrumbItems} title={labelTela}>
         <StyledCardWithoutBorder variant="borderless">
           <Steps
             className="convocacao-steps"
@@ -71,10 +150,20 @@ const IdentificacaoTela: React.FC = () => {
           variant="borderless"
         >
           <CardTitle>Identificação do concurso</CardTitle>
-          <Text type="secondary" style={{ display: "block", marginTop: 8 }}>
+          <Text
+            type="secondary"
+            style={{ display: "block", marginTop: 8, marginBottom: 24 }}
+          >
             Informe os dados que identificam o concurso e o processo
             administrativo correspondente.
           </Text>
+
+          <FormConcurso
+            control={control}
+            erros={errors}
+            opcoesIniciais={opcoesIniciais}
+            bloqueado={bloqueado}
+          />
 
           <StepActionsConcurso
             current={current}
@@ -82,6 +171,8 @@ const IdentificacaoTela: React.FC = () => {
             next={next}
             prev={prev}
             onCancel={cancel}
+            canAvancar={isValid}
+            loading={postConcurso.isPending || patchConcurso.isPending}
           />
         </StyledCardWithoutBorder>
       </BaseTela>

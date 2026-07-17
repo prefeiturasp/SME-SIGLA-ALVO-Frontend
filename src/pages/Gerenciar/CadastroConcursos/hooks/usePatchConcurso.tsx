@@ -4,7 +4,7 @@ import { API } from "../../../../services";
 import type { IConcursoPayload } from "../../../../services/resources/concursos/IConcursos";
 import { ehErroNumeroProcessoDuplicado } from "../utils/erroConcurso";
 
-export const usePatchConcurso = () => {
+export const usePatchConcurso = (silencioso = false) => {
   const queryClient = useQueryClient();
   const { notification } = App.useApp();
 
@@ -21,6 +21,7 @@ export const usePatchConcurso = () => {
       queryClient.invalidateQueries({
         queryKey: ["getConcursoByUuid", uuid],
       });
+      if (silencioso) return;
       notification.success({
         message: "Concurso atualizado",
         description: "As alterações foram salvas com sucesso!",
@@ -29,10 +30,7 @@ export const usePatchConcurso = () => {
       });
     },
     onError: (error) => {
-      // Erro de numero de processo duplicado ja e exibido inline no
-      // formulario; nao exibir notificacao generica redundante.
       if (ehErroNumeroProcessoDuplicado(error)) return;
-
       notification.error({
         message: "Erro ao salvar",
         description:
