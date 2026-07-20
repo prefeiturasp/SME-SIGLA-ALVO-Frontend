@@ -18,8 +18,12 @@ export const usePatchConcurso = (silencioso = false) => {
     }) => API.Concursos.patchConcurso(uuid, payload).response,
     onSuccess: (_data, { uuid }) => {
       queryClient.invalidateQueries({ queryKey: ["listarConcursos"] });
+      // Marca o detalhe como stale sem refetch imediato (refetchType "none"):
+      // evita o GET duplicado na tela atual durante a navegacao entre passos,
+      // mas garante dados atualizados ao reabrir a edicao do concurso.
       queryClient.invalidateQueries({
         queryKey: ["getConcursoByUuid", uuid],
+        refetchType: "none",
       });
       if (silencioso) return;
       notification.success({

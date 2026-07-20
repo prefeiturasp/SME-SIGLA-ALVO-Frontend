@@ -6,7 +6,7 @@ export const useCargos = () => {
     queryKey: ["getCargos"],
     queryFn: ({ signal }) =>
       API.Cargos.getCargos({ signal }).response,
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000,
     retry: 0,
   });
 

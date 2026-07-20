@@ -33,16 +33,19 @@ const schema = yup.object({
   habilitados_geral: yup
     .number()
     .typeError("Informe a quantidade de habilitados (Geral)")
+    .integer("A quantidade deve ser um número inteiro")
     .min(0, "A quantidade não pode ser negativa")
     .required("Informe a quantidade de habilitados (Geral)"),
   habilitados_nna: yup
     .number()
     .typeError("Informe a quantidade de habilitados (NNA)")
+    .integer("A quantidade deve ser um número inteiro")
     .min(0, "A quantidade não pode ser negativa")
     .required("Informe a quantidade de habilitados (NNA)"),
   habilitados_pcd: yup
     .number()
     .typeError("Informe a quantidade de habilitados (PcD)")
+    .integer("A quantidade deve ser um número inteiro")
     .min(0, "A quantidade não pode ser negativa")
     .required("Informe a quantidade de habilitados (PcD)"),
   retificacoes: yup.string().trim().optional(),

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Steps, Typography } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
 import FormPublicacoesResultados from "../components/FormPublicacoesResultados";
 import { usePublicacoesResultadosForm } from "../hooks/usePublicacoesResultadosForm";
@@ -16,6 +16,10 @@ import {
   montarPayloadRetificacoesLiberada,
 } from "../utils/montarPayloadConcurso";
 import {
+  leHouveAlteracao,
+  opcoesNavegacaoConcurso,
+} from "../utils/notificacaoConcurso";
+import {
   CardTitle,
   ConvocacaoStepsGlobalStyle,
   StyledCardWithoutBorder,
@@ -25,6 +29,8 @@ const { Text } = Typography;
 
 const PublicacoesResultadosTela: React.FC = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const houveAlteracaoAnterior = leHouveAlteracao(state);
   const current = 1;
 
   const { isEdicao, uuidRota, getStepPath, labelTela } = useModoConcurso();
@@ -34,7 +40,7 @@ const PublicacoesResultadosTela: React.FC = () => {
     control,
     handleSubmit,
     reset,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
   } = usePublicacoesResultadosForm();
 
   const { concursoData: concurso } = useGetConcursoByUuid(uuidRota ?? "");
@@ -64,7 +70,7 @@ const PublicacoesResultadosTela: React.FC = () => {
           style={{ cursor: "pointer" }}
           onClick={() => navigate("/gerenciar/concursos")}
         >
-          Cadastro de concurso
+          Cadastro de concursos
         </Text>
       ),
     },
@@ -73,12 +79,20 @@ const PublicacoesResultadosTela: React.FC = () => {
 
   const bloqueado = concurso?.situacao === "EM_ANDAMENTO";
 
-  const irParaPasso3 = () => {
-    navigate(getStepPath(2, uuid) ?? "/gerenciar/concursos");
+  const irParaPasso3 = (houveAlteracao: boolean) => {
+    navigate(
+      getStepPath(2, uuid) ?? "/gerenciar/concursos",
+      opcoesNavegacaoConcurso(houveAlteracao)
+    );
   };
 
   const next = handleSubmit((valores) => {
     if (!uuidRota) return;
+
+    if (!isDirty) {
+      irParaPasso3(houveAlteracaoAnterior);
+      return;
+    }
 
     const payload = bloqueado
       ? montarPayloadRetificacoesLiberada(valores)
@@ -86,7 +100,7 @@ const PublicacoesResultadosTela: React.FC = () => {
 
     patchConcurso.mutate(
       { uuid: uuidRota, payload },
-      { onSuccess: () => irParaPasso3() }
+      { onSuccess: () => irParaPasso3(true) }
     );
   });
 

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Typography } from "antd";
+import React, { useEffect, useRef, useState } from "react";
+import { App, Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import FiltrosBuscaConcurso from "./components/FiltrosBuscaConcurso";
 import TabelaConcursos from "./components/TabelaConcursos";
@@ -9,20 +9,43 @@ import { useListarConcursos } from "./hooks/useListarConcursos";
 import { AppButton, BuscaProcessosTitle, ConteudoPagina } from "@/components/ui";
 import { ConcursoTabelaWrapper } from "@/design-system/estilos";
 import type { IConcursoFiltros } from "../../../services/resources/concursos/IConcursos";
+import { leHouveAlteracao } from "./utils/notificacaoConcurso";
 
 const { Text } = Typography;
 
 const ListagemConcursosTela: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { notification } = App.useApp();
   const [filtros, setFiltros] = useState<IConcursoFiltros>({});
   const [page, setPage] = useState(1);
+  // Guard contra disparo duplicado: o StrictMode (dev) executa o efeito duas
+  // vezes antes do navigate limpar o state, o que exibiria a notificacao 2x.
+  const notificacaoExibidaRef = useRef(false);
+
+  useEffect(() => {
+    if (!leHouveAlteracao(location.state) || notificacaoExibidaRef.current) {
+      return;
+    }
+    notificacaoExibidaRef.current = true;
+
+    notification.success({
+      message: "Concurso atualizado",
+      description: "As alterações foram salvas com sucesso!",
+      placement: "top",
+      duration: 3.5,
+    });
+
+    // Limpa o state para nao repetir a notificacao em refresh da pagina.
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.state, location.pathname, navigate, notification]);
 
   const { concursos, total, isLoading } = useListarConcursos(filtros, 1, 1000);
   const { concursos: concursosParaFiltros } = useListarConcursos({}, 1, 1000);
 
   const breadcrumbItems = [
     { title: <Text strong>Gerenciar</Text> },
-    { title: "Cadastro de concurso" },
+    { title: "Cadastro de concursos" },
   ] as TitleItem[];
 
   const aoBuscar = (novosFiltros: IConcursoFiltros) => {

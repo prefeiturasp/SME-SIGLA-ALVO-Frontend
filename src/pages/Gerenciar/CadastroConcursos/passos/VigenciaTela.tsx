@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Steps, Typography } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
 import FormVigencia from "../components/FormVigencia";
 import { useVigenciaForm } from "../hooks/useVigenciaForm";
@@ -16,6 +16,11 @@ import {
   montarPayloadVigenciaLiberada,
 } from "../utils/montarPayloadConcurso";
 import {
+  leHouveAlteracao,
+  opcoesNavegacaoConcurso,
+  ROTA_LISTAGEM_CONCURSOS,
+} from "../utils/notificacaoConcurso";
+import {
   CardTitle,
   ConvocacaoStepsGlobalStyle,
   StyledCardWithoutBorder,
@@ -25,6 +30,8 @@ const { Text } = Typography;
 
 const VigenciaTela: React.FC = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const houveAlteracaoAnterior = leHouveAlteracao(state);
   const current = 2;
 
   const { isEdicao, uuidRota, getStepPath, labelTela, labelBotaoFinal } =
@@ -35,7 +42,7 @@ const VigenciaTela: React.FC = () => {
     control,
     handleSubmit,
     reset,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
   } = useVigenciaForm();
 
   const { concursoData: concurso } = useGetConcursoByUuid(uuidRota ?? "");
@@ -47,7 +54,7 @@ const VigenciaTela: React.FC = () => {
 
   }, [concurso]);
 
-  const patchConcurso = usePatchConcurso();
+  const patchConcurso = usePatchConcurso(true);
 
   const { stepItems, handleStepChange } = useConcursoSteps({
     uuid,
@@ -65,7 +72,7 @@ const VigenciaTela: React.FC = () => {
           style={{ cursor: "pointer" }}
           onClick={() => navigate("/gerenciar/concursos")}
         >
-          Cadastro de concurso
+          Cadastro de concursos
         </Text>
       ),
     },
@@ -74,14 +81,27 @@ const VigenciaTela: React.FC = () => {
 
   const bloqueado = concurso?.situacao === "EM_ANDAMENTO";
 
+  const irParaListagem = (houveAlteracao: boolean) => {
+    navigate(
+      ROTA_LISTAGEM_CONCURSOS,
+      opcoesNavegacaoConcurso(houveAlteracao)
+    );
+  };
+
   const next = handleSubmit((valores) => {
     if (!uuidRota) return;
+
+    if (!isDirty) {
+      irParaListagem(houveAlteracaoAnterior);
+      return;
+    }
+
     const payload = bloqueado
       ? montarPayloadVigenciaLiberada(valores)
       : { ...montarPayloadPasso3(valores), situacao: "COMPLETO" as const };
     patchConcurso.mutate(
       { uuid: uuidRota, payload },
-      { onSuccess: () => navigate("/gerenciar/concursos") }
+      { onSuccess: () => irParaListagem(true) }
     );
   });
 
