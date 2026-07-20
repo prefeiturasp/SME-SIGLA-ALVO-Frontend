@@ -1,13 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../services";
-import type { AxiosRequestConfig } from "axios";
- 
-const STALE_TIME_PADRAO = 5 * 60 * 1000;
+import type { AxiosRequestConfig } from "axios"; 
 
 export const useGetConcursoByUuid = (
   uuid: string,
-  axiosRequestConfig?: AxiosRequestConfig,
-  staleTime: number = STALE_TIME_PADRAO
+  axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { data: concursoData, isLoading: concursoIsLoading } = useQuery({
     queryKey: ["getConcursoByUuid", uuid],

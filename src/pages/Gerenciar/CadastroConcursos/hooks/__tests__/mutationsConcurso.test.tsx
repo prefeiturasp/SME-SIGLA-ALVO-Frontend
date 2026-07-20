@@ -108,8 +108,7 @@ describe("usePatchConcurso", () => {
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: ["listarConcursos"],
     });
-    // Detalhe marcado stale sem refetch imediato: corrige o cache velho ao
-    // reabrir a edicao, sem gerar GET duplicado durante a navegacao.
+    
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: ["getConcursoByUuid", uuid],
       refetchType: "none",
