@@ -20,6 +20,7 @@ export const usePatchConcurso = (silencioso = false) => {
       queryClient.invalidateQueries({ queryKey: ["listarConcursos"] });
       queryClient.invalidateQueries({
         queryKey: ["getConcursoByUuid", uuid],
+        refetchType: "none",
       });
       if (silencioso) return;
       notification.success({

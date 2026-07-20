@@ -96,7 +96,7 @@ describe("usePostConcurso", () => {
 describe("usePatchConcurso", () => {
   const uuid = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 
-  it("chama patchConcurso com uuid/payload, invalida caches e notifica sucesso", async () => {
+  it("chama patchConcurso com uuid/payload, invalida a listagem, marca o detalhe stale e notifica sucesso", async () => {
     mockPatchConcurso.mockReturnValue({ response: Promise.resolve({}) });
     const { wrapper, invalidateSpy } = criarWrapper();
 
@@ -108,8 +108,10 @@ describe("usePatchConcurso", () => {
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: ["listarConcursos"],
     });
+    
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: ["getConcursoByUuid", uuid],
+      refetchType: "none",
     });
     expect(mockNotification.success).toHaveBeenCalled();
   });

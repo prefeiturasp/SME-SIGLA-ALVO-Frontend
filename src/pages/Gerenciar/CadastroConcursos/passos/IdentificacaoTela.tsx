@@ -1,10 +1,14 @@
 import React, { useEffect } from "react";
 import { Steps, Typography } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
 import FormConcurso from "../components/FormConcurso";
 import { useConcursoForm } from "../hooks/useConcursoForm";
-import { useModoConcurso } from "../hooks/useModoConcurso";
+import {
+  seHouveAlteracao,
+  opcoesNavegacaoConcurso,
+  useModoConcurso,
+} from "../hooks/useModoConcurso";
 import { usePostConcurso } from "../hooks/usePostConcurso";
 import { usePatchConcurso } from "../hooks/usePatchConcurso";
 import { useGetConcursoByUuid } from "../../../GerenciamentoVagas/hooks/useGetConcursoPorUuid";
@@ -26,6 +30,8 @@ const { Text } = Typography;
 
 const IdentificacaoTela: React.FC = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const houveAlteracaoAnterior = seHouveAlteracao(state);
   const current = 0;
 
   const { isEdicao, uuidRota, getStepPath, labelTela } = useModoConcurso();
@@ -35,7 +41,7 @@ const IdentificacaoTela: React.FC = () => {
     handleSubmit,
     reset,
     setError,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
   } = useConcursoForm();
 
   const { concursoData: concurso } = useGetConcursoByUuid(
@@ -74,15 +80,18 @@ const IdentificacaoTela: React.FC = () => {
           style={{ cursor: "pointer" }}
           onClick={() => navigate("/gerenciar/concursos")}
         >
-          Cadastro de concurso
+          Cadastro de concursos
         </Text>
       ),
     },
     { title: labelTela },
   ] as TitleItem[];
 
-  const irParaPasso2 = (uuid: string) => {
-    navigate(getStepPath(1, uuid) ?? "/gerenciar/concursos");
+  const irParaPasso2 = (uuid: string, houveAlteracao: boolean) => {
+    navigate(
+      getStepPath(1, uuid) ?? "/gerenciar/concursos",
+      opcoesNavegacaoConcurso(houveAlteracao)
+    );
   };
 
   const tratarErroProcessoDuplicado = (error: unknown) => {
@@ -100,10 +109,15 @@ const IdentificacaoTela: React.FC = () => {
       : montarPayloadPasso1(valores);
 
     if (isEdicao && uuidRota) {
+      if (!isDirty) {
+        irParaPasso2(uuidRota, houveAlteracaoAnterior);
+        return;
+      }
+
       patchConcurso.mutate(
         { uuid: uuidRota, payload },
         {
-          onSuccess: () => irParaPasso2(uuidRota),
+          onSuccess: () => irParaPasso2(uuidRota, true),
           onError: tratarErroProcessoDuplicado,
         }
       );
@@ -113,7 +127,7 @@ const IdentificacaoTela: React.FC = () => {
     postConcurso.mutate(
       { ...payload, situacao: "INCOMPLETO" },
       {
-        onSuccess: (data) => irParaPasso2(data.uuid),
+        onSuccess: (data) => irParaPasso2(data.uuid, houveAlteracaoAnterior),
         onError: tratarErroProcessoDuplicado,
       }
     );

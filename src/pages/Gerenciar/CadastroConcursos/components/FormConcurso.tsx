@@ -1,10 +1,10 @@
-import { Col, Row } from "antd";
+import { Col, Row, Select } from "antd";
 import type { DefaultOptionType } from "antd/es/select";
 import { Controller } from "react-hook-form";
 import type { Control, FieldErrors } from "react-hook-form";
 import type { IConcursoFormFields } from "../hooks/useConcursoForm";
 import { useCargos } from "../../../../hooks/useCargos";
-import { AppFormItem, AppInput, FilterSelect, FilterSelectMulti } from "@/components/ui";
+import { AppFormItem, AppInput, FilterSelect } from "@/components/ui";
 
 interface IOpcaoCargo {
   value: string;
@@ -54,10 +54,13 @@ const FormConcurso: React.FC<IFormConcursoProps> = ({
               help={erros.cargos_ids?.message}
               labelCol={{ span: 24 }}
             >
-              <FilterSelectMulti
+              <Select
                 {...field}
                 mode="multiple"
+                allowClear
+                size="large"
                 disabled={bloqueado}
+                style={{ width: "100%" }}
                 placeholder="Selecione o(s) cargo(s)..."
                 optionFilterProp="label"
                 filterOption={filtrarPorLabel}

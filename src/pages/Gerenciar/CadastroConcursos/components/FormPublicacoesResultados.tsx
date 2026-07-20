@@ -11,6 +11,15 @@ interface IFormPublicacoesResultadosProps {
   bloqueado?: boolean;
 }
 
+const propsQuantidadeHabilitados = {
+  min: 0,
+  precision: 0,
+  controls: false,
+  style: { width: "100%" },
+  placeholder: "Exemplo: 100",
+  parser: (valor?: string) => (valor ? valor.replace(/\D/g, "") : ""),
+} as const;
+
 const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
   control,
   erros,
@@ -121,11 +130,8 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
             >
               <InputNumber
                 {...field}
+                {...propsQuantidadeHabilitados}
                 disabled={bloqueado}
-                style={{ width: "100%" }}
-                min={0}
-                controls={false}
-                placeholder="Exemplo: 100"
               />
             </AppFormItem>
           )}
@@ -145,11 +151,8 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
             >
               <InputNumber
                 {...field}
+                {...propsQuantidadeHabilitados}
                 disabled={bloqueado}
-                style={{ width: "100%" }}
-                min={0}
-                controls={false}
-                placeholder="Exemplo: 100"
               />
             </AppFormItem>
           )}
@@ -169,11 +172,8 @@ const FormPublicacoesResultados: React.FC<IFormPublicacoesResultadosProps> = ({
             >
               <InputNumber
                 {...field}
+                {...propsQuantidadeHabilitados}
                 disabled={bloqueado}
-                style={{ width: "100%" }}
-                min={0}
-                controls={false}
-                placeholder="Exemplo: 100"
               />
             </AppFormItem>
           )}
