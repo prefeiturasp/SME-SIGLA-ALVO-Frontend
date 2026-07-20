@@ -11,8 +11,6 @@ interface IFormPublicacoesResultadosProps {
   bloqueado?: boolean;
 }
 
-// Aceita apenas inteiros >= 0: remove tudo que nao for digito na digitacao
-// ou colagem, e impede casas decimais.
 const propsQuantidadeHabilitados = {
   min: 0,
   precision: 0,

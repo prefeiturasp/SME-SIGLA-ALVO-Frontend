@@ -5,7 +5,7 @@ import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
 import FormVigencia from "../components/FormVigencia";
 import { useVigenciaForm } from "../hooks/useVigenciaForm";
 import {
-  leHouveAlteracao,
+  seHouveAlteracao,
   opcoesNavegacaoConcurso,
   ROTA_LISTAGEM_CONCURSOS,
   useModoConcurso,
@@ -31,7 +31,7 @@ const { Text } = Typography;
 const VigenciaTela: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const houveAlteracaoAnterior = leHouveAlteracao(state);
+  const houveAlteracaoAnterior = seHouveAlteracao(state);
   const current = 2;
 
   const { isEdicao, uuidRota, getStepPath, labelTela, labelBotaoFinal } =

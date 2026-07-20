@@ -5,7 +5,7 @@ import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
 import FormPublicacoesResultados from "../components/FormPublicacoesResultados";
 import { usePublicacoesResultadosForm } from "../hooks/usePublicacoesResultadosForm";
 import {
-  leHouveAlteracao,
+  seHouveAlteracao,
   opcoesNavegacaoConcurso,
   useModoConcurso,
 } from "../hooks/useModoConcurso";
@@ -30,7 +30,7 @@ const { Text } = Typography;
 const PublicacoesResultadosTela: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const houveAlteracaoAnterior = leHouveAlteracao(state);
+  const houveAlteracaoAnterior = seHouveAlteracao(state);
   const current = 1;
 
   const { isEdicao, uuidRota, getStepPath, labelTela } = useModoConcurso();

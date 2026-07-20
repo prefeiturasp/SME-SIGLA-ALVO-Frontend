@@ -8,7 +8,7 @@ export interface IEstadoNavegacaoConcurso {
   houveAlteracao?: boolean;
 }
 
-export const leHouveAlteracao = (state: unknown): boolean => {
+export const seHouveAlteracao = (state: unknown): boolean => {
   return Boolean((state as IEstadoNavegacaoConcurso | null)?.houveAlteracao);
 };
 

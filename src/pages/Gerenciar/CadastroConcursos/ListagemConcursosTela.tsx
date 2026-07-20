@@ -9,7 +9,7 @@ import { useListarConcursos } from "./hooks/useListarConcursos";
 import { AppButton, BuscaProcessosTitle, ConteudoPagina } from "@/components/ui";
 import { ConcursoTabelaWrapper } from "@/design-system/estilos";
 import type { IConcursoFiltros } from "../../../services/resources/concursos/IConcursos";
-import { leHouveAlteracao } from "./hooks/useModoConcurso";
+import { seHouveAlteracao } from "./hooks/useModoConcurso";
 
 const { Text } = Typography;
 
@@ -19,12 +19,10 @@ const ListagemConcursosTela: React.FC = () => {
   const { notification } = App.useApp();
   const [filtros, setFiltros] = useState<IConcursoFiltros>({});
   const [page, setPage] = useState(1);
-  // Guard contra disparo duplicado: o StrictMode (dev) executa o efeito duas
-  // vezes antes do navigate limpar o state, o que exibiria a notificacao 2x.
   const notificacaoExibidaRef = useRef(false);
 
   useEffect(() => {
-    if (!leHouveAlteracao(location.state) || notificacaoExibidaRef.current) {
+    if (!seHouveAlteracao(location.state) || notificacaoExibidaRef.current) {
       return;
     }
     notificacaoExibidaRef.current = true;
@@ -36,7 +34,6 @@ const ListagemConcursosTela: React.FC = () => {
       duration: 3.5,
     });
 
-    // Limpa o state para nao repetir a notificacao em refresh da pagina.
     navigate(location.pathname, { replace: true, state: null });
   }, [location.state, location.pathname, navigate, notification]);
 

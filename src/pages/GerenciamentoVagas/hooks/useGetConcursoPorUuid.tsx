@@ -13,7 +13,7 @@ export const useGetConcursoByUuid = (
     queryKey: ["getConcursoByUuid", uuid],
     queryFn: ({ signal }) =>
       API.Concursos.getConcursoByUuid(uuid, { signal, ...axiosRequestConfig }).response,
-    staleTime,
+    staleTime: 0,
     retry: 0,
     enabled: !!uuid
   });
