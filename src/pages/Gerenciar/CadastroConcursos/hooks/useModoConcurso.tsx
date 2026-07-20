@@ -2,6 +2,22 @@ import { useLocation, useParams } from "react-router-dom";
 
 const BASE = "/gerenciar/concursos";
 
+export const ROTA_LISTAGEM_CONCURSOS = BASE;
+
+export interface IEstadoNavegacaoConcurso {
+  houveAlteracao?: boolean;
+}
+
+export const leHouveAlteracao = (state: unknown): boolean => {
+  return Boolean((state as IEstadoNavegacaoConcurso | null)?.houveAlteracao);
+};
+
+export const opcoesNavegacaoConcurso = (
+  houveAlteracao: boolean
+): { state: IEstadoNavegacaoConcurso } => ({
+  state: { houveAlteracao },
+});
+
 export const useModoConcurso = () => {
   const { pathname } = useLocation();
   const { uuid: uuidRota } = useParams();

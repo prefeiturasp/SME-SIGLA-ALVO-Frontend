@@ -9,7 +9,7 @@ import { useListarConcursos } from "./hooks/useListarConcursos";
 import { AppButton, BuscaProcessosTitle, ConteudoPagina } from "@/components/ui";
 import { ConcursoTabelaWrapper } from "@/design-system/estilos";
 import type { IConcursoFiltros } from "../../../services/resources/concursos/IConcursos";
-import { leHouveAlteracao } from "./utils/notificacaoConcurso";
+import { leHouveAlteracao } from "./hooks/useModoConcurso";
 
 const { Text } = Typography;
 

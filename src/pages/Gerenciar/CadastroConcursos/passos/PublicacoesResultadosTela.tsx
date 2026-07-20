@@ -4,7 +4,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import BaseTela, { type TitleItem } from "../../../Base/BaseTela";
 import FormPublicacoesResultados from "../components/FormPublicacoesResultados";
 import { usePublicacoesResultadosForm } from "../hooks/usePublicacoesResultadosForm";
-import { useModoConcurso } from "../hooks/useModoConcurso";
+import {
+  leHouveAlteracao,
+  opcoesNavegacaoConcurso,
+  useModoConcurso,
+} from "../hooks/useModoConcurso";
 import { usePatchConcurso } from "../hooks/usePatchConcurso";
 import { useGetConcursoByUuid } from "../../../GerenciamentoVagas/hooks/useGetConcursoPorUuid";
 import { StepActionsConcurso } from "../components/StepActionsConcurso";
@@ -15,10 +19,6 @@ import {
   montarPayloadPasso2,
   montarPayloadRetificacoesLiberada,
 } from "../utils/montarPayloadConcurso";
-import {
-  leHouveAlteracao,
-  opcoesNavegacaoConcurso,
-} from "../utils/notificacaoConcurso";
 import {
   CardTitle,
   ConvocacaoStepsGlobalStyle,
