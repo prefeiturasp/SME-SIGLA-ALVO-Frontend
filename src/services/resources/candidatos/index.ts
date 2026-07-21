@@ -128,7 +128,6 @@ export const postHabilitadoEliminar = (
   };
 };
 
-// POST reclassificar candidato
 export const postReclassificarCandidato = (
   payload: {
     candidato_uuid: string;
