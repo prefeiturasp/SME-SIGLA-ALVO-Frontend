@@ -34,6 +34,7 @@ type Registro = {
   hasPCD?: boolean;
   hasNNA?: boolean;
   reclassificadosDe?: string[];
+  reclassificacoes?: { desclassificado_de: string; mandado_judicial?: boolean }[];
   hasReclassificacao?: boolean;
   tipoClassificacao: string;
   classificacaoGeral: number | string;
@@ -216,9 +217,17 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
     const mapped: Registro[] = list.map((item: any, idx: number) => {
       const candidato = item?.candidato || {};
       const tipo = String(item?.categoria_efetiva || "").toUpperCase();
-      const reclassificadosDe = Array.isArray(item?.reclassificacoes)
-        ? (item.reclassificacoes as any[]).map((rec: any) => String(rec?.desclassificado_de || "").toUpperCase()).filter(Boolean)
+      const reclassificacoesList = Array.isArray(item?.reclassificacoes)
+        ? (item.reclassificacoes as any[]).map((rec: any) => ({
+            desclassificado_de: String(rec?.desclassificado_de || "").toUpperCase(),
+            mandado_judicial: Boolean(rec?.mandado_judicial),
+          })).filter((rec) => rec.desclassificado_de)
         : [];
+      // Considera reclassificado apenas o que ainda não foi revertido
+      // por mandado judicial (desclassificação ativa).
+      const reclassificadosDe = reclassificacoesList
+        .filter((rec) => !rec.mandado_judicial)
+        .map((rec) => rec.desclassificado_de);
       return {
         key: String(item?.uuid || item?.id || idx),
         nome: String(candidato?.nome || "—"),
@@ -229,6 +238,7 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
         hasPCD: Boolean(item?.classificacao_pcd),
         hasNNA: Boolean(item?.classificacao_nna),
         reclassificadosDe,
+        reclassificacoes: reclassificacoesList,
         hasReclassificacao: reclassificadosDe.length > 0,
         tipoClassificacao: tipo,
         classificacaoGeral: Number(item?.classificacao) || "-",
@@ -417,6 +427,7 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
         hasPCD={selectedRow?.hasPCD || false}
         hasNNA={selectedRow?.hasNNA || false}
         reclassificadosDe={selectedRow?.reclassificadosDe || []}
+        reclassificacoes={selectedRow?.reclassificacoes || []}
         concursoUuid={concursoSelecionado || ""}
         concursoLabel={(() => {
           const list = Array.isArray((concursosData as any)?.results)

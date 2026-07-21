@@ -130,7 +130,12 @@ export const postHabilitadoEliminar = (
 
 // POST reclassificar candidato
 export const postReclassificarCandidato = (
-  payload: { candidato_uuid: string; desclassificar_de: string; motivo: string },
+  payload: {
+    candidato_uuid: string;
+    desclassificar_de: string;
+    motivo: string;
+    mandado_judicial?: boolean;
+  },
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
