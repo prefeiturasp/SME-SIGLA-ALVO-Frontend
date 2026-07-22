@@ -1,4 +1,3 @@
-// src/pages/CriarEditarConvocacao/SelecaoCargos/hooks/useGetCandidatosMandadoJudicial.tsx
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../../services";
 
@@ -18,10 +17,8 @@ export const useGetCandidatosMandadoJudicial = (
     },
     staleTime: 0,
     retry: 0,
-    // A lista é editável pelo usuário (exclusão por linha); um refetch em
-    // background não pode sobrescrever as exclusões já feitas
     refetchOnWindowFocus: false,
-    enabled: buscarCandidatos && !!parametros, // Só executa quando buscarCandidatos for true e parametros existirem
+    enabled: buscarCandidatos && !!parametros,
   });
 
   return {

@@ -74,11 +74,8 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const [parametrosBuscaReconvocacao, setParametrosBuscaReconvocacao] = useState<{ concurso_uuid: string; quantidade: number } | undefined>(undefined);
   // Parâmetros para busca de candidatos calculados (Nova Autorização)
   const [parametrosBuscaCalculados, setParametrosBuscaCalculados] = useState<{ concurso_uuid: string; processo_uuid?: string; quantidade: number; codigo_cargo?: string } | undefined>(undefined);
-  // Nome digitado para busca de candidatos por mandado judicial
   const [nomeMandadoJudicial, setNomeMandadoJudicial] = useState('');
-  // Parâmetros para busca de candidatos por mandado judicial
   const [parametrosBuscaMandadoJudicial, setParametrosBuscaMandadoJudicial] = useState<{ concurso_uuid: string; codigo_cargo?: string; nome?: string } | undefined>(undefined);
-  // Lista local editável (a lixeira remove itens apenas desta lista)
   const [candidatosMandadoJudicial, setCandidatosMandadoJudicial] = useState<any[]>([]);
 
   // Refs para rastrear se já processamos os UUIDs (evitar loops infinitos)
@@ -86,7 +83,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const uuidsProcessadosReconvocacao = useRef<string>('');
   const uuidsProcessadosCalculados = useRef<string>('');
   const uuidsProcessadosMandadoJudicial = useRef<string>('');
-  // Guarda os parâmetros da última busca já refletida na lista local
   const parametrosMandadoJudicialProcessados = useRef<string>('');
 
   // Hook para buscar vagas dinamicamente
@@ -98,7 +94,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
 
   // Fixar tipoConvocacao como 'digitadas' quando for Reposição ou Reconvocação
   // Fixar tipoConvocacao como 'calculada' quando for Nova Autorização
-  // Fixar tipoConvocacao como 'mandado_judicial' quando for Mandado Judicial
   useEffect(() => {
     if (isMandadoJudicial) {
       setTipoConvocacao('mandado_judicial');
@@ -168,11 +163,8 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       setCandidatosMandadoJudicial([]);
       parametrosMandadoJudicialProcessados.current = '';
     }
-    // Nota: as flags de tipo (isReposicao/isReconvocacao/isNovaAutorizacao/
-    // isMandadoJudicial) são intencionalmente omitidas das dependências. Este
-    // effect zera o estado da busca, e incluí-las faria a tabela ser limpa ao
-    // trocar o tipo com o modal aberto. O gatilho correto é abrir/fechar o
-    // modal ou trocar de cargo.
+    // Flags de tipo omitidas de propósito: incluí-las limpa a tabela ao trocar
+    // o tipo com o modal aberto.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, cargoEmEdicao]);
 
@@ -209,7 +201,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     parametrosBuscaCalculados
   );
 
-  // Hook para buscar candidatos com reclassificação por mandado judicial
   const {
     candidatosData: candidatosMandadoJudicialData,
     candidatosIsLoading: candidatosMandadoJudicialIsLoading
@@ -218,7 +209,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     parametrosBuscaMandadoJudicial
   );
 
-  // Determinar qual fonte de dados usar, na ordem de precedência dos modos
   const { candidatosDataFinal, candidatosIsLoadingFinal } = useMemo(() => {
     if (isMandadoJudicial) {
       return {
@@ -269,11 +259,8 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const candidatosBuscados = mostrarTabelaCandidatos && candidatosDataFinal ?
     (Array.isArray(candidatosDataFinal) ? candidatosDataFinal : candidatosDataFinal.results) : [];
 
-  // No modo Mandado Judicial a tabela reflete a lista local, que a lixeira edita
   const candidatos = isMandadoJudicial ? candidatosMandadoJudicial : candidatosBuscados;
 
-  // Popular a lista local a cada NOVA busca. Um refetch da mesma busca (troca de
-  // foco da janela, revalidação de cache) não pode ressuscitar quem foi excluído.
   useEffect(() => {
     if (!isMandadoJudicial || candidatosMandadoJudicialIsLoading) return;
     const chave = JSON.stringify(parametrosBuscaMandadoJudicial ?? null);
@@ -384,7 +371,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     }
   }, [isNovaAutorizacao, tipoConvocacao, candidatosCalculadosData, candidatosCalculadosIsLoading, onCandidatosUuidsChange, cargoUuid]);
 
-  // Propagar UUIDs da lista local de mandado judicial (reflete as exclusões)
   useEffect(() => {
     if (!isMandadoJudicial || !onCandidatosUuidsChange || !cargoUuid) return;
     const uuids = candidatosMandadoJudicial
@@ -400,7 +386,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   }, [isMandadoJudicial, candidatosMandadoJudicial, onCandidatosUuidsChange, cargoUuid]);
 
   // Calcular total baseado no tipo de escolha
-  // Em Mandado Judicial o total é a própria lista, já descontadas as exclusões
   const totalAutorizacoes = isMandadoJudicial
     ? candidatosMandadoJudicial.length
     : isReconvocacao
@@ -490,12 +475,10 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     },
   ];
 
-  // Remove o candidato apenas da lista local, sem chamar o backend
   const handleExcluirCandidato = (uuid: string) => {
     setCandidatosMandadoJudicial((prev) => prev.filter((item: any) => item?.uuid !== uuid));
   };
 
-  // No modo Mandado Judicial cada linha ganha uma ação de exclusão local
   if (isMandadoJudicial) {
     columns.push({
       title: (
@@ -549,7 +532,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   };
 
   const handleBuscar = async () => {
-    // Mandado Judicial não tem quantidades: busca pelo nome informado
     if (isMandadoJudicial) {
       if (!concursoValue) {
         message.error('Concurso não informado');
@@ -562,7 +544,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
         nome: nomeMandadoJudicial.trim() || undefined
       });
       setMostrarTabelaCandidatos(true);
-      // O hook useGetCandidatosMandadoJudicial fará o request automaticamente
       return;
     }
 
@@ -772,7 +753,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
             <Radio value="digitadas" disabled={isNovaAutorizacao || isMandadoJudicial}>
               <span className="modal-radio-label">Digitadas</span>
             </Radio>
-            {/* O tipo só aparece quando o processo é de Mandado Judicial */}
             {isMandadoJudicial && (
               <Radio value="mandado_judicial">
                 <span className="modal-radio-label">Mandado Judicial</span>
@@ -782,7 +762,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
         </div>
 
         <div style={modalInlineStyles.infoSection}>
-          {/* Primeira linha - Autorizações Digitadas (ou Nome, em Mandado Judicial) */}
+          {/* Primeira linha - Autorizações Digitadas */}
           <div style={modalInlineStyles.inputsRow}>
             <div style={modalInlineStyles.inputsLabel}>
               <span className="modal-section-label">
@@ -791,7 +771,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
             </div>
             <div style={isMandadoJudicial ? { ...modalInlineStyles.inputsContainer, flex: 1 } : modalInlineStyles.inputsContainer}>
               {isMandadoJudicial ? (
-                // Para Mandado Judicial: busca do candidato pelo nome
                 <AppInput
                   aria-label="Nome"
                   value={nomeMandadoJudicial}

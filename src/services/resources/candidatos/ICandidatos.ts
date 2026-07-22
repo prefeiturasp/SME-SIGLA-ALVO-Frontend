@@ -7,7 +7,6 @@ export interface ICandidato {
   [key: string]: any; // Permite campos adicionais do ConcursoCandidatoSerializer
 }
 
-// Retorno de /api/v1/habilitados/mandado-judicial/
 export interface ICandidatoMandadoJudicial {
   uuid: string;
   candidato: {

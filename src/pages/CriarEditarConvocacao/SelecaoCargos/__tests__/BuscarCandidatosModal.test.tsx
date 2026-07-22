@@ -468,14 +468,12 @@ describe('BuscarCandidatosModal - Mandado Judicial', () => {
       expect(screen.queryByText('Ana Judicial')).not.toBeInTheDocument();
     });
 
-    // Refetch da MESMA busca devolve um array novo, porém equivalente
     mockUseGetCandidatosMandadoJudicial.mockReturnValue({
       candidatosData: candidatosResponse.map((item) => ({ ...item })),
       candidatosIsLoading: false,
     });
     rerender(<BuscarCandidatosModal {...mandadoJudicialProps} />);
 
-    // O candidato excluído não pode ressuscitar
     await waitFor(() => {
       expect(screen.getByText('Bruno Judicial (PcD)')).toBeInTheDocument();
     });
