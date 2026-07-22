@@ -481,6 +481,32 @@ describe('BuscarCandidatosModal - Mandado Judicial', () => {
     expect(screen.getByText('1 de 5 vagas')).toBeInTheDocument();
   });
 
+  it('repopula a lista ao refazer a mesma busca explicitamente', async () => {
+    const user = userEvent.setup();
+    mockUseGetCandidatosMandadoJudicial.mockReturnValue({
+      candidatosData: candidatosResponse,
+      candidatosIsLoading: false,
+    });
+
+    render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
+    await user.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Ana Judicial')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Excluir Ana Judicial' }));
+    await waitFor(() => {
+      expect(screen.queryByText('Ana Judicial')).not.toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Ana Judicial')).toBeInTheDocument();
+    });
+  });
+
   it('mantém Adicionar ao cargo desabilitado sem resultados', () => {
     render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
 

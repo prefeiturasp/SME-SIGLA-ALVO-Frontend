@@ -84,6 +84,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const uuidsProcessadosCalculados = useRef<string>('');
   const uuidsProcessadosMandadoJudicial = useRef<string>('');
   const parametrosMandadoJudicialProcessados = useRef<string>('');
+  const buscaMandadoJudicialPendente = useRef<boolean>(false);
 
   // Hook para buscar vagas dinamicamente
   const { vagasIsLoading, totalVagas } = useGetVagasPorProcessoECargo(
@@ -127,6 +128,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       uuidsProcessadosCalculados.current = '';
       uuidsProcessadosMandadoJudicial.current = '';
       parametrosMandadoJudicialProcessados.current = '';
+      buscaMandadoJudicialPendente.current = false;
     } else if (cargoEmEdicao) {
       // Preencher campos quando estiver editando
       if (isReconvocacao) {
@@ -162,6 +164,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       setParametrosBuscaMandadoJudicial(undefined);
       setCandidatosMandadoJudicial([]);
       parametrosMandadoJudicialProcessados.current = '';
+      buscaMandadoJudicialPendente.current = false;
     }
     // Flags de tipo omitidas de propósito: incluí-las limpa a tabela ao trocar
     // o tipo com o modal aberto.
@@ -264,8 +267,10 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   useEffect(() => {
     if (!isMandadoJudicial || candidatosMandadoJudicialIsLoading) return;
     const chave = JSON.stringify(parametrosBuscaMandadoJudicial ?? null);
-    if (parametrosMandadoJudicialProcessados.current === chave) return;
+    const buscaNova = parametrosMandadoJudicialProcessados.current !== chave;
+    if (!buscaNova && !buscaMandadoJudicialPendente.current) return;
     parametrosMandadoJudicialProcessados.current = chave;
+    buscaMandadoJudicialPendente.current = false;
     const lista = Array.isArray(candidatosMandadoJudicialData) ? candidatosMandadoJudicialData : [];
     setCandidatosMandadoJudicial(lista);
   }, [isMandadoJudicial, candidatosMandadoJudicialData, candidatosMandadoJudicialIsLoading, parametrosBuscaMandadoJudicial]);
@@ -538,6 +543,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
         return;
       }
 
+      buscaMandadoJudicialPendente.current = true;
       setParametrosBuscaMandadoJudicial({
         concurso_uuid: concursoValue,
         codigo_cargo: cargoCodigo || undefined,
