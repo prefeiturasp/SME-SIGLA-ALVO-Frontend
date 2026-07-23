@@ -11,6 +11,13 @@ jest.mock('react-hook-form', () => ({
       const [formKey, field] = path.split('.');
       return mockFormValues[formKey]?.[field as keyof (typeof mockFormValues)[string]];
     }),
+    setValue: jest.fn((path: string, value: unknown) => {
+      const [formKey, field] = path.split('.');
+      if (!mockFormValues[formKey]) {
+        mockFormValues[formKey] = { horaInicio: '', horaFim: '', classificacao: 1 };
+      }
+      mockFormValues[formKey][field as keyof (typeof mockFormValues)[string]] = value as never;
+    }),
     reset: jest.fn(),
     watch: jest.fn(() => mockFormValues),
   }),
@@ -37,17 +44,6 @@ jest.mock('antd', () => ({
   message: {
     error: jest.fn(),
   },
-  TimePicker: ({ onChange, value, ...props }: any) => (
-    <input
-      data-testid="time-picker"
-      value={value ? value.format('HH:mm') : ''}
-      onChange={(event) => {
-        const dayjsLib = require('dayjs');
-        onChange(event.target.value ? dayjsLib(event.target.value, 'HH:mm') : null);
-      }}
-      {...props}
-    />
-  ),
 }));
 
 import '../testHelpers/useAgendaMocks';
@@ -108,7 +104,6 @@ const criarProps = (overrides: Record<string, unknown> = {}) => ({
   cancelEdit: jest.fn(),
   saveEdit: jest.fn(() => ({ success: true })),
   calcularIntervaloClassificacao: jest.fn(() => '1ª até 30ª'),
-  verificarConflitoTempoReal: jest.fn(() => false),
   validarRedistribuicaoClassificacao: jest.fn(() => ({ valid: true })),
   cargoParaExpandir: 'Professor',
   limparExpansao: jest.fn(),
@@ -154,8 +149,8 @@ describe('AgendaTabela - CriarEditarConvocacao', () => {
     expect(validarRedistribuicaoClassificacao).toHaveBeenCalled();
   });
 
-  it('deve exibir erro inline quando intervalo de horário não é de 1 hora', async () => {
-    mockFormValues['1'] = { horaInicio: '10:00', horaFim: '12:00', classificacao: 30 };
+  it('deve exibir horário de fim somente leitura ao editar', async () => {
+    mockFormValues['1'] = { horaInicio: '10:00', horaFim: '11:00', classificacao: 30 };
 
     renderWithProviders(
       <AgendaTabela
@@ -164,8 +159,8 @@ describe('AgendaTabela - CriarEditarConvocacao', () => {
             criarPeriodo({
               id: 1,
               horaInicio: '10:00',
-              horaFim: '12:00',
-              horario: '10:00 às 12:00',
+              horaFim: '11:00',
+              horario: '10:00 às 11:00',
             }),
           ],
           editingKey: 1,
@@ -175,7 +170,8 @@ describe('AgendaTabela - CriarEditarConvocacao', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Intervalo permitido: somente 1h.')).toBeInTheDocument();
+      expect(screen.getByTestId('hora-inicio-input')).toBeInTheDocument();
+      expect(screen.getByText('11:00')).toBeInTheDocument();
     });
   });
 
@@ -351,7 +347,7 @@ describe('AgendaTabela - CriarEditarConvocacao', () => {
     expect(handleRemoverPeriodo).toHaveBeenCalledWith(1);
   });
 
-  it('deve exibir conflito de horário e toast para erro genérico ao salvar', async () => {
+  it('deve exibir toast para erro genérico ao salvar', async () => {
     const saveEdit = jest.fn(() => ({
       success: false,
       message: 'Erro inesperado ao salvar',
@@ -363,14 +359,13 @@ describe('AgendaTabela - CriarEditarConvocacao', () => {
           periodosList: [criarPeriodo({ id: 1 })],
           editingKey: 1,
           isEditing: (record: PeriodoItem) => record.id === 1,
-          verificarConflitoTempoReal: jest.fn(() => true),
           saveEdit,
         })}
       />
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Horário já existe')).toBeInTheDocument();
+      expect(screen.getByLabelText('check')).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getByLabelText('check'));
@@ -451,12 +446,10 @@ describe('AgendaTabela - CriarEditarConvocacao', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByTestId('time-picker').length).toBeGreaterThan(0);
+      expect(screen.getByTestId('hora-inicio-input')).toBeInTheDocument();
     });
 
-    const timePickers = screen.getAllByTestId('time-picker');
-    fireEvent.change(timePickers[0], { target: { value: '' } });
-    fireEvent.change(timePickers[1], { target: { value: '12:00' } });
+    fireEvent.change(screen.getByTestId('hora-inicio-input'), { target: { value: '12' } });
 
     const expandIcons = document.querySelectorAll('.anticon-down');
     fireEvent.click(expandIcons[0]);

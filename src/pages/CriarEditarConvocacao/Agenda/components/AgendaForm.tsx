@@ -5,22 +5,34 @@ import {
   DatePicker,
   Radio,
   Checkbox,
-  TimePicker,
+  Select,
   InputNumber,
   Row,
   Col,
   Typography,
 } from "antd";
-import { CalendarOutlined, CloseOutlined, PlusOutlined } from "@ant-design/icons";
+import { CalendarOutlined, ClockCircleOutlined, CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import { AppButton, AppIconButton, AppFormItem } from '@/components/ui';
 import { Controller } from "react-hook-form";
 import type { Control, FieldErrors } from "react-hook-form";
 import { agendaFormStyles } from "@/design-system/estilos";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
 const HORA_INICIO_MIN = 10;
 const HORA_FIM_MAX = 17;
+
+const HORA_OPTIONS = Array.from(
+  { length: HORA_FIM_MAX - HORA_INICIO_MIN },
+  (_, i) => {
+    const hora = HORA_INICIO_MIN + i;
+    return {
+      value: hora,
+      label: String(hora).padStart(2, "0"),
+    };
+  }
+);
 
 interface AgendaFormProps {
   agendaAberto: any;
@@ -60,28 +72,6 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
   hasAgendas,
 }) => {
   if (!agendaAberto) return null;
-
-  const disabledTime = (_date: any, type: "start" | "end") => {
-    const disabledHours = () => {
-      const hours: number[] = [];
-      for (let h = 0; h < 24; h++) {
-        const isAllowed = h >= HORA_INICIO_MIN && h <= HORA_FIM_MAX;
-        if (!isAllowed) hours.push(h);
-      }
-      // Para garantir 1h de intervalo, start não pode iniciar às 17 e end não pode terminar às 10
-      if (type === "start") {
-        if (!hours.includes(HORA_FIM_MAX)) hours.push(HORA_FIM_MAX);
-      } else {
-        if (!hours.includes(HORA_INICIO_MIN)) hours.push(HORA_INICIO_MIN);
-      }
-      return hours.sort((a, b) => a - b);
-    };
-
-    // Mantém minutos/segundos livres; a validação do intervalo (1h) acontece no schema.
-    return {
-      disabledHours,
-    };
-  };
 
   return (
     <Card
@@ -303,36 +293,31 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                   name="horaInicio"
                   control={control}
                   render={({ field }) => (
-                    <Controller
-                      name="horaFim"
-                      control={control}
-                      render={({ field: fieldFim }) => (
-                        <TimePicker.RangePicker
-                          placeholder={["Início", "Fim"]}
-                          style={agendaFormStyles.timePickerRange}
-                          format="HH:mm"
-                          disabledTime={disabledTime}
-                          onChange={async (times) => {
-                            if (times && times.length === 2) {
-                              field.onChange(times[0]);
-                              fieldFim.onChange(times[1]);
-                              // Disparar validação quando o horário mudar, especialmente para retardatário
-                              if (isRetardatario) {
-                                await trigger(['horaInicio', 'horaFim']);
-                              }
-                            } else {
-                              field.onChange(null);
-                              fieldFim.onChange(null);
-                            }
-                          }}
-                          value={field.value && fieldFim.value ? [field.value, fieldFim.value] : null}
-                          status={(formErrors.horaInicio || formErrors.horaFim) ? 'error' : undefined}
-                        />
-                      )}
+                    <Select
+                      placeholder="Início"
+                      style={agendaFormStyles.timePickerRange}
+                      options={HORA_OPTIONS}
+                      suffixIcon={<ClockCircleOutlined />}
+                      allowClear
+                      value={field.value ? dayjs(field.value).hour() : undefined}
+                      onChange={async (hora) => {
+                        if (hora != null) {
+                          const horaInicio = dayjs().hour(hora).minute(0).second(0).millisecond(0);
+                          const horaFim = horaInicio.clone().add(1, "hour");
+                          field.onChange(horaInicio);
+                          setValue("horaFim", horaFim);
+                          if (isRetardatario) {
+                            await trigger(["horaInicio", "horaFim"]);
+                          }
+                        } else {
+                          field.onChange(null);
+                          setValue("horaFim", null);
+                        }
+                      }}
+                      status={(formErrors.horaInicio || formErrors.horaFim) ? "error" : undefined}
                     />
                   )}
                 />
-                {/* Mensagens de erro para horários */}
                 {(formErrors.horaInicio || formErrors.horaFim) && (
                   <div style={agendaFormStyles.timeErrorContainer}>
                     {formErrors.horaInicio && (
