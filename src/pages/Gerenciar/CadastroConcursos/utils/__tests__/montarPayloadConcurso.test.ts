@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import {
+  detalheParaPasso1,
   detalheParaPasso2,
   detalheParaPasso3,
   formatarDataApi,
@@ -45,6 +46,23 @@ describe("detalheParaPasso2 / detalheParaPasso3", () => {
     vigencia_inicio: "2026-07-01",
     vigencia_fim: "2028-07-01",
   };
+
+  it("reidrata os campos de identificação do passo 1", () => {
+    const p1 = detalheParaPasso1({
+      ...detalhe,
+      cargos: [
+        { uuid: "c1", nome: "Professor", codigo: 10 },
+        { uuid: "c2", nome: "Diretor", codigo: 20 },
+      ],
+    });
+    expect(p1).toEqual({
+      cargos_ids: ["c1", "c2"],
+      nome: "Concurso",
+      numero_processo: "123",
+      banca_responsavel: "FGV",
+      status: "ATIVO",
+    });
+  });
 
   it("reidrata as datas do passo 2 para Dayjs", () => {
     const p2 = detalheParaPasso2(detalhe);

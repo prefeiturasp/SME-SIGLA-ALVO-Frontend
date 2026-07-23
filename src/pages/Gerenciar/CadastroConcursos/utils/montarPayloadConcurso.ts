@@ -79,6 +79,16 @@ export const montarPayloadPasso3 = (
 const dataApiParaDayjs = (data: string | null): Dayjs | undefined =>
   data ? dayjs(data) : undefined;
 
+export const detalheParaPasso1 = (
+  detalhe: IConcursoDetalhe
+): Partial<IConcursoFormFields> => ({
+  cargos_ids: (detalhe.cargos ?? []).map((cargo) => cargo.uuid),
+  nome: detalhe.nome,
+  numero_processo: detalhe.numero_processo ?? "",
+  banca_responsavel: detalhe.banca_responsavel ?? "",
+  status: detalhe.status ?? "ATIVO",
+});
+
 export const detalheParaPasso2 = (
   detalhe: IConcursoDetalhe
 ): Partial<IPublicacoesResultadosFormFields> => ({

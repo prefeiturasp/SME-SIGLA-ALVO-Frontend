@@ -29,8 +29,9 @@ export const useModoConcurso = () => {
       if (!uuid) return null;
       return `${BASE}/editar/${uuid}/passo-${stepIndex + 1}`;
     }
-    if (stepIndex === 0) return `${BASE}/adicionar/passo-1`;
-    if (!uuid) return null;
+    if (!uuid) {
+      return stepIndex === 0 ? `${BASE}/adicionar/passo-1` : null;
+    }
     return `${BASE}/adicionar/${uuid}/passo-${stepIndex + 1}`;
   };
 

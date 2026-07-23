@@ -36,6 +36,22 @@ describe("useModoConcurso", () => {
     expect(result.current.getStepPath(1)).toBeNull();
   });
 
+  it("modo adicionar: passo 1 leva o uuid quando o rascunho já existe", () => {
+    const { result } = renderHook(() => useModoConcurso(), {
+      wrapper: wrapperPara(
+        "/gerenciar/concursos/adicionar/u1/passo-2",
+        "/gerenciar/concursos/adicionar/:uuid/passo-2"
+      ),
+    });
+
+    expect(result.current.isEdicao).toBe(false);
+    expect(result.current.uuidRota).toBe("u1");
+    expect(result.current.labelTela).toBe("Adicionar concurso");
+    expect(result.current.getStepPath(0, "u1")).toBe(
+      "/gerenciar/concursos/adicionar/u1/passo-1"
+    );
+  });
+
   it("modo editar: labels e paths sob /editar/:uuid", () => {
     const { result } = renderHook(() => useModoConcurso(), {
       wrapper: wrapperPara(
