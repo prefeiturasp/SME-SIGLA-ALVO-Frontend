@@ -19,7 +19,9 @@ module.exports = defineConfig({
     screenshotsFolder: 'cypress/screenshots',
     videosFolder: 'cypress/videos',
 
-    video: false,
+    // Gravação ativa localmente para permitir revisar a execução;
+    // desativada no Jenkins (CI=true) para não gerar/arquivar vídeo na esteira.
+    video: !process.env.CI,
     videoCompression: false,
     screenshotOnRunFailure: true,
 
@@ -36,7 +38,6 @@ module.exports = defineConfig({
     viewportHeight: 1080,
 
     experimentalMemoryManagement: true,
-    numTestsKeptInMemory: 0,
     watchForFileChanges: false,
 
     retries: {
@@ -81,6 +82,11 @@ module.exports = defineConfig({
       // CUCUMBER
       // =========================
       await preprocessor.addCucumberPreprocessorPlugin(on, config)
+
+      // No modo interativo (cypress open) mantém os snapshots de cada ação
+      // para permitir navegar/"viajar no tempo" pelos passos após a execução.
+      // No modo headless (cypress run / CI) mantém 0 para economizar memória.
+      config.numTestsKeptInMemory = config.isInteractive ? 50 : 0
 
       on(
         'file:preprocessor',

@@ -303,7 +303,7 @@ When('clica e seleciono um Cargo de forma aleatória', () => {
   })
 })
 
-When('clico no botão {string}', (textoBotao) => {
+When('clico no botão {string} na tela de consulta', (textoBotao) => {
   if (textoBotao.includes('Buscar')) {
     consultaSelectors.botaoBuscar().should('be.visible').click({ force: true })
   } else if (textoBotao.includes('Voltar')) {

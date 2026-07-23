@@ -22,7 +22,20 @@ const meusDadosSelectors = {
   modal: {
     container: '.ant-modal, [role="dialog"]',
     wrap: '.ant-modal-wrap, .ant-modal-root'
+  },
+
+  alterarEmail: {
+    novoEmail: '//*[@id="novo_email"]',
+    confirmacaoNovoEmail: '//*[@id="confirmacao_novo_email"]'
   }
+}
+
+const semAcento = (str) =>
+  str.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+
+const campoXPathMap = {
+  'novo e-mail': meusDadosSelectors.alterarEmail.novoEmail,
+  'confirmacao do novo e-mail': meusDadosSelectors.alterarEmail.confirmacaoNovoEmail
 }
 
 // =====================================================
@@ -118,20 +131,32 @@ Then('o modal de alterar e-mail exibe os botões {string} e {string}', (botao1, 
 })
 
 When('preencho o campo {string} no modal com {string}', (campo, valor) => {
-  cy.get(meusDadosSelectors.modal.container, { timeout: 10000 })
-    .filter(':visible')
-    .within(() => {
-      cy.contains(criarRegex(campo))
-        .closest('.ant-form-item, .ant-row, label, div')
-        .find('input')
-        .should('be.visible')
-        .clear({ force: true })
-        .type(valor, { force: true, delay: 80 })
-    })
+  const xpath = campoXPathMap[semAcento(campo)]
+
+  cy.wait(500)
+  if (xpath) {
+    cy.xpath(xpath, { timeout: 10000 })
+      .should('be.visible')
+      .clear({ force: true })
+      .type(valor, { force: true, delay: 120 })
+  } else {
+    cy.get(meusDadosSelectors.modal.container, { timeout: 10000 })
+      .filter(':visible')
+      .within(() => {
+        cy.contains(criarRegex(campo))
+          .closest('.ant-form-item')
+          .find('input')
+          .should('be.visible')
+          .clear({ force: true })
+          .type(valor, { force: true, delay: 120 })
+      })
+  }
+  cy.wait(600)
   cy.log(`✅ Campo "${campo}" preenchido com "${valor}"`)
 })
 
 When('clico em {string} no modal de alterar e-mail', (botao) => {
+  cy.wait(800)
   cy.get(meusDadosSelectors.modal.container, { timeout: 10000 })
     .filter(':visible')
     .contains('button', criarRegex(botao))

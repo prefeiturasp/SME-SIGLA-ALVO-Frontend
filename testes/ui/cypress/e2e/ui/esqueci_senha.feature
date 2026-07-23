@@ -18,6 +18,9 @@ Funcionalidade: Recuperação de Senha no Sistema SIGLA
   # CENÁRIOS ESSENCIAIS — RECUPERAÇÃO DE SENHA
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1 — Fluxo esqueci a senha com RF válido
+  # ════════════════════════════════════════════════════════════════
   @recuperacao-sucesso @critico
   Cenário: Fluxo esqueci a senha com RF válido
     Quando clico na opção "Esqueci minha senha"
@@ -30,6 +33,9 @@ Funcionalidade: Recuperação de Senha no Sistema SIGLA
     E clico no botão continuar para voltar ao login
     Então devo estar na página de login
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 2 — Fluxo esqueci a senha com RF inválido
+  # ════════════════════════════════════════════════════════════════
   @recuperacao-falha @validacao
   Cenário: Fluxo esqueci a senha com RF inválido
     Quando clico na opção "Esqueci minha senha"

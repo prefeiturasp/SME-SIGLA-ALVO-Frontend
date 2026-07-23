@@ -19,6 +19,9 @@ Funcionalidade: Login no Sistema SIGLA
   # CENÁRIOS ESSENCIAIS — LOGIN
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1 — Login com credenciais válidas
+  # ════════════════════════════════════════════════════════════════
   @login-sucesso @critico
   Cenário: Login com credenciais válidas
     Quando eu insiro credenciais válidas
@@ -26,12 +29,18 @@ Funcionalidade: Login no Sistema SIGLA
     Então devo ser redirecionado para o dashboard
     E devo visualizar a página principal do sistema
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 2 — Validação de campo senha obrigatório
+  # ════════════════════════════════════════════════════════════════
   @validacao-campo @obrigatoriedade
   Cenário: Validação de campo senha obrigatório
     Quando eu preencho o campo RF com "123456"
     E eu clico no botão de acessar
     Então devo ver mensagem "Campo Obrigatório" ou botão desabilitado
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 3 — Validação de campo RF obrigatório
+  # ════════════════════════════════════════════════════════════════
   @validacao-campo @obrigatoriedade
   Cenário: Validação de campo RF obrigatório
     Quando eu preencho o campo Senha com "SenhaTeste123"
