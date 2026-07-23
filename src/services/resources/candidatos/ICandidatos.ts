@@ -7,6 +7,16 @@ export interface ICandidato {
   [key: string]: any; // Permite campos adicionais do ConcursoCandidatoSerializer
 }
 
+export interface IReclassificacao {
+  uuid: string | null;
+  desclassificado_de: string | null;
+  nova_classificacao: string | null;
+  motivo: string;
+  executado_por: string;
+  mandado_judicial: boolean;
+  criado_em: string | null;
+}
+
 export interface ICandidatoMandadoJudicial {
   uuid: string;
   candidato: {
@@ -19,11 +29,7 @@ export interface ICandidatoMandadoJudicial {
   classificacao_pcd: number | null;
   classificacao_nna: number | null;
   codigo_cargo: string | null;
-  reclassificacao_judicial: {
-    desclassificado_de: string;
-    motivo: string;
-    criado_em: string;
-  } | null;
+  reclassificacoes: IReclassificacao[];
 }
 
 export interface IBuscarPorUuidsPayload {

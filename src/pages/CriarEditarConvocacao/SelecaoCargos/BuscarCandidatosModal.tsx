@@ -166,18 +166,13 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       parametrosMandadoJudicialProcessados.current = '';
       buscaMandadoJudicialPendente.current = false;
     }
-    // Flags de tipo omitidas de propósito: incluí-las limpa a tabela ao trocar
-    // o tipo com o modal aberto.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, cargoEmEdicao]);
 
-  // Hook para buscar candidatos normais (digitadas)
   const { candidatosData, candidatosIsLoading, fetchCandidatosNow } = useGetCandidatos(
     mostrarTabelaCandidatos && !isReposicao && !isReconvocacao && !isNovaAutorizacao, 
     parametrosBusca
   );
 
-  // Hook para buscar candidatos de reposição
   const { 
     candidatosData: candidatosReposicaoData, 
     candidatosIsLoading: candidatosReposicaoIsLoading
@@ -186,7 +181,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     parametrosBuscaReposicao
   );
 
-  // Hook para buscar candidatos de reconvocação
   const { 
     candidatosData: candidatosReconvocacaoData, 
     candidatosIsLoading: candidatosReconvocacaoIsLoading
@@ -195,7 +189,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     parametrosBuscaReconvocacao
   );
 
-  // Hook para buscar candidatos calculados (Nova Autorização)
   const { 
     candidatosData: candidatosCalculadosData, 
     candidatosIsLoading: candidatosCalculadosIsLoading
@@ -249,7 +242,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     candidatosData, candidatosIsLoading,
   ]);
 
-  // Porcentagens retornadas junto com a listagem (quando a resposta é objeto paginado)
   const porcentagemNna =
     candidatosDataFinal && !Array.isArray(candidatosDataFinal)
       ? (candidatosDataFinal as any)?.porcentagem_nna
