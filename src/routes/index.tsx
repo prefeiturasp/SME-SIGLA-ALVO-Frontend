@@ -115,6 +115,17 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
   },
   {
+    path: "/gerenciar/concursos/adicionar/:uuid/passo-1",
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="concurso" permissaoDeExibirATELA="add_concurso">
+          <IdentificacaoTela />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
     path: "/gerenciar/concursos/adicionar/:uuid/passo-2",
     element: (
       <ProtectedRoute>

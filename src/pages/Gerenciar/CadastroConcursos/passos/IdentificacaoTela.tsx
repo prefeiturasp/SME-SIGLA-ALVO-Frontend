@@ -7,6 +7,7 @@ import { useConcursoForm } from "../hooks/useConcursoForm";
 import {
   seHouveAlteracao,
   opcoesNavegacaoConcurso,
+  ROTA_LISTAGEM_CONCURSOS,
   useModoConcurso,
 } from "../hooks/useModoConcurso";
 import { usePostConcurso } from "../hooks/usePostConcurso";
@@ -16,6 +17,7 @@ import { StepActionsConcurso } from "../components/StepActionsConcurso";
 import { steps } from "../components/stepsConcurso";
 import { useConcursoSteps } from "../components/useConcursoSteps";
 import {
+  detalheParaPasso1,
   montarPayloadPasso1,
   montarPayloadStatus,
 } from "../utils/montarPayloadConcurso";
@@ -44,22 +46,14 @@ const IdentificacaoTela: React.FC = () => {
     formState: { errors, isValid, isDirty },
   } = useConcursoForm();
 
-  const { concursoData: concurso } = useGetConcursoByUuid(
-    isEdicao ? uuidRota ?? "" : ""
-  );
+  const { concursoData: concurso } = useGetConcursoByUuid(uuidRota ?? "");
 
   useEffect(() => {
-    if (isEdicao && concurso) {
-      reset({
-        cargos_ids: (concurso.cargos ?? []).map((c) => c.uuid),
-        nome: concurso.nome,
-        numero_processo: concurso.numero_processo ?? "",
-        banca_responsavel: concurso.banca_responsavel ?? "",
-        status: concurso.status ?? "ATIVO",
-      });
+    if (concurso) {
+      reset(detalheParaPasso1(concurso));
     }
 
-  }, [isEdicao, concurso]);
+  }, [concurso]);
 
   const postConcurso = usePostConcurso(true);
   const patchConcurso = usePatchConcurso(true);
@@ -108,7 +102,7 @@ const IdentificacaoTela: React.FC = () => {
       ? montarPayloadStatus(valores)
       : montarPayloadPasso1(valores);
 
-    if (isEdicao && uuidRota) {
+    if (uuidRota) {
       if (!isDirty) {
         irParaPasso2(uuidRota, houveAlteracaoAnterior);
         return;
@@ -134,7 +128,14 @@ const IdentificacaoTela: React.FC = () => {
   });
 
   const prev = () => {
-    navigate("/gerenciar/concursos");
+    if (uuidRota) {
+      navigate(
+        ROTA_LISTAGEM_CONCURSOS,
+        opcoesNavegacaoConcurso(houveAlteracaoAnterior)
+      );
+      return;
+    }
+    navigate(ROTA_LISTAGEM_CONCURSOS);
   };
 
   const cancel = () => {
