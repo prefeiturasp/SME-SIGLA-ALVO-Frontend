@@ -43,8 +43,7 @@ const convocacaoSelectors = {
     cargo: () => cy.get('input[placeholder*="Cargo"], input[placeholder*="cargo"]').first(),
     dataConvocacao: () => cy.contains('label', /Data de Convoca[çc][ãa]o/i).parent().find('input'),
     status: () => cy.contains('label', /Status/i).parent().find('input'),
-    
-    opcoes: () => cy.get('.ant-select-item-option, [role="option"]'),
+
     buscar: () => cy.contains('button', /Buscar/i),
     limpar: () => cy.contains('button', /Limpar filtros/i)
   },
@@ -165,20 +164,6 @@ const validarPermissaoNegada = (botaoFn, mensagem) => {
   cy.wait(500)
 }
 
-const selecionarOpcaoAleatoria = (seletor) => {
-  seletor.click({ force: true })
-  cy.wait(1000)
-  
-  convocacaoSelectors.filtros.opcoes().then(($opcoes) => {
-    const total = $opcoes.length
-    if (total > 0) {
-      const indiceAleatorio = Math.floor(Math.random() * total)
-      cy.wrap($opcoes[indiceAleatorio]).click({ force: true })
-      cy.wait(500)
-    }
-  })
-}
-
 // =====================================================
 // STEPS — CONTEXTO (ESPECÍFICO)
 // =====================================================
@@ -262,7 +247,7 @@ Then('valido a existência dos campos de filtro de convocação:', (dataTable) =
 })
 
 When('seleciono um concurso aleatório para convocação', () => {
-  selecionarOpcaoAleatoria(convocacaoSelectors.filtros.concurso())
+  cy.selecionarOpcaoAntd(convocacaoSelectors.filtros.concurso, 'aleatoria')
 })
 
 Then('valido a existência dos botões de filtro de convocação', () => {
@@ -271,7 +256,7 @@ Then('valido a existência dos botões de filtro de convocação', () => {
 })
 
 Given('realizo uma busca de convocação com filtros válidos', () => {
-  selecionarOpcaoAleatoria(convocacaoSelectors.filtros.concurso())
+  cy.selecionarOpcaoAntd(convocacaoSelectors.filtros.concurso, 'aleatoria')
   convocacaoSelectors.filtros.buscar().click({ force: true })
   cy.wait(3000)
 })

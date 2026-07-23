@@ -22,17 +22,7 @@ Then('o campo Processo está visível na tela de gerenciamento de vagas', () => 
 })
 
 When('seleciono uma opção aleatória no campo Processo do gerenciamento de vagas', () => {
-  selecionarProcesso().click({ force: true })
-  cy.wait(1000)
-  cy.get('.ant-select-dropdown .ant-select-item-option', { timeout: 8000 }).then(($opcoes) => {
-    if ($opcoes.length > 0) {
-      const indice = Math.floor(Math.random() * Math.min($opcoes.length, 5))
-      cy.wrap($opcoes.eq(indice)).click({ force: true })
-      cy.wait(1500)
-    } else {
-      cy.log('Nenhuma opção de processo disponível no momento')
-    }
-  })
+  cy.selecionarOpcaoAntd(selecionarProcesso, 'aleatoria')
 })
 
 Then('o sistema carrega os dados do processo selecionado no gerenciamento de vagas', () => {
