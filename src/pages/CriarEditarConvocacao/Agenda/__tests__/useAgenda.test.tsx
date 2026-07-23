@@ -689,13 +689,19 @@ describe('useAgenda - CriarEditarConvocacao', () => {
       ]);
     });
 
-    expect(
-      result.current.saveEdit(1, criarPeriodo({ id: 1 }), {
-        classificacao: 5,
-        horaInicio: '11:00',
-        horaFim: '12:00',
-      }).success
-    ).toBe(false);
+    act(() => {
+      expect(
+        result.current.saveEdit(1, criarPeriodo({ id: 1 }), {
+          classificacao: 5,
+          horaInicio: '11:00',
+          horaFim: '12:00',
+        }).success
+      ).toBe(true);
+    });
+
+    expect(result.current.periodosList.find((p) => p.id === 1)?.horaInicio).toBe('11:00');
+    expect(result.current.periodosList.find((p) => p.id === 2)?.horaInicio).toBe('12:00');
+    expect(result.current.periodosList.find((p) => p.id === 2)?.horaFim).toBe('13:00');
 
     mockMutateAsyncDelete.mockRejectedValue(new Error('delete falhou'));
     act(() => {
