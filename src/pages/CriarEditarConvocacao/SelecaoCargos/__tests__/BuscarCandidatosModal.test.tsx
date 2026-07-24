@@ -360,30 +360,14 @@ describe('BuscarCandidatosModal - Mandado Judicial', () => {
     expect(screen.queryByRole('radio', { name: 'Mandado Judicial' })).not.toBeInTheDocument();
   });
 
-  it('exibe o campo Nome no lugar dos campos de quantidade', () => {
+  it('não exibe campo Nome nem campos de quantidade', () => {
     render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
 
-    expect(screen.getByLabelText('Nome')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Nome')).not.toBeInTheDocument();
     expect(screen.queryByPlaceholderText('00')).not.toBeInTheDocument();
   });
 
-  it('busca pelo nome enviando concurso e cargo', async () => {
-    const user = userEvent.setup();
-    render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
-
-    await user.type(screen.getByLabelText('Nome'), 'Ana');
-    await user.click(screen.getByRole('button', { name: /buscar/i }));
-
-    await waitFor(() => {
-      expect(mockUseGetCandidatosMandadoJudicial).toHaveBeenCalledWith(true, {
-        concurso_uuid: 'conc-1',
-        codigo_cargo: 'P001',
-        nome: 'Ana',
-      });
-    });
-  });
-
-  it('busca sem nome quando o campo está vazio', async () => {
+  it('lista todos os candidatos ao clicar em Buscar', async () => {
     const user = userEvent.setup();
     render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
 
@@ -393,7 +377,6 @@ describe('BuscarCandidatosModal - Mandado Judicial', () => {
       expect(mockUseGetCandidatosMandadoJudicial).toHaveBeenCalledWith(true, {
         concurso_uuid: 'conc-1',
         codigo_cargo: 'P001',
-        nome: undefined,
       });
     });
   });
