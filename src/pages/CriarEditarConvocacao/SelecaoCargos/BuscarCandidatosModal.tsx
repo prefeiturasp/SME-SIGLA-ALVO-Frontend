@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Modal, Typography, message, Spin, Radio, Divider } from 'antd';
-import { AppButton, AppIconButton, AppInput, DeleteActionIcon } from '@/components/ui';
+import { AppButton, AppIconButton, DeleteActionIcon } from '@/components/ui';
 import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
 import { ModalTitle } from "@/components/ui";
@@ -74,8 +74,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const [parametrosBuscaReconvocacao, setParametrosBuscaReconvocacao] = useState<{ concurso_uuid: string; quantidade: number } | undefined>(undefined);
   // Parâmetros para busca de candidatos calculados (Nova Autorização)
   const [parametrosBuscaCalculados, setParametrosBuscaCalculados] = useState<{ concurso_uuid: string; processo_uuid?: string; quantidade: number; codigo_cargo?: string } | undefined>(undefined);
-  const [nomeMandadoJudicial, setNomeMandadoJudicial] = useState('');
-  const [parametrosBuscaMandadoJudicial, setParametrosBuscaMandadoJudicial] = useState<{ concurso_uuid: string; codigo_cargo?: string; nome?: string } | undefined>(undefined);
+  const [parametrosBuscaMandadoJudicial, setParametrosBuscaMandadoJudicial] = useState<{ concurso_uuid: string; codigo_cargo?: string } | undefined>(undefined);
   const [candidatosMandadoJudicial, setCandidatosMandadoJudicial] = useState<any[]>([]);
 
   // Refs para rastrear se já processamos os UUIDs (evitar loops infinitos)
@@ -119,7 +118,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       setParametrosBusca(undefined);
       setParametrosBuscaReposicao(undefined);
       setParametrosBuscaReconvocacao(undefined);
-      setNomeMandadoJudicial('');
       setParametrosBuscaMandadoJudicial(undefined);
       setCandidatosMandadoJudicial([]);
       // Resetar refs quando o modal fechar
@@ -160,7 +158,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       setParametrosBuscaReposicao(undefined);
       setParametrosBuscaReconvocacao(undefined);
       setParametrosBuscaCalculados(undefined);
-      setNomeMandadoJudicial('');
       setParametrosBuscaMandadoJudicial(undefined);
       setCandidatosMandadoJudicial([]);
       parametrosMandadoJudicialProcessados.current = '';
@@ -538,8 +535,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       buscaMandadoJudicialPendente.current = true;
       setParametrosBuscaMandadoJudicial({
         concurso_uuid: concursoValue,
-        codigo_cargo: cargoCodigo || undefined,
-        nome: nomeMandadoJudicial.trim() || undefined
+        codigo_cargo: cargoCodigo || undefined
       });
       setMostrarTabelaCandidatos(true);
       return;
@@ -760,25 +756,16 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
         </div>
 
         <div style={modalInlineStyles.infoSection}>
-          {/* Primeira linha - Autorizações Digitadas */}
+          {/* Primeira linha - Autorizações Digitadas (Mandado Judicial não digita quantidades) */}
+          {!isMandadoJudicial && (
           <div style={modalInlineStyles.inputsRow}>
             <div style={modalInlineStyles.inputsLabel}>
               <span className="modal-section-label">
-                {isMandadoJudicial ? 'Nome:' : 'Autorizações Digitadas:'}
+                Autorizações Digitadas:
               </span>
             </div>
-            <div style={isMandadoJudicial ? { ...modalInlineStyles.inputsContainer, flex: 1 } : modalInlineStyles.inputsContainer}>
-              {isMandadoJudicial ? (
-                <AppInput
-                  aria-label="Nome"
-                  value={nomeMandadoJudicial}
-                  onChange={(e) => setNomeMandadoJudicial(e.target.value)}
-                  onPressEnter={handleBuscar}
-                  placeholder="Digite o nome do candidato"
-                  allowClear
-                  style={{ width: '100%' }}
-                />
-              ) : isReconvocacao ? (
+            <div style={modalInlineStyles.inputsContainer}>
+              {isReconvocacao ? (
                 // Para Reposição: apenas um campo numérico único
                 <div style={modalStyles.actionButtonContainer}>
                   <input
@@ -872,6 +859,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
               )}
             </div>
           </div>
+          )}
 
           {/* Segunda linha - Vagas utilizadas */}
           <div style={modalInlineStyles.vagasRow}>
