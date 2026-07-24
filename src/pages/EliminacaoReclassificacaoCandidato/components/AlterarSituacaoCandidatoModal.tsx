@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Input, message } from "antd";
+import { Modal, Input, Checkbox, message } from "antd";
 import { usePostHabilitadoEliminar } from "../hooks/usePostHabilitadoEliminar";
 import { usePostReclassificarCandidato } from "../hooks/usePostReclassificarCandidato";
 
 import { AppButton, StyledSelect, AppFormItem, ModalInfoLabel, ModalInfoValue, InlineInfoItem } from '@/components/ui';
+
+export type ReclassificacaoResumo = {
+  desclassificado_de: string;
+  mandado_judicial?: boolean;
+};
+
 type Props = {
   open: boolean;
   nomeCandidato: string;
@@ -11,6 +17,7 @@ type Props = {
   hasPCD?: boolean;
   hasNNA?: boolean;
   reclassificadosDe?: string[];
+  reclassificacoes?: ReclassificacaoResumo[];
   concursoUuid?: string;
   concursoLabel?: string;
   cargoUuid?: string;
@@ -27,6 +34,7 @@ const AlterarSituacaiCandidatoModal: React.FC<Props> = ({
   hasPCD = false,
   hasNNA = false,
   reclassificadosDe = [],
+  reclassificacoes = [],
   concursoUuid,
   concursoLabel,
   cargoUuid,
@@ -37,17 +45,35 @@ const AlterarSituacaiCandidatoModal: React.FC<Props> = ({
 }) => {
   const [situacao, setSituacao] = useState<string>("");
   const [motivo, setMotivo] = useState<string>("");
+  const [mandadoJudicial, setMandadoJudicial] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const eliminarMutation = usePostHabilitadoEliminar();
   const reclassificarMutation = usePostReclassificarCandidato();
+
+  // Reclassificações passíveis de reversão por mandado (as que ainda
+  // não foram revertidas por mandado judicial).
+  const reclassificacoesReversiveis = reclassificacoes.filter(
+    (rec) => !rec.mandado_judicial && rec.desclassificado_de
+  );
+  const hasReclassificacao =
+    reclassificacoesReversiveis.length > 0 || reclassificadosDe.length > 0;
+
   useEffect(() => {
     if (open) {
       // Não pré-selecionar valor para forçar escolha explícita
       setSituacao("");
       setMotivo("");
+      setMandadoJudicial(false);
       setSubmitting(false);
     }
   }, [open, situacaoInicial]);
+
+  // Ao alternar o checkbox, limpar a situação selecionada, pois as
+  // opções do select mudam entre os dois modos.
+  const handleToggleMandado = (checked: boolean) => {
+    setMandadoJudicial(checked);
+    setSituacao("");
+  };
 
   const submitAlteracao = async () => {
     if (!situacao) {
@@ -56,7 +82,14 @@ const AlterarSituacaiCandidatoModal: React.FC<Props> = ({
     }
     try {
       setSubmitting(true);
-      if (situacao === "ELIMINAR") {
+      if (mandadoJudicial) {
+        await reclassificarMutation.mutateAsync({
+          candidato_uuid: candidatoUuid,
+          desclassificar_de: situacao,
+          motivo,
+          mandado_judicial: true,
+        });
+      } else if (situacao === "ELIMINAR") {
         await eliminarMutation.mutateAsync({ candidato_uuid: candidatoUuid, motivo });
       } else {
         await reclassificarMutation.mutateAsync({
@@ -102,6 +135,15 @@ const AlterarSituacaiCandidatoModal: React.FC<Props> = ({
           <ModalInfoValue>{nomeCandidato || "—"}</ModalInfoValue>
         </InlineInfoItem>
 
+        {hasReclassificacao && (
+          <Checkbox
+            checked={mandadoJudicial}
+            onChange={(e) => handleToggleMandado(e.target.checked)}
+          >
+            Mandado judicial
+          </Checkbox>
+        )}
+
         <AppFormItem label="Situação" labelCol={{ span: 24 }}>
           <StyledSelect
             style={{ width: "100%" }}
@@ -109,19 +151,34 @@ const AlterarSituacaiCandidatoModal: React.FC<Props> = ({
             onChange={(value: unknown) => setSituacao(String(value))}
             placeholder="Selecione a situação"
           >
-            <StyledSelect.Option value="ELIMINAR">Eliminar</StyledSelect.Option>
-            <StyledSelect.Option
-              value="NNA"
-              disabled={!hasNNA || reclassificadosDe.includes("NNA")}
-            >
-              Desclassificar NNA
-            </StyledSelect.Option>
-            <StyledSelect.Option
-              value="PCD"
-              disabled={!hasPCD || reclassificadosDe.includes("PCD")}
-            >
-              Desclassificar PCD
-            </StyledSelect.Option>
+            {mandadoJudicial
+              ? reclassificacoesReversiveis.map((rec) => (
+                  <StyledSelect.Option
+                    key={rec.desclassificado_de}
+                    value={rec.desclassificado_de}
+                  >
+                    {`Reclassificar para ${rec.desclassificado_de}`}
+                  </StyledSelect.Option>
+                ))
+              : [
+                  <StyledSelect.Option key="ELIMINAR" value="ELIMINAR">
+                    Eliminar
+                  </StyledSelect.Option>,
+                  <StyledSelect.Option
+                    key="NNA"
+                    value="NNA"
+                    disabled={!hasNNA || reclassificadosDe.includes("NNA")}
+                  >
+                    Desclassificar NNA
+                  </StyledSelect.Option>,
+                  <StyledSelect.Option
+                    key="PCD"
+                    value="PCD"
+                    disabled={!hasPCD || reclassificadosDe.includes("PCD")}
+                  >
+                    Desclassificar PCD
+                  </StyledSelect.Option>,
+                ]}
           </StyledSelect>
         </AppFormItem>
 

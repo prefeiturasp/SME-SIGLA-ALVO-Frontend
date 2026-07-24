@@ -61,6 +61,9 @@ export const MAX_CANDIDATOS_POR_AGENDA = 30;
 export const MENSAGEM_LIMITE_REDISTRIBUICAO =
   "O valor não pode ser alterado pois ultrapassaria o limite de 30 candidatos nas outras agendas.";
 
+export const HORA_INICIO_MAX_AGENDA = 16;
+export const MENSAGEM_LIMITE_HORA_INICIO = "Hora de início de uma das sessões chegou no limite de 16h";
+
 export const ordenarSessoesPresenciais = (periodos: PeriodoItem[], cargo: string) =>
   periodos
     .filter((periodo) => periodo.cargo === cargo && !periodo.isRetardatario && periodo.tipoEscolha === "PRESENCIAL")
@@ -70,6 +73,104 @@ export const ordenarSessoesPresenciais = (periodos: PeriodoItem[], cargo: string
       }
       return a.horario.localeCompare(b.horario);
     });
+
+const toMinutesHorario = (time: string | number | undefined): number => {
+  if (!time || typeof time !== "string") return 0;
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + (minutes || 0);
+};
+
+const fromMinutesHorario = (totalMinutes: number): string => {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+};
+
+const horariosSobrepostos = (
+  inicio1: string,
+  fim1: string,
+  inicio2: string,
+  fim2: string
+): boolean =>
+  toMinutesHorario(inicio1) < toMinutesHorario(fim2) &&
+  toMinutesHorario(fim1) > toMinutesHorario(inicio2);
+
+export const buildHorarioFields = (horaInicio: string, horaFim: string) => ({
+  horaInicio,
+  horaFim,
+  horario: `${horaInicio} às ${horaFim}`,
+  horaInicioOriginal: dayjs(`2000-01-01 ${horaInicio}`),
+  horaFimOriginal: dayjs(`2000-01-01 ${horaFim}`),
+});
+
+/** Empurra agendas seguintes (+1h em cadeia) quando o novo horário conflita com elas. */
+export const calcularCascataHorarios = (
+  periodos: PeriodoItem[],
+  key: number,
+  novaHoraInicio: string,
+  novaHoraFim: string
+):
+  | { ok: true; updates: Map<number, ReturnType<typeof buildHorarioFields>> }
+  | { ok: false; message: string } => {
+  const periodoAtual = periodos.find((p) => p.id === key);
+  const updates = new Map<number, ReturnType<typeof buildHorarioFields>>();
+  updates.set(key, buildHorarioFields(novaHoraInicio, novaHoraFim));
+
+  if (!periodoAtual || periodoAtual.isRetardatario || periodoAtual.tipoEscolha !== "PRESENCIAL") {
+    return { ok: true, updates };
+  }
+
+  const sessoesMesmaData = ordenarSessoesPresenciais(periodos, periodoAtual.cargo).filter(
+    (p) => p.dataEscolha === periodoAtual.dataEscolha
+  );
+  const idx = sessoesMesmaData.findIndex((p) => p.id === key);
+  if (idx === -1) {
+    return { ok: true, updates };
+  }
+
+  for (let i = 0; i < idx; i++) {
+    const anterior = sessoesMesmaData[i];
+    if (
+      anterior.horaInicio &&
+      anterior.horaFim &&
+      horariosSobrepostos(novaHoraInicio, novaHoraFim, anterior.horaInicio, anterior.horaFim)
+    ) {
+      return {
+        ok: false,
+        message: "Horário conflita com uma agenda anterior. Escolha um horário posterior.",
+      };
+    }
+  }
+
+  let prevFimMin = toMinutesHorario(novaHoraFim);
+
+  for (let i = idx + 1; i < sessoesMesmaData.length; i++) {
+    const sessao = sessoesMesmaData[i];
+    const inicioMin = toMinutesHorario(sessao.horaInicio);
+
+    if (inicioMin < prevFimMin) {
+      const novoInicioMin = prevFimMin;
+      const novoFimMin = novoInicioMin + 60;
+
+      if (novoInicioMin > HORA_INICIO_MAX_AGENDA * 60) {
+        return {
+          ok: false,
+          message: MENSAGEM_LIMITE_HORA_INICIO,
+        };
+      }
+
+      updates.set(
+        sessao.id,
+        buildHorarioFields(fromMinutesHorario(novoInicioMin), fromMinutesHorario(novoFimMin))
+      );
+      prevFimMin = novoFimMin;
+    } else {
+      prevFimMin = toMinutesHorario(sessao.horaFim) || prevFimMin;
+    }
+  }
+
+  return { ok: true, updates };
+};
 
 export const simularRedistribuicaoClassificacao = (
   sessoesOrdenadas: PeriodoItem[],
@@ -1164,6 +1265,11 @@ export const useAgenda = () => {
   // Função para salvar edição (apenas em memória, sem fazer request)
   const saveEdit = (key: number, periodoDataItem: PeriodoItem, values: any) => {
     if (values.classificacao) {
+      let cascata:
+        | { ok: true; updates: Map<number, ReturnType<typeof buildHorarioFields>> }
+        | { ok: false; message: string }
+        | null = null;
+
       // Se for tipo Presencial, verificar horários
       if (periodoDataItem?.tipoEscolha === "PRESENCIAL") {
         if (!values.horaInicio || !values.horaFim) {
@@ -1176,10 +1282,15 @@ export const useAgenda = () => {
         if (!inicio.isValid() || !fim.isValid() || fim.diff(inicio, "minute") !== 60) {
           return { success: false, message: "Intervalo permitido: somente 1h." };
         }
-        
-        // Verificar se o horário já existe na mesma data
-        if (verificarHorarioExistente(key, values.horaInicio, values.horaFim)) {
-          return { success: false, message: 'Este horário já existe na mesma data. Escolha outro horário.' };
+
+        cascata = calcularCascataHorarios(
+          periodosList,
+          key,
+          values.horaInicio,
+          values.horaFim
+        );
+        if (!cascata.ok) {
+          return { success: false, message: cascata.message };
         }
       }
 
@@ -1196,33 +1307,29 @@ export const useAgenda = () => {
           message: validacaoRedistribuicao.message || "Valor inválido para redistribuição.",
         };
       }
-      
-      let horarioFormatado: string;
-      let horaInicioOriginal: any = null;
-      let horaFimOriginal: any = null;
-      
-      if (periodoDataItem?.tipoEscolha === "PRESENCIAL" && values.horaInicio && values.horaFim) {
-        horarioFormatado = `${values.horaInicio} às ${values.horaFim}`;
-        try {
-          horaInicioOriginal = dayjs(`2000-01-01 ${values.horaInicio}`);
-          horaFimOriginal = dayjs(`2000-01-01 ${values.horaFim}`);
-        } catch (e) {
-          console.error('Erro ao criar objetos dayjs:', e);
-        }
-      } else {
-        horarioFormatado = periodoDataItem?.tipoEscolha === "ONLINE" ? "Online" : (periodoDataItem?.horario || "—");
+
+      if (cascata?.ok) {
+        setPeriodosList((prev) =>
+          prev.map((periodo) => {
+            const horarioUpdate = cascata!.ok ? cascata.updates.get(periodo.id) : undefined;
+            return horarioUpdate ? { ...periodo, ...horarioUpdate } : periodo;
+          })
+        );
       }
-      
-      const updates = { 
-        horaInicio: values.horaInicio,
-        horaFim: values.horaFim,
-        horario: horarioFormatado,
-        horaInicioOriginal: horaInicioOriginal,
-        horaFimOriginal: horaFimOriginal,
-        classificacao: classificacaoNumerica
+
+      const updates: Partial<PeriodoItem> = {
+        classificacao: classificacaoNumerica,
       };
+
+      if (periodoDataItem?.tipoEscolha !== "PRESENCIAL") {
+        updates.horario =
+          periodoDataItem?.tipoEscolha === "ONLINE"
+            ? "Online"
+            : periodoDataItem?.horario || "—";
+      }
+
       handleUpdatePeriodo(key, updates);
-      
+
       setEditingKey(null);
       return { success: true };
     }

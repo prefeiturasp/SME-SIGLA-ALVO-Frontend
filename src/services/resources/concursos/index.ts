@@ -79,7 +79,7 @@ export const listarConcursos = (
 };
 
 export const postConcurso = (
-  payload: IConcursoPayload,
+  payload: Partial<IConcursoPayload>,
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();

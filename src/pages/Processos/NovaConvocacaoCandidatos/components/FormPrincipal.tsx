@@ -101,6 +101,7 @@ const FormPrincipal: React.FC<FormPrincipalProps> = ({
                   { value: "NOVA_AUTORIZACAO", label: "Nova Autorização" },
                   { value: "REPOSICAO", label: "Reposição" },
                   { value: "RECONVOCAO", label: "Reconvocação" },
+                  { value: "MANDADO_JUDICIAL", label: "Mandado Judicial" },
                 ]}
                 disabled={isViewMode}
                 suffixIcon={

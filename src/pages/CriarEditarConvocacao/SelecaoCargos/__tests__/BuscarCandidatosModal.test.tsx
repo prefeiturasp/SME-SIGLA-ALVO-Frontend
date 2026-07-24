@@ -8,6 +8,7 @@ const mockUseGetCandidatos = jest.fn();
 const mockUseGetCandidatosReposicao = jest.fn();
 const mockUseGetCandidatosReconvocacao = jest.fn();
 const mockUseGetCandidatosCalculados = jest.fn();
+const mockUseGetCandidatosMandadoJudicial = jest.fn();
 const mockUseGetVagasPorProcessoECargo = jest.fn();
 
 jest.mock('../hooks/useGetCandidatos', () => ({
@@ -21,6 +22,9 @@ jest.mock('../hooks/useGetCandidatosReconvocacao', () => ({
 }));
 jest.mock('../hooks/useGetCandidatosCalculados', () => ({
   useGetCandidatosCalculados: (...args: unknown[]) => mockUseGetCandidatosCalculados(...args),
+}));
+jest.mock('../hooks/useGetCandidatosMandadoJudicial', () => ({
+  useGetCandidatosMandadoJudicial: (...args: unknown[]) => mockUseGetCandidatosMandadoJudicial(...args),
 }));
 jest.mock('../hooks/useGetVagasPorProcessoECargo', () => ({
   useGetVagasPorProcessoECargo: (...args: unknown[]) => mockUseGetVagasPorProcessoECargo(...args),
@@ -68,6 +72,10 @@ describe('BuscarCandidatosModal', () => {
       candidatosIsLoading: false,
     });
     mockUseGetCandidatosCalculados.mockReturnValue({
+      candidatosData: null,
+      candidatosIsLoading: false,
+    });
+    mockUseGetCandidatosMandadoJudicial.mockReturnValue({
       candidatosData: null,
       candidatosIsLoading: false,
     });
@@ -291,5 +299,220 @@ describe('BuscarCandidatosModal', () => {
     );
     const [editInput] = screen.getAllByPlaceholderText('00');
     expect(editInput).toHaveValue('4');
+  });
+});
+
+describe('BuscarCandidatosModal - Mandado Judicial', () => {
+  const mockOnClose = jest.fn();
+  const mockOnSelecionados = jest.fn();
+  const mockOnUuidsChange = jest.fn();
+
+  const mandadoJudicialProps = {
+    visible: true,
+    onClose: mockOnClose,
+    concurso: 'Concurso SME',
+    concursoValue: 'conc-1',
+    cargo: 'Professor',
+    cargoCodigo: 'P001',
+    cargoUuid: 'cargo-1',
+    processoUuid: 'proc-1',
+    tipoEscolha: 'MANDADO_JUDICIAL',
+    onCandidatosSelecionados: mockOnSelecionados,
+    onCandidatosUuidsChange: mockOnUuidsChange,
+  };
+
+  const candidatosResponse = [
+    { uuid: 'c1', candidato: { uuid: 'cand-1', nome: 'Ana Judicial', cpf: '111' }, categoria_efetiva: 'GERAL', classificacao: 3 },
+    { uuid: 'c2', candidato: { uuid: 'cand-2', nome: 'Bruno Judicial', cpf: '222' }, categoria_efetiva: 'PCD', classificacao_pcd: 1 },
+  ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    mockUseGetVagasPorProcessoECargo.mockReturnValue({
+      vagasIsLoading: false,
+      totalVagas: 5,
+    });
+    mockUseGetCandidatos.mockReturnValue({
+      candidatosData: null,
+      candidatosIsLoading: false,
+      fetchCandidatosNow: jest.fn(),
+    });
+    mockUseGetCandidatosReposicao.mockReturnValue({ candidatosData: null, candidatosIsLoading: false });
+    mockUseGetCandidatosReconvocacao.mockReturnValue({ candidatosData: null, candidatosIsLoading: false });
+    mockUseGetCandidatosCalculados.mockReturnValue({ candidatosData: null, candidatosIsLoading: false });
+    mockUseGetCandidatosMandadoJudicial.mockReturnValue({ candidatosData: null, candidatosIsLoading: false });
+
+    jest.spyOn(message, 'error').mockImplementation(jest.fn());
+  });
+
+  it('seleciona Mandado Judicial e desabilita os demais tipos', () => {
+    render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
+
+    expect(screen.getByRole('radio', { name: 'Mandado Judicial' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Calculada' })).toBeDisabled();
+    expect(screen.getByRole('radio', { name: 'Digitadas' })).toBeDisabled();
+  });
+
+  it('não exibe o tipo Mandado Judicial nos demais tipos de escolha', () => {
+    render(<BuscarCandidatosModal {...mandadoJudicialProps} tipoEscolha="ESCOLHA" />);
+
+    expect(screen.queryByRole('radio', { name: 'Mandado Judicial' })).not.toBeInTheDocument();
+  });
+
+  it('não exibe campo Nome nem campos de quantidade', () => {
+    render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
+
+    expect(screen.queryByLabelText('Nome')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('00')).not.toBeInTheDocument();
+  });
+
+  it('lista todos os candidatos ao clicar em Buscar', async () => {
+    const user = userEvent.setup();
+    render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
+
+    await user.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(mockUseGetCandidatosMandadoJudicial).toHaveBeenCalledWith(true, {
+        concurso_uuid: 'conc-1',
+        codigo_cargo: 'P001',
+      });
+    });
+  });
+
+  it('exclui candidato da lista local e atualiza as vagas utilizadas', async () => {
+    const user = userEvent.setup();
+    mockUseGetCandidatosMandadoJudicial.mockReturnValue({
+      candidatosData: candidatosResponse,
+      candidatosIsLoading: false,
+    });
+
+    render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
+    await user.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Ana Judicial')).toBeInTheDocument();
+    });
+    expect(screen.getByText('2 de 5 vagas')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Excluir Ana Judicial' }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Ana Judicial')).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('1 de 5 vagas')).toBeInTheDocument();
+    expect(screen.getByText('Bruno Judicial (PcD)')).toBeInTheDocument();
+  });
+
+  it('adiciona ao cargo apenas os candidatos remanescentes', async () => {
+    const user = userEvent.setup();
+    mockUseGetCandidatosMandadoJudicial.mockReturnValue({
+      candidatosData: candidatosResponse,
+      candidatosIsLoading: false,
+    });
+
+    render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
+    await user.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Ana Judicial')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Excluir Ana Judicial' }));
+    await user.click(screen.getByRole('button', { name: 'Adicionar ao cargo' }));
+
+    expect(mockOnSelecionados).toHaveBeenCalledWith(
+      1,
+      { geral: 0, pcd: 1, nna: 0 },
+      5,
+      ['c2'],
+      undefined,
+      undefined
+    );
+  });
+
+  it('mantém as exclusões quando a mesma busca é refeita em background', async () => {
+    const user = userEvent.setup();
+    mockUseGetCandidatosMandadoJudicial.mockReturnValue({
+      candidatosData: candidatosResponse,
+      candidatosIsLoading: false,
+    });
+
+    const { rerender } = render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
+    await user.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Ana Judicial')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Excluir Ana Judicial' }));
+    await waitFor(() => {
+      expect(screen.queryByText('Ana Judicial')).not.toBeInTheDocument();
+    });
+
+    mockUseGetCandidatosMandadoJudicial.mockReturnValue({
+      candidatosData: candidatosResponse.map((item) => ({ ...item })),
+      candidatosIsLoading: false,
+    });
+    rerender(<BuscarCandidatosModal {...mandadoJudicialProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Bruno Judicial (PcD)')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Ana Judicial')).not.toBeInTheDocument();
+    expect(screen.getByText('1 de 5 vagas')).toBeInTheDocument();
+  });
+
+  it('repopula a lista ao refazer a mesma busca explicitamente', async () => {
+    const user = userEvent.setup();
+    mockUseGetCandidatosMandadoJudicial.mockReturnValue({
+      candidatosData: candidatosResponse,
+      candidatosIsLoading: false,
+    });
+
+    render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
+    await user.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Ana Judicial')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Excluir Ana Judicial' }));
+    await waitFor(() => {
+      expect(screen.queryByText('Ana Judicial')).not.toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Ana Judicial')).toBeInTheDocument();
+    });
+  });
+
+  it('mantém Adicionar ao cargo desabilitado sem resultados', () => {
+    render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
+
+    expect(screen.getByRole('button', { name: 'Adicionar ao cargo' })).toBeDisabled();
+  });
+
+  it('bloqueia adição quando a lista excede as vagas do cargo', async () => {
+    const user = userEvent.setup();
+    mockUseGetVagasPorProcessoECargo.mockReturnValue({
+      vagasIsLoading: false,
+      totalVagas: 1,
+    });
+    mockUseGetCandidatosMandadoJudicial.mockReturnValue({
+      candidatosData: candidatosResponse,
+      candidatosIsLoading: false,
+    });
+
+    render(<BuscarCandidatosModal {...mandadoJudicialProps} />);
+    await user.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Total de vagas excedido.')).toBeInTheDocument();
+    });
+    expect(screen.getByRole('button', { name: 'Adicionar ao cargo' })).toBeDisabled();
   });
 });

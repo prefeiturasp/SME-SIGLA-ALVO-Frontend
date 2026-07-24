@@ -3,7 +3,12 @@ import { notification } from "antd";
 import type { AxiosRequestConfig } from "axios";
 import { postReclassificarCandidato } from "../../../services/resources/candidatos";
 
-type Payload = { candidato_uuid: string; desclassificar_de: string; motivo: string };
+type Payload = {
+  candidato_uuid: string;
+  desclassificar_de: string;
+  motivo: string;
+  mandado_judicial?: boolean;
+};
 
 export const usePostReclassificarCandidato = (axiosRequestConfig?: AxiosRequestConfig) => {
   const queryClient = useQueryClient();

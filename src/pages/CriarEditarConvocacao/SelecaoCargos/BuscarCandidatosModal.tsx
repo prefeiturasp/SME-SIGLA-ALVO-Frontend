@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Modal, Typography, message, Spin, Radio, Divider } from 'antd';
-import { AppButton } from '@/components/ui';
+import { AppButton, AppIconButton, DeleteActionIcon } from '@/components/ui';
 import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
 import { ModalTitle } from "@/components/ui";
@@ -10,6 +10,7 @@ import { useGetCandidatos } from './hooks/useGetCandidatos';
 import { useGetCandidatosReposicao } from './hooks/useGetCandidatosReposicao';
 import { useGetCandidatosReconvocacao } from './hooks/useGetCandidatosReconvocacao';
 import { useGetCandidatosCalculados } from './hooks/useGetCandidatosCalculados';
+import { useGetCandidatosMandadoJudicial } from './hooks/useGetCandidatosMandadoJudicial';
 import { useGetVagasPorProcessoECargo } from './hooks/useGetVagasPorProcessoECargo';
 
 const { Title, Text } = Typography;
@@ -54,7 +55,8 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const isReposicao = tipoEscolha === 'REPOSICAO';
   const isReconvocacao = tipoEscolha === 'RECONVOCAO';
   const isNovaAutorizacao = tipoEscolha === 'NOVA_AUTORIZACAO';
-  const [tipoConvocacao, setTipoConvocacao] = useState<'calculada' | 'digitadas'>('digitadas');
+  const isMandadoJudicial = tipoEscolha === 'MANDADO_JUDICIAL';
+  const [tipoConvocacao, setTipoConvocacao] = useState<'calculada' | 'digitadas' | 'mandado_judicial'>('digitadas');
   const [autorizacoesDigitadas, setAutorizacoesDigitadas] = useState({
     geral: 0,
     def: 0,
@@ -72,11 +74,16 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   const [parametrosBuscaReconvocacao, setParametrosBuscaReconvocacao] = useState<{ concurso_uuid: string; quantidade: number } | undefined>(undefined);
   // Parâmetros para busca de candidatos calculados (Nova Autorização)
   const [parametrosBuscaCalculados, setParametrosBuscaCalculados] = useState<{ concurso_uuid: string; processo_uuid?: string; quantidade: number; codigo_cargo?: string } | undefined>(undefined);
+  const [parametrosBuscaMandadoJudicial, setParametrosBuscaMandadoJudicial] = useState<{ concurso_uuid: string; codigo_cargo?: string } | undefined>(undefined);
+  const [candidatosMandadoJudicial, setCandidatosMandadoJudicial] = useState<any[]>([]);
 
   // Refs para rastrear se já processamos os UUIDs (evitar loops infinitos)
   const uuidsProcessadosReposicao = useRef<string>('');
   const uuidsProcessadosReconvocacao = useRef<string>('');
   const uuidsProcessadosCalculados = useRef<string>('');
+  const uuidsProcessadosMandadoJudicial = useRef<string>('');
+  const parametrosMandadoJudicialProcessados = useRef<string>('');
+  const buscaMandadoJudicialPendente = useRef<boolean>(false);
 
   // Hook para buscar vagas dinamicamente
   const { vagasIsLoading, totalVagas } = useGetVagasPorProcessoECargo(
@@ -88,12 +95,14 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   // Fixar tipoConvocacao como 'digitadas' quando for Reposição ou Reconvocação
   // Fixar tipoConvocacao como 'calculada' quando for Nova Autorização
   useEffect(() => {
-    if (isReposicao || isReconvocacao) {
+    if (isMandadoJudicial) {
+      setTipoConvocacao('mandado_judicial');
+    } else if (isReposicao || isReconvocacao) {
       setTipoConvocacao('digitadas');
     } else if (isNovaAutorizacao) {
       setTipoConvocacao('calculada');
     }
-  }, [isReposicao, isReconvocacao, isNovaAutorizacao, visible]);
+  }, [isReposicao, isReconvocacao, isNovaAutorizacao, isMandadoJudicial, visible]);
 
   // Reset do estado quando o modal for fechado ou preencher quando editando
   useEffect(() => {
@@ -109,10 +118,15 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       setParametrosBusca(undefined);
       setParametrosBuscaReposicao(undefined);
       setParametrosBuscaReconvocacao(undefined);
+      setParametrosBuscaMandadoJudicial(undefined);
+      setCandidatosMandadoJudicial([]);
       // Resetar refs quando o modal fechar
       uuidsProcessadosReposicao.current = '';
       uuidsProcessadosReconvocacao.current = '';
       uuidsProcessadosCalculados.current = '';
+      uuidsProcessadosMandadoJudicial.current = '';
+      parametrosMandadoJudicialProcessados.current = '';
+      buscaMandadoJudicialPendente.current = false;
     } else if (cargoEmEdicao) {
       // Preencher campos quando estiver editando
       if (isReconvocacao) {
@@ -144,16 +158,18 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       setParametrosBuscaReposicao(undefined);
       setParametrosBuscaReconvocacao(undefined);
       setParametrosBuscaCalculados(undefined);
+      setParametrosBuscaMandadoJudicial(undefined);
+      setCandidatosMandadoJudicial([]);
+      parametrosMandadoJudicialProcessados.current = '';
+      buscaMandadoJudicialPendente.current = false;
     }
-  }, [visible, cargoEmEdicao, isReposicao, isNovaAutorizacao]);
+  }, [visible, cargoEmEdicao]);
 
-  // Hook para buscar candidatos normais (digitadas)
   const { candidatosData, candidatosIsLoading, fetchCandidatosNow } = useGetCandidatos(
     mostrarTabelaCandidatos && !isReposicao && !isReconvocacao && !isNovaAutorizacao, 
     parametrosBusca
   );
 
-  // Hook para buscar candidatos de reposição
   const { 
     candidatosData: candidatosReposicaoData, 
     candidatosIsLoading: candidatosReposicaoIsLoading
@@ -162,7 +178,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     parametrosBuscaReposicao
   );
 
-  // Hook para buscar candidatos de reconvocação
   const { 
     candidatosData: candidatosReconvocacaoData, 
     candidatosIsLoading: candidatosReconvocacaoIsLoading
@@ -171,7 +186,6 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     parametrosBuscaReconvocacao
   );
 
-  // Hook para buscar candidatos calculados (Nova Autorização)
   const { 
     candidatosData: candidatosCalculadosData, 
     candidatosIsLoading: candidatosCalculadosIsLoading
@@ -180,23 +194,51 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     parametrosBuscaCalculados
   );
 
-  // Determinar qual fonte de dados usar
-  const candidatosIsLoadingFinal = isReposicao 
-    ? candidatosReposicaoIsLoading 
-    : isReconvocacao 
-      ? candidatosReconvocacaoIsLoading 
-      : isNovaAutorizacao && tipoConvocacao === 'calculada'
-        ? candidatosCalculadosIsLoading
-        : candidatosIsLoading;
-  const candidatosDataFinal = isReposicao 
-    ? candidatosReposicaoData 
-    : isReconvocacao 
-      ? candidatosReconvocacaoData 
-      : isNovaAutorizacao && tipoConvocacao === 'calculada'
-        ? candidatosCalculadosData
-        : candidatosData;
-  
-  // Porcentagens retornadas junto com a listagem (quando a resposta é objeto paginado)
+  const {
+    candidatosData: candidatosMandadoJudicialData,
+    candidatosIsLoading: candidatosMandadoJudicialIsLoading
+  } = useGetCandidatosMandadoJudicial(
+    mostrarTabelaCandidatos && isMandadoJudicial,
+    parametrosBuscaMandadoJudicial
+  );
+
+  const { candidatosDataFinal, candidatosIsLoadingFinal } = useMemo(() => {
+    if (isMandadoJudicial) {
+      return {
+        candidatosDataFinal: candidatosMandadoJudicialData,
+        candidatosIsLoadingFinal: candidatosMandadoJudicialIsLoading,
+      };
+    }
+    if (isReposicao) {
+      return {
+        candidatosDataFinal: candidatosReposicaoData,
+        candidatosIsLoadingFinal: candidatosReposicaoIsLoading,
+      };
+    }
+    if (isReconvocacao) {
+      return {
+        candidatosDataFinal: candidatosReconvocacaoData,
+        candidatosIsLoadingFinal: candidatosReconvocacaoIsLoading,
+      };
+    }
+    if (isNovaAutorizacao && tipoConvocacao === 'calculada') {
+      return {
+        candidatosDataFinal: candidatosCalculadosData,
+        candidatosIsLoadingFinal: candidatosCalculadosIsLoading,
+      };
+    }
+    return {
+      candidatosDataFinal: candidatosData,
+      candidatosIsLoadingFinal: candidatosIsLoading,
+    };
+  }, [
+    isMandadoJudicial, candidatosMandadoJudicialData, candidatosMandadoJudicialIsLoading,
+    isReposicao, candidatosReposicaoData, candidatosReposicaoIsLoading,
+    isReconvocacao, candidatosReconvocacaoData, candidatosReconvocacaoIsLoading,
+    isNovaAutorizacao, tipoConvocacao, candidatosCalculadosData, candidatosCalculadosIsLoading,
+    candidatosData, candidatosIsLoading,
+  ]);
+
   const porcentagemNna =
     candidatosDataFinal && !Array.isArray(candidatosDataFinal)
       ? (candidatosDataFinal as any)?.porcentagem_nna
@@ -206,8 +248,21 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       ? (candidatosDataFinal as any)?.porcentagem_pcd
       : undefined;
   
-  const candidatos = mostrarTabelaCandidatos && candidatosDataFinal ? 
+  const candidatosBuscados = mostrarTabelaCandidatos && candidatosDataFinal ?
     (Array.isArray(candidatosDataFinal) ? candidatosDataFinal : candidatosDataFinal.results) : [];
+
+  const candidatos = isMandadoJudicial ? candidatosMandadoJudicial : candidatosBuscados;
+
+  useEffect(() => {
+    if (!isMandadoJudicial || candidatosMandadoJudicialIsLoading) return;
+    const chave = JSON.stringify(parametrosBuscaMandadoJudicial ?? null);
+    const buscaNova = parametrosMandadoJudicialProcessados.current !== chave;
+    if (!buscaNova && !buscaMandadoJudicialPendente.current) return;
+    parametrosMandadoJudicialProcessados.current = chave;
+    buscaMandadoJudicialPendente.current = false;
+    const lista = Array.isArray(candidatosMandadoJudicialData) ? candidatosMandadoJudicialData : [];
+    setCandidatosMandadoJudicial(lista);
+  }, [isMandadoJudicial, candidatosMandadoJudicialData, candidatosMandadoJudicialIsLoading, parametrosBuscaMandadoJudicial]);
 
   // Função para mapear categoria_efetiva para exibição
   const mapearCategoriaEfetiva = (categoria?: string): string => {
@@ -310,12 +365,28 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     }
   }, [isNovaAutorizacao, tipoConvocacao, candidatosCalculadosData, candidatosCalculadosIsLoading, onCandidatosUuidsChange, cargoUuid]);
 
+  useEffect(() => {
+    if (!isMandadoJudicial || !onCandidatosUuidsChange || !cargoUuid) return;
+    const uuids = candidatosMandadoJudicial
+      .map((item: any) => item?.uuid)
+      .filter((id: any) => typeof id === 'string');
+
+    // Criar uma chave única para verificar se já processamos esses dados
+    const chave = `${cargoUuid}-${JSON.stringify(uuids)}`;
+    if (uuidsProcessadosMandadoJudicial.current !== chave) {
+      uuidsProcessadosMandadoJudicial.current = chave;
+      onCandidatosUuidsChange(cargoUuid, uuids);
+    }
+  }, [isMandadoJudicial, candidatosMandadoJudicial, onCandidatosUuidsChange, cargoUuid]);
+
   // Calcular total baseado no tipo de escolha
-  const totalAutorizacoes = isReconvocacao 
-    ? quantidadeReposicao 
-    : isNovaAutorizacao
-      ? quantidadeNovaAutorizacao
-      : autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
+  const totalAutorizacoes = isMandadoJudicial
+    ? candidatosMandadoJudicial.length
+    : isReconvocacao
+      ? quantidadeReposicao
+      : isNovaAutorizacao
+        ? quantidadeNovaAutorizacao
+        : autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
   const isTotalValido = totalAutorizacoes > 0;
   const isTotalExcedido = totalAutorizacoes > totalVagas && totalVagas > 0;
   const hasResultadosBusca = mostrarTabelaCandidatos && !candidatosIsLoadingFinal && candidatos.length > 0;
@@ -398,6 +469,32 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
     },
   ];
 
+  const handleExcluirCandidato = (uuid: string) => {
+    setCandidatosMandadoJudicial((prev) => prev.filter((item: any) => item?.uuid !== uuid));
+  };
+
+  if (isMandadoJudicial) {
+    columns.push({
+      title: (
+        <div style={modalStyles.tableHeader}>
+          Excluir
+        </div>
+      ),
+      key: 'excluir',
+      width: '10%',
+      align: 'center',
+      render: (_: any, record: any) => (
+        <AppIconButton
+          type="link"
+          tooltip="Excluir"
+          aria-label={`Excluir ${record?.candidato?.nome || 'candidato'}`}
+          icon={<DeleteActionIcon />}
+          onClick={() => handleExcluirCandidato(record?.uuid)}
+        />
+      ),
+    });
+  }
+
   const handleNumericInput = (value: string, setter: (value: number) => void) => {
     const numericValue = value.replace(/[^0-9]/g, '');
     
@@ -429,6 +526,21 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   };
 
   const handleBuscar = async () => {
+    if (isMandadoJudicial) {
+      if (!concursoValue) {
+        message.error('Concurso não informado');
+        return;
+      }
+
+      buscaMandadoJudicialPendente.current = true;
+      setParametrosBuscaMandadoJudicial({
+        concurso_uuid: concursoValue,
+        codigo_cargo: cargoCodigo || undefined
+      });
+      setMostrarTabelaCandidatos(true);
+      return;
+    }
+
     // Para Reposição, usar quantidadeReposicao; para Nova Autorização, usar quantidadeNovaAutorizacao; caso contrário, usar a soma dos campos individuais
     const somatorio = isReconvocacao
       ? quantidadeReposicao 
@@ -533,7 +645,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
   };
 
   const handleSelecionar = () => {
-    const quantidadeCandidatos = (isReposicao || isReconvocacao || (isNovaAutorizacao && tipoConvocacao === 'calculada'))
+    const quantidadeCandidatos = (isMandadoJudicial || isReposicao || isReconvocacao || (isNovaAutorizacao && tipoConvocacao === 'calculada'))
       ? candidatos.length
       : autorizacoesDigitadas.geral + autorizacoesDigitadas.def + autorizacoesDigitadas.nna;
 
@@ -542,7 +654,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
       return;
     }
 
-    const quantidadesIndividuais = isReposicao || isReconvocacao || (isNovaAutorizacao && tipoConvocacao === 'calculada')
+    const quantidadesIndividuais = isMandadoJudicial || isReposicao || isReconvocacao || (isNovaAutorizacao && tipoConvocacao === 'calculada')
       ? {
           geral: contagensPorCategoria.geral,
           pcd: contagensPorCategoria.pcd,
@@ -625,24 +737,32 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
           <Text strong style={modalInlineStyles.convocacaoLabel}>
             Tipo de convocação
           </Text>
-          <Radio.Group 
-            onChange={(e) => !isReposicao && !isReconvocacao && !isNovaAutorizacao && setTipoConvocacao(e.target.value)} 
+          <Radio.Group
+            onChange={(e) => !isReposicao && !isReconvocacao && !isNovaAutorizacao && !isMandadoJudicial && setTipoConvocacao(e.target.value)}
             value={tipoConvocacao}
           >
-            <Radio value="calculada" disabled={isReposicao || isReconvocacao}>
+            <Radio value="calculada" disabled={isReposicao || isReconvocacao || isMandadoJudicial}>
               <span className="modal-radio-label">Calculada</span>
             </Radio>
-            <Radio value="digitadas" disabled={isNovaAutorizacao}>
+            <Radio value="digitadas" disabled={isNovaAutorizacao || isMandadoJudicial}>
               <span className="modal-radio-label">Digitadas</span>
             </Radio>
+            {isMandadoJudicial && (
+              <Radio value="mandado_judicial">
+                <span className="modal-radio-label">Mandado Judicial</span>
+              </Radio>
+            )}
           </Radio.Group>
         </div>
 
         <div style={modalInlineStyles.infoSection}>
-          {/* Primeira linha - Autorizações Digitadas */}
+          {/* Primeira linha - Autorizações Digitadas (Mandado Judicial não digita quantidades) */}
+          {!isMandadoJudicial && (
           <div style={modalInlineStyles.inputsRow}>
             <div style={modalInlineStyles.inputsLabel}>
-              <span className="modal-section-label">Autorizações Digitadas:</span>
+              <span className="modal-section-label">
+                Autorizações Digitadas:
+              </span>
             </div>
             <div style={modalInlineStyles.inputsContainer}>
               {isReconvocacao ? (
@@ -739,6 +859,7 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
               )}
             </div>
           </div>
+          )}
 
           {/* Segunda linha - Vagas utilizadas */}
           <div style={modalInlineStyles.vagasRow}>
@@ -778,7 +899,9 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
           {mostrarTabelaCandidatos && (
             <div style={modalInlineStyles.tableContainer}>
               <Text strong style={modalStyles.listTitle}>
-                Lista de Convocados por autorizações {tipoConvocacao === 'calculada' ? 'calculadas' : 'digitadas'}
+                {isMandadoJudicial
+                  ? 'Lista de Convocados por mandado judicial'
+                  : `Lista de Convocados por autorizações ${tipoConvocacao === 'calculada' ? 'calculadas' : 'digitadas'}`}
               </Text>
               
               {candidatosIsLoadingFinal && (
@@ -792,7 +915,9 @@ const BuscarCandidatosModal: React.FC<BuscarCandidatosModalProps> = ({
                 <Table
                   columns={columns}
                   dataSource={candidatos}
-                  rowKey={(_, index?: number) => index?.toString() || '0'}
+                  rowKey={(record: any, index?: number) =>
+                    record?.uuid || record?.candidato?.uuid || index?.toString() || '0'
+                  }
                   bordered
                   rowClassName={(_, index?: number) =>
                     (index || 0) % 2 === 0 ? "row-white" : "row-gray"

@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from "axios";
 import { appAxiosCandidatos } from "../../axios";
-import type { ICandidato, IBuscarPorUuidsPayload, IBuscarPorUuidsResponse } from "./ICandidatos";
+import type { ICandidato, ICandidatoMandadoJudicial, IBuscarPorUuidsPayload, IBuscarPorUuidsResponse } from "./ICandidatos";
 import type { PaginatedResponse } from "../../../types/IListRequest";
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
@@ -13,6 +13,7 @@ export const URL = {
   getCandidatosHabilitadosReposicao: () => `/api/v1/habilitados/reposicao/`,
   getCandidatosHabilitadosReconvocacao: () => `/api/v1/habilitados/reconvocacao/`,
   getCandidatosHabilitadosCalculados: () => `/api/v1/habilitados/calculados/`,
+  getCandidatosHabilitadosMandadoJudicial: () => `/api/v1/habilitados/mandado-judicial/`,
   patchCandidatosHabilitadosConvocados: () => `/api/v1/habilitados/convocar/`,
   patchCandidatosHabilitadosDesconvocados: () => `/api/v1/habilitados/desconvocar/`,
   postBuscarPorUuids: () => `/api/v1/habilitados/buscar-por-uuids/`,
@@ -128,9 +129,13 @@ export const postHabilitadoEliminar = (
   };
 };
 
-// POST reclassificar candidato
 export const postReclassificarCandidato = (
-  payload: { candidato_uuid: string; desclassificar_de: string; motivo: string },
+  payload: {
+    candidato_uuid: string;
+    desclassificar_de: string;
+    motivo: string;
+    mandado_judicial?: boolean;
+  },
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
@@ -211,6 +216,28 @@ export const getCandidatosHabilitadosReconvocacao = (
 
   const response = appAxiosCandidatos
     .get<ICandidato[]>(URL.getCandidatosHabilitadosReconvocacao(), {
+      params,
+      paramsSerializer: queryParamsSerializer,
+      signal,
+      ...axiosRequestConfig,
+    })
+    .then((response) => response.data);
+
+  return {
+    response,
+    abort,
+  };
+};
+
+// TODO adicionar JWT no header Authorization
+export const getCandidatosHabilitadosMandadoJudicial = (
+  params: { concurso_uuid: string; codigo_cargo?: string; nome?: string },
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
+  const { signal, abort } = new AbortController();
+
+  const response = appAxiosCandidatos
+    .get<ICandidatoMandadoJudicial[]>(URL.getCandidatosHabilitadosMandadoJudicial(), {
       params,
       paramsSerializer: queryParamsSerializer,
       signal,

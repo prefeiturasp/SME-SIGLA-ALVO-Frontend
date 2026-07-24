@@ -67,7 +67,6 @@ const AgendaTela: React.FC = () => {
     cancelEdit,
     saveEdit,
     calcularIntervaloClassificacao,
-    verificarConflitoTempoReal,
     validarRedistribuicaoClassificacao,
     cargoParaExpandir,
     limparExpansao,
@@ -317,7 +316,6 @@ const AgendaTela: React.FC = () => {
               cancelEdit={cancelEdit}
               saveEdit={saveEdit}
               calcularIntervaloClassificacao={calcularIntervaloClassificacao}
-              verificarConflitoTempoReal={verificarConflitoTempoReal}
               validarRedistribuicaoClassificacao={validarRedistribuicaoClassificacao}
               cargoParaExpandir={cargoParaExpandir}
               limparExpansao={limparExpansao}

@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../../services";
-import type { AxiosRequestConfig } from "axios";
- 
-export const useGetConcursoByUuid = (uuid: string, axiosRequestConfig?: AxiosRequestConfig) => {
+import type { AxiosRequestConfig } from "axios"; 
+
+export const useGetConcursoByUuid = (
+  uuid: string,
+  axiosRequestConfig?: AxiosRequestConfig
+) => {
   const { data: concursoData, isLoading: concursoIsLoading } = useQuery({
     queryKey: ["getConcursoByUuid", uuid],
     queryFn: ({ signal }) =>

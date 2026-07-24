@@ -34,6 +34,17 @@ export const AppFormItemStyled = styled(FormItem)`
     height: ${tokens.controlHeight}px;
   }
 
+  /* Select multiplo cresce em altura quando as tags passam de uma linha */
+  .ant-select-multiple {
+    height: auto;
+    min-height: ${tokens.controlHeight}px;
+
+    .ant-select-selector {
+      height: auto;
+      min-height: ${tokens.controlHeight}px;
+    }
+  }
+
   .ant-form-item-label {
     padding-bottom: 0;
     margin-bottom: 0.75rem;

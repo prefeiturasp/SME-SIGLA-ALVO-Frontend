@@ -12,6 +12,7 @@ const TIPO_ESCOLHA_LABELS: Record<string, string> = {
   NOVA_AUTORIZACAO: "Nova Autorização",
   REPOSICAO: "Reposição",
   RECONVOCAO: "Reconvocação",
+  MANDADO_JUDICIAL: "Mandado Judicial",
 };
 
 function getTipoEscolhaLabel(value: string | undefined): string {

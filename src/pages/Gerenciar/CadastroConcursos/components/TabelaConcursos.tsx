@@ -28,7 +28,6 @@ const TabelaConcursos: React.FC<ITabelaProps> = ({
       render: (_, row) => row.cargos_descricao.join(", "),
     },
     { title: "Nº do processo", dataIndex: "numero_processo", key: "numero_processo" },
-    { title: "Ano edital", dataIndex: "ano_edital", key: "ano_edital" },
     { title: "Banca responsável", dataIndex: "banca_responsavel", key: "banca_responsavel" },
     {
       title: "Status",
