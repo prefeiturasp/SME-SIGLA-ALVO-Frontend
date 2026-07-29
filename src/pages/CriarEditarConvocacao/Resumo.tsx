@@ -15,17 +15,12 @@ import { useGetAgendas } from "./Agenda/hooks/useGetAgendas";
 import type { IAgenda } from "../../services/resources/agenda/IAgenda";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 import { cursorPointer, cardSpacing } from "@/design-system/estilos";
-import { cardTitleStyle } from "@/design-system/estilos";
 import { usePatchPassoProcessoConvocacao } from "./hooks/usePatchPassoProcessoConvocacao";
 
 import { AppButton, StyledCardWithoutBorder } from '@/components/ui';
 
 const resumoStyles = {
   breadcrumbItem: cursorPointer,
-  cardTitle: (token: { colorTextHeading: string }) => ({
-    ...cardTitleStyle,
-    color: token.colorTextHeading,
-  }),
   cardWithMarginTop: cardSpacing.marginTop20,
   collapseLabel: { fontWeight: 600, fontSize: 16 },
   emptyAgendasMessage: {
@@ -229,11 +224,7 @@ const Resumo: React.FC = () => {
       >
         {!isViewOnlyResumo && (
           <StyledCardWithoutBorder
-            title={
-              <Text style={resumoStyles.cardTitle(token)}>
-                Processo de convocação de candidatos
-              </Text>
-            }
+            title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>}
             variant="borderless"
           >
             <Steps className="convocacao-steps" current={current} items={stepItems} onChange={handleStepChange} />
@@ -242,7 +233,7 @@ const Resumo: React.FC = () => {
 
         <StyledCardWithoutBorder
           style={resumoStyles.cardWithMarginTop}
-          title={isViewOnlyResumo ? undefined : steps[current].title}
+          title="Dados do processo"
           variant="borderless"
         >
           {processoConvocacaoData && (
