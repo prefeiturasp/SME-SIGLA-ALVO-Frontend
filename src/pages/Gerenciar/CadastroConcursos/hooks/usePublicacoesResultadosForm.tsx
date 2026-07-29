@@ -9,9 +9,9 @@ export interface IPublicacoesResultadosFormFields {
   classificacao_final: Dayjs;
   data_abertura: Dayjs;
   link_edital: string;
-  habilitados_geral: number;
-  habilitados_nna: number;
-  habilitados_pcd: number;
+  habilitados_geral?: number | null;
+  habilitados_nna?: number | null;
+  habilitados_pcd?: number | null;
   retificacoes?: string;
 }
 
@@ -32,22 +32,25 @@ const schema = yup.object({
     .required("Informe o link do edital"),
   habilitados_geral: yup
     .number()
-    .typeError("Informe a quantidade de habilitados (Geral)")
+    .typeError("Informe um número válido")
     .integer("A quantidade deve ser um número inteiro")
     .min(0, "A quantidade não pode ser negativa")
-    .required("Informe a quantidade de habilitados (Geral)"),
+    .nullable()
+    .optional(),
   habilitados_nna: yup
     .number()
-    .typeError("Informe a quantidade de habilitados (NNA)")
+    .typeError("Informe um número válido")
     .integer("A quantidade deve ser um número inteiro")
     .min(0, "A quantidade não pode ser negativa")
-    .required("Informe a quantidade de habilitados (NNA)"),
+    .nullable()
+    .optional(),
   habilitados_pcd: yup
     .number()
-    .typeError("Informe a quantidade de habilitados (PcD)")
+    .typeError("Informe um número válido")
     .integer("A quantidade deve ser um número inteiro")
     .min(0, "A quantidade não pode ser negativa")
-    .required("Informe a quantidade de habilitados (PcD)"),
+    .nullable()
+    .optional(),
   retificacoes: yup.string().trim().optional(),
 });
 
