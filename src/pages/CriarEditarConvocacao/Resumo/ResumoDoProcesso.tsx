@@ -1,12 +1,21 @@
 import React from "react";
-import { Row, Col, Spin } from "antd";
+import { Row, Col, Spin, Typography } from "antd";
 import dayjs from "dayjs";
 
-import { TextSubHeadingPreto, TextSubTituloCinza, TextTitulo } from '@/components/ui';
+import { processInfoStyles } from "@/design-system/estilos";
 
 import type { IProcessoConvocacaoResumo } from "../../../services/resources/convocacao/IConvocacao";
 
+const { Text } = Typography;
+
 const textColorBlack = { color: "#111111" };
+
+const contentStyle: React.CSSProperties = {
+  lineHeight: "normal",
+  textAlign: "left",
+  borderRadius: "0.5rem",
+  marginTop: 0,
+};
 
 const TIPO_ESCOLHA_LABELS: Record<string, string> = {
   NOVA_AUTORIZACAO: "Nova Autorização",
@@ -34,43 +43,67 @@ const ResumoDoProcesso: React.FC<ResumoDoProcessoProps> = ({
   modalidade,
 }) => {
   const blackStyle = useBlackText ? textColorBlack : undefined;
+  const labelStyle = { ...processInfoStyles.label, ...blackStyle };
+  const valueStyle = { ...processInfoStyles.value, ...blackStyle };
 
   return (
     <Spin spinning={isLoading} tip="Carregando dados do processo..." size="large">
-      <Row gutter={30}>
-        <Col xs={24} md={24} style={{ marginBottom: 16 }}>
-          <TextSubHeadingPreto style={blackStyle}>
-            Dados do processo
-          </TextSubHeadingPreto>
-        </Col>
-
-        <Col xs={24} md={8}>
-          <TextTitulo style={blackStyle}>Concurso</TextTitulo>
-          <TextSubTituloCinza style={blackStyle}>{data.concurso_nome}</TextSubTituloCinza>
-          <TextTitulo style={blackStyle}>Data da convocação</TextTitulo>
-          <TextSubTituloCinza style={blackStyle}>
-            {data.data_convocacao ? dayjs(data.data_convocacao).format("DD/MM/YYYY") : ""}
-          </TextSubTituloCinza>
-        </Col>
-
-        <Col xs={24} md={8}>
-          <TextTitulo style={blackStyle}>Tipo de processo</TextTitulo>
-          <TextSubTituloCinza style={blackStyle}>{getTipoEscolhaLabel(data.tipo_escolha)}</TextSubTituloCinza>
-          <TextTitulo style={blackStyle}>Data da publicação</TextTitulo>
-          <TextSubTituloCinza style={blackStyle}>
-            {data.data_corte_vagas ? dayjs(data.data_corte_vagas).format("DD/MM/YYYY") : ""}
-          </TextSubTituloCinza>
-        </Col>
-
-        <Col xs={24} md={8}>
-          <TextTitulo style={blackStyle}>Título</TextTitulo>
-          <TextSubTituloCinza style={blackStyle}>{data.descricao}</TextSubTituloCinza>
-          <TextTitulo style={blackStyle}>Modalidade</TextTitulo>
-          <TextSubTituloCinza style={blackStyle}>
-            {modalidade ?? "—"}
-          </TextSubTituloCinza>
-        </Col>
-      </Row>
+      <div style={contentStyle}>
+        <Row gutter={[16, 16]}>
+          <Col span={8}>
+            <div style={processInfoStyles.container}>
+              <Text strong style={labelStyle}>
+                Concurso:
+              </Text>
+              <Text style={valueStyle}>{data.concurso_nome}</Text>
+            </div>
+          </Col>
+          <Col span={8}>
+            <div style={processInfoStyles.container}>
+              <Text strong style={labelStyle}>
+                Data da convocação:
+              </Text>
+              <Text style={valueStyle}>
+                {data.data_convocacao ? dayjs(data.data_convocacao).format("DD/MM/YYYY") : ""}
+              </Text>
+            </div>
+          </Col>
+          <Col span={8}>
+            <div style={processInfoStyles.container}>
+              <Text strong style={labelStyle}>
+                Tipo de Escolha:
+              </Text>
+              <Text style={valueStyle}>{getTipoEscolhaLabel(data.tipo_escolha)}</Text>
+            </div>
+          </Col>
+          <Col span={8}>
+            <div style={processInfoStyles.container}>
+              <Text strong style={labelStyle}>
+                Data corte de vagas:
+              </Text>
+              <Text style={valueStyle}>
+                {data.data_corte_vagas ? dayjs(data.data_corte_vagas).format("DD/MM/YYYY") : ""}
+              </Text>
+            </div>
+          </Col>
+          <Col span={8}>
+            <div style={processInfoStyles.container}>
+              <Text strong style={labelStyle}>
+                Descrição:
+              </Text>
+              <Text style={valueStyle}>{data.descricao}</Text>
+            </div>
+          </Col>
+          <Col span={8}>
+            <div style={processInfoStyles.container}>
+              <Text strong style={labelStyle}>
+                Modalidade:
+              </Text>
+              <Text style={valueStyle}>{modalidade ?? "—"}</Text>
+            </div>
+          </Col>
+        </Row>
+      </div>
     </Spin>
   );
 };
