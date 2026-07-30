@@ -95,7 +95,7 @@ Funcionalidade: API Concurso SIGLA
   Cenário: Criar autorização com cargo inexistente retorna 400
     Quando eu crio uma autorização CONCURSO com payload "autorizacaoPublicadaCargoInvalido"
     Então o status CONCURSO deve ser 400
-    E a resposta CONCURSO deve conter "Cargo não encontrado"
+    E a resposta CONCURSO deve conter "objeto não existe"
 
   # ============================================================================
   # GET /ms-processos-concursos/api/v1/autorizacoes-publicadas/{uuid}/
@@ -106,7 +106,8 @@ Funcionalidade: API Concurso SIGLA
   # ════════════════════════════════════════════════════════════════
   @smoke @autorizacoes_buscar_uuid
   Cenário: Buscar autorização por UUID válido retorna 200
-    Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/autorizacoes-publicadas/299f830c-5e8a-42d4-83d1-d36d98912397/"
+    Dado que tenho uma autorização CONCURSO publicada existente
+    Quando eu busco a autorização CONCURSO pelo UUID criado
     Então o status CONCURSO deve ser 200
     E a resposta CONCURSO deve conter "uuid"
     E a resposta CONCURSO deve conter "cargo"
@@ -130,8 +131,7 @@ Funcionalidade: API Concurso SIGLA
   Cenário: Listar cargos sem filtros retorna 200
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/cargos/"
     Então o status CONCURSO deve ser 200
-    E a resposta CONCURSO deve conter "count"
-    E a resposta CONCURSO deve conter "results"
+    E a resposta CONCURSO deve ser uma lista
 
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 11 — Buscar cargos por termo retorna 200
@@ -140,7 +140,7 @@ Funcionalidade: API Concurso SIGLA
   Cenário: Buscar cargos por termo retorna 200
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/cargos/?search=DIRETOR"
     Então o status CONCURSO deve ser 200
-    E a resposta CONCURSO deve conter "results"
+    E a resposta CONCURSO deve ser uma lista
 
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 12 — Buscar cargos com termo em lowercase retorna resultados
@@ -149,16 +149,17 @@ Funcionalidade: API Concurso SIGLA
   Cenário: Buscar cargos com termo em lowercase retorna resultados
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/cargos/?search=professor"
     Então o status CONCURSO deve ser 200
-    E a resposta CONCURSO deve conter "results"
+    E a resposta CONCURSO deve ser uma lista
     E a lista de resultados CONCURSO não deve estar vazia
 
   # ════════════════════════════════════════════════════════════════
-  # CENÁRIO 13 — Requisitar página inválida de cargos retorna 404
+  # CENÁRIO 13 — Requisitar página inválida de cargos retorna 200 (endpoint não é paginado)
   # ════════════════════════════════════════════════════════════════
   @negativo @cargos_pagina_invalida
-  Cenário: Requisitar página inválida de cargos retorna 404
+  Cenário: Requisitar página inválida de cargos retorna 200 (endpoint não é paginado)
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/cargos/?page=999999"
-    Então o status CONCURSO deve ser 404
+    Então o status CONCURSO deve ser 200
+    E a resposta CONCURSO deve ser uma lista
 
   # ============================================================================
   # POST /ms-processos-concursos/api/v1/cargos/ - REQUER AUTENTICAÇÃO

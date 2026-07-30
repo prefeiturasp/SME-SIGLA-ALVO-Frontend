@@ -8,6 +8,17 @@ const path = require('path')
 dotenv.config({ path: path.resolve(__dirname, '.env') })
 
 module.exports = defineConfig({
+  reporter: 'cypress-mochawesome-reporter',
+  reporterOptions: {
+    reportDir: 'cypress/reports/mochawesome',
+    reportFilename: '[status]_[datetime]-relatorio',
+    reportPageTitle: 'Relatório de Testes — SME SIGLA ALVO',
+    charts: true,
+    embeddedScreenshots: true,
+    inlineAssets: true,
+    overwrite: false,
+  },
+
   e2e: {
     // Base URL configurável: usa API para testes de API, UI para testes de UI
     baseUrl: process.env.CYPRESS_BASE_URL || 'https://qa-sigla.sme.prefeitura.sp.gov.br',
@@ -78,6 +89,11 @@ module.exports = defineConfig({
     },
 
     async setupNodeEvents(on, config) {
+      // =========================
+      // MOCHAWESOME REPORTER
+      // =========================
+      require('cypress-mochawesome-reporter/plugin')(on)
+
       // =========================
       // CUCUMBER
       // =========================

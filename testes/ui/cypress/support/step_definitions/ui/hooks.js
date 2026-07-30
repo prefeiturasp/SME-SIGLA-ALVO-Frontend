@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 import { Before, After } from '@badeball/cypress-cucumber-preprocessor'
+import 'cypress-mochawesome-reporter/cucumberSupport'
 
 // Timeout estendido para cenários E2E de rastreabilidade (consulta_filtros.feature)
 // Esses cenários encadeiam múltiplos logins, navegações e carregamentos de dados via API

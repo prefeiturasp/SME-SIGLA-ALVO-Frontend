@@ -334,8 +334,23 @@ const preencherCampoPorLabel = (campo, valor) => {
     cy.get('input', { timeout: 10000 })
       .filter(':visible')
       .eq(indice)
-      .clear({ force: true })
-      .type(valor, { force: true, delay: 80 })
+      .then(($input) => {
+        // "Candidatos"/"Sessão" têm um máximo real ligado à quantidade de
+        // candidatos de fato adicionados ao cargo (que pode ser menor do que
+        // o pedido em "Autorizações Digitadas" — a API de cálculo/reposição
+        // não garante devolver exatamente a quantidade solicitada). Digitar
+        // um valor acima do máximo permitido trava o formulário mais adiante
+        // sem nenhum erro visível (botão "Adicionar"/avançar fica
+        // desabilitado). InputNumber do Ant Design expõe esse limite via
+        // aria-valuemax (ou max, se for input[type=number]) — usamos o menor
+        // entre o valor pedido no cenário e o disponível.
+        const max = $input.attr('aria-valuemax') ?? $input.attr('max')
+        const valorFinal = max && Number(valor) > Number(max) ? String(max) : valor
+        if (valorFinal !== valor) {
+          cy.log(`Campo "${campo}": valor "${valor}" excede o máximo disponível (${max}) — usando "${valorFinal}"`)
+        }
+        cy.wrap($input).clear({ force: true }).type(valorFinal, { force: true, delay: 80 })
+      })
     return
   }
 
@@ -581,10 +596,14 @@ When('preencho a data de nomeação', () => {
   confirmarDataNoPicker(nomeacao)
 })
 
-// Campo é um range de dois inputs de texto simples com atributos únicos
-// (date-range="start"/"end") — seleciona direto por esses atributos em vez de
-// navegar a partir do label, evitando o mesmo problema de traversal frágil
-// (.parent().parent().find(...)) que quebrava o step de "Escolha em".
+// Campo tinha um atributo customizado (date-range="start"/"end") que o app
+// parou de renderizar; a tentativa seguinte (classes nativas do Ant Design
+// .ant-picker-input-start/-end) também não bateu com o DOM atual — sem
+// acesso ao DOM ao vivo, adivinhar mais uma classe é method arriscado.
+// Em vez disso, localizamos os inputs pelo mesmo padrão já comprovado nos
+// outros campos deste formulário ("Data da convocação", "Data corte de
+// Vagas"): a partir do label visível, sobe até o .ant-form-item/.ant-row
+// mais próximo e pega os inputs visíveis ali dentro (1º = início, 2º = fim).
 //
 // Digitar o texto direto no input não atualiza a seleção interna do painel do
 // TimePicker — é preciso clicar nas células de hora/minuto
@@ -619,22 +638,50 @@ const selecionarHoraNoPainel = (horaTexto) => {
     })
 }
 
+const inputsHoraPorLabel = () => {
+  const regex = /Hora da convoca[çc][ãa]o/i
+  return cy.get('label, span', { timeout: 10000 })
+    .filter((i, el) => regex.test(el.textContent) && !el.closest('.ant-breadcrumb'))
+    .should('have.length.greaterThan', 0)
+    .first()
+    .then(($label) => {
+      const $formItem = $label.closest('.ant-form-item, .ant-row')
+      let $container = $formItem.length > 0 ? $formItem : $label.parent().parent()
+      let $inputs = $container.find('input').filter(':visible')
+
+      // Três tentativas anteriores (atributo customizado, classes do Ant
+      // Design, container do label) já erraram o alvo desse campo. Em vez de
+      // arriscar mais um seletor às cegas sem ver o DOM real, sobe até 4
+      // níveis a partir do label procurando algum ancestral que já contenha
+      // inputs visíveis — e loga o HTML do container final usado, pra
+      // diagnosticar com precisão caso ainda erre.
+      for (let i = 0; $inputs.length === 0 && i < 4; i++) {
+        $container = $container.parent()
+        $inputs = $container.find('input').filter(':visible')
+      }
+
+      cy.log(
+        `[DEBUG Hora da convocação] inputs visíveis encontrados: ${$inputs.length} — HTML do container: ${($container.prop('outerHTML') || '').slice(0, 3000)}`
+      )
+
+      return cy.wrap($inputs)
+    })
+}
+
 const preencherPeriodoDeHoras = (inicio, fim) => {
-  cy.get('input[date-range="start"]', { timeout: 10000 })
-    .click({ force: true })
+  inputsHoraPorLabel().eq(0).click({ force: true })
   selecionarHoraNoPainel(inicio)
   cy.wait(500)
 
-  cy.get('input[date-range="end"]', { timeout: 10000 })
-    .click({ force: true })
+  inputsHoraPorLabel().eq(1).click({ force: true })
   selecionarHoraNoPainel(fim)
 
   // Só agora — depois que início E fim foram selecionados — o dropdown
   // deve de fato fechar.
   cy.get('.ant-picker-dropdown:visible', { timeout: 8000 }).should('not.exist')
 
-  cy.get('input[date-range="start"]').should('have.value', inicio)
-  cy.get('input[date-range="end"]').should('have.value', fim)
+  inputsHoraPorLabel().eq(0).should('have.value', inicio)
+  inputsHoraPorLabel().eq(1).should('have.value', fim)
 }
 
 When('preencho o período de horas de {string} a {string}', (inicio, fim) => {

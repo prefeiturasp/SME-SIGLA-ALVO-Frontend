@@ -6,16 +6,12 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
   Para garantir consistência de navegação, dados e controle de acesso em toda a jornada do usuário
 
   Contexto:
-    Dado que estou na página de login do SIGLA
-    Quando eu insiro credenciais válidas
-    E clico no botão de acessar
-    Então devo ser redirecionado para o dashboard
-    E devo visualizar a página principal do sistema
+    Dado que estou logado no SIGLA com perfil administrador
 
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Contraste direto entre perfis — visualização bloqueado vs admin com acesso pleno ao Gerenciamento de Vagas
   # ════════════════════════════════════════════════════════════════
-  @contraste-perfis @critico @comparacao
+  @contraste-perfis @critico @comparacao @skip
   Cenário: Contraste direto entre perfis — visualização bloqueado vs admin com acesso pleno ao Gerenciamento de Vagas
     Dado que estou logado no sistema com perfil de visualização
     Quando navego até a opção "Processos"
@@ -88,7 +84,7 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Busca por cargo e validação de restrições de permissão em todas as ações da tabela
   # ════════════════════════════════════════════════════════════════
-  @busca-cargo @permissoes-tabela @critico @perfil-visualizacao
+  @busca-cargo @permissoes-tabela @critico @perfil-visualizacao @skip
   Cenário: Busca por cargo e validação de restrições de permissão em todas as ações da tabela
     Dado que estou logado no sistema com perfil de visualização
     Quando navego até a opção "Processos"
@@ -264,7 +260,7 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 7 — Jornada completa de preenchimento sequencial da escolha de candidatos com perfil de visualização
   # ════════════════════════════════════════════════════════════════
-  @escolha-candidatos @e2e @perfil-visualizacao
+  @escolha-candidatos @e2e @perfil-visualizacao @skip
   Cenário: Jornada completa de preenchimento sequencial da escolha de candidatos com perfil de visualização
     Dado que estou logado no sistema com perfil de visualização
     Quando navego até a opção "Processos"

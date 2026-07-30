@@ -35,11 +35,40 @@
 // um container que o contém (div.ant-select, .ant-form-item, etc.) — o
 // comando identifica qual é o caso.
 Cypress.Commands.add('selecionarOpcaoAntd', (getSelectContainer, opcao) => {
+  // Alguns campos ficam desabilitados até terminar de carregar suas opções
+  // de forma assíncrona (ex.: um campo que só habilita depois da resposta de
+  // uma chamada de API disparada pela seleção do campo anterior). Clicar num
+  // select ainda desabilitado não abre o dropdown — e como o clique não é
+  // refeito automaticamente, só aumentar o timeout da espera pelo dropdown
+  // não resolve. Por isso esperamos o campo sair do estado disabled antes de
+  // clicar, em vez de confiar num wait fixo.
+  getSelectContainer().should(($el) => {
+    const $container = $el.is('input') ? $el.closest('.ant-select') : $el
+    const $input = $el.is('input') ? $el : $el.find('input').first()
+    const desabilitado =
+      (!!$container.length && $container.hasClass('ant-select-disabled')) || $input.is(':disabled')
+    expect(desabilitado, 'Select não deve estar desabilitado').to.be.false
+  })
+
   getSelectContainer()
     .then(($el) => ($el.is('input') ? $el : $el.find('input').first()))
     .click({ force: true })
 
   cy.wait(500)
+
+  // Quando uma opção específica é pedida por texto (não "aleatoria"), digita
+  // no campo antes de procurar. O dropdown do Ant Design é virtualizado (só
+  // renderiza uma janela pequena de opções por vez, a partir do topo da
+  // lista) — em selects com muitas opções, a opção procurada pode nunca
+  // estar nessa janela inicial, e `.contains()` não encontra algo que não
+  // está no DOM, não importa o timeout. Digitar filtra o dropdown e traz o
+  // item procurado pra dentro da janela renderizada.
+  if (opcao && opcao !== 'aleatoria') {
+    getSelectContainer()
+      .then(($el) => ($el.is('input') ? $el : $el.find('input').first()))
+      .type(opcao, { delay: 50, force: true })
+    cy.wait(500)
+  }
 
   const dropdownAtual = () => cy.get('.ant-select-dropdown:visible', { timeout: 10000 }).last()
 

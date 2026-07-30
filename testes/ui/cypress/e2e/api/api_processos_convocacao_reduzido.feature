@@ -11,8 +11,11 @@ Funcionalidade: API Processos Convocação SIGLA
   # GET /carta-convocacao/
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Listar cartas de convocação retorna 200
+  # SKIP: endpoint /carta-convocacao/ não existe mais no schema da API
+  # (confirmado em /ms-processos-convocacao/api/schema/?format=json em 24/07/2026).
+  # Reativar se o endpoint voltar a existir.
   # ════════════════════════════════════════════════════════════════
-  @smoke
+  @smoke @skip
   Cenário: Listar cartas de convocação retorna 200
     Quando eu faço uma requisição SIGLA GET para "/carta-convocacao/"
     Então o status SIGLA deve ser 200
@@ -20,8 +23,9 @@ Funcionalidade: API Processos Convocação SIGLA
 
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Acessar cartas com método não permitido retorna 405
+  # SKIP: endpoint /carta-convocacao/ não existe mais no schema da API
   # ════════════════════════════════════════════════════════════════
-  @negativo
+  @negativo @skip
   Cenário: Acessar cartas com método não permitido retorna 405
     Quando eu faço uma requisição SIGLA de método "PUT" para "/carta-convocacao/" sem body
     Então o status SIGLA deve ser 405
@@ -29,16 +33,18 @@ Funcionalidade: API Processos Convocação SIGLA
   # POST /carta-convocacao/
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Criar carta de convocação com dados válidos retorna sucesso
+  # SKIP: endpoint /carta-convocacao/ não existe mais no schema da API
   # ════════════════════════════════════════════════════════════════
-  @smoke
+  @smoke @skip
   Cenário: Criar carta de convocação com dados válidos retorna sucesso
     Quando eu crio uma carta de convocação com dados válidos
     Então o status SIGLA deve ser 200 ou 201
 
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 4 — Criar carta com body vazio retorna erro de validação
+  # SKIP: endpoint /carta-convocacao/ não existe mais no schema da API
   # ════════════════════════════════════════════════════════════════
-  @negativo
+  @negativo @skip
   Cenário: Criar carta com body vazio retorna erro de validação
     Quando eu faço um POST SIGLA para "/carta-convocacao/" com body vazio
     Então o status SIGLA deve ser 400
@@ -46,8 +52,9 @@ Funcionalidade: API Processos Convocação SIGLA
   # GET /carta-convocacao/{uuid}/
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 5 — Buscar carta de convocação por UUID retorna 200
+  # SKIP: endpoint /carta-convocacao/ não existe mais no schema da API
   # ════════════════════════════════════════════════════════════════
-  @smoke
+  @smoke @skip
   Cenário: Buscar carta de convocação por UUID retorna 200
     Dado que tenho uma carta de convocação criada
     Quando eu busco a carta de convocação pelo UUID criado
@@ -55,8 +62,9 @@ Funcionalidade: API Processos Convocação SIGLA
 
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 6 — Buscar carta com UUID inexistente retorna 404
+  # SKIP: endpoint /carta-convocacao/ não existe mais no schema da API
   # ════════════════════════════════════════════════════════════════
-  @negativo
+  @negativo @skip
   Cenário: Buscar carta com UUID inexistente retorna 404
     Quando eu faço uma requisição SIGLA GET para "/carta-convocacao/00000000-0000-0000-0000-000000000000/"
     Então o status SIGLA deve ser 404

@@ -108,16 +108,84 @@ Then('valido a existência do campo {string} na escolha de candidatos', (campo) 
   })
 })
 
+// Muitos processos cadastrados no ambiente de QA são lixo de execuções de
+// automação anteriores (sem cleanup) e não têm nenhuma agenda vinculada —
+// confirmado via API: dos 146 processos do select, ~83 têm nome tipo
+// "Processo de Teste Automacao"/"Processo Parcialmente Atualizado" e nenhum
+// deles tem agenda. O dropdown do Ant Design é virtualizado (só renderiza
+// ~12 opções por vez, sempre a partir do topo da lista), e esse topo é
+// justamente dominado por esse lixo — por isso tentar aleatoriamente entre
+// as opções visíveis nunca alcançava um processo real.
+//
+// Os 63 processos de fluxo real sempre têm "convocação" no nome (e nenhum
+// dos nomes de automação tem essa palavra), então filtramos a busca do
+// select por esse termo antes de sortear — restringe o dropdown ao universo
+// onde processos com agenda de fato existem. Depois de escolher, ainda
+// confirma que "Período da agenda" habilitou; se não, tenta outra opção
+// dentro do filtro (mesmo princípio de retry já usado em
+// cy.selecionarOpcaoAntd para opções que "não pegam").
+const periodoAgendaHabilitado = () =>
+  cy.get('.ant-select', { timeout: 10000 }).eq(1).then(($periodo) => {
+    const desabilitado = $periodo.hasClass('ant-select-disabled') || $periodo.find('input').is(':disabled')
+    return !desabilitado
+  })
+
+const inputProcesso = () =>
+  cy.get('.ant-select', { timeout: 10000 }).eq(0)
+    .then(($el) => ($el.is('input') ? $el : $el.find('input').first()))
+
+const selecionarProcessoComAgenda = (indicesTentados = []) => {
+  inputProcesso().click({ force: true })
+  cy.wait(300)
+  // Reaplica o filtro a cada tentativa: o antd limpa o texto de busca do
+  // campo assim que uma opção é selecionada.
+  inputProcesso().type('convocação', { delay: 50, force: true })
+  cy.wait(500)
+
+  const dropdownAtual = () => cy.get('.ant-select-dropdown:visible', { timeout: 10000 }).last()
+  dropdownAtual().should('be.visible')
+
+  dropdownAtual()
+    .find('.ant-select-item-option, [role="option"]')
+    .should('have.length.greaterThan', 0)
+    .then(($opcoes) => {
+      const total = $opcoes.length
+      const indicesDisponiveis = [...Array(total).keys()].filter((i) => !indicesTentados.includes(i))
+      if (indicesDisponiveis.length === 0) {
+        cy.log('Nenhum Processo com agenda disponível encontrado entre as opções filtradas por "convocação" — seguindo com a última selecionada')
+        return
+      }
+      const indice = indicesDisponiveis[Math.floor(Math.random() * indicesDisponiveis.length)]
+      cy.wrap($opcoes[indice]).click({ force: true })
+      cy.wait(1000) // aguarda a chamada de agendas/cargos disparada pela seleção
+
+      periodoAgendaHabilitado().then((habilitado) => {
+        if (habilitado) {
+          cy.log(`Processo (opção ${indice}, filtro "convocação") selecionado — "Período da agenda" habilitado`)
+        } else {
+          cy.log(`Processo (opção ${indice}) sem agenda vinculada — tentando outro`)
+          selecionarProcessoComAgenda([...indicesTentados, indice])
+        }
+      })
+    })
+}
+
 When('seleciono uma opção aleatória no campo {string} da escolha de candidatos', (campo) => {
   cy.wait(300)
-  const indiceCombobox = campo.match(/Processo/i) ? 0 : 1
-  cy.selecionarOpcaoAntd(() => cy.get('.ant-select', { timeout: 10000 }).eq(indiceCombobox), 'aleatoria')
+  if (campo.match(/Processo/i)) {
+    selecionarProcessoComAgenda()
+  } else {
+    cy.selecionarOpcaoAntd(() => cy.get('.ant-select', { timeout: 10000 }).eq(1), 'aleatoria')
+  }
 })
 
 When('clico no campo e seleciono uma opção aleatória no campo {string} da escolha de candidatos', (campo) => {
   cy.wait(300)
-  const indiceCombobox = campo.match(/Processo/i) ? 0 : 1
-  cy.selecionarOpcaoAntd(() => cy.get('.ant-select', { timeout: 10000 }).eq(indiceCombobox), 'aleatoria')
+  if (campo.match(/Processo/i)) {
+    selecionarProcessoComAgenda()
+  } else {
+    cy.selecionarOpcaoAntd(() => cy.get('.ant-select', { timeout: 10000 }).eq(1), 'aleatoria')
+  }
 })
 
 Then('valido que o botão de ação da escolha de candidatos está desabilitado', () => {

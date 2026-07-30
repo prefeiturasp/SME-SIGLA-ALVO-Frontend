@@ -44,6 +44,31 @@ When('eu crio uma autorização CONCURSO com payload {string}', (payloadKey) => 
   })
 })
 
+Given('que tenho uma autorização CONCURSO publicada existente', () => {
+  cy.fixture('api/sigla_payloads').then((payloads) => {
+    const baseUrl = Cypress.env('CONCURSO_BASE_URL') || 'https://qa-api-sigla.sme.prefeitura.sp.gov.br'
+    const url = `${baseUrl}/ms-processos-concursos/api/v1/autorizacoes-publicadas/`
+
+    cy.concurso_post(url, payloads.autorizacaoPublicadaValida).then((res) => {
+      expect(res.status, 'Setup: criar autorização deve retornar 201').to.eq(201)
+      cy.wrap(res.body.uuid).as('autorizacaoUuid')
+      Cypress.log({ name: 'Setup Autorização', message: `UUID: ${res.body.uuid}` })
+    })
+  })
+})
+
+When('eu busco a autorização CONCURSO pelo UUID criado', () => {
+  cy.get('@autorizacaoUuid').then((uuid) => {
+    const baseUrl = Cypress.env('CONCURSO_BASE_URL') || 'https://qa-api-sigla.sme.prefeitura.sp.gov.br'
+    const url = `${baseUrl}/ms-processos-concursos/api/v1/autorizacoes-publicadas/${uuid}/`
+
+    cy.concurso_get(url).then((res) => {
+      cy.wrap(res).as('response')
+      Cypress.log({ name: 'Buscar Autorização', message: `UUID: ${uuid} → HTTP ${res.status}` })
+    })
+  })
+})
+
 // ── Ações de Cargo ───────────────────────────────────────────────────────────
 
 When('eu crio um cargo CONCURSO com payload {string}', (payloadKey) => {
@@ -72,7 +97,16 @@ When('eu crio um cargo CONCURSO com payload {string}', (payloadKey) => {
 
 When('eu crio um concurso CONCURSO com payload {string}', (payloadKey) => {
   cy.fixture('api/sigla_payloads').then((payloads) => {
-    const payload = payloads[payloadKey]
+    const base = payloads[payloadKey]
+    // numero_processo e codigo têm constraint de unicidade no backend e o
+    // teste não limpa o dado criado — gera valores únicos por execução para
+    // o cenário continuar repetível em runs subsequentes.
+    const unico = Date.now() % 1000000
+    const payload = {
+      ...base,
+      ...(base.numero_processo !== undefined && { numero_processo: unico }),
+      ...(base.codigo !== undefined && { codigo: unico }),
+    }
     const baseUrl = Cypress.env('CONCURSO_BASE_URL') || 'https://qa-api-sigla.sme.prefeitura.sp.gov.br'
     const url = `${baseUrl}/ms-processos-concursos/api/v1/concursos/`
     
