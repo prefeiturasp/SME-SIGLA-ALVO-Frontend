@@ -10,7 +10,7 @@ import type { IListRequest, PaginatedResponse } from "../../../types/IListReques
 import queryParamsSerializer from "../../../utils/queryParamsSerializer";
 
 export const URL = {
-  getConcursos: () => `/api/v1/concursos/?formato=select`,
+  getConcursos: () => `/api/v1/concursos/?formato=select&status=ATIVO&situacao__in=EM_ANDAMENTO,COMPLETO`,
   listarConcursos: () => `/api/v1/concursos/`,
   getConcursoByUuid: (uuid: string) => `/api/v1/concursos/${uuid}/`,
   postConcurso: () => `/api/v1/concursos/`,
