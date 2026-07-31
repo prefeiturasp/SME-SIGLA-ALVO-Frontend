@@ -50,17 +50,19 @@ const AlterarSituacaiCandidatoModal: React.FC<Props> = ({
   const eliminarMutation = usePostHabilitadoEliminar();
   const reclassificarMutation = usePostReclassificarCandidato();
 
-  // Reclassificações passíveis de reversão por mandado (as que ainda
-  // não foram revertidas por mandado judicial).
-  const reclassificacoesReversiveis = reclassificacoes.filter(
-    (rec) => !rec.mandado_judicial && rec.desclassificado_de
-  );
-  const hasReclassificacao =
-    reclassificacoesReversiveis.length > 0 || reclassificadosDe.length > 0;
+  const primeiraReclassificacao =
+    reclassificacoes[reclassificacoes.length - 1];
+
+  const reclassificacoesReversiveis =
+    primeiraReclassificacao &&
+    !primeiraReclassificacao.mandado_judicial &&
+    primeiraReclassificacao.desclassificado_de
+      ? [primeiraReclassificacao]
+      : [];
+  const hasReclassificacao = reclassificacoesReversiveis.length > 0;
 
   useEffect(() => {
     if (open) {
-      // Não pré-selecionar valor para forçar escolha explícita
       setSituacao("");
       setMotivo("");
       setMandadoJudicial(false);
