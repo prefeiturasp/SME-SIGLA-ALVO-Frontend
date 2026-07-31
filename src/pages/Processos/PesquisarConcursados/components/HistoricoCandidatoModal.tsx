@@ -85,7 +85,10 @@ function buildAlteracoesFromReclassificacao(
         data: formatarDataISO(r.criado_em ?? undefined),
         statusAnterior: de || "—",
         statusNovo: r.nova_classificacao ?? "—",
-        motivo: r.motivo ?? "—",
+        motivo:
+          (r as any)?.mandado_judicial === true
+            ? "Mandado judicial"
+            : r.motivo ?? "—",
       },
     });
   });
