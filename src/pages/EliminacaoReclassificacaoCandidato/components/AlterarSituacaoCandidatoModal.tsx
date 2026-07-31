@@ -4,11 +4,9 @@ import { usePostHabilitadoEliminar } from "../hooks/usePostHabilitadoEliminar";
 import { usePostReclassificarCandidato } from "../hooks/usePostReclassificarCandidato";
 
 import { AppButton, StyledSelect, AppFormItem, ModalInfoLabel, ModalInfoValue, InlineInfoItem } from '@/components/ui';
+import { obterReclassificacoesReversiveis, type ReclassificacaoHistorico } from "../utils/reclassificacao";
 
-export type ReclassificacaoResumo = {
-  desclassificado_de: string;
-  mandado_judicial?: boolean;
-};
+export type ReclassificacaoResumo = ReclassificacaoHistorico;
 
 type Props = {
   open: boolean;
@@ -50,15 +48,14 @@ const AlterarSituacaiCandidatoModal: React.FC<Props> = ({
   const eliminarMutation = usePostHabilitadoEliminar();
   const reclassificarMutation = usePostReclassificarCandidato();
 
-  const primeiraReclassificacao =
-    reclassificacoes[reclassificacoes.length - 1];
-
-  const reclassificacoesReversiveis =
-    primeiraReclassificacao &&
-    !primeiraReclassificacao.mandado_judicial &&
-    primeiraReclassificacao.desclassificado_de
-      ? [primeiraReclassificacao]
-      : [];
+  // Para cada categoria (NNA/PCD), considera apenas o evento mais
+  // recente que a envolve — não o mais recente entre todas as
+  // categorias misturadas — para não perder a reversibilidade de uma
+  // categoria só porque a outra teve um evento mais novo.
+  const reclassificacoesReversiveis = obterReclassificacoesReversiveis(
+    reclassificacoes,
+    ["NNA", "PCD"]
+  );
   const hasReclassificacao = reclassificacoesReversiveis.length > 0;
 
   useEffect(() => {
