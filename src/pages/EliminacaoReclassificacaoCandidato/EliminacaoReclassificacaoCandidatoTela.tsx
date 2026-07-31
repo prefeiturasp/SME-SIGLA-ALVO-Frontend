@@ -81,7 +81,7 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<Registro | null>(null);
   const [habilitadosParams, setHabilitadosParams] = useState<Record<string, unknown> | undefined>(undefined);
-  const { habilitadosData } = useGetHablitados(
+  const { habilitadosData, habilitadosIsFetching } = useGetHablitados(
     habilitadosParams,
     Boolean(habilitadosParams)
   );
@@ -387,7 +387,11 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
             <FilterActionSlot>
               <FilterActionsGroup>
                 <AppButton variant="secondary" onClick={handleLimpar}>Limpar</AppButton>
-                <AppButton onClick={handleFiltrar} disabled={!concursoSelecionado || !cargoSelecionadoForm}>
+                <AppButton
+                  onClick={handleFiltrar}
+                  disabled={!concursoSelecionado || !cargoSelecionadoForm}
+                  loading={habilitadosIsFetching}
+                >
                   Filtrar
                 </AppButton>
               </FilterActionsGroup>
@@ -400,6 +404,7 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
         <Table
           columns={columns}
           dataSource={filteredRows}
+          loading={habilitadosIsFetching}
           pagination={{
             current: pagination.current,
             pageSize: pagination.pageSize,
