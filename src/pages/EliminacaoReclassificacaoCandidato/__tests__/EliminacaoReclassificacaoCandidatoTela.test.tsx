@@ -157,6 +157,49 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
       await waitFor(() => expect(screen.getByText(/\* Candidato reclassificado/)).toBeInTheDocument(), { timeout: 5000 });
       formState.useFilterValues = false;
     });
+
+    it("não marca a linha como reclassificada quando a desclassificação mais recente já foi revertida por mandado", async () => {
+      formState.useFilterValues = true;
+      mockGetCandidatosHabilitados.mockReturnValue({
+        response: Promise.resolve([
+          {
+            ...habilitadoItem,
+            reclassificacoes: [
+              { desclassificado_de: "GERAL", nova_classificacao: "NNA", mandado_judicial: true },
+              { desclassificado_de: "NNA", nova_classificacao: "GERAL", mandado_judicial: false },
+            ],
+          },
+        ]),
+        abort: () => {},
+      });
+      render(<EliminacaoReclassificacaoCandidatoTela />, { wrapper });
+      fireEvent.click(screen.getByRole("button", { name: /filtrar/i }));
+      await waitFor(() => expect(screen.getByText("João")).toBeInTheDocument(), { timeout: 5000 });
+      expect(screen.getByText("AMPLA")).toBeInTheDocument();
+      expect(screen.queryByText("AMPLA *")).not.toBeInTheDocument();
+      formState.useFilterValues = false;
+    });
+
+    it("marca a linha como reclassificada quando a desclassificação mais recente é um novo ciclo após reversão anterior", async () => {
+      formState.useFilterValues = true;
+      mockGetCandidatosHabilitados.mockReturnValue({
+        response: Promise.resolve([
+          {
+            ...habilitadoItem,
+            reclassificacoes: [
+              { desclassificado_de: "NNA", nova_classificacao: "GERAL", mandado_judicial: false },
+              { desclassificado_de: "GERAL", nova_classificacao: "NNA", mandado_judicial: true },
+              { desclassificado_de: "NNA", nova_classificacao: "GERAL", mandado_judicial: false },
+            ],
+          },
+        ]),
+        abort: () => {},
+      });
+      render(<EliminacaoReclassificacaoCandidatoTela />, { wrapper });
+      fireEvent.click(screen.getByRole("button", { name: /filtrar/i }));
+      await waitFor(() => expect(screen.getByText("AMPLA *")).toBeInTheDocument(), { timeout: 5000 });
+      formState.useFilterValues = false;
+    });
   });
 
   describe("modal e alterar situação", () => {
@@ -177,7 +220,7 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
       formState.useFilterValues = false;
     });
 
-    it("ao salvar no modal atualiza situacao da linha e fecha modal", async () => {
+    it("ao salvar no modal fecha o modal", async () => {
       formState.useFilterValues = true;
       mockGetCandidatosHabilitados.mockReturnValue({
         response: Promise.resolve([habilitadoItem]),
@@ -191,6 +234,30 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
       await waitFor(() => expect(screen.getByTestId("modal-alterar")).toBeInTheDocument(), { timeout: 10000 });
       fireEvent.click(screen.getByTestId("modal-salvar"));
       await waitFor(() => expect(screen.queryByTestId("modal-alterar")).not.toBeInTheDocument(), { timeout: 10000 });
+      formState.useFilterValues = false;
+    });
+
+    it("ao salvar no modal, re-busca os dados do backend em vez de só corrigir a linha localmente", async () => {
+      // Regressão: salvar só fazia um patch local no campo "situacao",
+      // deixando reclassificadosDe/hasNNA/hasPCD desatualizados até um
+      // refresh manual — por isso era preciso repetir a ação 2x para
+      // ela "pegar" na tela.
+      formState.useFilterValues = true;
+      mockGetCandidatosHabilitados.mockReturnValue({
+        response: Promise.resolve([habilitadoItem]),
+        abort: () => {},
+      });
+      render(<EliminacaoReclassificacaoCandidatoTela />, { wrapper });
+      fireEvent.click(screen.getByRole("button", { name: /filtrar/i }));
+      await waitFor(() => expect(screen.getByText("João")).toBeInTheDocument(), { timeout: 10000 });
+      const chamadasAntesDoSave = mockGetCandidatosHabilitados.mock.calls.length;
+      await waitFor(() => expect(document.querySelector(".anticon-edit")).toBeTruthy(), { timeout: 10000 });
+      fireEvent.click(document.querySelector(".anticon-edit")!);
+      await waitFor(() => expect(screen.getByTestId("modal-alterar")).toBeInTheDocument(), { timeout: 10000 });
+      fireEvent.click(screen.getByTestId("modal-salvar"));
+      await waitFor(() =>
+        expect(mockGetCandidatosHabilitados.mock.calls.length).toBeGreaterThan(chamadasAntesDoSave)
+      );
       formState.useFilterValues = false;
     });
   });
