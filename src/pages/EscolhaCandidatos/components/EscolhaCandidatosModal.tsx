@@ -224,7 +224,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
       }
       dreMap.set(dre.uuid, {
         value: dre.uuid,
-        label: dre.nome,
+        label: dre.nome.replace(/DIRETORIA REGIONAL DE EDUCACAO\s*/gi, "").trim(),
         codigo: dre.codigo,
         raw: dre,
       });
