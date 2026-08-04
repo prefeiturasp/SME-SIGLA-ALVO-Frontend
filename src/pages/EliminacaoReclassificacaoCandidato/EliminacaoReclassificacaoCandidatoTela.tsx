@@ -11,6 +11,7 @@ import { Select } from "antd";
 import AlterarSituacaiCandidatoModal from "./components/AlterarSituacaoCandidatoModal";
 import { useGetHablitados } from "./hooks/useGetHablitados";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
+import { possuiDesclassificacaoAtiva, type ReclassificacaoHistorico } from "./utils/reclassificacao";
 
 
 import { AppButton, AppIconButton, EditActionIcon, StyledSelect, AppFormItem, FilterActionSlot, FilterInlineRow, FilterFieldCol, FilterActionCol, FilterActionsGroup, selectSuffixIcon } from '@/components/ui';
@@ -34,7 +35,7 @@ type Registro = {
   hasPCD?: boolean;
   hasNNA?: boolean;
   reclassificadosDe?: string[];
-  reclassificacoes?: { desclassificado_de: string; mandado_judicial?: boolean }[];
+  reclassificacoes?: ReclassificacaoHistorico[];
   hasReclassificacao?: boolean;
   tipoClassificacao: string;
   classificacaoGeral: number | string;
@@ -220,14 +221,15 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
       const reclassificacoesList = Array.isArray(item?.reclassificacoes)
         ? (item.reclassificacoes as any[]).map((rec: any) => ({
             desclassificado_de: String(rec?.desclassificado_de || "").toUpperCase(),
+            nova_classificacao: String(rec?.nova_classificacao || "").toUpperCase(),
             mandado_judicial: Boolean(rec?.mandado_judicial),
+            criado_em: rec?.criado_em || "",
           })).filter((rec) => rec.desclassificado_de)
         : [];
-      // Considera reclassificado apenas o que ainda não foi revertido
-      // por mandado judicial (desclassificação ativa).
-      const reclassificadosDe = reclassificacoesList
-        .filter((rec) => !rec.mandado_judicial)
-        .map((rec) => rec.desclassificado_de);
+    
+      const reclassificadosDe = ["NNA", "PCD"].filter((categoria) =>
+        possuiDesclassificacaoAtiva(reclassificacoesList, categoria)
+      );
       return {
         key: String(item?.uuid || item?.id || idx),
         nome: String(candidato?.nome || "—"),
@@ -454,12 +456,13 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
           setModalOpen(false);
           setSelectedRow(null);
         }}
-        onSave={(novaSituacao) => {
-          if (selectedRow) {
-            setRows((prev) =>
-              prev.map((r) => (r.key === selectedRow.key ? { ...r, situacao: novaSituacao } : r))
-            );
-          }
+        onSave={() => {
+          // Re-busca os dados do backend em vez de só corrigir a linha
+          // localmente: a situação, o histórico de reclassificações e
+          // os campos derivados (hasNNA/hasPCD/reclassificadosDe) do
+          // candidato alterado mudam no servidor e precisam refletir a
+          // fonte de verdade real antes do modal poder ser reaberto.
+          habilitadosRefetch();
           setModalOpen(false);
           setSelectedRow(null);
         }}
