@@ -26,7 +26,7 @@ describe('Concursos Service', () => {
 
   describe('URL', () => {
     it('deve retornar URLs corretas para todas as rotas', () => {
-      expect(URL.getConcursos()).toBe('/api/v1/concursos/?formato=select');
+      expect(URL.getConcursos()).toBe('/api/v1/concursos/?formato=select&status=ATIVO&situacao__in=EM_ANDAMENTO,COMPLETO');
       expect(URL.getConcursoByUuid('uuid-123')).toBe(
         '/api/v1/concursos/uuid-123/'
       );
@@ -63,7 +63,7 @@ describe('Concursos Service', () => {
       await expect(response).resolves.toEqual(mockConcursosData);
       
       expect(mockAxios.get).toHaveBeenCalledWith(
-        '/api/v1/concursos/?formato=select',
+        '/api/v1/concursos/?formato=select&status=ATIVO&situacao__in=EM_ANDAMENTO,COMPLETO',
         expect.objectContaining({
           paramsSerializer: expect.any(Function),
           signal: expect.any(AbortSignal)
