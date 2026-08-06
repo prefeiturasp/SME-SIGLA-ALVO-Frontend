@@ -2,6 +2,7 @@ export interface IImportacaoHabilitadosFiltros {
   concurso: string | undefined;
   arquivo: File | null;
   observacao?: string;
+  mandado_judicial?: boolean;
 }
 
 export interface IUltimaImportacaoHabilitados {
@@ -15,4 +16,5 @@ export interface IImportacaoHabilitadosPayload {
   arquivo: File;
   tipo: string;
   observacao?: string;
+  mandado_judicial?: boolean;
 }

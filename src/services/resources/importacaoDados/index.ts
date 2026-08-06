@@ -60,7 +60,15 @@ export const postImportacaoArquivosVagas = (
 
 // TODO adicionar JWT no header Authorization
 export const postImportacaoArquivosHabilitados = (
-  payload: { cargo?: string; arquivo: File; tipo: string, concurso_uuid:string, concurso_nome: string, observacao?: string },
+  payload: {
+    cargo?: string;
+    arquivo: File;
+    tipo: string;
+    concurso_uuid: string;
+    concurso_nome: string;
+    observacao?: string;
+    mandado_judicial?: boolean;
+  },
   axiosRequestConfig?: AxiosRequestConfig
 ) => {
   const { signal, abort } = new AbortController();
@@ -72,6 +80,9 @@ export const postImportacaoArquivosHabilitados = (
   formData.append('concurso_uuid', payload.concurso_uuid);
   formData.append('concurso_nome', payload.concurso_nome);
   if (payload.observacao) formData.append('observacao', payload.observacao);
+  if (typeof payload.mandado_judicial !== "undefined") {
+    formData.append('mandado_judicial', String(!!payload.mandado_judicial));
+  }
 
   const response = appAxiosImportaArquivos
     .post<IImportacaoFundacao>(URL.postImportacaoArquivosHabilitados(), formData, {

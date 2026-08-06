@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Select, Button, Tooltip, Spin, Input } from "antd";
+import { Row, Col, Select, Button, Tooltip, Spin, Input, Checkbox } from "antd";
 import { Controller } from "react-hook-form";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useImportacaoDados } from "./hooks/useImportacaoDadosHabilitados";
@@ -9,7 +9,7 @@ import { CloudUploadOutlined } from "@ant-design/icons";
 import FormItem from "antd/es/form/FormItem";
 import { useNavigate } from "react-router-dom";
 
-import { AppFormItem, AppButton, TabContentContainer, StyledSelect, UploadArea, StyledUpload, ActionButtonsContainer, GrupoEsquerda, selectSuffixIcon } from '@/components/ui';
+import { AppFormItem, AppButton, TabContentContainer, StyledSelect, UploadArea, StyledUpload, ActionButtonsContainer, GrupoEsquerda, selectSuffixIcon, mutedHelperTextRem, labelStyle } from '@/components/ui';
 interface HabilitadosProps {
   canViewHistoricoHabilitados: boolean;
   canImportarHabilitados: boolean;
@@ -140,6 +140,31 @@ const HabilitadosFormTab: React.FC<HabilitadosProps> = ({
               )}
             />
           </Col>
+          </Row>
+
+          <Row gutter={40}>
+            <Col xs={24} sm={12}>
+              <Controller
+                control={control}
+                name="mandado_judicial"
+                render={({ field }) => (
+                  <AppFormItem
+                    labelCol={{ span: 24 }}
+                  >
+                    <Checkbox
+                      checked={!!field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      disabled={!canImportarHabilitados}
+                    >
+                      <span style={labelStyle}>Mandado Judicial</span>
+                    </Checkbox>
+                    <div style={{ ...(mutedHelperTextRem ?? {}), marginTop: 4, marginBottom: 12, marginLeft: 24 }}>
+                    Marque esta opção se o arquivo de importação contém candidatos incluídos por decisão judicial. Assim, eles serão identificados e processados corretamente.
+                    </div>
+                  </AppFormItem>
+                )}
+              />
+            </Col>
           </Row>
 
           <Row gutter={40}>
