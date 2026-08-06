@@ -15,6 +15,7 @@ const useImportacaoSchema = () => {
       }),
 
     observacao: yup.string().optional(),
+    mandado_judicial: yup.boolean().optional(),
   });
 };
 

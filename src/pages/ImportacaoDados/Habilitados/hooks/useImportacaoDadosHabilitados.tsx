@@ -24,6 +24,7 @@ export const useImportacaoDados = () => {
     arquivo: null,
     tipo: "HABILITADOS",
     observacao: "",
+    mandado_judicial: false,
   };
 
   const {
@@ -74,6 +75,7 @@ export const useImportacaoDados = () => {
       arquivo: data.arquivo!,
       tipo: "HABILITADOS",
       observacao: data.observacao?.trim() || undefined,
+      mandado_judicial: !!data.mandado_judicial,
     };
 
     try {
