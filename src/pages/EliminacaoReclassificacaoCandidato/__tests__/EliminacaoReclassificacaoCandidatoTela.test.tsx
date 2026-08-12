@@ -146,7 +146,7 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
   });
 
   describe("tabela e filteredRows", () => {
-    it("exibe texto de reclassificação quando há linhas na tabela com reclassificações", async () => {
+    it("exibe tag Desclassificado quando há reclassificação sem mandado judicial", async () => {
       formState.useFilterValues = true;
       mockGetCandidatosHabilitados.mockReturnValue({
         response: Promise.resolve([{ ...habilitadoItem, reclassificacoes: [{ desclassificado_de: "PCD" }] }]),
@@ -154,11 +154,11 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
       });
       render(<EliminacaoReclassificacaoCandidatoTela />, { wrapper });
       fireEvent.click(screen.getByRole("button", { name: /filtrar/i }));
-      await waitFor(() => expect(screen.getByText(/\* Candidato reclassificado/)).toBeInTheDocument(), { timeout: 5000 });
+      await waitFor(() => expect(screen.getByText("Desclassificado")).toBeInTheDocument(), { timeout: 5000 });
       formState.useFilterValues = false;
     });
 
-    it("não marca a linha como reclassificada quando a desclassificação mais recente já foi revertida por mandado", async () => {
+    it("exibe tag Reclassificado quando a reclassificação mais recente é mandado judicial", async () => {
       formState.useFilterValues = true;
       mockGetCandidatosHabilitados.mockReturnValue({
         response: Promise.resolve([
@@ -175,12 +175,12 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
       render(<EliminacaoReclassificacaoCandidatoTela />, { wrapper });
       fireEvent.click(screen.getByRole("button", { name: /filtrar/i }));
       await waitFor(() => expect(screen.getByText("João")).toBeInTheDocument(), { timeout: 5000 });
-      expect(screen.getByText("AMPLA")).toBeInTheDocument();
-      expect(screen.queryByText("AMPLA *")).not.toBeInTheDocument();
+      expect(screen.getByText("Reclassificado")).toBeInTheDocument();
+      expect(screen.queryByText("Desclassificado")).not.toBeInTheDocument();
       formState.useFilterValues = false;
     });
 
-    it("marca a linha como reclassificada quando a desclassificação mais recente é um novo ciclo após reversão anterior", async () => {
+    it("exibe tag Desclassificado quando a desclassificação mais recente é um novo ciclo após reversão anterior", async () => {
       formState.useFilterValues = true;
       mockGetCandidatosHabilitados.mockReturnValue({
         response: Promise.resolve([
@@ -197,7 +197,7 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
       });
       render(<EliminacaoReclassificacaoCandidatoTela />, { wrapper });
       fireEvent.click(screen.getByRole("button", { name: /filtrar/i }));
-      await waitFor(() => expect(screen.getByText("AMPLA *")).toBeInTheDocument(), { timeout: 5000 });
+      await waitFor(() => expect(screen.getByText("Desclassificado")).toBeInTheDocument(), { timeout: 5000 });
       formState.useFilterValues = false;
     });
   });
@@ -299,7 +299,7 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
       render(<EliminacaoReclassificacaoCandidatoTela />, { wrapper });
       fireEvent.click(screen.getByRole("button", { name: /filtrar/i }));
       await waitFor(() => expect(screen.getByText("João")).toBeInTheDocument());
-      expect(screen.getByText(/\* Candidato reclassificado/)).toBeInTheDocument();
+      expect(screen.getByText("Desclassificado")).toBeInTheDocument();
       formState.useFilterValues = false;
     });
   });

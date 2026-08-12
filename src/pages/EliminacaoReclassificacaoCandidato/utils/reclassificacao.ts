@@ -4,6 +4,24 @@ export type ReclassificacaoHistorico = {
   mandado_judicial?: boolean;
 };
 
+export type TagReclassificacaoTipo = "desclassificado" | "reclassificado";
+
+/**
+ * Retorna o tipo de tag a exibir abaixo do nome do candidato, com base
+ * na reclassificação mais recente (primeira posição do array retornado
+ * pelo backend, ordenado por `-criado_em`).
+ *
+ * Sem histórico → `null`.
+ */
+export const obterTagReclassificacao = (
+  reclassificacoes: ReclassificacaoHistorico[]
+): TagReclassificacaoTipo | null => {
+  if (!reclassificacoes.length) return null;
+
+  const maisRecente = reclassificacoes[0];
+  return maisRecente.mandado_judicial ? "reclassificado" : "desclassificado";
+};
+
 /**
  * Retorna, para a categoria informada, o registro de histórico mais
  * recente entre os que a envolvem — seja como origem da
