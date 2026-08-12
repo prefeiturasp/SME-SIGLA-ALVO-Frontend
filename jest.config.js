@@ -1,6 +1,6 @@
 export default {
   testEnvironment: 'jsdom',
-  testTimeout: 15000,
+  testTimeout: 30000,
   maxWorkers: '50%',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',

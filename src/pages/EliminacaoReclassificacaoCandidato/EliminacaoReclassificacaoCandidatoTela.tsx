@@ -9,9 +9,15 @@ import { useGetConcursoByUuid } from "../GerenciamentoVagas/hooks/useGetConcurso
 import type { ColumnsType } from "antd/es/table";
 import { Select } from "antd";
 import AlterarSituacaiCandidatoModal from "./components/AlterarSituacaoCandidatoModal";
+import TagReclassificacaoCandidato from "./components/TagReclassificacaoCandidato";
 import { useGetHablitados } from "./hooks/useGetHablitados";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
-import { possuiDesclassificacaoAtiva, type ReclassificacaoHistorico } from "./utils/reclassificacao";
+import {
+  obterTagReclassificacao,
+  possuiDesclassificacaoAtiva,
+  type ReclassificacaoHistorico,
+  type TagReclassificacaoTipo,
+} from "./utils/reclassificacao";
 
 
 import { AppButton, AppIconButton, EditActionIcon, StyledSelect, AppFormItem, FilterActionSlot, FilterInlineRow, FilterFieldCol, FilterActionCol, FilterActionsGroup, selectSuffixIcon } from '@/components/ui';
@@ -37,6 +43,7 @@ type Registro = {
   reclassificadosDe?: string[];
   reclassificacoes?: ReclassificacaoHistorico[];
   hasReclassificacao?: boolean;
+  tagReclassificacao?: TagReclassificacaoTipo | null;
   tipoClassificacao: string;
   classificacaoGeral: number | string;
   classificacaoDeficiente: number | string;
@@ -82,7 +89,7 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<Registro | null>(null);
   const [habilitadosParams, setHabilitadosParams] = useState<Record<string, unknown> | undefined>(undefined);
-  const { habilitadosData, habilitadosIsFetching } = useGetHablitados(
+  const { habilitadosData, habilitadosIsFetching, habilitadosRefetch } = useGetHablitados(
     habilitadosParams,
     Boolean(habilitadosParams)
   );
@@ -110,6 +117,14 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
         key: "nome",
         sorter: (a: Registro, b: Registro) => a.nome.localeCompare(b.nome),
         sortDirections: ["ascend", "descend"],
+        render: (value: string, record: Registro) => (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+            <span>{value}</span>
+            {record.tagReclassificacao ? (
+              <TagReclassificacaoCandidato tipo={record.tagReclassificacao} />
+            ) : null}
+          </div>
+        ),
       },
       { title: "RF", dataIndex: "rf", key: "rf", align: "center" },
       { title: "RG", dataIndex: "rg", key: "rg", align: "center" },
@@ -119,12 +134,6 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
         dataIndex: "tipoClassificacao",
         key: "tipoClassificacao",
         align: "center",
-        render: (value: string, record: Registro) => (
-          <span>
-            {value}
-            {record.hasReclassificacao ? " *" : ""}
-          </span>
-        ),
       },
       {
         title: "Classificação geral",
@@ -242,6 +251,7 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
         reclassificadosDe,
         reclassificacoes: reclassificacoesList,
         hasReclassificacao: reclassificadosDe.length > 0,
+        tagReclassificacao: obterTagReclassificacao(reclassificacoesList),
         tipoClassificacao: tipo,
         classificacaoGeral: Number(item?.classificacao) || "-",
         classificacaoDeficiente: Number(item?.classificacao_pcd) || "-",
@@ -420,11 +430,6 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
           }}
           rowKey="key"
         />
-        {filteredRows.length > 0 && (
-          <div style={{ marginTop: 4, textAlign: "left" }}>
-            <Text type="secondary">* Candidato reclassificado</Text>
-          </div>
-        )}
       </Card>
 
       <AlterarSituacaiCandidatoModal
@@ -457,11 +462,6 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
           setSelectedRow(null);
         }}
         onSave={() => {
-          // Re-busca os dados do backend em vez de só corrigir a linha
-          // localmente: a situação, o histórico de reclassificações e
-          // os campos derivados (hasNNA/hasPCD/reclassificadosDe) do
-          // candidato alterado mudam no servidor e precisam refletir a
-          // fonte de verdade real antes do modal poder ser reaberto.
           habilitadosRefetch();
           setModalOpen(false);
           setSelectedRow(null);
