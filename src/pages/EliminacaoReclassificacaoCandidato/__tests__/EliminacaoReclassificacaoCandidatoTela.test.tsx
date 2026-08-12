@@ -238,10 +238,6 @@ describe("EliminacaoReclassificacaoCandidatoTela", () => {
     });
 
     it("ao salvar no modal, re-busca os dados do backend em vez de só corrigir a linha localmente", async () => {
-      // Regressão: salvar só fazia um patch local no campo "situacao",
-      // deixando reclassificadosDe/hasNNA/hasPCD desatualizados até um
-      // refresh manual — por isso era preciso repetir a ação 2x para
-      // ela "pegar" na tela.
       formState.useFilterValues = true;
       mockGetCandidatosHabilitados.mockReturnValue({
         response: Promise.resolve([habilitadoItem]),

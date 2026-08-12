@@ -462,11 +462,6 @@ const EliminacaoReclassificacaoCandidatoTela: React.FC = () => {
           setSelectedRow(null);
         }}
         onSave={() => {
-          // Re-busca os dados do backend em vez de só corrigir a linha
-          // localmente: a situação, o histórico de reclassificações e
-          // os campos derivados (hasNNA/hasPCD/reclassificadosDe) do
-          // candidato alterado mudam no servidor e precisam refletir a
-          // fonte de verdade real antes do modal poder ser reaberto.
           habilitadosRefetch();
           setModalOpen(false);
           setSelectedRow(null);
