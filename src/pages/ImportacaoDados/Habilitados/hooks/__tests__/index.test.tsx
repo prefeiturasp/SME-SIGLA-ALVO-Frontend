@@ -383,6 +383,8 @@ describe('ImportacaoDados Hooks - Cobertura Completa', () => {
         concurso_uuid: 'CONCURSO_001',
         arquivo: testFile,
         tipo: 'HABILITADOS',
+        mandado_judicial: false,
+        observacao: undefined,
       });
     });
 

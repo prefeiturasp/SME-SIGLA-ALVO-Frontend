@@ -4,17 +4,19 @@ export type ReclassificacaoHistorico = {
   mandado_judicial?: boolean;
 };
 
-/**
- * Retorna, para a categoria informada, o registro de histórico mais
- * recente entre os que a envolvem — seja como origem da
- * desclassificação (`desclassificado_de`), seja como destino de uma
- * reversão por mandado judicial (`nova_classificacao` com
- * `mandado_judicial=true`, que inverte esses campos).
- *
- * Assume que `reclassificacoes` já vem ordenado do mais recente para
- * o mais antigo (ver `listar_por_concurso_candidato_ordenado` no
- * backend).
- */
+export type TagReclassificacaoTipo = "desclassificado" | "reclassificado";
+
+
+export const obterTagReclassificacao = (
+  reclassificacoes: ReclassificacaoHistorico[]
+): TagReclassificacaoTipo | null => {
+  if (!reclassificacoes.length) return null;
+
+  const maisRecente = reclassificacoes[0];
+  return maisRecente.mandado_judicial ? "reclassificado" : "desclassificado";
+};
+
+
 export const obterEventoMaisRecentePorCategoria = (
   reclassificacoes: ReclassificacaoHistorico[],
   categoria: string
@@ -25,11 +27,7 @@ export const obterEventoMaisRecentePorCategoria = (
       (rec.nova_classificacao === categoria && Boolean(rec.mandado_judicial))
   );
 
-/**
- * Indica se a categoria tem uma desclassificação ativa (ainda não
- * revertida por mandado judicial) — ou seja, se o evento mais recente
- * que a envolve é, ele próprio, uma desclassificação dessa categoria.
- */
+
 export const possuiDesclassificacaoAtiva = (
   reclassificacoes: ReclassificacaoHistorico[],
   categoria: string
@@ -45,11 +43,7 @@ export const possuiDesclassificacaoAtiva = (
   );
 };
 
-/**
- * Retorna, para a lista de categorias informada, os eventos de
- * desclassificação ainda ativos (reversíveis por mandado judicial) —
- * um por categoria, no máximo.
- */
+
 export const obterReclassificacoesReversiveis = (
   reclassificacoes: ReclassificacaoHistorico[],
   categorias: string[]
