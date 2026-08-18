@@ -47,10 +47,10 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
     Então o sistema exibe a tela "Resumo do processo"
     E valido a existência dos dados do processo de convocação:
       | Concurso           |
-      | Tipo de processo   |
-      | Titulo             |
+      | Tipo de Escolha     |
+      | Descrição           |
       | Data da convocação |
-      | Data da publicação |
+      | Data corte de vagas |
       | Modalidade         |
     E valido a tabela de agenda de convocação ou mensagem vazia
     Quando clico em "Voltar"
@@ -209,10 +209,10 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
 
     E valido a existência dos dados do processo de convocação:
       | Concurso           |
-      | Tipo de processo   |
-      | Titulo             |
+      | Tipo de Escolha     |
+      | Descrição           |
       | Data da convocação |
-      | Data da publicação |
+      | Data corte de vagas |
       | Modalidade         |
 
     E valido a tabela de agenda de convocação ou mensagem vazia

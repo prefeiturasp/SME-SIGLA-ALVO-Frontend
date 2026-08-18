@@ -11,7 +11,7 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Contraste direto entre perfis — visualização bloqueado vs admin com acesso pleno ao Gerenciamento de Vagas
   # ════════════════════════════════════════════════════════════════
-  @contraste-perfis @critico @comparacao @skip
+  @contraste-perfis @critico @comparacao
   Cenário: Contraste direto entre perfis — visualização bloqueado vs admin com acesso pleno ao Gerenciamento de Vagas
     Dado que estou logado no sistema com perfil de visualização
     Quando navego até a opção "Processos"
@@ -71,10 +71,10 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
 
     E valido a existência dos dados do processo de convocação:
       | Concurso           |
-      | Tipo de processo   |
-      | Titulo             |
+      | Tipo de Escolha     |
+      | Descrição           |
       | Data da convocação |
-      | Data da publicação |
+      | Data corte de vagas |
       | Modalidade         |
     E valido a tabela de agenda de convocação ou mensagem vazia
 
@@ -84,7 +84,7 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Busca por cargo e validação de restrições de permissão em todas as ações da tabela
   # ════════════════════════════════════════════════════════════════
-  @busca-cargo @permissoes-tabela @critico @perfil-visualizacao @skip
+  @busca-cargo @permissoes-tabela @critico @perfil-visualizacao
   Cenário: Busca por cargo e validação de restrições de permissão em todas as ações da tabela
     Dado que estou logado no sistema com perfil de visualização
     Quando navego até a opção "Processos"
@@ -111,19 +111,19 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
     Então o sistema exibe a tela "Resumo do processo"
     E valido a existência dos dados do processo de convocação:
       | Concurso           |
-      | Tipo de processo   |
-      | Titulo             |
+      | Tipo de Escolha     |
+      | Descrição           |
       | Data da convocação |
-      | Data da publicação |
+      | Data corte de vagas |
       | Modalidade         |
 
     Quando clico no botão "Voltar"
     Então o sistema exibe a tela "Lista de Convocações"
 
   # ════════════════════════════════════════════════════════════════
-  # CENÁRIO 4 — Auditoria completa de restrições de acesso em todos os módulos de processos em sessão única    [@skip]
+  # CENÁRIO 4 — Auditoria completa de restrições de acesso em todos os módulos de processos em sessão única
   # ════════════════════════════════════════════════════════════════
-  @auditoria-permissoes @critico @perfil-visualizacao @skip
+  @auditoria-permissoes @critico @perfil-visualizacao
   Cenário: Auditoria completa de restrições de acesso em todos os módulos de processos em sessão única
     Dado que estou logado no sistema com perfil de visualização
     Quando navego até a opção "Processos"
@@ -260,7 +260,7 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 7 — Jornada completa de preenchimento sequencial da escolha de candidatos com perfil de visualização
   # ════════════════════════════════════════════════════════════════
-  @escolha-candidatos @e2e @perfil-visualizacao @skip
+  @escolha-candidatos @e2e @perfil-visualizacao
   Cenário: Jornada completa de preenchimento sequencial da escolha de candidatos com perfil de visualização
     Dado que estou logado no sistema com perfil de visualização
     Quando navego até a opção "Processos"

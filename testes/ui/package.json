@@ -14,8 +14,11 @@
     "cy:cloud:api": "cypress-cloud run --parallel --browser chrome --record --spec 'cypress/e2e/api/**/*.feature'",
     "report": "node scripts/gerar-relatorio.js",
     "report:spec": "node scripts/gerar-relatorio.js --spec",
+    "dashboard": "node scripts/gerar-dashboard.js",
+    "dashboard:repo": "node scripts/gerar-dashboard.js --sem-screenshots",
     "test:report": "node scripts/rodar-tudo.js",
-    "test:report:spec": "node scripts/rodar-tudo.js --spec"
+    "test:report:spec": "node scripts/rodar-tudo.js --spec",
+    "test:report:ui": "node scripts/rodar-tudo.js --ui"
   },
   "cypress-cucumber-preprocessor": {
     "stepDefinitions": [

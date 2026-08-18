@@ -69,7 +69,10 @@ function gerar() {
   const todos = dedupJsons()
   const alvo = filtrarPorSpec(todos, specFilter)
 
-  const sufixo = specFilter ? `-${specFilter}` : '-consolidado'
+  // Sufixo usado no nome do arquivo precisa ser seguro em qualquer SO — o
+  // filtro pode conter separadores de caminho (ex.: "--ui" passa "\ui\" no
+  // Windows), que não podem aparecer em nome de arquivo/pasta.
+  const sufixo = specFilter ? `-${specFilter.replace(/[\\/]/g, '')}` : '-consolidado'
   const mergedPath = path.join(REPORT_DIR, `merged${sufixo}.json`)
   const htmlName = `relatorio${sufixo}`
 

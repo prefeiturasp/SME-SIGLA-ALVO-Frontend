@@ -8,7 +8,7 @@ Funcionalidade: Processos — Convocação de Candidatos (Modalidade Presencial)
   # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
   # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
-  # CONCURSO   : Concurso de Exemplo 2
+  # CONCURSO   : Test Judicial
   # CARGO      : Analista de Sistemas
   # ============================================================
 
@@ -26,7 +26,7 @@ Funcionalidade: Processos — Convocação de Candidatos (Modalidade Presencial)
     E clico em "Nova convocação" na lista de convocações
     Então o sistema exibe a tela "Nova convocação"
 
-    Quando seleciono o concurso "Concurso de Exemplo 2"
+    Quando seleciono o concurso "Test Judicial"
     E seleciono o tipo de escolha "Nova Autorização"
     E preencho o campo "Descrição" com "Processo de convocação Presencial"
     E seleciono a data da convocação como sendo "ontem"
@@ -94,7 +94,7 @@ Funcionalidade: Processos — Convocação de Candidatos (Modalidade Presencial)
     E clico em "Nova convocação" na lista de convocações
     Então o sistema exibe a tela "Nova convocação"
 
-    Quando seleciono o concurso "Concurso de Exemplo 2"
+    Quando seleciono o concurso "Test Judicial"
     E seleciono o tipo de escolha "Reposição"
     E preencho o campo "Descrição" com "Processo de convocação Reposição Presencial"
     E seleciono a data da convocação como sendo "ontem"
@@ -149,9 +149,9 @@ Funcionalidade: Processos — Convocação de Candidatos (Modalidade Presencial)
     Então o sistema retorna para a lista de convocações
 
   # ════════════════════════════════════════════════════════════════
-  # CENÁRIO 3 — Criar convocação completa com agendamento (Reconvocação) - Presencial    [@skip]
+  # CENÁRIO 3 — Criar convocação completa com agendamento (Reconvocação) - Presencial
   # ════════════════════════════════════════════════════════════════
-  @skip @nova-convocacao-presencial @e2e @critico
+  @nova-convocacao-presencial @e2e @critico
   Cenário: Criar convocação completa com agendamento (Reconvocação) - Presencial
 
     # =====================================================

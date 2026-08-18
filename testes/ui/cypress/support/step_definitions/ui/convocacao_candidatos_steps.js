@@ -78,12 +78,15 @@ const convocacaoSelectors = {
     botaoGerenciar: () => cy.contains('button', /Gerenciar processo/i, { timeout: 5000 }),
     botaoVoltar: () => cy.contains('button', /Voltar/i),
     
+    // A tela real de "Resumo do processo" (confirmada ao vivo) não tem os
+    // campos "Tipo de processo"/"Título"/"Data da publicação" — os rótulos
+    // reais são "Tipo de Escolha", "Descrição" e "Data corte de vagas".
     campos: {
       concurso: () => cy.contains(/Concurso/i),
-      tipoProcesso: () => cy.contains(/Tipo de processo/i),
-      titulo: () => cy.contains(/T[íi]tulo/i),
+      tipoProcesso: () => cy.contains(/Tipo de Escolha/i),
+      titulo: () => cy.contains(/Descri[çc][ãa]o/i),
       dataConvocacao: () => cy.contains(/Data da convoca[çc][ãa]o/i),
-      dataPublicacao: () => cy.contains(/Data da publica[çc][ãa]o/i),
+      dataPublicacao: () => cy.contains(/Data corte de vagas/i),
       modalidade: () => cy.contains(/Modalidade/i)
     },
 
@@ -477,13 +480,13 @@ Then('valido a existência dos dados do processo de convocação:', (dataTable) 
   campos.forEach((campo) => {
     if (campo.match(/Concurso/i)) {
       convocacaoSelectors.resumo.campos.concurso().should('be.visible')
-    } else if (campo.match(/Tipo de processo/i)) {
+    } else if (campo.match(/Tipo de Escolha/i)) {
       convocacaoSelectors.resumo.campos.tipoProcesso().should('be.visible')
-    } else if (campo.match(/T[íi]tulo/i)) {
+    } else if (campo.match(/Descri[çc][ãa]o/i)) {
       convocacaoSelectors.resumo.campos.titulo().should('be.visible')
     } else if (campo.match(/Data da convoca[çc][ãa]o/i)) {
       convocacaoSelectors.resumo.campos.dataConvocacao().should('be.visible')
-    } else if (campo.match(/Data da publica[çc][ãa]o/i)) {
+    } else if (campo.match(/Data corte de vagas/i)) {
       convocacaoSelectors.resumo.campos.dataPublicacao().should('be.visible')
     } else if (campo.match(/Modalidade/i)) {
       convocacaoSelectors.resumo.campos.modalidade().should('be.visible')

@@ -27,12 +27,14 @@ const formatarData = (data) => {
   return `${dd}/${mm}/${yyyy}`
 }
 
-const resolverData = (referencia) => {
+const resolverDataObjeto = (referencia) => {
   const data = new Date()
   if (/ontem/i.test(referencia)) data.setDate(data.getDate() - 1)
   else if (/amanhã|amanha/i.test(referencia)) data.setDate(data.getDate() + 1)
-  return formatarData(data)
+  return data
 }
+
+const resolverData = (referencia) => formatarData(resolverDataObjeto(referencia))
 
 // Formata data como atributo title do calendário Ant Design (YYYY-MM-DD)
 const toAttrDate = (data) => {
@@ -40,6 +42,30 @@ const toAttrDate = (data) => {
   const mm = String(data.getMonth() + 1).padStart(2, '0')
   const dd = String(data.getDate()).padStart(2, '0')
   return `${yyyy}-${mm}-${dd}`
+}
+
+// "Data da convocação" e "Data corte de Vagas" (etapa 1 do formulário de nova
+// convocação) NÃO aceitam digitação — confirmado ao vivo: digitar no input
+// (com ou sem clique/foco prévio) nunca altera o value do campo, só clicar na
+// célula do calendário funciona. É um comportamento diferente dos outros
+// campos de data deste mesmo arquivo (ex.: "Escolha em"/"Nomeação em" da
+// etapa Agendar, que aceitam texto livre — ver confirmarDataNoPicker).
+// Usa .last() no dropdown pelo mesmo motivo documentado em
+// cy.selecionarOpcaoAntd (commands.js): o Ant Design pode manter o painel do
+// datepicker anterior no DOM/:visible ao abrir o próximo, e sem escopar ao
+// último aberto o clique pode acertar o calendário errado.
+const clicarDataNoCalendario = (getFormItem, data) => {
+  getFormItem()
+    .find('.ant-picker-input input')
+    .first()
+    .click({ force: true })
+  cy.get('.ant-picker-dropdown:visible', { timeout: 8000 }).last().should('be.visible')
+  cy.get('.ant-picker-dropdown:visible')
+    .last()
+    .find(`td[title="${toAttrDate(data)}"]`)
+    .first()
+    .click({ force: true })
+  cy.wait(1000)
 }
 
 // Seleciona um range de datas clicando nas células do calendário Ant Design.
@@ -287,7 +313,13 @@ Then('o sistema exibe mensagens de erro nos campos obrigatórios', () => {
 // STEPS — ETAPA 1 (PHRASINGS REFINADOS)
 // =====================================================
 
-When('seleciono o concurso {string}', (valor) => {
+// A lista de concursos vem de uma API compartilhada no ambiente de QA
+// (crescendo com dados de outras execuções/usuários) — a posição de um
+// concurso específico na janela virtualizada não é estável entre execuções,
+// então "rolar até o fim" nem sempre traz o item procurado pra dentro do
+// range renderizado. Tenta rolar até o fim e, se não achar, até o topo,
+// antes de desistir — mais barato que travar cego numa direção só.
+const selecionarConcurso = (valor, tentativasRestantes = 2) => {
   cy.contains('label, span', /^Concurso$/i, { timeout: 10000 })
     .closest('.ant-form-item, .ant-row')
     .find('.ant-select-selector')
@@ -296,10 +328,34 @@ When('seleciono o concurso {string}', (valor) => {
   cy.get('.ant-select-dropdown:visible .rc-virtual-list-holder')
     .scrollTo('bottom', { ensureScrollable: false })
   cy.wait(2000)
-  cy.contains('.ant-select-item-option-content', valor, { timeout: 12000 })
-    .scrollIntoView()
-    .click({ force: true })
+  cy.get('body').then(($body) => {
+    const encontrado = [...$body[0].querySelectorAll('.ant-select-dropdown:visible .ant-select-item-option-content')]
+      .some((el) => el.textContent.includes(valor))
+    if (!encontrado) {
+      cy.get('.ant-select-dropdown:visible .rc-virtual-list-holder')
+        .scrollTo('top', { ensureScrollable: false })
+      cy.wait(1000)
+    }
+    cy.get('body').then(($body2) => {
+      const encontradoAgora = [...$body2[0].querySelectorAll('.ant-select-dropdown:visible .ant-select-item-option-content')]
+        .some((el) => el.textContent.includes(valor))
+      if (!encontradoAgora && tentativasRestantes > 1) {
+        cy.log(`Concurso "${valor}" não encontrado na janela renderizada — fechando e tentando de novo (tentativas restantes: ${tentativasRestantes - 1})`)
+        cy.get('body').type('{esc}')
+        cy.wait(1000)
+        selecionarConcurso(valor, tentativasRestantes - 1)
+        return
+      }
+      cy.contains('.ant-select-dropdown:visible .ant-select-item-option-content', valor, { timeout: 12000 })
+        .scrollIntoView()
+        .click({ force: true })
+    })
+  })
   cy.wait(2000)
+}
+
+When('seleciono o concurso {string}', (valor) => {
+  selecionarConcurso(valor)
 })
 
 When('seleciono o tipo de escolha {string}', (valor) => {
@@ -397,27 +453,19 @@ When('clica e preencho o campo {string} com {string}', (campo, valor) => {
 })
 
 When('seleciono a data da convocação como sendo {string}', (referencia) => {
-  const dataFormatada = resolverData(referencia)
-  cy.contains('label, span', /Data da convoca[çc][ãa]o/i, { timeout: 10000 })
-    .closest('.ant-form-item')
-    .find('.ant-picker-input input')
-    .first()
-    .click({ force: true })
-    .type('{selectall}' + dataFormatada, { force: true })
-    .type('{enter}', { force: true })
-  cy.wait(1500)
+  const data = resolverDataObjeto(referencia)
+  clicarDataNoCalendario(
+    () => cy.contains('label, span', /Data da convoca[çc][ãa]o/i, { timeout: 10000 }).closest('.ant-form-item'),
+    data
+  )
 })
 
 When('seleciono a data corte de vagas como sendo {string}', (referencia) => {
-  const dataFormatada = resolverData(referencia)
-  cy.contains('label, span', /Data corte de Vagas/i, { timeout: 10000 })
-    .closest('.ant-form-item')
-    .find('.ant-picker-input input')
-    .first()
-    .click({ force: true })
-    .type('{selectall}' + dataFormatada, { force: true })
-    .type('{enter}', { force: true })
-  cy.wait(1500)
+  const data = resolverDataObjeto(referencia)
+  clicarDataNoCalendario(
+    () => cy.contains('label, span', /Data corte de Vagas/i, { timeout: 10000 }).closest('.ant-form-item'),
+    data
+  )
 })
 
 // Verifica no log do Cypress qualquer sinal de que o clique não teve efeito:
@@ -596,100 +644,36 @@ When('preencho a data de nomeação', () => {
   confirmarDataNoPicker(nomeacao)
 })
 
-// Campo tinha um atributo customizado (date-range="start"/"end") que o app
-// parou de renderizar; a tentativa seguinte (classes nativas do Ant Design
-// .ant-picker-input-start/-end) também não bateu com o DOM atual — sem
-// acesso ao DOM ao vivo, adivinhar mais uma classe é method arriscado.
-// Em vez disso, localizamos os inputs pelo mesmo padrão já comprovado nos
-// outros campos deste formulário ("Data da convocação", "Data corte de
-// Vagas"): a partir do label visível, sobe até o .ant-form-item/.ant-row
-// mais próximo e pega os inputs visíveis ali dentro (1º = início, 2º = fim).
-//
-// Digitar o texto direto no input não atualiza a seleção interna do painel do
-// TimePicker — é preciso clicar nas células de hora/minuto
-// (.ant-picker-time-panel-column) para o "OK" habilitar e o valor ser
-// realmente commitado (confirmado via screenshot: "OK" ficava acinzentado
-// depois de só digitar).
-//
-// IMPORTANTE: os dois inputs (start/end) pertencem a um único Ant Design
-// RangePicker (classe .ant-picker-dropdown-range no dropdown) — não são dois
-// TimePickers independentes. Por isso, clicar em "OK" depois de selecionar
-// o horário de início NÃO fecha o dropdown: ele só transiciona internamente
-// para a seleção do horário de fim, permanecendo aberto. Só o "OK" clicado
-// depois que os dois lados (início e fim) estão selecionados de fato fecha o
-// dropdown — esperar o fechamento logo após o primeiro "OK" trava o teste
-// num timeout, pois esse fechamento nunca acontece nesse ponto do fluxo.
-const selecionarHoraNoPainel = (horaTexto) => {
-  const [hh, mm] = horaTexto.split(':')
-  cy.get('.ant-picker-dropdown:visible', { timeout: 8000 })
-    .should('be.visible')
-    .within(() => {
-      cy.get('.ant-picker-time-panel-column').eq(0)
-        .contains('.ant-picker-time-panel-cell-inner', new RegExp(`^${hh}$`))
-        .scrollIntoView()
-        .click({ force: true })
-      cy.get('.ant-picker-time-panel-column').eq(1)
-        .contains('.ant-picker-time-panel-cell-inner', new RegExp(`^${mm}$`))
-        .scrollIntoView()
-        .click({ force: true })
-      cy.contains('.ant-btn, button, a', /^OK$/i, { timeout: 8000 })
-        .should('not.be.disabled')
-        .click({ force: true })
-    })
-}
-
-const inputsHoraPorLabel = () => {
-  const regex = /Hora da convoca[çc][ãa]o/i
-  return cy.get('label, span', { timeout: 10000 })
-    .filter((i, el) => regex.test(el.textContent) && !el.closest('.ant-breadcrumb'))
-    .should('have.length.greaterThan', 0)
-    .first()
-    .then(($label) => {
-      const $formItem = $label.closest('.ant-form-item, .ant-row')
-      let $container = $formItem.length > 0 ? $formItem : $label.parent().parent()
-      let $inputs = $container.find('input').filter(':visible')
-
-      // Três tentativas anteriores (atributo customizado, classes do Ant
-      // Design, container do label) já erraram o alvo desse campo. Em vez de
-      // arriscar mais um seletor às cegas sem ver o DOM real, sobe até 4
-      // níveis a partir do label procurando algum ancestral que já contenha
-      // inputs visíveis — e loga o HTML do container final usado, pra
-      // diagnosticar com precisão caso ainda erre.
-      for (let i = 0; $inputs.length === 0 && i < 4; i++) {
-        $container = $container.parent()
-        $inputs = $container.find('input').filter(':visible')
-      }
-
-      cy.log(
-        `[DEBUG Hora da convocação] inputs visíveis encontrados: ${$inputs.length} — HTML do container: ${($container.prop('outerHTML') || '').slice(0, 3000)}`
-      )
-
-      return cy.wrap($inputs)
-    })
-}
-
-const preencherPeriodoDeHoras = (inicio, fim) => {
-  inputsHoraPorLabel().eq(0).click({ force: true })
-  selecionarHoraNoPainel(inicio)
+// "Hora da convocação" (modalidade Presencial) NÃO é um range picker com
+// painéis de hora/minuto como se supunha (três tentativas anteriores já
+// erraram nessa premissa — ver histórico de comentários removidos aqui).
+// Confirmado ao vivo: é um Ant Select simples de escolha única, com só a
+// HORA de início (ex.: "10", sem minutos). Não existe campo de "hora fim" —
+// ao clicar em "Adicionar período" (step separado "adiciono um novo
+// período"), o sistema gera sozinho as sessões seguintes de 1h em 1h a
+// partir dessa hora de início, uma por unidade do campo "Sessão", até
+// completar a quantidade de "Candidatos". Por isso este step só seleciona a
+// hora de início — o "a {string}" (fim) do texto do Gherkin não corresponde
+// a nenhum campo real e é ignorado.
+const preencherPeriodoDeHoras = (inicio) => {
+  const [horaInicio] = inicio.split(':')
+  cy.contains('label, span', /Hora da convoca[çc][ãa]o/i, { timeout: 10000 })
+    .closest('.ant-form-item, .ant-row')
+    .find('.ant-select-selector')
+    .click({ force: true })
+  cy.get('.ant-select-dropdown:visible', { timeout: 8000 }).should('be.visible')
+  cy.get('.ant-select-dropdown:visible')
+    .contains('.ant-select-item-option', new RegExp(`^${horaInicio}$`))
+    .click({ force: true })
   cy.wait(500)
-
-  inputsHoraPorLabel().eq(1).click({ force: true })
-  selecionarHoraNoPainel(fim)
-
-  // Só agora — depois que início E fim foram selecionados — o dropdown
-  // deve de fato fechar.
-  cy.get('.ant-picker-dropdown:visible', { timeout: 8000 }).should('not.exist')
-
-  inputsHoraPorLabel().eq(0).should('have.value', inicio)
-  inputsHoraPorLabel().eq(1).should('have.value', fim)
 }
 
-When('preencho o período de horas de {string} a {string}', (inicio, fim) => {
-  preencherPeriodoDeHoras(inicio, fim)
+When('preencho o período de horas de {string} a {string}', (inicio) => {
+  preencherPeriodoDeHoras(inicio)
 })
 
-When('clica e preencho o período de horas de {string} a {string}', (inicio, fim) => {
-  preencherPeriodoDeHoras(inicio, fim)
+When('clica e preencho o período de horas de {string} a {string}', (inicio) => {
+  preencherPeriodoDeHoras(inicio)
 })
 
 When('adiciono um novo período', () => {

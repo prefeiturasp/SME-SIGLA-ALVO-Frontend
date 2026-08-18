@@ -36,6 +36,11 @@ module.exports = defineConfig({
     videoCompression: false,
     screenshotOnRunFailure: true,
 
+    // Por padrão o Cypress apaga TODA a pasta de vídeos/screenshots no início
+    // de cada "cypress run", mesmo quando a execução é filtrada por --spec.
+    // Desativado para preservar evidências de execuções anteriores.
+    trashAssetsBeforeRuns: false,
+
     chromeWebSecurity: false,
     defaultCommandTimeout: 20000,
     pageLoadTimeout: 90000,
@@ -90,9 +95,35 @@ module.exports = defineConfig({
 
     async setupNodeEvents(on, config) {
       // =========================
-      // MOCHAWESOME REPORTER
+      // MOCHAWESOME REPORTER + DASHBOARD LOCAL PÓS-EXECUÇÃO
       // =========================
-      require('cypress-mochawesome-reporter/plugin')(on)
+      // Cypress só mantém UM handler por evento de ciclo de vida ('after:run'
+      // incluso): registrar on('after:run', ...) mais de uma vez faz o último
+      // registro substituir o anterior EM SILÊNCIO (sem erro/aviso). O antigo
+      // require('cypress-mochawesome-reporter/plugin')(on) registra o próprio
+      // 'after:run' dele — chamado depois do nosso, ele vencia e o dashboard
+      // local nunca rodava (era esse o motivo do dashboard.html ficar
+      // desatualizado). A solução é importar os hooks do reporter direto de
+      // 'cypress-mochawesome-reporter/lib' e compor um único handler por
+      // evento, chamando o hook do reporter e, na sequência, o dashboard. Ele
+      // só roda localmente: nunca em CI (Jenkins seta CI=true), e uma falha
+      // nele é só um aviso — nunca derruba a execução dos testes nem altera
+      // o exit code.
+      const { beforeRunHook, afterRunHook } = require('cypress-mochawesome-reporter/lib')
+
+      on('before:run', async (details) => {
+        await beforeRunHook(details)
+      })
+
+      on('after:run', async (results) => {
+        await afterRunHook(results)
+        if (process.env.CI) return
+        try {
+          require('./scripts/gerar-dashboard.js').gerar()
+        } catch (e) {
+          console.warn('Aviso: falha ao gerar dashboard local (ignorado):', e.message)
+        }
+      })
 
       // =========================
       // CUCUMBER

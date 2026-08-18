@@ -8,14 +8,14 @@ Funcionalidade: Processos — Convocação de Candidatos
   # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
   # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
-  # CONCURSO   : Concurso de Exemplo 2
+  # CONCURSO   : Test Judicial
   # CARGO      : Analista de Sistemas (Reconvocação usa Engenheiro de Software)
   # ============================================================
 
   # ════════════════════════════════════════════════════════════════
-  # CENÁRIO 1 — Criar convocação completa com agendamento (Nova Autorização)    [@skip]
+  # CENÁRIO 1 — Criar convocação completa com agendamento (Nova Autorização)
   # ════════════════════════════════════════════════════════════════
-  @skip @nova-convocacao @e2e @critico
+  @nova-convocacao @e2e @critico
   Cenário: Criar convocação completa com agendamento (Nova Autorização)
 
     # =====================================================
@@ -26,7 +26,7 @@ Funcionalidade: Processos — Convocação de Candidatos
     E clico em "Nova convocação" na lista de convocações
     Então o sistema exibe a tela "Nova convocação"
 
-    Quando seleciono o concurso "Concurso de Exemplo 2"
+    Quando seleciono o concurso "Test Judicial"
     E seleciono o tipo de escolha "Nova Autorização"
     E preencho o campo "Descrição" com "Processo de convocação"
     E seleciono a data da convocação como sendo "ontem"
@@ -75,9 +75,9 @@ Funcionalidade: Processos — Convocação de Candidatos
     Então o sistema retorna para a lista de convocações
 
   # ════════════════════════════════════════════════════════════════
-  # CENÁRIO 2 — Criar convocação completa com agendamento (Reposição)    [@skip]
+  # CENÁRIO 2 — Criar convocação completa com agendamento (Reposição)
   # ════════════════════════════════════════════════════════════════
-  @skip @nova-convocacao @e2e @critico
+  @nova-convocacao @e2e @critico
   Cenário: Criar convocação completa com agendamento (Reposição)
 
     # =====================================================
@@ -88,7 +88,7 @@ Funcionalidade: Processos — Convocação de Candidatos
     E clico em "Nova convocação" na lista de convocações
     Então o sistema exibe a tela "Nova convocação"
 
-    Quando seleciono o concurso "Concurso de Exemplo 2"
+    Quando seleciono o concurso "Test Judicial"
     E seleciono o tipo de escolha "Reposição"
     E preencho o campo "Descrição" com "Processo de convocação reposição"
     E seleciono a data da convocação como sendo "ontem"
@@ -137,9 +137,9 @@ Funcionalidade: Processos — Convocação de Candidatos
     Então o sistema retorna para a lista de convocações
 
   # ════════════════════════════════════════════════════════════════
-  # CENÁRIO 3 — Criar convocação completa com agendamento (Reconvocação)    [@skip]
+  # CENÁRIO 3 — Criar convocação completa com agendamento (Reconvocação)
   # ════════════════════════════════════════════════════════════════
-  @skip @nova-convocacao2 @e2e @critico
+  @nova-convocacao2 @e2e @critico
   Cenário: Criar convocação completa com agendamento (Reconvocação)
 
     # =====================================================
@@ -150,7 +150,7 @@ Funcionalidade: Processos — Convocação de Candidatos
     E clico em "Nova convocação" na lista de convocações
     Então o sistema exibe a tela "Nova convocação"
 
-    Quando seleciono o concurso "Concurso de Exemplo 2"
+    Quando seleciono o concurso "Test Judicial"
     E seleciono o tipo de escolha "Reconvocação"
     E preencho o campo "Descrição" com "Processo de convocação Reconvocação"
     E seleciono a data da convocação como sendo "ontem"
@@ -269,9 +269,9 @@ Funcionalidade: Processos — Convocação de Candidatos
       | Buscar         |
 
   # ════════════════════════════════════════════════════════════════
-  # CENÁRIO 8 — Fluxo completo — da página inicial à etapa 2 de configuração de cargos    [@skip]
+  # CENÁRIO 8 — Fluxo completo — da página inicial à etapa 2 de configuração de cargos
   # ════════════════════════════════════════════════════════════════
-  @skip @fluxo-completo @critico
+  @fluxo-completo @critico
   Cenário: Fluxo completo — da página inicial à etapa 2 de configuração de cargos
     Dado que estou na página inicial do SIGLA
     Então o sistema exibe o título "ALOCAÇÃO DE VAGAS ONLINE"
@@ -290,7 +290,7 @@ Funcionalidade: Processos — Convocação de Candidatos
       | Seleção e configuração dos cargos |
       | Agendar                           |
       | Resumo                            |
-    Quando seleciono "Concurso de Exemplo 2" no campo Concurso
+    Quando seleciono "Test Judicial" no campo Concurso
     E seleciono "Nova Autorização" no campo Tipo de Escolha
     E preencho o campo Descrição com "Processo de convocação de candidatos" no formulário de convocação
     E preencho a Data da convocação com a data de ontem
