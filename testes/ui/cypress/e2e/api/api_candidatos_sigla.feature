@@ -17,6 +17,9 @@ Funcionalidade: API Candidatos SIGLA
     Dado que a API de Candidatos SIGLA está acessível
 
   # GET /ms-candidatos/api/schema/ — listar schema
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1 — Listar schema OpenAPI em formato JSON retorna 200
+  # ════════════════════════════════════════════════════════════════
   @smoke @schema_listagem
   Cenário: Listar schema OpenAPI em formato JSON retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/schema/?format=json"
@@ -24,11 +27,17 @@ Funcionalidade: API Candidatos SIGLA
     E a resposta SIGLA deve conter "paths"
     E a resposta SIGLA deve conter "components"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 2 — Listar schema OpenAPI em formato YAML retorna 406 (Not Acceptable)
+  # ════════════════════════════════════════════════════════════════
   @smoke @schema_listagem
   Cenário: Listar schema OpenAPI em formato YAML retorna 406 (Not Acceptable)
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/schema/?format=yaml"
     Então o status SIGLA deve ser 406
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 3 — Schema contém endpoints de candidatos
+  # ════════════════════════════════════════════════════════════════
   @contrato @schema_contrato
   Cenário: Schema contém endpoints de candidatos
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/schema/?format=json"
@@ -36,6 +45,9 @@ Funcionalidade: API Candidatos SIGLA
     E a resposta SIGLA deve conter "/ms-candidatos/api/v1/candidatos/"
     E a resposta SIGLA deve conter "/ms-candidatos/api/v1/habilitados/"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 4 — Requisitar schema com linguagem inválida retorna 200 (não valida parâmetro)
+  # ════════════════════════════════════════════════════════════════
   @negativo @schema_linguagem_invalida
   Cenário: Requisitar schema com linguagem inválida retorna 200 (não valida parâmetro)
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/schema/?lang=xyz"
@@ -45,6 +57,9 @@ Funcionalidade: API Candidatos SIGLA
   # GET /ms-candidatos/api/v1/candidatos/ — listar candidatos
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 5 — Listar candidatos sem parâmetros retorna 200 e estrutura paginada
+  # ════════════════════════════════════════════════════════════════
   @smoke @candidatos_listagem
   Cenário: Listar candidatos sem parâmetros retorna 200 e estrutura paginada
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/"
@@ -54,6 +69,9 @@ Funcionalidade: API Candidatos SIGLA
     E a resposta SIGLA deve conter "previous"
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 6 — Listar candidatos retorna campos obrigatórios nos resultados
+  # ════════════════════════════════════════════════════════════════
   @smoke @candidatos_listagem
   Cenário: Listar candidatos retorna campos obrigatórios nos resultados
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/"
@@ -65,6 +83,9 @@ Funcionalidade: API Candidatos SIGLA
     E a resposta SIGLA deve conter "status"
     E a resposta SIGLA deve conter "genero"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 7 — Listar candidatos com paginação retorna página 2
+  # ════════════════════════════════════════════════════════════════
   @paginacao @candidatos_paginacao
   Cenário: Listar candidatos com paginação retorna página 2
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?page=2"
@@ -72,77 +93,116 @@ Funcionalidade: API Candidatos SIGLA
     E a resposta SIGLA deve conter "results"
     E a resposta SIGLA deve conter "previous"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 8 — Filtrar candidatos por gênero feminino retorna 200
+  # ════════════════════════════════════════════════════════════════
   @filtro @candidatos_filtro_genero
   Cenário: Filtrar candidatos por gênero feminino retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?genero=F"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 9 — Filtrar candidatos por gênero masculino retorna 200
+  # ════════════════════════════════════════════════════════════════
   @filtro @candidatos_filtro_genero
   Cenário: Filtrar candidatos por gênero masculino retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?genero=M"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 10 — Filtrar candidatos por estado SP retorna 200
+  # ════════════════════════════════════════════════════════════════
   @filtro @candidatos_filtro_estado
   Cenário: Filtrar candidatos por estado SP retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?estado=SP"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 11 — Filtrar candidatos por cidade SAO PAULO retorna 200
+  # ════════════════════════════════════════════════════════════════
   @filtro @candidatos_filtro_cidade
   Cenário: Filtrar candidatos por cidade SAO PAULO retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?cidade=SAO%20PAULO"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 12 — Filtrar candidatos por status ativo retorna 200
+  # ════════════════════════════════════════════════════════════════
   @filtro @candidatos_filtro_status
   Cenário: Filtrar candidatos por status ativo retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?status=ativo"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 13 — Filtrar candidatos por status inativo retorna 200
+  # ════════════════════════════════════════════════════════════════
   @filtro @candidatos_filtro_status
   Cenário: Filtrar candidatos por status inativo retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?status=inativo"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 14 — Buscar candidatos por termo retorna 200
+  # ════════════════════════════════════════════════════════════════
   @busca @candidatos_busca
   Cenário: Buscar candidatos por termo retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?search=Candidato"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 15 — Buscar candidatos por CPF retorna 200
+  # ════════════════════════════════════════════════════════════════
   @busca @candidatos_busca_cpf
   Cenário: Buscar candidatos por CPF retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?search=00095811036"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 16 — Ordenar candidatos por nome retorna 200
+  # ════════════════════════════════════════════════════════════════
   @ordenacao @candidatos_ordenacao
   Cenário: Ordenar candidatos por nome retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?ordering=nome"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 17 — Ordenar candidatos por nome decrescente retorna 200
+  # ════════════════════════════════════════════════════════════════
   @ordenacao @candidatos_ordenacao
   Cenário: Ordenar candidatos por nome decrescente retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?ordering=-nome"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 18 — Filtrar candidatos com múltiplos parâmetros retorna 200
+  # ════════════════════════════════════════════════════════════════
   @filtro @candidatos_filtro_multiplo
   Cenário: Filtrar candidatos com múltiplos parâmetros retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?genero=F&estado=SP&status=ativo"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 19 — Requisitar página inválida retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @candidatos_pagina_invalida
   Cenário: Requisitar página inválida retorna 404
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/?page=999999"
     Então o status SIGLA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 20 — Validar estrutura completa de candidato na resposta
+  # ════════════════════════════════════════════════════════════════
   @contrato @candidatos_estrutura
   Cenário: Validar estrutura completa de candidato na resposta
     Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/"
@@ -167,6 +227,9 @@ Funcionalidade: API Candidatos SIGLA
   # NOTA: Este endpoint requer concurso_uuid e candidatos (não cria candidatos individuais)
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 21 — Tentar criar candidato sem concurso_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @candidatos_criar_sem_concurso
   Cenário: Tentar criar candidato sem concurso_uuid retorna 400
     Quando eu crio um candidato SIGLA com payload "candidatoValido"
@@ -174,26 +237,41 @@ Funcionalidade: API Candidatos SIGLA
     E a resposta SIGLA deve conter "concurso_uuid"
     E a resposta SIGLA deve conter "Este campo é obrigatório"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 22 — Criar candidato sem nome retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @candidatos_criar_campos_obrigatorios
   Cenário: Criar candidato sem nome retorna 400
     Quando eu crio um candidato SIGLA com payload "candidatoSemNome"
     Então o status SIGLA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 23 — Criar candidato sem CPF retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @candidatos_criar_campos_obrigatorios
   Cenário: Criar candidato sem CPF retorna 400
     Quando eu crio um candidato SIGLA com payload "candidatoSemCPF"
     Então o status SIGLA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 24 — Criar candidato com email inválido retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @candidatos_criar_validacao
   Cenário: Criar candidato com email inválido retorna 400
     Quando eu crio um candidato SIGLA com payload "candidatoEmailInvalido"
     Então o status SIGLA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 25 — Criar candidato com CPF inválido retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @candidatos_criar_validacao
   Cenário: Criar candidato com CPF inválido retorna 400
     Quando eu crio um candidato SIGLA com payload "candidatoCPFInvalido"
     Então o status SIGLA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 26 — Criar candidato com body vazio retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @candidatos_criar_body_vazio
   Cenário: Criar candidato com body vazio retorna 400
     Quando eu faço um POST SIGLA para "https://hom-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/" com body vazio
@@ -203,12 +281,18 @@ Funcionalidade: API Candidatos SIGLA
   # GET /ms-candidatos/api/v1/habilitados/ — listar candidatos habilitados
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 27 — Listar habilitados sem filtros retorna 200
+  # ════════════════════════════════════════════════════════════════
   @smoke @habilitados_listagem
   Cenário: Listar habilitados sem filtros retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://hom-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/habilitados/"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve ser uma lista
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 28 — Filtrar habilitados por classificacao retorna 200
+  # ════════════════════════════════════════════════════════════════
   @filtro @habilitados_filtro_classificacao
   Cenário: Filtrar habilitados por classificacao retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://hom-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/habilitados/?classificacao=1"
@@ -220,11 +304,17 @@ Funcionalidade: API Candidatos SIGLA
   # NOTA: Endpoint requer campos específicos e lote válido (relacionamento complexo)
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 29 — Criar habilitado sem campos obrigatórios retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @habilitados_criar_campos_obrigatorios
   Cenário: Criar habilitado sem campos obrigatórios retorna 400
     Quando eu faço um POST SIGLA para "https://hom-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/habilitados/" com body vazio
     Então o status SIGLA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 30 — Criar habilitado com lote inválido retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @habilitados_criar_lote_invalido
   Cenário: Criar habilitado com lote inválido retorna 400
     Quando eu crio um habilitado SIGLA com payload "habilitadoLoteInvalido"
@@ -235,12 +325,18 @@ Funcionalidade: API Candidatos SIGLA
   # GET /ms-candidatos/api/v1/habilitados/{id}/ — buscar habilitado por ID
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 31 — Buscar habilitado por ID válido retorna 200
+  # ════════════════════════════════════════════════════════════════
   @smoke @habilitados_buscar_id
   Cenário: Buscar habilitado por ID válido retorna 200
     Quando eu faço uma requisição SIGLA GET para "https://hom-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/habilitados/3660/"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve conter "uuid"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 32 — Buscar habilitado com ID inexistente retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @habilitados_buscar_id_invalido
   Cenário: Buscar habilitado com ID inexistente retorna 404
     Quando eu faço uma requisição SIGLA GET para "https://hom-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/habilitados/999999999/"
@@ -250,12 +346,18 @@ Funcionalidade: API Candidatos SIGLA
   # POST /ms-candidatos/api/v1/habilitados/buscar-por-uuids/
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 33 — Buscar habilitados por UUIDs válidos retorna 200
+  # ════════════════════════════════════════════════════════════════
   @smoke @habilitados_buscar_uuids
   Cenário: Buscar habilitados por UUIDs válidos retorna 200
     Quando eu busco habilitados SIGLA por UUIDs com payload "buscarPorUuidsValido"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve ser uma lista
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 34 — Buscar habilitados sem campo uuids retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @habilitados_buscar_uuids_sem_campo
   Cenário: Buscar habilitados sem campo uuids retorna 400
     Quando eu busco habilitados SIGLA por UUIDs com payload "buscarPorUuidsSemCampo"

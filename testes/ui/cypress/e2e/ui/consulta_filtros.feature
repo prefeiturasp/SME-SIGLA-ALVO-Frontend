@@ -6,12 +6,11 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
   Para garantir consistência de navegação, dados e controle de acesso em toda a jornada do usuário
 
   Contexto:
-    Dado que estou na página de login do SIGLA
-    Quando eu insiro credenciais válidas
-    E clico no botão de acessar
-    Então devo ser redirecionado para o dashboard
-    E devo visualizar a página principal do sistema
+    Dado que estou logado no SIGLA com perfil administrador
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1 — Contraste direto entre perfis — visualização bloqueado vs admin com acesso pleno ao Gerenciamento de Vagas
+  # ════════════════════════════════════════════════════════════════
   @contraste-perfis @critico @comparacao
   Cenário: Contraste direto entre perfis — visualização bloqueado vs admin com acesso pleno ao Gerenciamento de Vagas
     Dado que estou logado no sistema com perfil de visualização
@@ -38,6 +37,9 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
     Quando seleciono uma opção aleatória no campo Processo do gerenciamento de vagas
     Então o sistema carrega os dados do processo selecionado no gerenciamento de vagas
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 2 — Jornada E2E de consulta por concurso, visualização do processo e retorno à lista
+  # ════════════════════════════════════════════════════════════════
   @e2e-completo @critico
   Cenário: Jornada E2E de consulta por concurso, visualização do processo e retorno à lista
     Dado que estou no dashboard
@@ -69,16 +71,19 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
 
     E valido a existência dos dados do processo de convocação:
       | Concurso           |
-      | Tipo de processo   |
-      | Titulo             |
+      | Tipo de Escolha     |
+      | Descrição           |
       | Data da convocação |
-      | Data da publicação |
+      | Data corte de vagas |
       | Modalidade         |
     E valido a tabela de agenda de convocação ou mensagem vazia
 
     Quando clico no botão "Voltar"
     Então o sistema exibe a tela "Lista de Convocações"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 3 — Busca por cargo e validação de restrições de permissão em todas as ações da tabela
+  # ════════════════════════════════════════════════════════════════
   @busca-cargo @permissoes-tabela @critico @perfil-visualizacao
   Cenário: Busca por cargo e validação de restrições de permissão em todas as ações da tabela
     Dado que estou logado no sistema com perfil de visualização
@@ -106,16 +111,19 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
     Então o sistema exibe a tela "Resumo do processo"
     E valido a existência dos dados do processo de convocação:
       | Concurso           |
-      | Tipo de processo   |
-      | Titulo             |
+      | Tipo de Escolha     |
+      | Descrição           |
       | Data da convocação |
-      | Data da publicação |
+      | Data corte de vagas |
       | Modalidade         |
 
     Quando clico no botão "Voltar"
     Então o sistema exibe a tela "Lista de Convocações"
 
-  @auditoria-permissoes @critico @perfil-visualizacao @skip
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 4 — Auditoria completa de restrições de acesso em todos os módulos de processos em sessão única
+  # ════════════════════════════════════════════════════════════════
+  @auditoria-permissoes @critico @perfil-visualizacao
   Cenário: Auditoria completa de restrições de acesso em todos os módulos de processos em sessão única
     Dado que estou logado no sistema com perfil de visualização
     Quando navego até a opção "Processos"
@@ -162,6 +170,9 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
     E ao clicar no botão "Selecionar" da importação devo ver "Você não possui permissão para essa ação"
     E ao clicar no botão "Importar" da importação devo ver "Você não possui permissão para essa ação"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 5 — Limpeza de filtros após busca por concurso e reconsulta por cargo
+  # ════════════════════════════════════════════════════════════════
   @filtros @reconsulta @funcional
   Cenário: Limpeza de filtros após busca por concurso e reconsulta por cargo
     Dado que estou no dashboard
@@ -194,6 +205,9 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
       | Status             |
       | Gerenciar          |
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 6 — Rastreio de histórico de importação com navegação entre abas e retorno consistente
+  # ════════════════════════════════════════════════════════════════
   @historico-importacao @rastreio @funcional
   Cenário: Rastreio de histórico de importação com navegação entre abas e retorno consistente
     Dado que estou no dashboard
@@ -243,6 +257,9 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
     Quando clico na aba "Lotes SIGPEC" da importação de dados
     Então o sistema exibe o campo "Concurso" na aba de importação
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 7 — Jornada completa de preenchimento sequencial da escolha de candidatos com perfil de visualização
+  # ════════════════════════════════════════════════════════════════
   @escolha-candidatos @e2e @perfil-visualizacao
   Cenário: Jornada completa de preenchimento sequencial da escolha de candidatos com perfil de visualização
     Dado que estou logado no sistema com perfil de visualização
@@ -258,6 +275,9 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
 
     Então valido que o botão de ação da escolha de candidatos está desabilitado
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 8 — Admin (007001) acessa Gerenciamento de Vagas e carrega dados de processo
+  # ════════════════════════════════════════════════════════════════
   @admin-acesso @gerenciamento-vagas @critico
   Cenário: Admin (007001) acessa Gerenciamento de Vagas e carrega dados de processo
     Dado que estou logado no SIGLA com perfil administrador
@@ -275,6 +295,9 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
     Quando seleciono uma opção aleatória no campo Processo do gerenciamento de vagas
     Então o sistema carrega os dados do processo selecionado no gerenciamento de vagas
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 9 — Admin (007001) acessa Nova Convocação, valida estrutura do formulário e cancela
+  # ════════════════════════════════════════════════════════════════
   @admin-acesso @nova-convocacao @estrutura
   Cenário: Admin (007001) acessa Nova Convocação, valida estrutura do formulário e cancela
     Dado que estou logado no SIGLA com perfil administrador

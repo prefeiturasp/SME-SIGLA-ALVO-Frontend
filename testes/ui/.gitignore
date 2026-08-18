@@ -9,7 +9,7 @@ node_modules/
 cypress/videos/
 cypress/screenshots/
 cypress/downloads/
-cypress/reports/
+cypress/reports/*
 cypress/results/
 cypress/junit/
 cypress/.cache/
@@ -20,6 +20,15 @@ allure-results/
 allure-report/
 test-results/
 *.xml
+
+# Playwright MCP - logs/screenshots/snapshots de sessoes interativas
+.playwright-mcp/
+
+# Dashboard local: fica versionado sob demanda (commit manual); o resto de
+# cypress/reports/ (JSONs brutos, screenshots embutidos etc) continua ignorado.
+!cypress/reports/mochawesome/
+cypress/reports/mochawesome/*
+!cypress/reports/mochawesome/dashboard.html
 
 
 

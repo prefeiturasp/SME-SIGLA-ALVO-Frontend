@@ -2,12 +2,36 @@
 
 import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
 
+// =====================================================
+// SELECTORES — MEUS DADOS / ALTERAR SENHA
+// =====================================================
+
 const senhaSelectors = {
   modal: {
     container: '.ant-modal, [role="dialog"]',
     wrap: '.ant-modal-wrap, .ant-modal-root'
+  },
+
+  alterarSenha: {
+    senhaAtual:           '/html/body/div[2]/div/div[2]/div/div[1]/div/div[2]/div[1]/div[2]/div[1]/span[2]/input',
+    novaSenha:            '/html/body/div[2]/div/div[2]/div/div[1]/div/div[2]/div[1]/div[2]/div[2]/span[2]/input',
+    confirmacaoNovaSenha: '/html/body/div[2]/div/div[2]/div/div[1]/div/div[2]/div[1]/div[2]/div[3]/span[2]/input'
   }
 }
+
+// Mapa: nome do campo (sem acento, lowercase) → XPath do input
+const semAcento = (str) =>
+  str.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+
+const campoXPathMap = {
+  'nova senha':                   senhaSelectors.alterarSenha.novaSenha,
+  'confirmacao da nova senha':    senhaSelectors.alterarSenha.confirmacaoNovaSenha,
+  'confirmacao':                   senhaSelectors.alterarSenha.confirmacaoNovaSenha
+}
+
+// =====================================================
+// HELPERS
+// =====================================================
 
 const escaparRegex = (texto) =>
   texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -26,6 +50,10 @@ const criarRegex = (texto) =>
       .replace(/ê|Ê/g, '[eê]'),
     'i'
   )
+
+// =====================================================
+// STEPS — MODAL ALTERAR SENHA
+// =====================================================
 
 Then('o modal de alterar senha é exibido', () => {
   cy.get(senhaSelectors.modal.container, { timeout: 10000 })
@@ -49,6 +77,7 @@ Then('o modal de alterar senha exibe os botões {string} e {string}', (botao1, b
 })
 
 When('clico em {string} no modal de alterar senha', (botao) => {
+  cy.wait(800)
   cy.get(senhaSelectors.modal.container, { timeout: 10000 })
     .filter(':visible')
     .contains('button', criarRegex(botao))
@@ -58,25 +87,38 @@ When('clico em {string} no modal de alterar senha', (botao) => {
 
 When('preencho a senha atual no modal de alterar senha', () => {
   const senhaAtual = Cypress.env('SIGLA_LOGIN_SENHA')
-  cy.get(senhaSelectors.modal.container, { timeout: 10000 }).filter(':visible').within(() => {
-    cy.contains('label, span', /Senha atual/i)
-      .closest('.ant-form-item, .ant-row, form')
-      .find('input')
-      .first()
-      .clear({ force: true })
-      .type(senhaAtual, { force: true, delay: 80 })
-  })
+  cy.wait(500)
+  cy.xpath(senhaSelectors.alterarSenha.senhaAtual, { timeout: 10000 })
+    .should('be.visible')
+    .clear({ force: true })
+    .type(senhaAtual, { force: true, delay: 120 })
+  cy.wait(600)
+  cy.log('✅ Senha atual preenchida')
 })
 
 When('preencho o campo {string} com {string} no modal de alterar senha', (campo, valor) => {
-  cy.get(senhaSelectors.modal.container, { timeout: 10000 }).filter(':visible').within(() => {
-    cy.contains('label, span', criarRegex(campo))
-      .closest('.ant-form-item, .ant-row, form')
-      .find('input')
-      .first()
+  const xpath = campoXPathMap[semAcento(campo)]
+
+  cy.wait(500)
+  if (xpath) {
+    cy.xpath(xpath, { timeout: 10000 })
+      .should('be.visible')
       .clear({ force: true })
-      .type(valor, { force: true, delay: 80 })
-  })
+      .type(valor, { force: true, delay: 120 })
+  } else {
+    cy.get(senhaSelectors.modal.container, { timeout: 10000 })
+      .filter(':visible')
+      .within(() => {
+        cy.contains(criarRegex(campo))
+          .closest('.ant-form-item')
+          .find('input')
+          .should('be.visible')
+          .clear({ force: true })
+          .type(valor, { force: true, delay: 120 })
+      })
+  }
+  cy.wait(600)
+  cy.log(`✅ Campo "${campo}" preenchido com "${valor}"`)
 })
 
 When('fecho o modal de alterar senha pelo botão fechar', () => {
@@ -100,4 +142,5 @@ Then('o modal de alterar senha é fechado', () => {
       cy.get(senhaSelectors.modal.container).should('not.exist')
     }
   })
+  cy.log('✅ Modal de alteração de senha fechado')
 })

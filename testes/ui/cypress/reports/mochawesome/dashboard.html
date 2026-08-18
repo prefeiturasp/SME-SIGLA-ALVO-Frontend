@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard de Automacao - SIGLA</title>
+<style>
+:root{color-scheme:dark light}
+*{box-sizing:border-box}
+body{font-family:system-ui,Segoe UI,Arial,sans-serif;margin:0;background:#121212;color:#e8e8e8}
+header.topo{padding:24px 32px;border-bottom:1px solid #2a2a2a;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+h1{margin:0;font-size:22px}
+.gerado-em{color:#999;font-size:13px}
+.resumo{display:flex;gap:32px;padding:24px 32px;flex-wrap:wrap;align-items:center}
+.resumo-cards{display:flex;gap:16px;flex-wrap:wrap}
+.stat{background:#1c1c1c;border:1px solid #2a2a2a;border-radius:10px;padding:16px 20px;min-width:140px}
+.stat .valor{font-size:26px;font-weight:700}
+.stat .rotulo{color:#999;font-size:13px}
+.donuts{display:flex;gap:24px;align-items:center}
+.donut-wrap{text-align:center}
+.donut-wrap span{display:block;font-size:13px;color:#999;margin-top:4px}
+.donut-label{fill:#e8e8e8;font-size:20px;font-weight:700}
+main{padding:0 32px 48px}
+.card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;margin-bottom:12px;overflow:hidden}
+.card-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;cursor:pointer;flex-wrap:wrap;gap:12px}
+.card-header:hover{background:#222}
+.tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-right:8px}
+.tag-ui{background:#274D9B;color:#fff}
+.tag-api{background:#8B5E3C;color:#fff}
+.tag-outros{background:#555;color:#fff}
+.spec-path{color:#777;font-size:12px;margin-left:10px}
+.card-resumo{display:flex;align-items:center;gap:10px;font-size:13px;color:#ccc}
+.barra-fundo{width:120px;height:8px;background:#2a2a2a;border-radius:4px;overflow:hidden}
+.barra-preenchida{height:100%}
+.pct{font-weight:700;min-width:38px;text-align:right}
+.card-body{display:none;padding:0 18px 18px;border-top:1px solid #2a2a2a}
+.card-body.aberto{display:block}
+.lista-cenarios{list-style:none;padding:0;margin:14px 0}
+.lista-cenarios li{padding:6px 0;font-size:14px;display:flex;align-items:center;gap:10px}
+.badge{font-size:11px;font-weight:700;color:#fff;padding:2px 8px;border-radius:20px;min-width:56px;text-align:center}
+.evidencias{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.evidencias figure{margin:0;width:220px}
+.evidencias img{width:100%;border-radius:6px;border:1px solid #2a2a2a;cursor:zoom-in}
+.evidencias figcaption{font-size:11px;color:#888;margin-top:4px;word-break:break-word}
+.sem-evidencia{color:#666;font-size:13px;font-style:italic}
+.filtros{padding:0 32px 16px;display:flex;gap:10px}
+.filtros button{background:#1c1c1c;border:1px solid #2a2a2a;color:#ccc;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:13px}
+.filtros button.ativo{background:#274D9B;border-color:#274D9B;color:#fff}
+@media (prefers-color-scheme: light){
+  body{background:#f5f5f5;color:#222}
+  header.topo,.stat,.card,.filtros button{background:#fff;border-color:#ddd}
+  .card-header:hover{background:#f0f0f0}
+  .donut-label{fill:#222}
+}
+</style>
+</head>
+<body>
+<header class="topo">
+  <h1>Dashboard de Automacao - SIGLA</h1>
+  <span class="gerado-em">Gerado em 18/08/2026 10:11 - 19 features (13 UI / 6 API) - versao sem screenshots</span>
+</header>
+
+<section class="resumo">
+  <div class="donuts">
+    <div class="donut-wrap"><svg width="120" height="120" viewBox="0 0 120 120" class="donut">
+    <circle cx="60.0" cy="60.0" r="50.0" fill="none" stroke="#2a2a2a" stroke-width="16" />
+    <circle cx="60.0" cy="60.0" r="50.0" fill="none" stroke="#2E7D32" stroke-width="16" stroke-dasharray="300.23 314.16" stroke-dashoffset="-0.00" transform="rotate(-90 60.0 60.0)" /><circle cx="60.0" cy="60.0" r="50.0" fill="none" stroke="#C62828" stroke-width="16" stroke-dasharray="13.93 314.16" stroke-dashoffset="-300.23" transform="rotate(-90 60.0 60.0)" />
+    <text x="60.0" y="60.0" class="donut-label" text-anchor="middle" dominant-baseline="central">96%</text>
+    </svg><span>Geral</span></div>
+    <div class="donut-wrap"><svg width="120" height="120" viewBox="0 0 120 120" class="donut">
+    <circle cx="60.0" cy="60.0" r="50.0" fill="none" stroke="#2a2a2a" stroke-width="16" />
+    <circle cx="60.0" cy="60.0" r="50.0" fill="none" stroke="#2E7D32" stroke-width="16" stroke-dasharray="266.24 314.16" stroke-dashoffset="-0.00" transform="rotate(-90 60.0 60.0)" /><circle cx="60.0" cy="60.0" r="50.0" fill="none" stroke="#C62828" stroke-width="16" stroke-dasharray="47.92 314.16" stroke-dashoffset="-266.24" transform="rotate(-90 60.0 60.0)" />
+    <text x="60.0" y="60.0" class="donut-label" text-anchor="middle" dominant-baseline="central">85%</text>
+    </svg><span>UI</span></div>
+    <div class="donut-wrap"><svg width="120" height="120" viewBox="0 0 120 120" class="donut">
+    <circle cx="60.0" cy="60.0" r="50.0" fill="none" stroke="#2a2a2a" stroke-width="16" />
+    <circle cx="60.0" cy="60.0" r="50.0" fill="none" stroke="#2E7D32" stroke-width="16" stroke-dasharray="314.16 314.16" stroke-dashoffset="-0.00" transform="rotate(-90 60.0 60.0)" /><circle cx="60.0" cy="60.0" r="50.0" fill="none" stroke="#C62828" stroke-width="16" stroke-dasharray="0.00 314.16" stroke-dashoffset="-314.16" transform="rotate(-90 60.0 60.0)" />
+    <text x="60.0" y="60.0" class="donut-label" text-anchor="middle" dominant-baseline="central">100%</text>
+    </svg><span>API</span></div>
+  </div>
+  <div class="resumo-cards">
+    <div class="stat"><div class="valor">96%</div><div class="rotulo">Sucesso geral</div></div>
+    <div class="stat"><div class="valor">203</div><div class="rotulo">Cenarios executados</div></div>
+    <div class="stat"><div class="valor">194</div><div class="rotulo">Passaram</div></div>
+    <div class="stat"><div class="valor">9</div><div class="rotulo">Falharam</div></div>
+    <div class="stat"><div class="valor">15</div><div class="rotulo">Pendentes</div></div>
+  </div>
+</section>
+
+<div class="filtros">
+  <button data-filtro="todos" class="ativo" onclick="filtrar('todos')">Todas (19)</button><button data-filtro="UI" onclick="filtrar('UI')">UI (13)</button><button data-filtro="API" onclick="filtrar('API')">API (6)</button>
+</div>
+
+<main>
+
+    <article class="card" id="feature-0">
+      <header class="card-header" onclick="toggle(0)">
+        <div>
+          <span class="tag tag-api">API</span>
+          <strong>API Agenda SIGLA</strong>
+          <span class="spec-path">api/api_agenda_sigla.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>15/15 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-0">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Listar agendas retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar agenda com dados válidos retorna 201</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar agenda por UUID retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Atualizar agenda com dados válidos retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Atualizar parcialmente agenda com dados válidos retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Deletar agenda por UUID retorna 204</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar agenda com body vazio retorna erro de validação</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar agenda com UUID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar agenda com UUID em formato inválido retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Listar agendas retorna estrutura de paginação correta</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar agenda retorna campos obrigatórios na resposta</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Atualizar agenda com UUID inexistente via PUT retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Atualizar agenda com body vazio via PUT retorna erro de validação</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Atualizar parcialmente agenda com UUID inexistente via PATCH retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Deletar agenda com UUID inexistente retorna 404</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-1">
+      <header class="card-header" onclick="toggle(1)">
+        <div>
+          <span class="tag tag-api">API</span>
+          <strong>API Candidatos SIGLA</strong>
+          <span class="spec-path">api/api_candidatos_sigla.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>34/34 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-1">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Listar schema OpenAPI em formato JSON retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Listar schema OpenAPI em formato YAML retorna 406 (Not Acceptable)</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Schema contém endpoints de candidatos</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar schema com linguagem inválida retorna 200 (não valida parâmetro)</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Listar candidatos sem parâmetros retorna 200 e estrutura paginada</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Listar candidatos retorna campos obrigatórios nos resultados</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Listar candidatos com paginação retorna página 2</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Filtrar candidatos por gênero feminino retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Filtrar candidatos por gênero masculino retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Filtrar candidatos por estado SP retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Filtrar candidatos por cidade SAO PAULO retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Filtrar candidatos por status ativo retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Filtrar candidatos por status inativo retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar candidatos por termo retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar candidatos por CPF retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Ordenar candidatos por nome retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Ordenar candidatos por nome decrescente retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Filtrar candidatos com múltiplos parâmetros retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inválida retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar estrutura completa de candidato na resposta</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Tentar criar candidato sem concurso_uuid retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar candidato sem nome retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar candidato sem CPF retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar candidato com email inválido retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar candidato com CPF inválido retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar candidato com body vazio retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Listar habilitados sem filtros retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Filtrar habilitados por classificacao retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar habilitado sem campos obrigatórios retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar habilitado com lote inválido retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar habilitado por ID válido retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar habilitado com ID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar habilitados por UUIDs válidos retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar habilitados sem campo uuids retorna 400</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-2">
+      <header class="card-header" onclick="toggle(2)">
+        <div>
+          <span class="tag tag-api">API</span>
+          <strong>API Concurso SIGLA</strong>
+          <span class="spec-path">api/api_concurso_sigla.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>21/21 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-2">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Listar autorizações publicadas sem filtros retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Ordenar autorizações por cargo retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar schema completo da resposta de autorizações publicadas</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Listar autorizações com page_size customizado retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar autorização publicada com dados válidos retorna 201</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar campos obrigatórios da autorização criada</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar autorização com cargo inexistente retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar autorização por UUID válido retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar autorização com UUID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Listar cargos sem filtros retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar cargos por termo retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar cargos com termo em lowercase retorna resultados</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inválida de cargos retorna 200 (endpoint não é paginado)</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Tentar criar cargo sem autenticação retorna 403</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Listar concursos sem filtros retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar concursos por nome retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar estrutura da resposta de listagem de concursos</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Ordenar concursos por nome decrescente retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inválida de concursos retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar concurso com dados válidos retorna 201</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar concurso sem nome retorna 400</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-3">
+      <header class="card-header" onclick="toggle(3)">
+        <div>
+          <span class="tag tag-api">API</span>
+          <strong>API Escolha de Vagas SIGLA</strong>
+          <span class="spec-path">api/api_escolha_sigla.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>18/18 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-3">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inexistente de vagas retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar vaga com UUID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar vaga com UUID em formato inválido retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar escolha com UUID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Atualizar escolha inexistente via PUT retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Atualizar escolha inexistente via PATCH retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Deletar escolha inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Confirmar escolha inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Cancelar escolha inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Incluir vagas sem processo_uuid retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Incluir vagas sem array de vagas retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Incluir vagas com array vazio retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Incluir vagas com processo_uuid inexistente retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Incluir vagas com cargo inválido retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Incluir vagas sem código EOL da escola retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Incluir vagas com data de fechamento inválida retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Incluir vagas com valores negativos retorna 400</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-4">
+      <header class="card-header" onclick="toggle(4)">
+        <div>
+          <span class="tag tag-api">API</span>
+          <strong>API Importação de Arquivo SIGLA</strong>
+          <span class="spec-path">api/api_importa_arquivo_sigla.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>23/23 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-4">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inexistente de cabeçalhos retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar cabeçalho com UUID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inexistente de candidatos retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Exportar candidatos sem processo_uuid retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Exportar candidatos sem cargo_uuid retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inexistente de lotes retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Download de lote com UUID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Exportar lote sem concurso_uuid retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Exportar lote sem lote_uuid retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inexistente de vagas processo retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Exportar vagas processo sem processo_uuid retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inexistente de vagas SIGPEC retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Exportar vagas SIGPEC sem processo_uuid retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar importação habilitados com ID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Importar habilitados sem arquivo retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Importar habilitados sem concurso_uuid retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inexistente de vagas retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar importação vagas com ID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Importar vagas sem arquivo retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Importar vagas sem processo_uuid retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Requisitar página inexistente de escolhas retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Importar escolhas sem processo_uuid retorna 400</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Importar escolhas sem lote_uuid retorna 400</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-5">
+      <header class="card-header" onclick="toggle(5)">
+        <div>
+          <span class="tag tag-api">API</span>
+          <strong>API Processos Convocação SIGLA</strong>
+          <span class="spec-path">api/api_processos_convocacao_reduzido.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>33/33 cenarios (+6 pendentes)</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-5">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#F9A825">Pendente</span>Listar cartas de convocação retorna 200</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Acessar cartas com método não permitido retorna 405</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Criar carta de convocação com dados válidos retorna sucesso</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Criar carta com body vazio retorna erro de validação</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Buscar carta de convocação por UUID retorna 200</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Buscar carta com UUID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar processo de convocação com dados válidos retorna sucesso</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar processo de convocação gera UUID único</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Criar processo com body vazio retorna erro de validação</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar processo de convocação por UUID retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Processo retornado por UUID é um objeto com dados</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Buscar processo com UUID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Atualização completa de processo retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>PUT em processo inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Atualização parcial de processo retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>PATCH em processo inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Deletar processo de convocação existente retorna sucesso</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Processo deletado não pode ser recuperado</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Deletar processo com UUID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Finalizar processo não retorna erro de servidor</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Finalizar processo retorna resposta no formato esperado</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Avançar passo de processo não retorna erro de servidor</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Avançar passo retorna resposta no formato esperado</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Avançar passo de processo com UUID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Listar cargos do processo retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar Content-Type da listagem de cargos</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Listar cargos de processo inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Adicionar cargo ao processo retorna sucesso</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Cargo adicionado ao processo gera UUID único</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Deletar cargo do processo retorna sucesso</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Cargo deletado não pode ser recuperado</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Deletar cargo com UUID inexistente retorna 404</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Obter filtros disponíveis retorna 200</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Acessar filtros com método DELETE retorna erro</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Fluxo completo — criar processo, adicionar cargo e deletar tudo</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Processo criado aparece na listagem geral</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Múltiplos GETs no mesmo processo retornam dados consistentes</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Dados atualizados via PATCH são refletidos no GET subsequente</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Processo recém-criado tem lista de cargos válida</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-6">
+      <header class="card-header" onclick="toggle(6)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Consulta de Processos - Perfil Somente Leitura</strong>
+          <span class="spec-path">ui/consulta_processos.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>7/11 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:64%;background:#C62828"></div></div>
+          <span class="pct">64%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-6">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#C62828">Falhou</span>Validar consulta de convocações com permissões restritas</li>
+<li><span class="badge" style="background:#C62828">Falhou</span>Validar consulta de escolha de candidatos com permissões restritas</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar consulta de importação de dados com permissões restritas</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar navegação completa entre todas as opções do menu Processos</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar aplicação de filtros e busca de convocações</li>
+<li><span class="badge" style="background:#C62828">Falhou</span>Validar detalhes completos de um processo de convocação</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar transição entre todas as abas de importação de dados</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar acesso ao histórico em múltiplas abas de importação</li>
+<li><span class="badge" style="background:#C62828">Falhou</span>Validar preenchimento sequencial de campos na escolha de candidatos</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar bloqueios de permissão em ações de gerenciamento</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar permissões nas ações da tabela de convocações</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Evidencias nao incluidas nesta versao (gerada com --sem-screenshots). Rode "npm run dashboard" localmente para visualizar.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-7">
+      <header class="card-header" onclick="toggle(7)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Recuperação de Senha no Sistema SIGLA</strong>
+          <span class="spec-path">ui/esqueci_senha.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>1/2 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:50%;background:#C62828"></div></div>
+          <span class="pct">50%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-7">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#C62828">Falhou</span>Fluxo esqueci a senha com RF válido</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Fluxo esqueci a senha com RF inválido</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Evidencias nao incluidas nesta versao (gerada com --sem-screenshots). Rode "npm run dashboard" localmente para visualizar.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-8">
+      <header class="card-header" onclick="toggle(8)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Processos — Convocação de Candidatos (Modalidade Presencial)</strong>
+          <span class="spec-path">ui/nova_convocacao_presencial.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>0/2 cenarios (+1 pendente)</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:0%;background:#C62828"></div></div>
+          <span class="pct">0%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-8">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#C62828">Falhou</span>Criar convocação completa com agendamento (Nova Autorização) - Presencial</li>
+<li><span class="badge" style="background:#C62828">Falhou</span>Criar convocação completa com agendamento (Reposição) - Presencial</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Criar convocação completa com agendamento (Reconvocação) - Presencial</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Evidencias nao incluidas nesta versao (gerada com --sem-screenshots). Rode "npm run dashboard" localmente para visualizar.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-9">
+      <header class="card-header" onclick="toggle(9)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Consulta de candidatos para eliminação e reclassificação</strong>
+          <span class="spec-path">ui/adm_candidato.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>6/7 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:86%;background:#C62828"></div></div>
+          <span class="pct">86%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-9">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Consultar candidato por CPF</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Consultar candidato por RF</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Consultar candidato por nome</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Limpar filtros da consulta</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar informações exibidas na tabela</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Consultar ação de alteração para candidato eliminado</li>
+<li><span class="badge" style="background:#C62828">Falhou</span>Eliminar candidato e confirmar a situação atualizada</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Evidencias nao incluidas nesta versao (gerada com --sem-screenshots). Rode "npm run dashboard" localmente para visualizar.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-10">
+      <header class="card-header" onclick="toggle(10)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Meus Dados — Alteração de E-mail</strong>
+          <span class="spec-path">ui/altera_email.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>6/6 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-10">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Preencher campos do modal de alteração de e-mail e cancelar</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar textos institucionais da página inicial</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar campos exibidos na tela Meus Dados</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar modal de alteração de e-mail</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Cancelar alteração de e-mail fecha o modal</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Fluxo completo — da página inicial ao cancelamento de alteração de e-mail</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-11">
+      <header class="card-header" onclick="toggle(11)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Meus Dados — Alteração de Senha</strong>
+          <span class="spec-path">ui/altera_senha.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>7/7 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-11">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Preencher campos do modal de alteração de senha e cancelar</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Preencher campos com senha válida e fechar modal pelo botão X</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar modal de alteração de senha</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Cancelar alteração de senha fecha o modal</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar campos exibidos na tela Meus Dados</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar textos institucionais da página inicial</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Fluxo completo — da página inicial ao cancelamento de alteração de senha</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-12">
+      <header class="card-header" onclick="toggle(12)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Rastreabilidade de Fluxo de Processos - Jornadas E2E</strong>
+          <span class="spec-path">ui/consulta_filtros.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>4/5 cenarios (+4 pendentes)</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:80%;background:#C62828"></div></div>
+          <span class="pct">80%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-12">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#F9A825">Pendente</span>Contraste direto entre perfis — visualização bloqueado vs admin com acesso pleno ao Gerenciamento de Vagas</li>
+<li><span class="badge" style="background:#C62828">Falhou</span>Jornada E2E de consulta por concurso, visualização do processo e retorno à lista</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Busca por cargo e validação de restrições de permissão em todas as ações da tabela</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Auditoria completa de restrições de acesso em todos os módulos de processos em sessão única</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Limpeza de filtros após busca por concurso e reconsulta por cargo</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Rastreio de histórico de importação com navegação entre abas e retorno consistente</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Jornada completa de preenchimento sequencial da escolha de candidatos com perfil de visualização</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Admin (007001) acessa Gerenciamento de Vagas e carrega dados de processo</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Admin (007001) acessa Nova Convocação, valida estrutura do formulário e cancela</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Evidencias nao incluidas nesta versao (gerada com --sem-screenshots). Rode "npm run dashboard" localmente para visualizar.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-13">
+      <header class="card-header" onclick="toggle(13)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Escolha de Candidatos</strong>
+          <span class="spec-path">ui/escolha_candidatos.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>2/2 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-13">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Consultar candidatos por situação</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Visualizar escolha do candidato</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-14">
+      <header class="card-header" onclick="toggle(14)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Processos — Gerenciamento de Vagas</strong>
+          <span class="spec-path">ui/gerenciamento_vagas.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>4/4 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-14">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Acessar gerenciamento de vagas e selecionar um processo</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar botões disponíveis na lista de convocações</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Navegar até gerenciamento de vagas pelo menu Processos</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Fluxo completo — da página inicial ao gerenciamento de vagas com seleção de processo</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-15">
+      <header class="card-header" onclick="toggle(15)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Login no Sistema SIGLA</strong>
+          <span class="spec-path">ui/login.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>3/3 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-15">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Login com credenciais válidas</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validação de campo senha obrigatório</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validação de campo RF obrigatório</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-16">
+      <header class="card-header" onclick="toggle(16)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Processos — Convocação de Candidatos</strong>
+          <span class="spec-path">ui/nova_convocacao_online.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>4/4 cenarios (+4 pendentes)</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-16">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#F9A825">Pendente</span>Criar convocação completa com agendamento (Nova Autorização)</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Criar convocação completa com agendamento (Reposição)</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Criar convocação completa com agendamento (Reconvocação)</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar bloqueio ao tentar avançar sem preencher campos obrigatórios</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Navegar até a lista de convocações pelo menu Processos</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar estrutura do formulário de nova convocação</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar filtros de busca na lista de convocações</li>
+<li><span class="badge" style="background:#F9A825">Pendente</span>Fluxo completo — da página inicial à etapa 2 de configuração de cargos</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-17">
+      <header class="card-header" onclick="toggle(17)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Visualizar Consulta de Convocação de Candidatos</strong>
+          <span class="spec-path">ui/visualizar_processos.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>5/5 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-17">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Visualizar resumo do processo de convocação</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Consultar convocação de candidatos com filtro por Concurso</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Consultar convocação de candidatos com filtro por Cargo</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Validar permissões de acesso em ações restritas</li>
+<li><span class="badge" style="background:#2E7D32">Passou</span>Limpar filtros de consulta</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+    <article class="card" id="feature-18">
+      <header class="card-header" onclick="toggle(18)">
+        <div>
+          <span class="tag tag-ui">UI</span>
+          <strong>Cadastro de Concursos</strong>
+          <span class="spec-path">ui/adicionar_concurso.feature</span>
+        </div>
+        <div class="card-resumo">
+          <span>1/1 cenarios</span>
+          <div class="barra-fundo"><div class="barra-preenchida" style="width:100%;background:#2E7D32"></div></div>
+          <span class="pct">100%</span>
+        </div>
+      </header>
+      <div class="card-body" id="body-18">
+        <ul class="lista-cenarios"><li><span class="badge" style="background:#2E7D32">Passou</span>Cadastrar concurso com sucesso</li></ul>
+        <h4>Evidencias</h4>
+        <p class="sem-evidencia">Sem evidencia de falha para a execucao mais recente.</p>
+      </div>
+    </article>
+
+</main>
+
+<script>
+function toggle(i){
+  document.getElementById('body-' + i).classList.toggle('aberto');
+}
+function filtrar(sistema){
+  document.querySelectorAll('.card').forEach(function(card){
+    var mostra = sistema === 'todos' || card.querySelector('.tag').textContent === sistema;
+    card.style.display = mostra ? '' : 'none';
+  });
+  document.querySelectorAll('.filtros button').forEach(function(b){
+    b.classList.toggle('ativo', b.dataset.filtro === sistema);
+  });
+}
+</script>
+</body>
+</html>

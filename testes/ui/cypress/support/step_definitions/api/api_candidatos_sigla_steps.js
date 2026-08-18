@@ -39,6 +39,38 @@ When('eu crio um candidato SIGLA com payload {string}', (payloadKey) => {
   })
 })
 
+// ── Ações de Habilitado ──────────────────────────────────────────────────────
+
+When('eu crio um habilitado SIGLA com payload {string}', (payloadKey) => {
+  cy.fixture('api/sigla_payloads').then((payloads) => {
+    const payload = payloads[payloadKey]
+    const url = 'https://hom-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/habilitados/'
+
+    cy.sigla_post(url, payload).then((res) => {
+      cy.wrap(res).as('response')
+      Cypress.log({
+        name: 'POST Habilitado',
+        message: `Payload: ${payloadKey} → HTTP ${res.status}`,
+      })
+    })
+  })
+})
+
+When('eu busco habilitados SIGLA por UUIDs com payload {string}', (payloadKey) => {
+  cy.fixture('api/sigla_payloads').then((payloads) => {
+    const payload = payloads[payloadKey]
+    const url = 'https://hom-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/habilitados/buscar-por-uuids/'
+
+    cy.sigla_post(url, payload).then((res) => {
+      cy.wrap(res).as('response')
+      Cypress.log({
+        name: 'POST Buscar Habilitados por UUIDs',
+        message: `Payload: ${payloadKey} → HTTP ${res.status}`,
+      })
+    })
+  })
+})
+
 // ============================================================================
 // Nota: Steps genéricos como "When eu faço uma requisição SIGLA GET" e
 // "Then o status SIGLA deve ser" estão definidos em api_sigla_steps.js
