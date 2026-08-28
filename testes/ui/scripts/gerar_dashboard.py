@@ -42,7 +42,7 @@ CONFIG_PATH = Path('dashboard.config.json')
 
 # Rastreabilidade: exibida no rodape do HTML e gravada no snapshot embutido --
 # incrementar a cada mudanca relevante no gerador.
-VERSAO_SCRIPT = '1.1.0'
+VERSAO_SCRIPT = '1.2.2'
 
 # Parametrizacao por projeto (titulo/branding do cabecalho). O script sempre
 # funciona mesmo sem dashboard.config.json ou com JSON corrompido -- cai
@@ -407,21 +407,21 @@ def badge_comparacao_feature(pct_atual, pct_anterior):
 
 
 def grafico_tendencia_svg(pontos):
-    largura, altura = 480, 130
-    margem_esq, margem_dir, margem_topo, margem_baixo = 26, 10, 10, 10
+    largura, altura = 460, 90
+    margem = 12
     n = len(pontos)
-    plot_w = largura - margem_esq - margem_dir
-    plot_h = altura - margem_topo - margem_baixo
+    plot_w = largura - margem * 2
+    plot_h = altura - margem * 2
 
     def x_de(i):
-        return margem_esq + (plot_w * i / (n - 1) if n > 1 else plot_w / 2)
+        return margem + (plot_w * i / (n - 1) if n > 1 else plot_w / 2)
 
     def y_de(pct):
-        return margem_topo + plot_h * (1 - pct / 100)
+        return margem + plot_h * (1 - pct / 100)
 
     grade = ''.join(
-        f'<line x1="{margem_esq}" y1="{y_de(v):.1f}" x2="{largura - margem_dir}" y2="{y_de(v):.1f}" stroke="#333" stroke-dasharray="2 3"/>'
-        f'<text x="0" y="{y_de(v) + 3:.1f}" font-size="9" fill="#888">{v}</text>'
+        f'<line x1="{margem}" y1="{y_de(v):.1f}" x2="{largura - margem}" y2="{y_de(v):.1f}" '
+        f'stroke="#2a2a2a" stroke-width="1" stroke-dasharray="2,3"/>'
         for v in (0, 50, 100)
     )
     pontos_svg = ' '.join(f'{x_de(i):.1f},{y_de(p["pct"]):.1f}' for i, p in enumerate(pontos))
@@ -431,10 +431,12 @@ def grafico_tendencia_svg(pontos):
         f'<title>{escape_html(p["data"])} - {p["pct"]}% ({p["total"]} cenarios)</title></circle>'
         for i, p in enumerate(pontos)
     )
+    titulo = escape_html(f'Tendência — últimas {n} execuções')
     return (
-        f'<div class="stat tendencia"><svg width="{largura}" height="{altura}" viewBox="0 0 {largura} {altura}">'
+        f'<div class="stat tendencia"><div class="tendencia-titulo">{titulo}</div>'
+        f'<svg width="{largura}" height="{altura}" viewBox="0 0 {largura} {altura}">'
         f'{grade}<polyline points="{pontos_svg}" fill="none" stroke="{cor}" stroke-width="2"/>{circulos}</svg>'
-        f'<div class="tendencia-legenda">{pontos[0]["pct"]}% → {pontos[-1]["pct"]}%</div></div>'
+        f'<div class="tendencia-legenda"><span>{pontos[0]["pct"]}%</span><span>{pontos[-1]["pct"]}%</span></div></div>'
     )
 
 
@@ -574,13 +576,14 @@ def pr_badge_html(pr):
         f'<div class="pr-container" id="pr-container" data-owner="{escape_html(pr["owner"])}" '
         f'data-repo="{escape_html(pr["repo"])}" data-branch="{escape_html(pr["branch"])}">'
         f'<a class="pr-info" id="pr-info" href="{escape_html(pr["url"])}" target="_blank" rel="noopener">{escape_html(texto)}</a>'
-        f'<button class="pr-refresh" onclick="atualizarPR()" title="Atualizar status do PR">&#8635;</button>'
+        f'<button class="pr-refresh" onclick="atualizarPR(true)" title="Atualizar status do PR">&#8635;</button>'
         f'</div>'
     )
 
 
 def renderizar_card(f, indice, sem_screenshots, anterior_por_feature):
     executados = f['passou'] + f['falhou']
+    total_cenarios = executados + f['pendente']
     pct = pct_sucesso(f['passou'], f['falhou'])
     cor_barra = COR_PASSOU if pct == 100 else COR_FALHOU
     tipo_label = ROTULO_TIPO.get(f['tipo'], f['tipo'].upper())
@@ -631,7 +634,7 @@ def renderizar_card(f, indice, sem_screenshots, anterior_por_feature):
           <span class="spec-path">{escape_html(f['caminho'])}</span>
         </div>
         <div class="card-resumo">
-          <span>{f['passou']}/{executados} cenarios{pendente_txt}</span>
+          <span>{f['passou']}/{total_cenarios} cenarios{pendente_txt}</span>
           <span class="duracao">{formatar_duracao(f['duracao_ms'])}</span>
           <div class="barra-fundo"><div class="barra-preenchida" style="width:{pct}%;background:{cor_barra}"></div></div>
           <span class="pct">{pct}%{badge_feature}</span>
@@ -683,29 +686,30 @@ main{padding:0 32px 48px}
 .lista-cenarios li.destaque{background:rgba(39,77,155,.25);border-radius:6px;padding-left:6px}
 .cenario-linha{display:flex;align-items:center;gap:10px}
 .badge{font-size:11px;font-weight:700;color:#fff;padding:2px 8px;border-radius:20px;min-width:56px;text-align:center}
-.erro-msg{margin:6px 0 0 66px;padding:6px 10px;font-family:Consolas,Menlo,monospace;font-size:12px;color:#f0a8a8;background:rgba(198,40,40,.12);border-left:3px solid #C62828;border-radius:2px;white-space:pre-wrap;word-break:break-word}
+.erro-msg{margin:6px 0 2px 66px;padding:6px 10px;font-family:Consolas,Menlo,monospace;font-size:12px;color:#f0a8a8;background:rgba(198,40,40,.12);border-left:3px solid #C62828;border-radius:2px;white-space:pre-wrap;word-break:break-word}
 .duracao{color:#999;font-size:12px}
 .evidencias{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
 .evidencias figure{margin:0;width:220px}
 .evidencias img{width:100%;border-radius:6px;border:1px solid #2a2a2a;cursor:zoom-in}
 .evidencias figcaption{font-size:11px;color:#888;margin-top:4px;word-break:break-word}
-.lista-evidencias{margin:6px 0 0;padding-left:18px;font-size:13px;color:#ccc}
-.sem-evidencia{color:#666;font-size:13px;font-style:italic}
+.lista-evidencias{margin:6px 0 0;padding-left:18px;font-size:12px;color:#ccc}
+.sem-evidencia{color:#666;font-size:12px;font-style:italic}
 .filtros{padding:0 32px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .filtros button{background:#1c1c1c;border:1px solid #2a2a2a;color:#ccc;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:13px}
 .filtros button.ativo{background:#274D9B;border-color:#274D9B;color:#fff}
-.filtros select{background:#1c1c1c;border:1px solid #2a2a2a;color:#ccc;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:13px;font-family:inherit}
+.filtros select{background:#1c1c1c;border:1px solid #2a2a2a;color:#ccc;padding:8px 14px;border-radius:20px;cursor:pointer;font-size:13px;font-family:inherit;max-width:280px}
 .filtros select.ativo{border-color:#274D9B;color:#fff}
-.comparacao{font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;border:1px solid;background:transparent;margin-left:auto}
+.comparacao{font-size:13px;font-weight:700;padding:8px 16px;border-radius:20px;border:1px solid;background:transparent;margin-left:auto}
 .comparacao-feature{font-size:11px;padding:1px 8px;margin-left:8px;border-radius:20px;border:1px solid;vertical-align:middle}
-.tendencia{min-width:300px}
-.tendencia-legenda{font-size:12px;color:#999;margin-top:4px;text-align:center}
+.tendencia{min-width:300px;padding:14px 18px}
+.tendencia-titulo{font-size:12px;color:#999}
+.tendencia-legenda{display:flex;justify-content:space-between;font-size:12px;color:#999;margin-top:4px}
 .pr-container{display:flex;align-items:center;gap:6px}
-.pr-info{background:#1c1c1c;border:1px solid #2a2a2a;padding:6px 14px;border-radius:20px;font-size:12px;color:#ccc;text-decoration:none;max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pr-info{background:#1c1c1c;border:1px solid #2a2a2a;padding:6px 14px;border-radius:20px;font-size:13px;color:#ccc;text-decoration:none;max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pr-info:hover{background:#222}
-.pr-refresh{width:24px;height:24px;border-radius:50%;border:1px solid #2a2a2a;background:#1c1c1c;color:#ccc;cursor:pointer;font-size:13px;line-height:1;padding:0}
+.pr-refresh{width:30px;height:30px;border-radius:50%;border:1px solid #2a2a2a;background:#1c1c1c;color:#ccc;cursor:pointer;font-size:15px;line-height:1;padding:0}
 .pr-refresh:hover{background:#222}
-.rodape{padding:16px 32px 32px;color:#666;font-size:11px}
+.rodape{padding:20px 32px 32px;color:#666;font-size:11px}
 @media (prefers-color-scheme: light){
   body{background:#f5f5f5;color:#222}
   header.topo,.stat,.card,.filtros button,.filtros select,.pr-info,.pr-refresh{background:#fff;border-color:#ddd}
@@ -758,15 +762,31 @@ function filtrarFeature(valor){
   if (select) select.classList.toggle('ativo', Boolean(filtroFeature));
   aplicarFiltros();
 }
-function atualizarPR(){
+// Throttle do auto-refresh (ver window.addEventListener('load', ...) abaixo):
+// a API publica do GitHub sem autenticacao tem cota de 60 requisicoes/hora
+// POR IP -- reabrir a pagina varias vezes em sequencia (comum ao acompanhar
+// uma execucao) nao pode bater na API a cada reload, ou a cota estoura e o
+// badge inteiro some (ver obter_info_pr no lado Python: qualquer falha,
+// incluindo 403 de rate limit, deixa a secao ausente). O clique manual no
+// botao (forcado=true) ignora o throttle -- e uma acao explicita do usuario.
+var CHAVE_THROTTLE_PR = 'sigla-dashboard-pr-check';
+var INTERVALO_THROTTLE_PR_MS = 120000;
+function atualizarPR(forcado){
   var c = document.getElementById('pr-container');
   if (!c) return;
+  if (!forcado) {
+    try {
+      var ultimo = Number(localStorage.getItem(CHAVE_THROTTLE_PR) || 0);
+      if (Date.now() - ultimo < INTERVALO_THROTTLE_PR_MS) return;
+    } catch (e) { /* localStorage indisponivel -- segue sem throttle */ }
+  }
   var owner = c.dataset.owner, repo = c.dataset.repo, branch = c.dataset.branch;
   fetch('https://api.github.com/repos/' + owner + '/' + repo + '/pulls?head=' + owner + ':' + branch + '&state=all', {
     headers: { Accept: 'application/vnd.github+json' }
   })
     .then(function(r){ return r.json(); })
     .then(function(dados){
+      try { localStorage.setItem(CHAVE_THROTTLE_PR, String(Date.now())); } catch (e) { /* ignorado */ }
       if (!dados || !dados.length) return;
       var pr = dados[0];
       var estado = pr.draft ? 'draft' : pr.state;
@@ -775,6 +795,16 @@ function atualizarPR(){
       info.href = pr.html_url;
     })
     .catch(function(){ /* falha silenciosa: mantem o badge anterior */ });
+}
+// O badge e escrito estatico no HTML no momento da geracao (Python) -- sem
+// isso, toda vez que a pagina e reaberta ela volta a mostrar o estado
+// congelado daquela geracao, mesmo que alguem ja tenha clicado em atualizar
+// numa sessao anterior (nada e persistido, e so JS em memoria). Chama a
+// mesma atualizacao ao vivo automaticamente no carregamento (respeitando o
+// throttle acima), sem tirar o botao -- ele continua util para forcar uma
+// reconferida imediata.
+if (document.getElementById('pr-container')) {
+  window.addEventListener('load', function(){ atualizarPR(false); });
 }
 '''
 
