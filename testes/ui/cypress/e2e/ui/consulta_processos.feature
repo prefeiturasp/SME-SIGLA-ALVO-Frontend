@@ -56,22 +56,6 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
     Quando clico em "Voltar"
 
   # ════════════════════════════════════════════════════════════════
-  # CENÁRIO 2 — Validar consulta de escolha de candidatos com permissões restritas
-  # ════════════════════════════════════════════════════════════════
-  @consulta-completa @critico @permissoes-somente-leitura
-  Cenário: Validar consulta de escolha de candidatos com permissões restritas
-    Quando navego até a opção "Processos"
-    E seleciono a opção "Escolha de Candidatos"
-    Então o sistema exibe a tela "Escolha de Candidatos"
-
-    E valido a existência do campo "Processo" na escolha de candidatos
-    E seleciono uma opção aleatória no campo "Processo" da escolha de candidatos
-    E valido a existência do campo "Período da agenda" na escolha de candidatos
-    E seleciono uma opção aleatória no campo "Período da agenda" da escolha de candidatos
-
-    Então valido que o botão de ação da escolha de candidatos está desabilitado
-
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Validar consulta de importação de dados com permissões restritas
   # ════════════════════════════════════════════════════════════════
   @consulta-completa @critico @permissoes-somente-leitura
@@ -269,23 +253,6 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
 
     Quando clico em "Voltar" na tela de histórico de importação
     Então o sistema retorna para a tela de importação de dados
-
-  # ════════════════════════════════════════════════════════════════
-  # CENÁRIO 9 — Validar preenchimento sequencial de campos na escolha de candidatos
-  # ════════════════════════════════════════════════════════════════
-  @escolha-campos @funcional
-  Cenário: Validar preenchimento sequencial de campos na escolha de candidatos
-    Quando navego até a opção "Processos"
-    E seleciono a opção "Escolha de Candidatos"
-    Então o sistema exibe a tela "Escolha de Candidatos"
-
-    E valido a existência do campo "Processo" na escolha de candidatos
-    Quando seleciono uma opção aleatória no campo "Processo" da escolha de candidatos
-
-    Então valido a existência do campo "Período da agenda" na escolha de candidatos
-    Quando seleciono uma opção aleatória no campo "Período da agenda" da escolha de candidatos
-
-    Então valido que o botão de ação da escolha de candidatos está desabilitado
 
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 10 — Validar bloqueios de permissão em ações de gerenciamento

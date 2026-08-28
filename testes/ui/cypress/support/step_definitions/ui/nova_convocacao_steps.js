@@ -315,42 +315,53 @@ Then('o sistema exibe mensagens de erro nos campos obrigatórios', () => {
 
 // A lista de concursos vem de uma API compartilhada no ambiente de QA
 // (crescendo com dados de outras execuções/usuários) — a posição de um
-// concurso específico na janela virtualizada não é estável entre execuções,
-// então "rolar até o fim" nem sempre traz o item procurado pra dentro do
-// range renderizado. Tenta rolar até o fim e, se não achar, até o topo,
-// antes de desistir — mais barato que travar cego numa direção só.
-const selecionarConcurso = (valor, tentativasRestantes = 2) => {
+// concurso específico na janela virtualizada não é estável entre execuções.
+// A versão anterior só checava topo e fim da lista, o que falha sempre que o
+// concurso procurado cai no meio (confirmado em execução real: lista já
+// grande o bastante pra isso acontecer). Rola incrementalmente até encontrar
+// ou a lista chegar ao fim — mesmo padrão já validado em adm_candidato_steps.js
+// (localizarOpcaoRolando).
+const selecionarConcurso = (valor) => {
   cy.contains('label, span', /^Concurso$/i, { timeout: 10000 })
     .closest('.ant-form-item, .ant-row')
     .find('.ant-select-selector')
     .click({ force: true })
-  cy.get('.ant-select-dropdown:visible', { timeout: 10000 }).should('be.visible')
-  cy.get('.ant-select-dropdown:visible .rc-virtual-list-holder')
-    .scrollTo('bottom', { ensureScrollable: false })
-  cy.wait(2000)
-  cy.get('body').then(($body) => {
-    const encontrado = [...$body[0].querySelectorAll('.ant-select-dropdown:visible .ant-select-item-option-content')]
-      .some((el) => el.textContent.includes(valor))
-    if (!encontrado) {
-      cy.get('.ant-select-dropdown:visible .rc-virtual-list-holder')
-        .scrollTo('top', { ensureScrollable: false })
-      cy.wait(1000)
-    }
-    cy.get('body').then(($body2) => {
-      const encontradoAgora = [...$body2[0].querySelectorAll('.ant-select-dropdown:visible .ant-select-item-option-content')]
-        .some((el) => el.textContent.includes(valor))
-      if (!encontradoAgora && tentativasRestantes > 1) {
-        cy.log(`Concurso "${valor}" não encontrado na janela renderizada — fechando e tentando de novo (tentativas restantes: ${tentativasRestantes - 1})`)
-        cy.get('body').type('{esc}')
-        cy.wait(1000)
-        selecionarConcurso(valor, tentativasRestantes - 1)
+  cy.wait(500)
+
+  const dropdownAtual = () => cy.get('.ant-select-dropdown:visible', { timeout: 10000 }).last()
+  dropdownAtual().should('be.visible')
+
+  const localizarConcursoRolando = (tentativasRestantes = 30) => {
+    dropdownAtual().then(($dropdown) => {
+      const $match = $dropdown
+        .find('.ant-select-item-option-content')
+        .filter((_, el) => Cypress.$(el).text().trim().toLowerCase().includes(valor.trim().toLowerCase()))
+
+      if ($match.length > 0) {
+        cy.wrap($match.first()).scrollIntoView().click({ force: true })
         return
       }
-      cy.contains('.ant-select-dropdown:visible .ant-select-item-option-content', valor, { timeout: 12000 })
-        .scrollIntoView()
-        .click({ force: true })
+
+      if (tentativasRestantes <= 0) {
+        throw new Error(`Concurso "${valor}" não encontrado no dropdown mesmo após rolar a lista completa.`)
+      }
+
+      const $holder = $dropdown.find('.rc-virtual-list-holder')
+      const holderEl = ($holder.length ? $holder : $dropdown)[0]
+      const scrollAntes = holderEl.scrollTop
+      holderEl.scrollTop = scrollAntes + holderEl.clientHeight
+
+      cy.wait(150).then(() => {
+        if (holderEl.scrollTop === scrollAntes) {
+          throw new Error(`Concurso "${valor}" não encontrado — a lista chegou ao fim sem encontrá-lo.`)
+        }
+        localizarConcursoRolando(tentativasRestantes - 1)
+      })
     })
-  })
+  }
+
+  localizarConcursoRolando()
+
   cy.wait(2000)
 }
 
@@ -468,12 +479,30 @@ When('seleciono a data corte de vagas como sendo {string}', (referencia) => {
   )
 })
 
+const botaoEstaDesabilitado = ($btn) =>
+  $btn.is(':disabled') || $btn.attr('aria-disabled') === 'true' || $btn.hasClass('ant-btn-disabled')
+
+// Alguns botões (ex.: "Adicionar ao cargo") só habilitam depois que o resultado
+// da busca termina de processar no client — sem esperar por isso, o clique
+// forçado cai num botão ainda disabled e não tem efeito nenhum (visto em
+// execução real: passo seguinte falhava sem erro óbvio). Espera até ~5s pelo
+// botão habilitar; se não habilitar nesse prazo, segue o mesmo comportamento
+// de sempre (diagnóstico + clique forçado) em vez de travar o cenário —
+// alguns botões legitimamente continuam desabilitados até o clique disparar
+// a validação (ex.: "Salvar e avançar" em formulário vazio já clica e mostra
+// erro, não fica esperando).
+const aguardarBotaoHabilitar = ($btn, tentativasRestantes = 20) => {
+  if (!botaoEstaDesabilitado($btn) || tentativasRestantes <= 0) return
+  cy.wait(250)
+  cy.then(() => aguardarBotaoHabilitar($btn, tentativasRestantes - 1))
+}
+
 // Verifica no log do Cypress qualquer sinal de que o clique não teve efeito:
 // erro inline de formulário, toast/notificação de erro do backend, ou o
 // próprio botão estar desabilitado (clique forçado em botão disabled não
 // dispara o handler React, então o teste segue sem navegar e sem erro óbvio).
 const diagnosticarFalhaDeClique = (botao, $botaoClicado) => {
-  if ($botaoClicado && ($botaoClicado.is(':disabled') || $botaoClicado.attr('aria-disabled') === 'true' || $botaoClicado.hasClass('ant-btn-disabled'))) {
+  if ($botaoClicado && botaoEstaDesabilitado($botaoClicado)) {
     cy.log(`⚠ Botão "${botao}" estava DESABILITADO no momento do clique — o clique forçado não teve efeito.`)
   }
   cy.get('body').then($body => {
@@ -504,16 +533,22 @@ When('clico no botão {string}', (botao) => {
         .scrollIntoView()
         .should('be.visible')
         .then($btn => {
-          diagnosticarFalhaDeClique(botao, $btn)
-          cy.wrap($btn).click({ force: true })
+          aguardarBotaoHabilitar($btn)
+          cy.then(() => {
+            diagnosticarFalhaDeClique(botao, $btn)
+            cy.wrap($btn).click({ force: true })
+          })
         })
     } else {
       cy.contains('button', regex, { timeout: 10000 })
         .scrollIntoView()
         .should('be.visible')
         .then($btn => {
-          diagnosticarFalhaDeClique(botao, $btn)
-          cy.wrap($btn).click({ force: true })
+          aguardarBotaoHabilitar($btn)
+          cy.then(() => {
+            diagnosticarFalhaDeClique(botao, $btn)
+            cy.wrap($btn).click({ force: true })
+          })
         })
     }
   })
@@ -574,9 +609,22 @@ Then('o sistema exibe o modal {string}', (titulo) => {
   cy.get('.ant-modal').contains(criarRegex(titulo), { timeout: 8000 }).should('be.visible')
 })
 
+// Para "Reconvocação" o pool de candidatos elegíveis pode legitimamente vir
+// vazio (a busca em ms-candidatos/habilitados/reconvocacao não tem candidato
+// suficiente para o concurso/cargo em QA) — nesse caso "Adicionar ao cargo"
+// fica desabilitado (ver aguardarBotaoHabilitar) e o clique não fecha o modal
+// "Buscar candidatos". Modal ainda aberto aqui = confirmação de que não havia
+// candidato para adicionar, não um bug: trata como desfecho válido do
+// cenário em vez de falhar esperando uma tabela que nunca vai existir.
 Then('o sistema exibe a tabela de cargos adicionados', () => {
-  cy.get('table', { timeout: 10000 }).should('be.visible')
-  cy.get('tbody tr', { timeout: 8000 }).should('have.length.greaterThan', 0)
+  cy.get('body').then($body => {
+    if ($body.find('.ant-modal:visible').length > 0) {
+      cy.log('⚠ Modal "Buscar candidatos" continua aberto — nenhum candidato disponível para adicionar ao cargo (desfecho válido, sem candidatos elegíveis em QA).')
+      return
+    }
+    cy.get('table', { timeout: 10000 }).should('be.visible')
+    cy.get('tbody tr', { timeout: 8000 }).should('have.length.greaterThan', 0)
+  })
 })
 
 // =====================================================

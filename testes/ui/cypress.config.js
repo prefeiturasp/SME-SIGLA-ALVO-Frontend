@@ -119,7 +119,19 @@ module.exports = defineConfig({
         await afterRunHook(results)
         if (process.env.CI) return
         try {
-          require('./scripts/gerar-dashboard.js').gerar()
+          const { spawnSync } = require('child_process')
+          const path = require('path')
+          const script = path.join('scripts', 'gerar_dashboard.py')
+          // Gerador é em Python (stdlib apenas) — tenta 'python3' e depois
+          // 'python' (nome disponível no Windows); se nenhum interpretador
+          // existir na máquina, apenas avisa e segue sem derrubar a suíte.
+          let r = spawnSync('python3', [script], { stdio: 'inherit' })
+          if (r.error) r = spawnSync('python', [script], { stdio: 'inherit' })
+          if (r.error) {
+            console.warn('Aviso: Python não encontrado (tentado python3 e python) — dashboard local não gerado.')
+          } else if (r.status !== 0) {
+            console.warn('Aviso: geração do dashboard local retornou código ' + r.status)
+          }
         } catch (e) {
           console.warn('Aviso: falha ao gerar dashboard local (ignorado):', e.message)
         }

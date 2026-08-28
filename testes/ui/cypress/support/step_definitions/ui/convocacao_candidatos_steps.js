@@ -117,7 +117,7 @@ const obterCredenciaisVisualizacao = () => ({
 })
 
 const realizarLogin = (rf, senha) => {
-  cy.visit('https://qa-sigla.sme.prefeitura.sp.gov.br/login', { timeout: 15000 })
+  cy.visit('https://qa-sigla.sme.prefeitura.sp.gov.br/login')
   cy.get('input').filter('[type="text"], [type="number"]').first().clear().type(rf, { delay: 100 })
   cy.wait(500)
   cy.get('input[type="password"]').clear().type(senha, { delay: 100 })
@@ -192,7 +192,7 @@ Given('que estou logado no sistema com perfil de visualização', () => {
   cy.session(`sigla-visualizacao-${credenciais.rf}`, () => {
     realizarLogin(credenciais.rf, credenciais.senha)
   })
-  cy.visit(convocacaoSelectors.urls.home, { timeout: 15000 })
+  cy.visit(convocacaoSelectors.urls.home)
 
   Cypress.log({
     name: 'LOGIN VISUALIZAÇÃO',

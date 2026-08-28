@@ -5,6 +5,10 @@ node_modules/
 .pnp.*
 .yarn-integrity
 
+# Python (scripts/*.py) - artefatos de bytecode
+__pycache__/
+*.pyc
+
 # Cypress - artefatos gerados
 cypress/videos/
 cypress/screenshots/
