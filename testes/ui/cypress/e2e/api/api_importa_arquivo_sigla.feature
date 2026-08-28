@@ -17,11 +17,17 @@ Funcionalidade: API Importação de Arquivo SIGLA
   # GET/POST /ms-importa-arquivos/api/v1/exportacao/cabecalho-lote/
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1 — Requisitar página inexistente de cabeçalhos retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @cabecalho_lote_listar_pagina_invalida
   Cenário: Requisitar página inexistente de cabeçalhos retorna 404
     Quando eu faço uma requisição IMPORTA GET para "/exportacao/cabecalho-lote/?page=999999"
     Então o status IMPORTA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 2 — Buscar cabeçalho com UUID inexistente retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @cabecalho_lote_uuid_invalido
   Cenário: Buscar cabeçalho com UUID inexistente retorna 404
     Quando eu busco o cabeçalho de lote com UUID inexistente
@@ -41,16 +47,25 @@ Funcionalidade: API Importação de Arquivo SIGLA
   # GET/POST /ms-importa-arquivos/api/v1/exportacao/candidatos-processo/
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 3 — Requisitar página inexistente de candidatos retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @candidatos_processo_pagina_invalida
   Cenário: Requisitar página inexistente de candidatos retorna 404
     Quando eu faço uma requisição IMPORTA GET para "/exportacao/candidatos-processo/?page=999999"
     Então o status IMPORTA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 4 — Exportar candidatos sem processo_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @candidatos_processo_sem_processo
   Cenário: Exportar candidatos sem processo_uuid retorna 400
     Quando eu faço exportação de candidatos com payload "exportacaoCandidatosSemProcesso"
     Então o status IMPORTA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 5 — Exportar candidatos sem cargo_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @candidatos_processo_sem_cargo
   Cenário: Exportar candidatos sem cargo_uuid retorna 400
     Quando eu faço exportação de candidatos com payload "exportacaoCandidatosSemCargo"
@@ -60,21 +75,33 @@ Funcionalidade: API Importação de Arquivo SIGLA
   # GET/POST /ms-importa-arquivos/api/v1/exportacao/lote/
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 6 — Requisitar página inexistente de lotes retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @lote_pagina_invalida
   Cenário: Requisitar página inexistente de lotes retorna 404
     Quando eu faço uma requisição IMPORTA GET para "/exportacao/lote/?page=999999"
     Então o status IMPORTA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 7 — Download de lote com UUID inexistente retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @lote_download_uuid_invalido
   Cenário: Download de lote com UUID inexistente retorna 404
     Quando eu faço download de lote com UUID inexistente
     Então o status IMPORTA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 8 — Exportar lote sem concurso_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @lote_sem_concurso
   Cenário: Exportar lote sem concurso_uuid retorna 400
     Quando eu faço exportação de lote com payload "exportacaoLoteSemConcurso"
     Então o status IMPORTA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 9 — Exportar lote sem lote_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @lote_sem_lote_uuid
   Cenário: Exportar lote sem lote_uuid retorna 400
     Quando eu faço exportação de lote com payload "exportacaoLoteSemLoteUuid"
@@ -84,11 +111,17 @@ Funcionalidade: API Importação de Arquivo SIGLA
   # GET/POST /ms-importa-arquivos/api/v1/exportacao/vagas-processo/
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 10 — Requisitar página inexistente de vagas processo retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_processo_pagina_invalida
   Cenário: Requisitar página inexistente de vagas processo retorna 404
     Quando eu faço uma requisição IMPORTA GET para "/exportacao/vagas-processo/?page=999999"
     Então o status IMPORTA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 11 — Exportar vagas processo sem processo_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_processo_sem_processo
   Cenário: Exportar vagas processo sem processo_uuid retorna 400
     Quando eu faço exportação de vagas processo com payload "exportacaoVagasProcessoSemProcesso"
@@ -98,11 +131,17 @@ Funcionalidade: API Importação de Arquivo SIGLA
   # GET/POST /ms-importa-arquivos/api/v1/exportacao/vagas-sigpec/
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 12 — Requisitar página inexistente de vagas SIGPEC retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_sigpec_pagina_invalida
   Cenário: Requisitar página inexistente de vagas SIGPEC retorna 404
     Quando eu faço uma requisição IMPORTA GET para "/exportacao/vagas-sigpec/?page=999999"
     Então o status IMPORTA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 13 — Exportar vagas SIGPEC sem processo_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_sigpec_sem_processo
   Cenário: Exportar vagas SIGPEC sem processo_uuid retorna 400
     Quando eu faço exportação de vagas SIGPEC com payload "exportacaoVagasSigpecSemProcesso"
@@ -117,16 +156,25 @@ Funcionalidade: API Importação de Arquivo SIGLA
   #   Quando eu faço uma requisição IMPORTA GET para "/importacao-arquivo/habilitados/?page=999999"
   #   Então o status IMPORTA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 14 — Buscar importação habilitados com ID inexistente retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @habilitados_id_invalido
   Cenário: Buscar importação habilitados com ID inexistente retorna 404
     Quando eu busco importação de habilitados com ID inexistente
     Então o status IMPORTA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 15 — Importar habilitados sem arquivo retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @habilitados_sem_arquivo
   Cenário: Importar habilitados sem arquivo retorna 400
     Quando eu faço importação de habilitados com payload "importacaoHabilitadosSemArquivo"
     Então o status IMPORTA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 16 — Importar habilitados sem concurso_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @habilitados_sem_concurso
   Cenário: Importar habilitados sem concurso_uuid retorna 400
     Quando eu faço importação de habilitados com payload "importacaoHabilitadosSemConcurso"
@@ -136,21 +184,33 @@ Funcionalidade: API Importação de Arquivo SIGLA
   # GET/POST /ms-importa-arquivos/api/v1/importacao-arquivo/vagas/
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 17 — Requisitar página inexistente de vagas retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_pagina_invalida
   Cenário: Requisitar página inexistente de vagas retorna 404
     Quando eu faço uma requisição IMPORTA GET para "/importacao-arquivo/vagas/?page=999999"
     Então o status IMPORTA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 18 — Buscar importação vagas com ID inexistente retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_id_invalido
   Cenário: Buscar importação vagas com ID inexistente retorna 404
     Quando eu busco importação de vagas com ID inexistente
     Então o status IMPORTA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 19 — Importar vagas sem arquivo retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_sem_arquivo
   Cenário: Importar vagas sem arquivo retorna 400
     Quando eu faço importação de vagas com payload "importacaoVagasSemArquivo"
     Então o status IMPORTA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 20 — Importar vagas sem processo_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_sem_processo
   Cenário: Importar vagas sem processo_uuid retorna 400
     Quando eu faço importação de vagas com payload "importacaoVagasSemProcesso"
@@ -160,16 +220,25 @@ Funcionalidade: API Importação de Arquivo SIGLA
   # GET/POST /ms-importa-arquivos/api/v1/importacao-escolhas/
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 21 — Requisitar página inexistente de escolhas retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @escolhas_pagina_invalida
   Cenário: Requisitar página inexistente de escolhas retorna 404
     Quando eu faço uma requisição IMPORTA GET para "/importacao-escolhas/?page=999999"
     Então o status IMPORTA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 22 — Importar escolhas sem processo_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @escolhas_sem_processo
   Cenário: Importar escolhas sem processo_uuid retorna 400
     Quando eu faço importação de escolhas com payload "importacaoEscolhasSemProcesso"
     Então o status IMPORTA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 23 — Importar escolhas sem lote_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @escolhas_sem_lote
   Cenário: Importar escolhas sem lote_uuid retorna 400
     Quando eu faço importação de escolhas com payload "importacaoEscolhasSemLote"

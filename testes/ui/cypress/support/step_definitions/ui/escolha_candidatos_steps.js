@@ -3,6 +3,28 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 
 // =====================================================
+// HELPER — REGEX TOLERANTE A ACENTUAÇÃO
+// =====================================================
+
+const escaparRegex = (texto) =>
+  texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const criarRegex = (texto) =>
+  new RegExp(
+    escaparRegex(texto.trim())
+      .replace(/ç|Ç/g, '[çc]')
+      .replace(/ã|Ã/g, '[ãa]')
+      .replace(/õ|Õ/g, '[õo]')
+      .replace(/é|É/g, '[eé]')
+      .replace(/í|Í/g, '[ií]')
+      .replace(/ó|Ó/g, '[oó]')
+      .replace(/ú|Ú/g, '[uú]')
+      .replace(/â|Â/g, '[aâ]')
+      .replace(/ê|Ê/g, '[eê]'),
+    'i'
+  )
+
+// =====================================================
 // SELECTORES — ESCOLHA DE CANDIDATOS
 // =====================================================
 
@@ -16,48 +38,53 @@ const escolhaSelectors = {
   },
 
   filtros: {
-    processo: () =>
-      cy.contains('label, span, div', /^Processo$/i, { timeout: 10000 })
-        .closest('.ant-form-item, .ant-row, form > div, [class*="form"]')
-        .find('input[role="combobox"], .ant-select-selector input')
-        .first(),
+    // A tela de Escolha de Candidatos não associa o <label> ao select via
+    // ancestralidade previsível (o texto "Processo" também aparece em textos
+    // descritivos fora do formulário) — por isso a seleção é posicional,
+    // seguindo a ordem real dos campos: 0 = Processo, 1 = Período da agenda.
+    processo: () => cy.get('.ant-select', { timeout: 10000 }).eq(0),
+    periodoAgenda: () => cy.get('.ant-select', { timeout: 10000 }).eq(1),
 
-    periodoAgenda: () =>
-      cy.contains('label, span, div', /Período da agenda/i, { timeout: 10000 })
-        .closest('.ant-form-item, .ant-row, form > div, [class*="form"]')
-        .find('input[role="combobox"], .ant-select-selector input')
-        .first(),
-
-    processoPorIndice: () => cy.get('input[role="combobox"]', { timeout: 10000 }).eq(0),
-    periodoAgendaPorIndice: () => cy.get('input[role="combobox"]', { timeout: 10000 }).eq(1),
-
-    opcoes: () => cy.get('.ant-select-item-option, [role="option"]', { timeout: 10000 })
+    processoPorIndice: () => cy.get('.ant-select', { timeout: 10000 }).eq(0),
+    periodoAgendaPorIndice: () => cy.get('.ant-select', { timeout: 10000 }).eq(1)
   },
 
   botaoAcaoPrincipal: () =>
     cy.get('main button[disabled], main button[aria-disabled="true"], main .ant-btn[disabled]', { timeout: 10000 })
-      .first()
-}
+      .first(),
 
-// =====================================================
-// HELPER — SELECIONAR OPÇÃO ALEATÓRIA
-// =====================================================
+  // ---- Tabela de resultados (consulta por situação / candidatos)
+  tabela: {
+    container: () => cy.get('table', { timeout: 10000 }),
+    // O Ant Design Table sempre renderiza uma <tr class="ant-table-measure-row">
+    // oculta como primeira linha do tbody, usada só para calcular a largura
+    // das colunas (contém o texto dos headers concatenado, sem dados reais).
+    // Ela precisa ser excluída, senão aparece como "primeira linha" ou como
+    // uma linha de dados a mais na validação de cada registro.
+    linhas: () => cy.get('tbody tr:not(.ant-table-measure-row)', { timeout: 10000 }),
+    primeiraLinha: () => cy.get('tbody tr:not(.ant-table-measure-row)', { timeout: 10000 }).first(),
 
-const selecionarOpcaoAleatoriaDropdown = (campoFn) => {
-  campoFn().click({ force: true })
-  cy.wait(1000)
+    colunas: {
+      candidato: () => cy.contains('th', /Candidato/i),
+      cargo: () => cy.contains('th', /Cargo/i),
+      tipoVaga: () => cy.contains('th', /Tipo de Vaga/i),
+      classificacao: () => cy.contains('th', /Classifica[çc][ãa]o/i),
+      situacao: () => cy.contains('th', /Situa[çc][ãa]o/i),
+      escolha: () => cy.contains('th', /^Escolha$/i)
+    },
 
-  escolhaSelectors.filtros.opcoes().then(($opcoes) => {
-    const total = $opcoes.length
-    if (total > 0) {
-      const indice = Math.floor(Math.random() * total)
-      cy.wrap($opcoes[indice]).click({ force: true })
-      cy.wait(500)
-    } else {
-      cy.log('Nenhuma opção disponível no dropdown')
-      cy.get('body').click(0, 0)
-    }
-  })
+    // Ícone de "olho" (visualizar escolha) na linha do candidato
+    botaoVisualizarEscolha: () =>
+      cy.get('tbody tr:not(.ant-table-measure-row)', { timeout: 10000 })
+        .first()
+        .find('[aria-label="eye"], svg')
+        .first()
+  },
+
+  // ---- Modal "Visualizar escolha de candidato"
+  modal: {
+    container: () => cy.get('.ant-modal:visible', { timeout: 10000 })
+  }
 }
 
 // =====================================================
@@ -81,49 +108,84 @@ Then('valido a existência do campo {string} na escolha de candidatos', (campo) 
   })
 })
 
+// Muitos processos cadastrados no ambiente de QA são lixo de execuções de
+// automação anteriores (sem cleanup) e não têm nenhuma agenda vinculada —
+// confirmado via API: dos 146 processos do select, ~83 têm nome tipo
+// "Processo de Teste Automacao"/"Processo Parcialmente Atualizado" e nenhum
+// deles tem agenda. O dropdown do Ant Design é virtualizado (só renderiza
+// ~12 opções por vez, sempre a partir do topo da lista), e esse topo é
+// justamente dominado por esse lixo — por isso tentar aleatoriamente entre
+// as opções visíveis nunca alcançava um processo real.
+//
+// Os 63 processos de fluxo real sempre têm "convocação" no nome (e nenhum
+// dos nomes de automação tem essa palavra), então filtramos a busca do
+// select por esse termo antes de sortear — restringe o dropdown ao universo
+// onde processos com agenda de fato existem. Depois de escolher, ainda
+// confirma que "Período da agenda" habilitou; se não, tenta outra opção
+// dentro do filtro (mesmo princípio de retry já usado em
+// cy.selecionarOpcaoAntd para opções que "não pegam").
+const periodoAgendaHabilitado = () =>
+  cy.get('.ant-select', { timeout: 10000 }).eq(1).then(($periodo) => {
+    const desabilitado = $periodo.hasClass('ant-select-disabled') || $periodo.find('input').is(':disabled')
+    return !desabilitado
+  })
+
+const inputProcesso = () =>
+  cy.get('.ant-select', { timeout: 10000 }).eq(0)
+    .then(($el) => ($el.is('input') ? $el : $el.find('input').first()))
+
+const selecionarProcessoComAgenda = (indicesTentados = []) => {
+  inputProcesso().click({ force: true })
+  cy.wait(300)
+  // Reaplica o filtro a cada tentativa: o antd limpa o texto de busca do
+  // campo assim que uma opção é selecionada.
+  inputProcesso().type('convocação', { delay: 50, force: true })
+  cy.wait(500)
+
+  const dropdownAtual = () => cy.get('.ant-select-dropdown:visible', { timeout: 10000 }).last()
+  dropdownAtual().should('be.visible')
+
+  dropdownAtual()
+    .find('.ant-select-item-option, [role="option"]')
+    .should('have.length.greaterThan', 0)
+    .then(($opcoes) => {
+      const total = $opcoes.length
+      const indicesDisponiveis = [...Array(total).keys()].filter((i) => !indicesTentados.includes(i))
+      if (indicesDisponiveis.length === 0) {
+        cy.log('Nenhum Processo com agenda disponível encontrado entre as opções filtradas por "convocação" — seguindo com a última selecionada')
+        return
+      }
+      const indice = indicesDisponiveis[Math.floor(Math.random() * indicesDisponiveis.length)]
+      cy.wrap($opcoes[indice]).click({ force: true })
+      cy.wait(1000) // aguarda a chamada de agendas/cargos disparada pela seleção
+
+      periodoAgendaHabilitado().then((habilitado) => {
+        if (habilitado) {
+          cy.log(`Processo (opção ${indice}, filtro "convocação") selecionado — "Período da agenda" habilitado`)
+        } else {
+          cy.log(`Processo (opção ${indice}) sem agenda vinculada — tentando outro`)
+          selecionarProcessoComAgenda([...indicesTentados, indice])
+        }
+      })
+    })
+}
+
 When('seleciono uma opção aleatória no campo {string} da escolha de candidatos', (campo) => {
   cy.wait(300)
+  if (campo.match(/Processo/i)) {
+    selecionarProcessoComAgenda()
+  } else {
+    cy.selecionarOpcaoAntd(() => cy.get('.ant-select', { timeout: 10000 }).eq(1), 'aleatoria')
+  }
+})
 
-  const indiceCombobox = campo.match(/Processo/i) ? 0 : 1
-
-  cy.get('body').then(($body) => {
-    const labelRegex = campo.match(/Processo/i) ? /^Processo$/i : /Período da agenda/i
-    let encontrou = false
-
-    $body.find('label, .ant-form-item-label span, [class*="label"]').each((_, el) => {
-      if (labelRegex.test(el.textContent.trim())) {
-        encontrou = true
-        return false
-      }
-    })
-
-    if (encontrou) {
-      cy.contains('label, .ant-form-item-label span', labelRegex)
-        .closest('.ant-form-item, .ant-row, [class*="field"], [class*="form"]')
-        .find('.ant-select-selector, input[role="combobox"]')
-        .first()
-        .click({ force: true })
-    } else {
-      cy.log(`Label "${campo}" não encontrado — usando fallback por índice ${indiceCombobox}`)
-      cy.get('input[role="combobox"]', { timeout: 10000 })
-        .eq(indiceCombobox)
-        .click({ force: true })
-    }
-  })
-
-  cy.wait(1000)
-
-  escolhaSelectors.filtros.opcoes().then(($opcoes) => {
-    const total = $opcoes.length
-    if (total > 0) {
-      const indice = Math.floor(Math.random() * total)
-      cy.wrap($opcoes[indice]).click({ force: true })
-      cy.wait(500)
-    } else {
-      cy.log('Nenhuma opção disponível no dropdown — fechando')
-      cy.get('body').click(0, 0)
-    }
-  })
+When('clico no campo e seleciono uma opção aleatória no campo {string} da escolha de candidatos', (campo) => {
+  cy.wait(300)
+  if (campo.match(/Processo/i)) {
+    selecionarProcessoComAgenda()
+  } else {
+    cy.selecionarOpcaoAntd(() => cy.get('.ant-select', { timeout: 10000 }).eq(1), 'aleatoria')
+  }
 })
 
 Then('valido que o botão de ação da escolha de candidatos está desabilitado', () => {
@@ -170,5 +232,82 @@ Then('valido que o botão de ação da escolha de candidatos está desabilitado'
         cy.log(`Botões habilitados na página: ${textosBotoes.join(', ')}`)
       })
     }
+  })
+})
+
+// =====================================================
+// STEPS — CONSULTA POR SITUAÇÃO E VISUALIZAÇÃO DE ESCOLHA
+// =====================================================
+
+Then('o sistema exibe os campos:', (dataTable) => {
+  const campos = dataTable.raw().flat().filter(Boolean)
+  campos.forEach((campo) => {
+    cy.contains(criarRegex(campo), { timeout: 10000 }).should('be.visible')
+  })
+})
+
+When('seleciono o processo {string} na escolha de candidatos', (valor) => {
+  cy.selecionarOpcaoAntd(escolhaSelectors.filtros.processo, valor)
+})
+
+When('clico e seleciono o processo {string} na escolha de candidatos', (valor) => {
+  cy.selecionarOpcaoAntd(escolhaSelectors.filtros.processo, valor)
+})
+
+Then('o sistema exibe os resultados', () => {
+  escolhaSelectors.tabela.container().should('be.visible')
+  cy.wait(500)
+})
+
+Then('a escolha de candidatos exibe as opções de situação:', (dataTable) => {
+  const situacoes = dataTable.raw().flat().filter(Boolean)
+  situacoes.forEach((situacao) => {
+    cy.contains(criarRegex(situacao), { timeout: 10000 }).should('be.visible')
+  })
+})
+
+When('filtro a escolha de candidatos pela situação {string}', (situacao) => {
+  cy.contains(criarRegex(situacao), { timeout: 10000 }).click({ force: true })
+  cy.wait(500)
+})
+
+Then('a tabela de escolha de candidatos exibe registros da situação {string}', (situacao) => {
+  cy.wait(500)
+  escolhaSelectors.tabela.linhas().should('have.length.greaterThan', 0)
+  escolhaSelectors.tabela.linhas().each(($linha) => {
+    expect($linha.text(), `Linha deve conter a situação "${situacao}"`).to.match(criarRegex(situacao))
+  })
+})
+
+Then('o sistema exibe a tabela de candidatos da escolha', () => {
+  escolhaSelectors.tabela.container().should('be.visible')
+})
+
+Then('a tabela de candidatos da escolha contém as colunas:', (dataTable) => {
+  const colunas = dataTable.raw().flat().filter(Boolean)
+  colunas.forEach((coluna) => {
+    cy.contains('th', criarRegex(coluna), { timeout: 10000 }).should('be.visible')
+  })
+})
+
+When('clico para visualizar a escolha do primeiro candidato', () => {
+  escolhaSelectors.tabela.primeiraLinha().trigger('mouseover', { force: true })
+  cy.wait(300)
+  escolhaSelectors.tabela.botaoVisualizarEscolha().click({ force: true })
+  cy.wait(1000)
+})
+
+Then('o modal de escolha do candidato exibe os campos:', (dataTable) => {
+  const campos = dataTable.raw().flat().filter(Boolean)
+  escolhaSelectors.modal.container().should('be.visible')
+  campos.forEach((campo) => {
+    escolhaSelectors.modal.container().contains(criarRegex(campo), { timeout: 8000 }).should('be.visible')
+  })
+})
+
+Then('o modal de escolha do candidato exibe as situações:', (dataTable) => {
+  const situacoes = dataTable.raw().flat().filter(Boolean)
+  situacoes.forEach((situacao) => {
+    escolhaSelectors.modal.container().contains(criarRegex(situacao), { timeout: 8000 }).should('be.visible')
   })
 })

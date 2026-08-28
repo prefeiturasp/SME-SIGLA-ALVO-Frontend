@@ -11,6 +11,9 @@ Funcionalidade: Processos — Gerenciamento de Vagas
   # URL DIRETA : /processos/gerenciamento-vagas
   # ============================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1 — Acessar gerenciamento de vagas e selecionar um processo
+  # ════════════════════════════════════════════════════════════════
   @gerenciamento @acesso @critico
   Cenário: Acessar gerenciamento de vagas e selecionar um processo
     Quando navego até a opção "Processos"
@@ -23,6 +26,9 @@ Funcionalidade: Processos — Gerenciamento de Vagas
     Quando seleciono uma opção aleatória no campo Processo do gerenciamento de vagas
     Então o sistema carrega os dados do processo selecionado no gerenciamento de vagas
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 2 — Validar botões disponíveis na lista de convocações
+  # ════════════════════════════════════════════════════════════════
   @gerenciamento @validacao @critico
   Cenário: Validar botões disponíveis na lista de convocações
     Quando navego até a opção "Processos"
@@ -31,6 +37,9 @@ Funcionalidade: Processos — Gerenciamento de Vagas
     E a lista de convocações exibe o botão "Gerenciamento de vagas"
     E a lista de convocações exibe o botão "Nova convocação"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 3 — Navegar até gerenciamento de vagas pelo menu Processos
+  # ════════════════════════════════════════════════════════════════
   @gerenciamento @navegacao @smoke
   Cenário: Navegar até gerenciamento de vagas pelo menu Processos
     Dado que estou na página inicial do SIGLA
@@ -41,6 +50,9 @@ Funcionalidade: Processos — Gerenciamento de Vagas
     Então o sistema exibe a tela de gerenciamento de vagas
     E o campo Processo está visível na tela de gerenciamento de vagas
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 4 — Fluxo completo — da página inicial ao gerenciamento de vagas com seleção de processo
+  # ════════════════════════════════════════════════════════════════
   @fluxo-completo @critico
   Cenário: Fluxo completo — da página inicial ao gerenciamento de vagas com seleção de processo
     Dado que estou na página inicial do SIGLA

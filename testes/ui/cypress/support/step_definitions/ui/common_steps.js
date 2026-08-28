@@ -15,7 +15,7 @@ export const obterCredenciaisAdmin = () => ({
 })
 
 export const realizarLoginAdmin = (rf, senha) => {
-  cy.visit(`${obterBaseUrl()}/login`, { timeout: 15000 })
+  cy.visit(`${obterBaseUrl()}/login`)
   cy.get('input').filter('[type="text"], [type="number"]').first()
     .clear({ force: true }).type(rf, { force: true, delay: 100 })
   cy.wait(500)
@@ -55,7 +55,7 @@ const criarRegex = (texto) =>
 Given('que estou logado no SIGLA com perfil administrador', () => {
   const { rf, senha } = obterCredenciaisAdmin()
   cy.session(`sigla-admin-${rf}`, () => { realizarLoginAdmin(rf, senha) })
-  cy.visit(obterBaseUrl(), { timeout: 15000 })
+  cy.visit(obterBaseUrl())
   Cypress.log({ name: 'LOGIN ADMIN', message: `Sessão restaurada — RF: ${rf}` })
 })
 
@@ -64,7 +64,7 @@ Given('que estou logado no SIGLA com perfil administrador', () => {
 // =====================================================
 
 Given('que estou na página inicial do SIGLA', () => {
-  cy.visit(obterBaseUrl(), { timeout: 15000 })
+  cy.visit(obterBaseUrl())
   cy.url().should('not.include', '/login')
   cy.wait(1000)
 })

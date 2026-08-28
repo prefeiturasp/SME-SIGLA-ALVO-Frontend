@@ -38,6 +38,9 @@ Funcionalidade: API Escolha de Vagas SIGLA
   #   E a resposta ESCOLHA deve conter "count"
   #   E a resposta ESCOLHA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1 — Requisitar página inexistente de vagas retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_pagina_invalida
   Cenário: Requisitar página inexistente de vagas retorna 404
     Quando eu faço uma requisição ESCOLHA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-escolha-vagas/api/v1/vagas/?page=999999"
@@ -47,11 +50,17 @@ Funcionalidade: API Escolha de Vagas SIGLA
   # GET /ms-escolha-vagas/api/v1/vagas/{uuid}/
   # ============================================================================
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 2 — Buscar vaga com UUID inexistente retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_uuid_invalido
   Cenário: Buscar vaga com UUID inexistente retorna 404
     Quando eu faço uma requisição ESCOLHA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-escolha-vagas/api/v1/vagas/00000000-0000-0000-0000-000000000000/"
     Então o status ESCOLHA deve ser 404
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 3 — Buscar vaga com UUID em formato inválido retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_uuid_formato_invalido
   Cenário: Buscar vaga com UUID em formato inválido retorna 404
     Quando eu faço uma requisição ESCOLHA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-escolha-vagas/api/v1/vagas/uuid-invalido/"
@@ -68,6 +77,9 @@ Funcionalidade: API Escolha de Vagas SIGLA
   #   E a resposta ESCOLHA deve conter "count"
   #   E a resposta ESCOLHA deve conter "results"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 4 — Requisitar página inexistente retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @escolha_pagina_invalida
   Cenário: Requisitar página inexistente retorna 404
     Quando eu faço uma requisição ESCOLHA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-escolha-vagas/api/v1/escolha/?page=999999"
@@ -117,6 +129,9 @@ Funcionalidade: API Escolha de Vagas SIGLA
   #   E a resposta ESCOLHA deve conter "uuid"
   #   E a resposta ESCOLHA deve conter "processo_uuid"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 5 — Buscar escolha com UUID inexistente retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @escolha_uuid_invalido
   Cenário: Buscar escolha com UUID inexistente retorna 404
     Quando eu faço uma requisição ESCOLHA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-escolha-vagas/api/v1/escolha/00000000-0000-0000-0000-000000000000/"
@@ -133,6 +148,9 @@ Funcionalidade: API Escolha de Vagas SIGLA
   #   Então o status ESCOLHA deve ser 200
   #   E a resposta ESCOLHA deve conter "uuid"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 6 — Atualizar escolha inexistente via PUT retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @escolha_put_uuid_invalido
   Cenário: Atualizar escolha inexistente via PUT retorna 404
     Quando eu atualizo uma escolha inexistente via PUT com payload "escolhaAtualizada"
@@ -148,6 +166,9 @@ Funcionalidade: API Escolha de Vagas SIGLA
   #   Quando eu atualizo parcialmente a escolha pelo UUID criado com payload "escolhaPatch"
   #   Então o status ESCOLHA deve ser 200
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 7 — Atualizar escolha inexistente via PATCH retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @escolha_patch_uuid_invalido
   Cenário: Atualizar escolha inexistente via PATCH retorna 404
     Quando eu atualizo parcialmente uma escolha inexistente via PATCH com payload "escolhaPatch"
@@ -163,6 +184,9 @@ Funcionalidade: API Escolha de Vagas SIGLA
   #   Quando eu deleto a escolha pelo UUID criado
   #   Então o status ESCOLHA deve ser 204
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 8 — Deletar escolha inexistente retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @escolha_delete_uuid_invalido
   Cenário: Deletar escolha inexistente retorna 404
     Quando eu deleto uma escolha por UUID inexistente
@@ -178,6 +202,9 @@ Funcionalidade: API Escolha de Vagas SIGLA
   #   Quando eu confirmo a escolha pelo UUID criado
   #   Então o status ESCOLHA deve ser 200 ou 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 9 — Confirmar escolha inexistente retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @escolha_confirmar_uuid_invalido
   Cenário: Confirmar escolha inexistente retorna 404
     Quando eu faço uma requisição ESCOLHA POST de ação "confirmar" para UUID inexistente
@@ -193,6 +220,9 @@ Funcionalidade: API Escolha de Vagas SIGLA
   #   Quando eu cancelo a escolha pelo UUID criado
   #   Então o status ESCOLHA deve ser 200 ou 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 10 — Cancelar escolha inexistente retorna 404
+  # ════════════════════════════════════════════════════════════════
   @negativo @escolha_cancelar_uuid_invalido
   Cenário: Cancelar escolha inexistente retorna 404
     Quando eu faço uma requisição ESCOLHA POST de ação "cancelar" para UUID inexistente
@@ -221,38 +251,59 @@ Funcionalidade: API Escolha de Vagas SIGLA
   #   E a resposta ESCOLHA deve conter "cargo_codigo"
   #   E o campo "uuid" da resposta ESCOLHA deve ser um UUID válido
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 11 — Incluir vagas sem processo_uuid retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_inclusao_sem_processo
   Cenário: Incluir vagas sem processo_uuid retorna 400
     Quando eu faço inclusão de vagas em lote com payload "vagasEscolasInclusaoSemProcesso"
     Então o status ESCOLHA deve ser 400
     E a resposta ESCOLHA deve conter "processo_uuid"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 12 — Incluir vagas sem array de vagas retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_inclusao_sem_vagas
   Cenário: Incluir vagas sem array de vagas retorna 400
     Quando eu faço inclusão de vagas em lote com payload "vagasEscolasInclusaoSemVagas"
     Então o status ESCOLHA deve ser 400
     E a resposta ESCOLHA deve conter "vagas"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 13 — Incluir vagas com array vazio retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_inclusao_vagas_vazio
   Cenário: Incluir vagas com array vazio retorna 400
     Quando eu faço inclusão de vagas em lote com payload "vagasEscolasInclusaoVagasVazio"
     Então o status ESCOLHA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 14 — Incluir vagas com processo_uuid inexistente retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_inclusao_processo_inexistente
   Cenário: Incluir vagas com processo_uuid inexistente retorna 400
     Quando eu faço inclusão de vagas em lote com payload "vagasEscolasInclusaoProcessoInexistente"
     Então o status ESCOLHA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 15 — Incluir vagas com cargo inválido retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_inclusao_cargo_invalido
   Cenário: Incluir vagas com cargo inválido retorna 400
     Quando eu faço inclusão de vagas em lote com payload "vagasEscolasInclusaoCargoInvalido"
     Então o status ESCOLHA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 16 — Incluir vagas sem código EOL da escola retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_inclusao_sem_escola_codigo
   Cenário: Incluir vagas sem código EOL da escola retorna 400
     Quando eu faço inclusão de vagas em lote com payload "vagasEscolasInclusaoSemEscolaCodigo"
     Então o status ESCOLHA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 17 — Incluir vagas com data de fechamento inválida retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_inclusao_data_fechamento_invalida
   Cenário: Incluir vagas com data de fechamento inválida retorna 400
     Quando eu faço inclusão de vagas em lote com payload "vagasEscolasInclusaoDataInvalida"
@@ -282,6 +333,9 @@ Funcionalidade: API Escolha de Vagas SIGLA
   #   Quando eu faço uma requisição ESCOLHA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-escolha-vagas/api/v1/escolha/?created_at=data-invalida"
   #   Então o status ESCOLHA deve ser 400
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 18 — Incluir vagas com valores negativos retorna 400
+  # ════════════════════════════════════════════════════════════════
   @negativo @vagas_inclusao_valores_negativos
   Cenário: Incluir vagas com valores negativos retorna 400
     Quando eu faço inclusão de vagas em lote com payload "vagasEscolasInclusaoValoresNegativos"

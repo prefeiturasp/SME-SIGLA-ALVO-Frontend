@@ -12,6 +12,9 @@ Funcionalidade: Visualizar Consulta de Convocação de Candidatos
     Então devo ser redirecionado para o dashboard
     E devo visualizar a página principal do sistema
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1 — Visualizar resumo do processo de convocação
+  # ════════════════════════════════════════════════════════════════
   @consulta-sucesso @visualizar
   Cenário: Visualizar resumo do processo de convocação
     Dado que estou no dashboard
@@ -26,6 +29,9 @@ Funcionalidade: Visualizar Consulta de Convocação de Candidatos
     Quando clico no botão "Voltar"
     Então o sistema exibe a tela "Lista de Convocações"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 2 — Consultar convocação de candidatos com filtro por Concurso
+  # ════════════════════════════════════════════════════════════════
   @consulta-sucesso @critico
   Cenário: Consultar convocação de candidatos com filtro por Concurso
     Dado que estou no dashboard
@@ -39,6 +45,9 @@ Funcionalidade: Visualizar Consulta de Convocação de Candidatos
     E clico no botão "Buscar"
     Então o sistema exibe os dados na tabela
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 3 — Consultar convocação de candidatos com filtro por Cargo
+  # ════════════════════════════════════════════════════════════════
   @consulta-sucesso @filtro
   Cenário: Consultar convocação de candidatos com filtro por Cargo
     Dado que estou no dashboard
@@ -50,6 +59,9 @@ Funcionalidade: Visualizar Consulta de Convocação de Candidatos
     Então o sistema exibe os dados na tabela
     E valido a existência da tabela e colunas
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 4 — Validar permissões de acesso em ações restritas
+  # ════════════════════════════════════════════════════════════════
   @validacao-permissao @negativo
   Cenário: Validar permissões de acesso em ações restritas
     Dado que estou no dashboard
@@ -61,6 +73,9 @@ Funcionalidade: Visualizar Consulta de Convocação de Candidatos
     E tento acessar ações não permitidas em "Gerenciar"
     Então o sistema exibe mensagem de permissão negada
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 5 — Limpar filtros de consulta
+  # ════════════════════════════════════════════════════════════════
   @limpar-filtros @funcional
   Cenário: Limpar filtros de consulta
     Dado que estou no dashboard

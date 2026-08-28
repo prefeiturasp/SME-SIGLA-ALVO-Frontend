@@ -1,5 +1,8 @@
 // Arquivo principal de suporte do Cypress — SME SIGLA ALVO
 
+// Relatório consolidado (Mochawesome)
+import 'cypress-mochawesome-reporter/register'
+
 // Comandos principais
 import './commands'
 

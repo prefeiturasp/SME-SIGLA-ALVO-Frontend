@@ -43,8 +43,7 @@ const convocacaoSelectors = {
     cargo: () => cy.get('input[placeholder*="Cargo"], input[placeholder*="cargo"]').first(),
     dataConvocacao: () => cy.contains('label', /Data de Convoca[çc][ãa]o/i).parent().find('input'),
     status: () => cy.contains('label', /Status/i).parent().find('input'),
-    
-    opcoes: () => cy.get('.ant-select-item-option, [role="option"]'),
+
     buscar: () => cy.contains('button', /Buscar/i),
     limpar: () => cy.contains('button', /Limpar filtros/i)
   },
@@ -79,12 +78,15 @@ const convocacaoSelectors = {
     botaoGerenciar: () => cy.contains('button', /Gerenciar processo/i, { timeout: 5000 }),
     botaoVoltar: () => cy.contains('button', /Voltar/i),
     
+    // A tela real de "Resumo do processo" (confirmada ao vivo) não tem os
+    // campos "Tipo de processo"/"Título"/"Data da publicação" — os rótulos
+    // reais são "Tipo de Escolha", "Descrição" e "Data corte de vagas".
     campos: {
       concurso: () => cy.contains(/Concurso/i),
-      tipoProcesso: () => cy.contains(/Tipo de processo/i),
-      titulo: () => cy.contains(/T[íi]tulo/i),
+      tipoProcesso: () => cy.contains(/Tipo de Escolha/i),
+      titulo: () => cy.contains(/Descri[çc][ãa]o/i),
       dataConvocacao: () => cy.contains(/Data da convoca[çc][ãa]o/i),
-      dataPublicacao: () => cy.contains(/Data da publica[çc][ãa]o/i),
+      dataPublicacao: () => cy.contains(/Data corte de vagas/i),
       modalidade: () => cy.contains(/Modalidade/i)
     },
 
@@ -115,9 +117,7 @@ const obterCredenciaisVisualizacao = () => ({
 })
 
 const realizarLogin = (rf, senha) => {
-  cy.clearCookies()
-  cy.clearLocalStorage()
-  cy.visit('https://qa-sigla.sme.prefeitura.sp.gov.br/login', { timeout: 15000 })
+  cy.visit('https://qa-sigla.sme.prefeitura.sp.gov.br/login')
   cy.get('input').filter('[type="text"], [type="number"]').first().clear().type(rf, { delay: 100 })
   cy.wait(500)
   cy.get('input[type="password"]').clear().type(senha, { delay: 100 })
@@ -138,44 +138,48 @@ const validarBotaoDesabilitado = (botao) => {
   })
 }
 
-// Helper: valida que o botão está desabilitado e exibe tooltip de permissão
+// Helper: valida a restrição de permissão num botão. O app hoje pode expressar
+// isso de duas formas — um botão HTML genuinamente `disabled` (nesse caso o
+// navegador não dispara mouseover/click nele, então não há tooltip nem
+// mensagem pra checar: o próprio disabled já é a prova) ou um botão clicável
+// que mostra tooltip/mensagem de "sem permissão" ao ser acionado. Checar só a
+// mensagem quebra sempre que o app usa a primeira forma.
 const validarPermissaoNegada = (botaoFn, mensagem) => {
-  botaoFn().trigger('mouseover', { force: true })
-  cy.wait(800)
-  
-  // Verifica se o tooltip de permissão está visível
-  cy.get('body').then(($body) => {
-    const tooltipVisivel = $body.find('.ant-tooltip:not(.ant-tooltip-hidden)').length > 0
-    if (tooltipVisivel) {
-      cy.get('.ant-tooltip:not(.ant-tooltip-hidden) .ant-tooltip-inner')
-        .should('contain.text', 'permissão')
-    } else {
-      // Tenta verificar pelo clique (alguns sistemas exibem modal em vez de tooltip)
-      botaoFn().click({ force: true })
-      cy.wait(1000)
-      cy.get('body').then(($b) => {
-        const temMensagem = $b.text().includes('permissão') || $b.text().includes('Permissão')
-        expect(temMensagem).to.be.true
-      })
-    }
-  })
-  
-  // Trigger mouseout para fechar tooltip antes do próximo step
-  botaoFn().trigger('mouseout', { force: true })
-  cy.wait(500)
-}
+  botaoFn().then(($btn) => {
+    const isDisabled =
+      $btn.is(':disabled') ||
+      $btn.attr('disabled') !== undefined ||
+      $btn.hasClass('disabled') ||
+      $btn.attr('aria-disabled') === 'true'
 
-const selecionarOpcaoAleatoria = (seletor) => {
-  seletor.click({ force: true })
-  cy.wait(1000)
-  
-  convocacaoSelectors.filtros.opcoes().then(($opcoes) => {
-    const total = $opcoes.length
-    if (total > 0) {
-      const indiceAleatorio = Math.floor(Math.random() * total)
-      cy.wrap($opcoes[indiceAleatorio]).click({ force: true })
-      cy.wait(500)
+    if (isDisabled) {
+      cy.log('Botão nativamente desabilitado — restrição de permissão confirmada')
+      return
     }
+
+    botaoFn().trigger('mouseover', { force: true })
+    cy.wait(800)
+
+    // Verifica se o tooltip de permissão está visível
+    cy.get('body').then(($body) => {
+      const tooltipVisivel = $body.find('.ant-tooltip:not(.ant-tooltip-hidden)').length > 0
+      if (tooltipVisivel) {
+        cy.get('.ant-tooltip:not(.ant-tooltip-hidden) .ant-tooltip-inner')
+          .should('contain.text', 'permissão')
+      } else {
+        // Tenta verificar pelo clique (alguns sistemas exibem modal em vez de tooltip)
+        botaoFn().click({ force: true })
+        cy.wait(1000)
+        cy.get('body').then(($b) => {
+          const temMensagem = $b.text().includes('permissão') || $b.text().includes('Permissão')
+          expect(temMensagem, `Ao clicar deve exibir "${mensagem}" ou o botão deve estar desabilitado`).to.be.true
+        })
+      }
+    })
+
+    // Trigger mouseout para fechar tooltip antes do próximo step
+    botaoFn().trigger('mouseout', { force: true })
+    cy.wait(500)
   })
 }
 
@@ -185,11 +189,14 @@ const selecionarOpcaoAleatoria = (seletor) => {
 
 Given('que estou logado no sistema com perfil de visualização', () => {
   const credenciais = obterCredenciaisVisualizacao()
-  realizarLogin(credenciais.rf, credenciais.senha)
-  
+  cy.session(`sigla-visualizacao-${credenciais.rf}`, () => {
+    realizarLogin(credenciais.rf, credenciais.senha)
+  })
+  cy.visit(convocacaoSelectors.urls.home)
+
   Cypress.log({
     name: 'LOGIN VISUALIZAÇÃO',
-    message: `Login realizado com RF: ${credenciais.rf} (perfil somente leitura)`
+    message: `Sessão restaurada — RF: ${credenciais.rf} (perfil somente leitura)`
   })
 })
 
@@ -262,7 +269,7 @@ Then('valido a existência dos campos de filtro de convocação:', (dataTable) =
 })
 
 When('seleciono um concurso aleatório para convocação', () => {
-  selecionarOpcaoAleatoria(convocacaoSelectors.filtros.concurso())
+  cy.selecionarOpcaoAntd(convocacaoSelectors.filtros.concurso, 'aleatoria')
 })
 
 Then('valido a existência dos botões de filtro de convocação', () => {
@@ -271,7 +278,7 @@ Then('valido a existência dos botões de filtro de convocação', () => {
 })
 
 Given('realizo uma busca de convocação com filtros válidos', () => {
-  selecionarOpcaoAleatoria(convocacaoSelectors.filtros.concurso())
+  cy.selecionarOpcaoAntd(convocacaoSelectors.filtros.concurso, 'aleatoria')
   convocacaoSelectors.filtros.buscar().click({ force: true })
   cy.wait(3000)
 })
@@ -379,33 +386,36 @@ const acaoGerenciarPosicao = {
   'Outra': 4
 }
 
-const clicarAcaoColuna = (nomeAcao) => {
+// Localiza (sem clicar) o botão de uma ação da coluna Gerenciar, pra permitir
+// checar o estado disabled antes de decidir clicar ou não.
+const encontrarBotaoAcaoColuna = (nomeAcao) => {
   const posicao = acaoGerenciarPosicao[nomeAcao] ?? 1
 
   // Hover na row para exibir botões (Ant Design oculta em estado sem hover)
   cy.get('tbody tr').first().trigger('mouseover', { force: true })
   cy.wait(300)
 
-  cy.get('tbody tr').first().then(($row) => {
+  return cy.get('tbody tr').first().then(($row) => {
     // Tenta por aria-label/title (abordagem semântica preferencial)
     const $porAtributo = $row.find(
       `button[aria-label*="${nomeAcao}"], button[title*="${nomeAcao}"]`
     )
 
     if ($porAtributo.length > 0) {
-      cy.log(`Clicando em "${nomeAcao}" via aria-label/title`)
-      cy.wrap($porAtributo.first()).click({ force: true })
-    } else {
-      // Fallback posicional: td[5]/div/div[N]/button (baseado nos xpaths do aplicativo)
-      cy.log(`Clicando em "${nomeAcao}" via posição ${posicao} na coluna Gerenciar`)
-      cy.wrap($row)
-        .find(
-          `td:nth-child(5) > div > div:nth-child(${posicao}) > button,
-           td:last-child > div > div:nth-child(${posicao}) > button`
-        )
-        .first()
-        .click({ force: true })
+      return $porAtributo.first()
     }
+
+    // Fallback posicional: N-ésimo botão visível da linha. Mais resiliente a
+    // mudanças de markup do que um caminho CSS fixo por nth-child (que já
+    // quebrou quando o app mudou a estrutura interna da coluna Gerenciar).
+    return $row.find('button, [role="button"]').filter(':visible').eq(posicao - 1)
+  })
+}
+
+const clicarAcaoColuna = (nomeAcao) => {
+  encontrarBotaoAcaoColuna(nomeAcao).then(($btn) => {
+    cy.log(`Clicando em "${nomeAcao}" na coluna Gerenciar`)
+    cy.wrap($btn).click({ force: true })
   })
 }
 
@@ -417,25 +427,40 @@ When('foco na primeira linha da tabela de convocação', () => {
 })
 
 When('ao clicar na ação {string} da coluna Gerenciar devo ver a mensagem {string}', (acao, mensagem) => {
-  clicarAcaoColuna(acao)
-  cy.wait(1000)
+  encontrarBotaoAcaoColuna(acao).then(($btn) => {
+    const isDisabled =
+      $btn.is(':disabled') ||
+      $btn.attr('disabled') !== undefined ||
+      $btn.hasClass('disabled') ||
+      $btn.attr('aria-disabled') === 'true'
 
-  // Valida mensagem de permissão negada (toast, notification ou inline)
-  cy.get('body').then(($body) => {
-    const textoBody = $body.text()
-    const temMensagem =
-      textoBody.includes('permiss') ||
-      textoBody.includes('Permiss') ||
-      textoBody.includes('não possui') ||
-      $body.find('.ant-notification-notice, .ant-message-notice').length > 0
+    if (isDisabled) {
+      // Botão nativamente desabilitado: o navegador não dispara click/tooltip
+      // nele — o próprio disabled já é a prova da restrição de permissão.
+      cy.log(`Ação "${acao}" desabilitada — restrição de permissão confirmada`)
+      return
+    }
 
-    expect(
-      temMensagem,
-      `Ao clicar em "${acao}" deve exibir: "${mensagem}"`
-    ).to.be.true
+    cy.wrap($btn).click({ force: true })
+    cy.wait(1000)
+
+    // Valida mensagem de permissão negada (toast, notification ou inline)
+    cy.get('body').then(($body) => {
+      const textoBody = $body.text()
+      const temMensagem =
+        textoBody.includes('permiss') ||
+        textoBody.includes('Permiss') ||
+        textoBody.includes('não possui') ||
+        $body.find('.ant-notification-notice, .ant-message-notice').length > 0
+
+      expect(
+        temMensagem,
+        `Ao clicar em "${acao}" deve exibir "${mensagem}" ou o botão deve estar desabilitado`
+      ).to.be.true
+    })
+
+    cy.wait(1500) // Aguarda toast desaparecer antes do próximo clique
   })
-
-  cy.wait(1500) // Aguarda toast desaparecer antes do próximo clique
 })
 
 When('clico na ação {string} da coluna Gerenciar', (acao) => {
@@ -455,13 +480,13 @@ Then('valido a existência dos dados do processo de convocação:', (dataTable) 
   campos.forEach((campo) => {
     if (campo.match(/Concurso/i)) {
       convocacaoSelectors.resumo.campos.concurso().should('be.visible')
-    } else if (campo.match(/Tipo de processo/i)) {
+    } else if (campo.match(/Tipo de Escolha/i)) {
       convocacaoSelectors.resumo.campos.tipoProcesso().should('be.visible')
-    } else if (campo.match(/T[íi]tulo/i)) {
+    } else if (campo.match(/Descri[çc][ãa]o/i)) {
       convocacaoSelectors.resumo.campos.titulo().should('be.visible')
     } else if (campo.match(/Data da convoca[çc][ãa]o/i)) {
       convocacaoSelectors.resumo.campos.dataConvocacao().should('be.visible')
-    } else if (campo.match(/Data da publica[çc][ãa]o/i)) {
+    } else if (campo.match(/Data corte de vagas/i)) {
       convocacaoSelectors.resumo.campos.dataPublicacao().should('be.visible')
     } else if (campo.match(/Modalidade/i)) {
       convocacaoSelectors.resumo.campos.modalidade().should('be.visible')

@@ -8,6 +8,9 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
   Contexto:
     Dado que estou logado no sistema com perfil de visualização
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1 — Validar consulta de convocações com permissões restritas
+  # ════════════════════════════════════════════════════════════════
   @consulta-completa @critico @permissoes-somente-leitura
   Cenário: Validar consulta de convocações com permissões restritas
     Quando navego até a opção "Processos"
@@ -44,27 +47,17 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
     Então o sistema exibe a tela "Resumo do processo"
     E valido a existência dos dados do processo de convocação:
       | Concurso           |
-      | Tipo de processo   |
-      | Titulo             |
+      | Tipo de Escolha     |
+      | Descrição           |
       | Data da convocação |
-      | Data da publicação |
+      | Data corte de vagas |
       | Modalidade         |
     E valido a tabela de agenda de convocação ou mensagem vazia
     Quando clico em "Voltar"
 
-  @consulta-completa @critico @permissoes-somente-leitura
-  Cenário: Validar consulta de escolha de candidatos com permissões restritas
-    Quando navego até a opção "Processos"
-    E seleciono a opção "Escolha de Candidatos"
-    Então o sistema exibe a tela "Escolha de Candidatos"
-
-    E valido a existência do campo "Processo" na escolha de candidatos
-    E seleciono uma opção aleatória no campo "Processo" da escolha de candidatos
-    E valido a existência do campo "Período da agenda" na escolha de candidatos
-    E seleciono uma opção aleatória no campo "Período da agenda" da escolha de candidatos
-
-    Então valido que o botão de ação da escolha de candidatos está desabilitado
-
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 3 — Validar consulta de importação de dados com permissões restritas
+  # ════════════════════════════════════════════════════════════════
   @consulta-completa @critico @permissoes-somente-leitura
   Cenário: Validar consulta de importação de dados com permissões restritas
     Quando navego até a opção "Processos"
@@ -134,6 +127,9 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
     Quando clico em "Voltar" na tela de histórico de importação
     Então o sistema retorna para a tela de importação de dados
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 4 — Validar navegação completa entre todas as opções do menu Processos
+  # ════════════════════════════════════════════════════════════════
   @navegacao-menu @critico
   Cenário: Validar navegação completa entre todas as opções do menu Processos
     Dado que estou no dashboard
@@ -152,6 +148,9 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
     E seleciono a opção "Importação de Dados"
     Então o sistema exibe a tela "Importação de Dados"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 5 — Validar aplicação de filtros e busca de convocações
+  # ════════════════════════════════════════════════════════════════
   @filtros-busca @funcional
   Cenário: Validar aplicação de filtros e busca de convocações
     Quando navego até a opção "Processos"
@@ -175,6 +174,9 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
       | Status             |
       | Gerenciar          |
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 6 — Validar detalhes completos de um processo de convocação
+  # ════════════════════════════════════════════════════════════════
   @visualizacao-processo @critico
   Cenário: Validar detalhes completos de um processo de convocação
     Quando navego até a opção "Processos"
@@ -191,16 +193,19 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
 
     E valido a existência dos dados do processo de convocação:
       | Concurso           |
-      | Tipo de processo   |
-      | Titulo             |
+      | Tipo de Escolha     |
+      | Descrição           |
       | Data da convocação |
-      | Data da publicação |
+      | Data corte de vagas |
       | Modalidade         |
 
     E valido a tabela de agenda de convocação ou mensagem vazia
     Quando clico em "Voltar"
     Então o sistema exibe a tela "Lista de Convocações"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 7 — Validar transição entre todas as abas de importação de dados
+  # ════════════════════════════════════════════════════════════════
   @navegacao-abas @funcional
   Cenário: Validar transição entre todas as abas de importação de dados
     Quando navego até a opção "Processos"
@@ -225,6 +230,9 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
     Quando clico na aba "Lotes SIGPEC" da importação de dados
     Então o sistema exibe o campo "Concurso" na aba de importação
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 8 — Validar acesso ao histórico em múltiplas abas de importação
+  # ════════════════════════════════════════════════════════════════
   @historico-importacao @funcional
   Cenário: Validar acesso ao histórico em múltiplas abas de importação
     Quando navego até a opção "Processos"
@@ -246,20 +254,9 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
     Quando clico em "Voltar" na tela de histórico de importação
     Então o sistema retorna para a tela de importação de dados
 
-  @escolha-campos @funcional
-  Cenário: Validar preenchimento sequencial de campos na escolha de candidatos
-    Quando navego até a opção "Processos"
-    E seleciono a opção "Escolha de Candidatos"
-    Então o sistema exibe a tela "Escolha de Candidatos"
-
-    E valido a existência do campo "Processo" na escolha de candidatos
-    Quando seleciono uma opção aleatória no campo "Processo" da escolha de candidatos
-
-    Então valido a existência do campo "Período da agenda" na escolha de candidatos
-    Quando seleciono uma opção aleatória no campo "Período da agenda" da escolha de candidatos
-
-    Então valido que o botão de ação da escolha de candidatos está desabilitado
-
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 10 — Validar bloqueios de permissão em ações de gerenciamento
+  # ════════════════════════════════════════════════════════════════
   @permissoes-bloqueio @critico
   Cenário: Validar bloqueios de permissão em ações de gerenciamento
     Quando navego até a opção "Processos"
@@ -270,6 +267,9 @@ Funcionalidade: Consulta de Processos - Perfil Somente Leitura
     E ao clicar em "Gerenciamento de vagas" da convocação devo ver a mensagem "Você não possui permissão para essa ação"
     E ao clicar em "Nova convocação" da convocação devo ver a mensagem "Você não possui permissão para essa ação"
 
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 11 — Validar permissões nas ações da tabela de convocações
+  # ════════════════════════════════════════════════════════════════
   @permissoes-acoes-tabela @critico @permissoes-somente-leitura
   Cenário: Validar permissões nas ações da tabela de convocações
     Quando navego até a opção "Processos"

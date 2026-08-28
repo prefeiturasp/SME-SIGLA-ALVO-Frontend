@@ -8,6 +8,17 @@ const path = require('path')
 dotenv.config({ path: path.resolve(__dirname, '.env') })
 
 module.exports = defineConfig({
+  reporter: 'cypress-mochawesome-reporter',
+  reporterOptions: {
+    reportDir: 'cypress/reports/mochawesome',
+    reportFilename: '[status]_[datetime]-relatorio',
+    reportPageTitle: 'Relatório de Testes — SME SIGLA ALVO',
+    charts: true,
+    embeddedScreenshots: true,
+    inlineAssets: true,
+    overwrite: false,
+  },
+
   e2e: {
     // Base URL configurável: usa API para testes de API, UI para testes de UI
     baseUrl: process.env.CYPRESS_BASE_URL || 'https://qa-sigla.sme.prefeitura.sp.gov.br',
@@ -19,9 +30,16 @@ module.exports = defineConfig({
     screenshotsFolder: 'cypress/screenshots',
     videosFolder: 'cypress/videos',
 
-    video: false,
+    // Gravação ativa localmente para permitir revisar a execução;
+    // desativada no Jenkins (CI=true) para não gerar/arquivar vídeo na esteira.
+    video: !process.env.CI,
     videoCompression: false,
     screenshotOnRunFailure: true,
+
+    // Por padrão o Cypress apaga TODA a pasta de vídeos/screenshots no início
+    // de cada "cypress run", mesmo quando a execução é filtrada por --spec.
+    // Desativado para preservar evidências de execuções anteriores.
+    trashAssetsBeforeRuns: false,
 
     chromeWebSecurity: false,
     defaultCommandTimeout: 20000,
@@ -36,7 +54,6 @@ module.exports = defineConfig({
     viewportHeight: 1080,
 
     experimentalMemoryManagement: true,
-    numTestsKeptInMemory: 0,
     watchForFileChanges: false,
 
     retries: {
@@ -78,9 +95,57 @@ module.exports = defineConfig({
 
     async setupNodeEvents(on, config) {
       // =========================
+      // MOCHAWESOME REPORTER + DASHBOARD LOCAL PÓS-EXECUÇÃO
+      // =========================
+      // Cypress só mantém UM handler por evento de ciclo de vida ('after:run'
+      // incluso): registrar on('after:run', ...) mais de uma vez faz o último
+      // registro substituir o anterior EM SILÊNCIO (sem erro/aviso). O antigo
+      // require('cypress-mochawesome-reporter/plugin')(on) registra o próprio
+      // 'after:run' dele — chamado depois do nosso, ele vencia e o dashboard
+      // local nunca rodava (era esse o motivo do dashboard.html ficar
+      // desatualizado). A solução é importar os hooks do reporter direto de
+      // 'cypress-mochawesome-reporter/lib' e compor um único handler por
+      // evento, chamando o hook do reporter e, na sequência, o dashboard. Ele
+      // só roda localmente: nunca em CI (Jenkins seta CI=true), e uma falha
+      // nele é só um aviso — nunca derruba a execução dos testes nem altera
+      // o exit code.
+      const { beforeRunHook, afterRunHook } = require('cypress-mochawesome-reporter/lib')
+
+      on('before:run', async (details) => {
+        await beforeRunHook(details)
+      })
+
+      on('after:run', async (results) => {
+        await afterRunHook(results)
+        if (process.env.CI) return
+        try {
+          const { spawnSync } = require('child_process')
+          const path = require('path')
+          const script = path.join('scripts', 'gerar_dashboard.py')
+          // Gerador é em Python (stdlib apenas) — tenta 'python3' e depois
+          // 'python' (nome disponível no Windows); se nenhum interpretador
+          // existir na máquina, apenas avisa e segue sem derrubar a suíte.
+          let r = spawnSync('python3', [script], { stdio: 'inherit' })
+          if (r.error) r = spawnSync('python', [script], { stdio: 'inherit' })
+          if (r.error) {
+            console.warn('Aviso: Python não encontrado (tentado python3 e python) — dashboard local não gerado.')
+          } else if (r.status !== 0) {
+            console.warn('Aviso: geração do dashboard local retornou código ' + r.status)
+          }
+        } catch (e) {
+          console.warn('Aviso: falha ao gerar dashboard local (ignorado):', e.message)
+        }
+      })
+
+      // =========================
       // CUCUMBER
       // =========================
       await preprocessor.addCucumberPreprocessorPlugin(on, config)
+
+      // No modo interativo (cypress open) mantém os snapshots de cada ação
+      // para permitir navegar/"viajar no tempo" pelos passos após a execução.
+      // No modo headless (cypress run / CI) mantém 0 para economizar memória.
+      config.numTestsKeptInMemory = config.isInteractive ? 50 : 0
 
       on(
         'file:preprocessor',
