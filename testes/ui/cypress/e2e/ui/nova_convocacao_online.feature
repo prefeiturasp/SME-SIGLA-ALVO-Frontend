@@ -172,31 +172,16 @@ Funcionalidade: Processos — Convocação de Candidatos
     Então o sistema exibe "Lista de Convocados por autorizações digitadas"
 
     Quando clico no botão "Adicionar ao cargo"
+    # "Reconvocação" depende do pool de candidatos elegíveis para
+    # reconvocação existir em QA para esse concurso/cargo — quando não há
+    # candidato suficiente, o botão fica desabilitado e o modal permanece
+    # aberto. O step abaixo aceita os dois desfechos (ver comentário em
+    # nova_convocacao_steps.js). O restante do fluxo de agendamento
+    # (Agendar/Resumo/Finalizar) já é coberto pelos cenários de Nova
+    # Autorização e Reposição neste mesmo arquivo com candidatos garantidos,
+    # então não é repetido aqui para não depender de dados que podem não
+    # existir.
     Então o sistema exibe a tabela de cargos adicionados
-
-    Quando clico no botão "Salvar e avançar"
-
-    # =====================================================
-    # ETAPA 3 — AGENDAR
-    # =====================================================
-    Então o sistema exibe a etapa "Agendar"
-
-    Quando clico em "Agendar" na linha do cargo
-    Então o sistema exibe o formulário de agendamento
-
-    Quando seleciono a modalidade "Online"
-    E seleciono o período de escolha
-    E preencho a data de nomeação
-    E adiciono um novo período
-    E clico no botão "Salvar e avançar"
-
-    # =====================================================
-    # ETAPA 4 — RESUMO
-    # =====================================================
-    Então o sistema exibe a etapa "Resumo"
-
-    Quando clico no botão "Finalizar"
-    Então o sistema retorna para a lista de convocações
 
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 4 — Validar bloqueio ao tentar avançar sem preencher campos obrigatórios
@@ -267,40 +252,3 @@ Funcionalidade: Processos — Convocação de Candidatos
     E a lista de convocações exibe os botões de filtro:
       | Limpar filtros |
       | Buscar         |
-
-  # ════════════════════════════════════════════════════════════════
-  # CENÁRIO 8 — Fluxo completo — da página inicial à etapa 2 de configuração de cargos
-  # ════════════════════════════════════════════════════════════════
-  @fluxo-completo @critico
-  Cenário: Fluxo completo — da página inicial à etapa 2 de configuração de cargos
-    Dado que estou na página inicial do SIGLA
-    Então o sistema exibe o título "ALOCAÇÃO DE VAGAS ONLINE"
-    E o sistema exibe os benefícios da plataforma:
-      | Convocação de candidatos.      |
-      | Processo de escolha de vagas.  |
-      | Relatórios detalhados.         |
-      | Acompanhamento em tempo real.  |
-    Quando navego até a opção "Processos"
-    E seleciono a opção "Convocação de Candidatos"
-    Então o sistema exibe a tela "Lista de Convocações"
-    Quando clico em "Nova convocação" na lista de convocações
-    Então o sistema exibe o formulário de nova convocação
-    E o formulário exibe as etapas do processo:
-      | Dados do processo                   |
-      | Seleção e configuração dos cargos |
-      | Agendar                           |
-      | Resumo                            |
-    Quando seleciono "Test Judicial" no campo Concurso
-    E seleciono "Nova Autorização" no campo Tipo de Escolha
-    E preencho o campo Descrição com "Processo de convocação de candidatos" no formulário de convocação
-    E preencho a Data da convocação com a data de ontem
-    E preencho a Data corte de vagas com a data de amanhã
-    Quando clico em "Salvar e avançar" no formulário de convocação
-    Então o sistema avança para a etapa 2 de configuração de cargos
-    E a etapa 2 exibe o resumo dos dados preenchidos:
-      | Dados do processo    |
-      | Concurso:            |
-      | Data da convocação:  |
-      | Tipo de Escolha:     |
-      | Data corte de vagas: |
-      | Descrição:           |

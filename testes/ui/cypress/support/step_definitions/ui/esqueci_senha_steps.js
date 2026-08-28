@@ -35,7 +35,7 @@ const obterBaseUrlUI = () => Cypress.env('SIGLA_UI_BASE_URL') || 'https://hom-si
 
 Given('que eu acesso o sistema SIGLA', () => {
   const baseUrl = obterBaseUrlUI()
-  cy.visit(`${baseUrl}${esqueciSenhaSelectors.loginUrl}`, { timeout: 15000 })
+  cy.visit(`${baseUrl}${esqueciSenhaSelectors.loginUrl}`)
   cy.url().should('include', esqueciSenhaSelectors.loginUrl)
   Cypress.log({ name: 'SIGLA LOGIN PAGE', message: `Acessou página de login: ${baseUrl}${esqueciSenhaSelectors.loginUrl}` })
 })

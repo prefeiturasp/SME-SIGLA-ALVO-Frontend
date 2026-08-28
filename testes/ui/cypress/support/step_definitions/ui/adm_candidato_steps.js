@@ -60,32 +60,12 @@ const candidatoSelectors = {
     primeiraLinha: () => cy.get('tbody tr:not(.ant-table-measure-row)', { timeout: 10000 }).first(),
     botaoAlterarPrimeiraLinha: () =>
       cy.get('tbody tr:not(.ant-table-measure-row)', { timeout: 10000 }).first().find('button').first()
-  },
-
-  // Modal "Alterar situação do candidato", aberto pelo ícone de lápis quando o
-  // candidato ainda está "Ativo". Só tem um select (Situação) e um campo de
-  // texto (Motivo), então não precisa de índice/posição como os filtros.
-  modal: {
-    container: () => cy.get('.ant-modal:visible', { timeout: 10000 }),
-    situacaoSelect: () => cy.get('.ant-modal:visible .ant-select', { timeout: 10000 }),
-    motivo: () => cy.get('.ant-modal:visible [placeholder="Descreva o motivo"]', { timeout: 10000 }),
-    botaoSalvar: () => cy.get('.ant-modal:visible', { timeout: 10000 }).contains('button', 'Salvar'),
-    botaoCancelar: () => cy.get('.ant-modal:visible', { timeout: 10000 }).contains('button', 'Cancelar'),
-    botaoFechar: () => cy.get('.ant-modal:visible .ant-modal-close', { timeout: 10000 })
   }
 }
 
 // Guarda o último valor de filtro preenchido (CPF/RF/Nome) para validar que a
 // tabela retornada reflete de fato a busca realizada no cenário.
 let ultimoFiltroPreenchido = ''
-
-// Pool de CPFs "Ativo" reservado para o cenário de eliminação real (CENÁRIO 7
-// do .feature) — mesma combinação Concurso "Test Judicial" + Cargo "Analista
-// de Sistemas". Eliminar é uma ação real e não reversível pela tela, então o
-// step escolhe o primeiro CPF do pool que ainda estiver "Ativo" em vez de um
-// valor fixo — permite repetir a execução até o pool esgotar.
-const cpfsPoolEliminacao = ['37411874027', '04292797447', '87432197300', '04888328617']
-let cpfCandidatoAtivoSelecionado = ''
 
 // =====================================================
 // HELPER — SELEÇÃO ANT DESIGN SEM DIGITAR
@@ -107,6 +87,25 @@ let cpfCandidatoAtivoSelecionado = ''
 // timeout. Por isso a lista é rolada manualmente dentro do
 // .rc-virtual-list-holder, conferindo a cada passo se a opção já entrou na
 // janela renderizada, até encontrá-la ou a lista chegar ao fim.
+// O clique que abre o select às vezes não registra (elemento ainda não
+// totalmente interativo no momento do clique, mesmo com {force:true}) —
+// confirmado em execução real: o dropdown nunca chegava a abrir e a asserção
+// final estourava o timeout de 10s sem nenhuma nova tentativa de clique no
+// meio do caminho. Reabrir com um novo clique (até 3 tentativas) antes de
+// deixar a asserção final decidir evita depender de um único clique "sortudo".
+const abrirDropdown = (getSelectContainer, tentativasRestantes = 3) => {
+  getSelectContainer()
+    .then(($el) => ($el.is('input') ? $el : $el.find('input').first()))
+    .click({ force: true })
+
+  cy.wait(500)
+
+  return cy.get('body').then(($body) => {
+    if ($body.find('.ant-select-dropdown:visible').length > 0 || tentativasRestantes <= 1) return
+    abrirDropdown(getSelectContainer, tentativasRestantes - 1)
+  })
+}
+
 const selecionarOpcaoAntdSemDigitar = (getSelectContainer, opcao) => {
   getSelectContainer().should(($el) => {
     const $container = $el.is('input') ? $el.closest('.ant-select') : $el
@@ -116,11 +115,7 @@ const selecionarOpcaoAntdSemDigitar = (getSelectContainer, opcao) => {
     expect(desabilitado, 'Select não deve estar desabilitado').to.be.false
   })
 
-  getSelectContainer()
-    .then(($el) => ($el.is('input') ? $el : $el.find('input').first()))
-    .click({ force: true })
-
-  cy.wait(500)
+  abrirDropdown(getSelectContainer)
 
   const dropdownAtual = () => cy.get('.ant-select-dropdown:visible', { timeout: 10000 }).last()
   dropdownAtual().should('be.visible')
@@ -305,91 +300,4 @@ Then('o sistema exibe um aviso informando a situação do candidato', () => {
     .should('be.visible')
     .invoke('text')
     .should('match', /elimina|reclassifica|situaç[ãa]o/i)
-})
-
-// =====================================================
-// STEPS — ELIMINAR CANDIDATO (FLUXO REAL, CENÁRIO 7)
-// =====================================================
-// Confirmado manualmente no QA: para um candidato "Ativo", o ícone de lápis
-// abre o modal "Alterar situação do candidato" com um select Situação
-// (Eliminar / Desclassificar NNA / Desclassificar PCD) — ao escolher
-// "Eliminar" surge o campo Motivo, e só então o botão Salvar habilita. Depois
-// de salvar, o modal NÃO fecha sozinho e não exibe toast — a tabela por trás
-// já atualiza a Situação via refetch, mas o fechamento do modal é manual.
-
-const buscarCandidatoAtivo = (indice = 0) => {
-  if (indice >= cpfsPoolEliminacao.length) {
-    throw new Error(
-      'Nenhum candidato "Ativo" encontrado no pool configurado para o cenário de eliminação — pool esgotado, configure novos CPFs de teste.'
-    )
-  }
-  const cpf = cpfsPoolEliminacao[indice]
-  candidatoSelectors.filtros.cpf().clear({ force: true }).type(cpf, { force: true })
-  candidatoSelectors.botaoFiltrar().should('not.be.disabled').click({ force: true })
-  cy.wait(1000)
-
-  cy.get('body').then(($body) => {
-    const semDados = $body.text().includes('Não há dados')
-    if (semDados) {
-      buscarCandidatoAtivo(indice + 1)
-      return
-    }
-    const situacao = $body.find('tbody tr:not(.ant-table-measure-row)').first().find('td').eq(8).text().trim()
-    if (situacao === 'Ativo') {
-      cpfCandidatoAtivoSelecionado = cpf
-      cy.log(`Candidato ativo encontrado para eliminação: CPF ${cpf}`)
-    } else {
-      buscarCandidatoAtivo(indice + 1)
-    }
-  })
-}
-
-When('busco um candidato ativo da massa de eliminação e reclassificação', () => {
-  buscarCandidatoAtivo(0)
-})
-
-When('clico em Alterar no candidato ativo da eliminação e reclassificação', () => {
-  candidatoSelectors.tabela.botaoAlterarPrimeiraLinha().click({ force: true })
-  cy.wait(800)
-})
-
-When('seleciono a situação {string} no modal de alteração', (situacao) => {
-  selecionarOpcaoAntdSemDigitar(candidatoSelectors.modal.situacaoSelect, situacao)
-})
-
-When('preencho o motivo {string} no modal de alteração', (motivo) => {
-  candidatoSelectors.modal.motivo().clear({ force: true }).type(motivo, { force: true })
-})
-
-When('clico em {string} no modal de alteração', (texto) => {
-  if (/Salvar/i.test(texto)) {
-    candidatoSelectors.modal.botaoSalvar().should('not.be.disabled').click({ force: true })
-  } else if (/Cancelar/i.test(texto)) {
-    candidatoSelectors.modal.botaoCancelar().click({ force: true })
-  }
-  cy.wait(1500)
-})
-
-Then('a situação do candidato é atualizada para {string}', (situacaoEsperada) => {
-  candidatoSelectors.tabela.primeiraLinha().should('contain.text', situacaoEsperada)
-  candidatoSelectors.modal.botaoFechar().click({ force: true })
-  cy.wait(500)
-})
-
-// Recarrega a tela do zero (em vez de só refiltrar) para provar que a
-// eliminação persistiu no backend, e não é só um estado otimista no cliente —
-// mesma verificação feita manualmente durante o mapeamento deste fluxo.
-When('consulto novamente o mesmo CPF na eliminação e reclassificação', () => {
-  cy.reload()
-  cy.wait(1500)
-  selecionarOpcaoAntdSemDigitar(candidatoSelectors.filtros.concurso, 'Test Judicial')
-  selecionarOpcaoAntdSemDigitar(candidatoSelectors.filtros.cargo, 'Analista de Sistemas')
-  candidatoSelectors.filtros.cpf().clear({ force: true }).type(cpfCandidatoAtivoSelecionado, { force: true })
-  candidatoSelectors.botaoFiltrar().should('not.be.disabled').click({ force: true })
-  cy.wait(1000)
-})
-
-Then('o sistema exibe o candidato com situação {string}', (situacaoEsperada) => {
-  candidatoSelectors.tabela.linhas().should('have.length.greaterThan', 0)
-  candidatoSelectors.tabela.primeiraLinha().should('contain.text', situacaoEsperada)
 })

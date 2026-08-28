@@ -119,7 +119,7 @@ When('navego até a opção {string}', (opcao) => {
   // evitar que o clique no menu colapse o submenu em vez de expandi-lo
   cy.url().then((url) => {
     if (/\/processos/.test(url)) {
-      cy.visit(baseUrl, { timeout: 15000 })
+      cy.visit(baseUrl)
       cy.wait(2000)
     }
   })
