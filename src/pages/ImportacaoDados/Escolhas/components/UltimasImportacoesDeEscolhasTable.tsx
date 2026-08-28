@@ -107,6 +107,13 @@ const UltimasImportacoesDeEscolhasTable: React.FC<UltimasImportacoesDeEscolhasTa
       render: (text: string) => text ? dayjs(text).format("DD/MM/YYYY HH:mm") : "-",
     },
     {
+      title: "Modo",
+      dataIndex: "modo",
+      key: "modo",
+      align: "center",
+      render: (modo: string) => modo === "MANUAL" ? "Manual" : "Automático",
+    },
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
