@@ -44,6 +44,7 @@ import HistoricoEnvioEmailsTela from "../pages/Gerenciar/EnvioEmails/HistoricoEn
 import PesquisarConcursadosTela from "../pages/Processos/PesquisarConcursados/PesquisarConcursadosTela";
 import MeusDadosTela from "../pages/MeusDados/MeusDadosTela";
 import ExtracaoDadosTela from "../pages/Gerenciar/ExtracaoDados/ExtracaoDadosTela";
+import { LocusApp } from "../../modules/locus/app/App";
 
 
 const router = createBrowserRouter([
@@ -52,6 +53,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <HomeTela />
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
+  {
+    path: "/locus/*",
+    element: (
+      <ProtectedRoute>
+        <LocusApp />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,

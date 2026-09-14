@@ -26,8 +26,9 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@locus/*": ["modules/locus/*"]
     }
   },
-  "include": ["src", "src/styled.d.ts", "src/global.d.ts"]
+  "include": ["src", "src/styled.d.ts", "src/global.d.ts", "modules/locus"]
 }

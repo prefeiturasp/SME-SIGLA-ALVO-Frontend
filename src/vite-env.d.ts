@@ -9,6 +9,7 @@ interface ImportMetaEnv {
   readonly VITE_ESCOLHAS_API_URL?: string;
   readonly VITE_AGENDA_API_URL?: string;
   readonly VITE_RELATORIOS_API_URL?: string;
+  readonly VITE_LOCUS_API_URL?: string;
 }
 
 interface ImportMeta {
