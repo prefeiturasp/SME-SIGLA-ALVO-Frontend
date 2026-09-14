@@ -9,8 +9,9 @@ Funcionalidade: Gerenciar — Extração de Dados
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
   # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
   # MENU        : Gerenciar > Extração de dados
-  # MASSA DE DADOS (QA, confirmada manualmente em 2026-08-24):
-  #   - Filtro principal: Concurso "Concurso VHC 3" + Ano "2026"
+  # MASSA DE DADOS (QA, confirmada manualmente em 2026-09-11):
+  #   - Filtro principal: Concurso "Concurso 2708.1" + Ano "2026"
+  #     (substitui "Concurso VHC 3", que saiu da lista filtrada pela API)
   #   - Relatórios detalhados: Cargo "Todos" + DRE sorteada entre as disponíveis
   # ============================================================
 
@@ -29,7 +30,7 @@ Funcionalidade: Gerenciar — Extração de Dados
     E o campo Ano do filtro principal de extração de dados está desabilitado
     E o botão Filtrar do filtro principal de extração de dados está desabilitado
 
-    Quando seleciono o concurso "Concurso VHC 3" no filtro principal de extração de dados
+    Quando seleciono o concurso "Concurso 2708.1" no filtro principal de extração de dados
     Então o campo Ano do filtro principal de extração de dados é habilitado
 
     Quando seleciono o ano "2026" no filtro principal de extração de dados
