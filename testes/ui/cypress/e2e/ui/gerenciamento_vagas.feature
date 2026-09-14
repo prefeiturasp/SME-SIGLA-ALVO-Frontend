@@ -7,7 +7,6 @@ Funcionalidade: Processos — Gerenciamento de Vagas
 
   # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
   # URL DIRETA : /processos/gerenciamento-vagas
   # ============================================================
 
@@ -29,11 +28,6 @@ Funcionalidade: Processos — Gerenciamento de Vagas
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1B — Selecionar cargo carrega a tabela de vagas por unidade escolar
   # ════════════════════════════════════════════════════════════════
-  # Tela real (confirmada ao vivo): depois de selecionar o Processo, um campo
-  # "Cargo" aparece. Ao selecionar o Cargo, a tabela "Vagas por unidade
-  # escolar" é carregada com as colunas Código EOL, DRE, Unidade Escolar,
-  # Vagas definitivas, Vagas precárias e Editar — os campos de vaga começam
-  # somente leitura (spinbutton desabilitado).
   @gerenciamento @vagas-cargo @critico
   Cenário: Selecionar cargo carrega a tabela de vagas por unidade escolar
     Quando navego até a opção "Processos"
@@ -55,17 +49,6 @@ Funcionalidade: Processos — Gerenciamento de Vagas
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1C — Habilitar edição de vagas de uma unidade escolar
   # ════════════════════════════════════════════════════════════════
-  # Tela real (confirmada ao vivo): o ícone de editar (lápis) da linha troca
-  # os campos "Vagas definitivas"/"Vagas precárias" de somente leitura para
-  # editáveis e substitui o ícone por dois botões — confirmar (check) e
-  # cancelar (close) — só para aquela linha.
-  # @skip: o clique no ícone de editar funciona (confirmado em vídeo — a
-  # célula "Editar" passa a exibir ✓/✗), mas não foi possível confirmar a
-  # estrutura real do DOM do campo que substitui o valor somente leitura
-  # (atributos do input, se usa disabled/readonly) sem acesso a DevTools ao
-  # vivo — os steps "os campos de vagas ficam editáveis" e "voltam a ficar
-  # somente leitura" seguem baseados em suposição. Reativar após inspecionar
-  # o HTML real da célula em edição.
   @gerenciamento @editar-vaga @critico @skip
   Cenário: Habilitar edição de vagas de uma unidade escolar
     Quando navego até a opção "Processos"
@@ -84,9 +67,6 @@ Funcionalidade: Processos — Gerenciamento de Vagas
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1D — Cancelar edição de vagas mantém os valores originais
   # ════════════════════════════════════════════════════════════════
-  # @skip: mesmo motivo do Cenário 1C acima — estrutura real do DOM do
-  # campo em edição (e do botão de cancelar dentro da célula "Editar") não
-  # confirmada ao vivo. Reativar junto com 1C.
   @gerenciamento @editar-vaga @cancelamento @skip
   Cenário: Cancelar edição de vagas de uma unidade escolar mantém os valores originais
     Quando navego até a opção "Processos"

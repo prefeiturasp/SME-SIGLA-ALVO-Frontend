@@ -8,11 +8,6 @@ Funcionalidade: Pesquisar Concursados
   # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
   # URL DIRETA : /processo/pesquisar-concursado
-  # MENU       : Processos > Pesquisar Concursados
-  # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
-  # DADOS QA   : CPF 96728566287 / RF134393 (Concurso de Exemplo 2, cargo
-  #              PROFESSOR DE EDUCACAO INFANTIL) retorna múltiplos registros —
-  #              confirmado ao vivo, usado como massa de dados válida abaixo.
   # ============================================================
 
   Contexto:

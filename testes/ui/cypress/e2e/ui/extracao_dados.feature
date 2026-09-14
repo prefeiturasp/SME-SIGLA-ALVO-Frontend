@@ -7,12 +7,6 @@ Funcionalidade: Gerenciar — Extração de Dados
 
   # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
-  # MENU        : Gerenciar > Extração de dados
-  # MASSA DE DADOS (QA, confirmada manualmente em 2026-09-11):
-  #   - Filtro principal: Concurso "Concurso 2708.1" + Ano "2026"
-  #     (substitui "Concurso VHC 3", que saiu da lista filtrada pela API)
-  #   - Relatórios detalhados: Cargo "Todos" + DRE sorteada entre as disponíveis
   # ============================================================
 
   Contexto:

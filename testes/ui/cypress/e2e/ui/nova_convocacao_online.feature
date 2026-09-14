@@ -7,23 +7,11 @@ Funcionalidade: Processos — Convocação de Candidatos
 
   # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
-  # CONCURSO   : Test Judicial
-  # CARGO      : Analista de Sistemas (Reconvocação usa Engenheiro de Software)
   # ============================================================
 
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Criar convocação completa com agendamento (Nova Autorização)
   # ════════════════════════════════════════════════════════════════
-  # @skip: dependente de massa de dados fora do controle do teste —
-  # confirmado em execução real que não há candidatos elegíveis calculados
-  # em QA para a quantidade de autorizações usada (6), então "Adicionar ao
-  # cargo" não adiciona nenhum cargo e "Salvar e avançar" some desabilitado
-  # (a navegação para a etapa "Agendar" nunca ocorre). Mesma limitação já
-  # documentada e contornada no Cenário 3 (Reconvocação), que para em
-  # "a tabela de cargos adicionados" em vez de seguir para o agendamento.
-  # Reativar quando houver candidatos elegíveis garantidos em QA para este
-  # concurso/cargo, ou reduzir o escopo do cenário como no Cenário 3.
   @nova-convocacao @e2e @critico @skip
   Cenário: Criar convocação completa com agendamento (Nova Autorização)
 
@@ -86,10 +74,6 @@ Funcionalidade: Processos — Convocação de Candidatos
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Criar convocação completa com agendamento (Reposição)
   # ════════════════════════════════════════════════════════════════
-  # @skip: mesmo motivo do Cenário 1 acima — sem candidatos elegíveis de
-  # reposição em QA para a quantidade usada (6), "Salvar e avançar" fica
-  # desabilitado e a navegação para "Agendar" nunca ocorre. Reativar junto
-  # com o Cenário 1.
   @nova-convocacao @e2e @critico @skip
   Cenário: Criar convocação completa com agendamento (Reposição)
 
@@ -185,15 +169,6 @@ Funcionalidade: Processos — Convocação de Candidatos
     Então o sistema exibe "Lista de Convocados por autorizações digitadas"
 
     Quando clico no botão "Adicionar ao cargo"
-    # "Reconvocação" depende do pool de candidatos elegíveis para
-    # reconvocação existir em QA para esse concurso/cargo — quando não há
-    # candidato suficiente, o botão fica desabilitado e o modal permanece
-    # aberto. O step abaixo aceita os dois desfechos (ver comentário em
-    # nova_convocacao_steps.js). O restante do fluxo de agendamento
-    # (Agendar/Resumo/Finalizar) já é coberto pelos cenários de Nova
-    # Autorização e Reposição neste mesmo arquivo com candidatos garantidos,
-    # então não é repetido aqui para não depender de dados que podem não
-    # existir.
     Então o sistema exibe a tabela de cargos adicionados
 
   # ════════════════════════════════════════════════════════════════

@@ -7,7 +7,6 @@ Funcionalidade: Recuperação de Senha no Sistema SIGLA
 
   # ============================================================================
   # BASE URL : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS : definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
   # ============================================================================
 
   Contexto:

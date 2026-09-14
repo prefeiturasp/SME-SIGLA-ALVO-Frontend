@@ -7,11 +7,6 @@ Funcionalidade: Consulta de candidatos para eliminação e reclassificação
 
   # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
-  # MENU       : Gerenciar > Eliminação e Reclassificação de Candidato
-  # DADOS QA   : Concurso "Test Judicial" + Cargo "Analista de Sistemas" possui
-  #              candidato eliminado (RF134393 / CPF 96728566287) — usado como
-  #              massa de dados válida para as consultas abaixo.
   # ============================================================
 
   Contexto:
@@ -63,11 +58,6 @@ Funcionalidade: Consulta de candidatos para eliminação e reclassificação
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Consulta por Nome
   # ════════════════════════════════════════════════════════════════
-  # ATENÇÃO: falhou em execução real — a API de detalhe do concurso
-  # (GET /ms-processos-concursos/.../concursos/{uuid}/) retornou 502, o que
-  # deixou o select de Cargo sem opções (ant-select-dropdown-empty). Erro de
-  # instabilidade do backend/ambiente QA, não do teste — reavaliar o skip
-  # após confirmar estabilidade do endpoint.
   @consulta-nome
   Cenário: Consultar candidato por nome
     Quando seleciono o concurso "Test Judicial" na eliminação e reclassificação
