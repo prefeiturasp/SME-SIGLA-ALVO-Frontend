@@ -4,9 +4,12 @@ export default {
   maxWorkers: '50%',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@locus/.*\\.svg\\?react$': '<rootDir>/__mocks__/svgReactMock.jsx',
+    '^@locus/assets/.*\\.(svg|png|jpg|jpeg|gif|webp)$': '<rootDir>/__mocks__/fileMock.js',
+    '^@locus/(.*)$': '<rootDir>/modules/locus/$1',
     '^react-image-crop$': '<rootDir>/src/test/mocks/react-image-crop.tsx',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '\\.(svg|jpg|png|gif)$': '<rootDir>/__mocks__/fileMock.js',
+    '\\.(svg|jpg|png|gif)(\\?.*)?$': '<rootDir>/__mocks__/fileMock.js',
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   collectCoverage: true,
