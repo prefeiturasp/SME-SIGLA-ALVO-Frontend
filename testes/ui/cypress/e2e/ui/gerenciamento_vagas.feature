@@ -7,7 +7,6 @@ Funcionalidade: Processos — Gerenciamento de Vagas
 
   # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
   # URL DIRETA : /processos/gerenciamento-vagas
   # ============================================================
 
@@ -25,6 +24,65 @@ Funcionalidade: Processos — Gerenciamento de Vagas
     E o campo Processo está visível na tela de gerenciamento de vagas
     Quando seleciono uma opção aleatória no campo Processo do gerenciamento de vagas
     Então o sistema carrega os dados do processo selecionado no gerenciamento de vagas
+
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1B — Selecionar cargo carrega a tabela de vagas por unidade escolar
+  # ════════════════════════════════════════════════════════════════
+  @gerenciamento @vagas-cargo @critico
+  Cenário: Selecionar cargo carrega a tabela de vagas por unidade escolar
+    Quando navego até a opção "Processos"
+    E seleciono a opção "Gerenciamento de Vagas"
+    Então o sistema exibe a tela de gerenciamento de vagas
+
+    Quando seleciono um processo com cargo disponível no filtro do gerenciamento de vagas
+    E seleciono uma opção aleatória no campo Cargo do gerenciamento de vagas
+
+    Então a tabela de vagas por unidade escolar é exibida
+    E a tabela de vagas por unidade escolar exibe as colunas:
+      | Código EOL        |
+      | DRE                |
+      | Unidade Escolar    |
+      | Vagas definitivas  |
+      | Vagas precárias    |
+      | Editar             |
+
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1C — Habilitar edição de vagas de uma unidade escolar
+  # ════════════════════════════════════════════════════════════════
+  @gerenciamento @editar-vaga @critico @skip
+  Cenário: Habilitar edição de vagas de uma unidade escolar
+    Quando navego até a opção "Processos"
+    E seleciono a opção "Gerenciamento de Vagas"
+    Então o sistema exibe a tela de gerenciamento de vagas
+
+    Quando seleciono um processo com cargo disponível no filtro do gerenciamento de vagas
+    E seleciono uma opção aleatória no campo Cargo do gerenciamento de vagas
+    Então a tabela de vagas por unidade escolar é exibida
+
+    Quando clico no ícone de editar da primeira linha da tabela de vagas
+
+    Então os campos de vagas da primeira linha ficam editáveis
+    E a primeira linha exibe os botões de confirmar e cancelar edição
+
+  # ════════════════════════════════════════════════════════════════
+  # CENÁRIO 1D — Cancelar edição de vagas mantém os valores originais
+  # ════════════════════════════════════════════════════════════════
+  @gerenciamento @editar-vaga @cancelamento @skip
+  Cenário: Cancelar edição de vagas de uma unidade escolar mantém os valores originais
+    Quando navego até a opção "Processos"
+    E seleciono a opção "Gerenciamento de Vagas"
+    Então o sistema exibe a tela de gerenciamento de vagas
+
+    Quando seleciono um processo com cargo disponível no filtro do gerenciamento de vagas
+    E seleciono uma opção aleatória no campo Cargo do gerenciamento de vagas
+    Então a tabela de vagas por unidade escolar é exibida
+
+    Dado que anoto os valores de vagas da primeira linha da tabela
+    Quando clico no ícone de editar da primeira linha da tabela de vagas
+    E clico no botão de cancelar edição da primeira linha
+
+    Então os campos de vagas da primeira linha voltam a ficar somente leitura
+    E os valores de vagas da primeira linha permanecem os mesmos anotados
 
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Validar botões disponíveis na lista de convocações

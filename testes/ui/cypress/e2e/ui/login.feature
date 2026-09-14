@@ -7,9 +7,6 @@ Funcionalidade: Login no Sistema SIGLA
 
   # ============================================================================
   # BASE URL: https://qa-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS: Carregadas do arquivo .env
-  #   - SIGLA_LOGIN_RF
-  #   - SIGLA_LOGIN_SENHA
   # ============================================================================
 
   Contexto:

@@ -7,7 +7,6 @@ Funcionalidade: Escolha de Candidatos
 
   # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA, RF: 007001)
   # ============================================================
 
   Contexto:
