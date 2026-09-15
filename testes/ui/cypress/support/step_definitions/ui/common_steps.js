@@ -23,8 +23,12 @@ export const realizarLoginAdmin = (rf, senha) => {
     .clear({ force: true }).type(senha, { force: true, delay: 100 })
   cy.wait(500)
   cy.contains('button', /Acessar|Entrar|Login/i).click({ force: true })
-  cy.wait(3000)
-  cy.url().should('not.include', '/login')
+  // Timeout estendido (padrao: defaultCommandTimeout 20000ms): evidenciado por
+  // screenshot de falha real, o botao "Acessar" as vezes fica em loading (spinner)
+  // alem dos 20s por lentidao da API de autenticacao do ambiente de QA -- nao e
+  // problema no preenchimento/clique (RF e senha chegam corretos, botao responde
+  // ao clique). 45s da folga real sem mascarar um login genuinamente quebrado.
+  cy.url({ timeout: 45000 }).should('not.include', '/login')
 }
 
 const normalizarTexto = (texto) =>

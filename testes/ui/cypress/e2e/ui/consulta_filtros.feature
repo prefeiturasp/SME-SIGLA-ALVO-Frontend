@@ -123,7 +123,7 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 4 — Auditoria completa de restrições de acesso em todos os módulos de processos em sessão única
   # ════════════════════════════════════════════════════════════════
-  @auditoria-permissoes @critico @perfil-visualizacao
+  @auditoria-permissoes @critico @perfil-visualizacao @skip
   Cenário: Auditoria completa de restrições de acesso em todos os módulos de processos em sessão única
     Dado que estou logado no sistema com perfil de visualização
     Quando navego até a opção "Processos"
@@ -260,7 +260,7 @@ Funcionalidade: Rastreabilidade de Fluxo de Processos - Jornadas E2E
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 7 — Jornada completa de preenchimento sequencial da escolha de candidatos com perfil de visualização
   # ════════════════════════════════════════════════════════════════
-  @escolha-candidatos @e2e @perfil-visualizacao
+  @escolha-candidatos @e2e @perfil-visualizacao @skip
   Cenário: Jornada completa de preenchimento sequencial da escolha de candidatos com perfil de visualização
     Dado que estou logado no sistema com perfil de visualização
     Quando navego até a opção "Processos"

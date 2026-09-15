@@ -10,7 +10,6 @@ Funcionalidade: Meus Dados — Alteração de Senha
 
   # ============================================================
   # BASE URL : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS : definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
   # REGRAS DA NOVA SENHA:
   # ✅ Ao menos uma letra minúscula
   # ✅ Ao menos uma letra maiúscula

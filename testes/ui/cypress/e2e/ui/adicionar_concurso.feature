@@ -11,10 +11,6 @@ Funcionalidade: Cadastro de Concursos
 
   # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
-  # CÓDIGO DO CARGO: 8040 (MASCARA PROF.ED.INFANTIL)
-  # Tela real: menu "Gerenciar" > "Cadastro de concursos" > "Adicionar concurso"
-  # (wizard de 3 passos: Identificação do concurso / Publicações e resultados / Vigência)
   # ============================================================
 
   # ════════════════════════════════════════════════════════════════

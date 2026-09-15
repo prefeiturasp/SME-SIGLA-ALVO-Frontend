@@ -6,11 +6,11 @@ mochawesome/.jsons). Nao depende do merge automatico do reporter -- le os
 arquivos brutos diretamente, entao funciona mesmo que a suite tenha sido
 interrompida no meio ou rodada spec a spec.
 
-Escrito em Python (stdlib apenas), conforme o prompt-fonte
-(dashboard-pos-execucao.md): comparacao com a execucao anterior (badge),
-grafico de tendencia lendo o historico de commits do proprio dashboard.html
-versionado, filtro por status combinado (AND) com o filtro de sistema, e
-vinculo opcional com PR via API publica do GitHub.
+Escrito em Python (stdlib apenas), conforme o prompt-fonte (dashboard.md):
+comparacao com a execucao anterior (badge, sempre exibido -- sem grafico de
+tendencia, removido do padrao), filtro por status/feature/busca-livre
+combinados (AND) com o filtro de sistema, e vinculo opcional com PR via API
+publica do GitHub.
 
 Uso:
   python scripts/gerar_dashboard.py                  -> versao completa, com
@@ -31,6 +31,7 @@ import math
 import re
 import subprocess
 import sys
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 
@@ -42,7 +43,7 @@ CONFIG_PATH = Path('dashboard.config.json')
 
 # Rastreabilidade: exibida no rodape do HTML e gravada no snapshot embutido --
 # incrementar a cada mudanca relevante no gerador.
-VERSAO_SCRIPT = '1.2.2'
+VERSAO_SCRIPT = '1.4.0'
 
 # Parametrizacao por projeto (titulo/branding do cabecalho). O script sempre
 # funciona mesmo sem dashboard.config.json ou com JSON corrompido -- cai
@@ -65,7 +66,9 @@ def carregar_config():
 
 COR_PASSOU = '#2E7D32'
 COR_FALHOU = '#C62828'
-COR_PENDENTE = '#F9A825'
+# Valor canonico da paleta (DarkGoldenrod) -- ver "Padrao de design a seguir"
+# no prompt-fonte: nunca reusar verde/vermelho para pendente.
+COR_PENDENTE = '#B8860B'
 COR_TAG = {'ui': '#274D9B', 'api': '#8B5E3C', 'outros': '#555'}
 ROTULO_TIPO = {'ui': 'UI', 'api': 'API', 'outros': 'OUTROS'}
 BADGE_ESTADO = {
@@ -82,6 +85,15 @@ _ESCAPES = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}
 
 def escape_html(s):
     return re.sub(r'[&<>"\']', lambda m: _ESCAPES[m.group(0)], str(s))
+
+
+# Normaliza para a busca por texto livre: minusculo e sem diacriticos --
+# digitar "designacao" deve achar "Designação" (nome legivel ou caminho do
+# spec), sem o usuario precisar acertar o acento certo.
+def normalizar_busca(texto):
+    sem_acento = unicodedata.normalize('NFKD', texto or '')
+    sem_acento = ''.join(c for c in sem_acento if not unicodedata.combining(c))
+    return sem_acento.lower()
 
 
 # Duracao vem em ms no proprio JSON bruto do reporter (campo "duration" de
@@ -308,25 +320,29 @@ def somar_totais(features):
     }
 
 
-# % de sucesso considera so cenarios executados (passou/falhou) -- pendente
-# (passo ainda nao implementado, por exemplo) nao e "executado".
-def pct_sucesso(passou, falhou):
-    executados = passou + falhou
-    return round((passou / executados) * 100) if executados else 0
+# Pendente CONTA no denominador do % de sucesso (dilui o percentual) mas
+# NUNCA soma como "passou" -- padrao documentado no prompt-fonte. Cenario
+# pendente nao e falha, mas tambem nao foi verificado, entao nao pode inflar
+# o percentual como se tivesse passado.
+def pct_sucesso(passou, falhou, pendente=0):
+    total = passou + falhou + pendente
+    return round((passou / total) * 100) if total else 0
 
 
 def construir_snapshot_atual(features, totais_gerais, por_tipo_totais):
-    def stats(p, f):
-        return {'passou': p, 'falhou': f, 'pct': pct_sucesso(p, f)}
+    def stats(p, f, pend):
+        return {'passou': p, 'falhou': f, 'pendente': pend, 'pct': pct_sucesso(p, f, pend)}
 
     snapshot = {
-        'geral': stats(totais_gerais['passou'], totais_gerais['falhou']),
-        'por_tipo': {t: stats(v['passou'], v['falhou']) for t, v in por_tipo_totais.items()},
+        'geral': stats(totais_gerais['passou'], totais_gerais['falhou'], totais_gerais['pendente']),
+        'por_tipo': {
+            t: stats(v['passou'], v['falhou'], v['pendente']) for t, v in por_tipo_totais.items()
+        },
         'por_feature': {},
     }
     for f in features:
         chave = f"{f['tipo']}|{f['caminho']}|{f['nome']}"
-        snapshot['por_feature'][chave] = stats(f['passou'], f['falhou'])
+        snapshot['por_feature'][chave] = stats(f['passou'], f['falhou'], f['pendente'])
     return snapshot
 
 
@@ -342,15 +358,15 @@ def decidir_base_comparacao(snapshot_antigo, hash_novo):
     return snapshot_antigo.get('atual')
 
 
-def donut_svg(passou, falhou, rotulo):
+def donut_svg(passou, falhou, pendente, rotulo):
     cx = cy = 60.0
     r = 50.0
     largura_traco = 16
     circunferencia = 2 * math.pi * r
-    executados = passou + falhou
-    pct = pct_sucesso(passou, falhou)
+    total = passou + falhou + pendente
+    pct = pct_sucesso(passou, falhou, pendente)
 
-    if executados == 0:
+    if total == 0:
         return (
             f'<div class="donut-wrap"><svg width="120" height="120" viewBox="0 0 120 120" class="donut">'
             f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}" fill="none" stroke="#2a2a2a" stroke-width="{largura_traco}" />'
@@ -358,8 +374,11 @@ def donut_svg(passou, falhou, rotulo):
             f'</svg><span>{rotulo}</span></div>'
         )
 
-    comp_passou = (passou / executados) * circunferencia
-    comp_falhou = (falhou / executados) * circunferencia
+    # Tres fatias (passou/falhou/pendente) -- pendente dilui o % mas ganha
+    # cor propria (ambar), nunca soma como falha.
+    comp_passou = (passou / total) * circunferencia
+    comp_falhou = (falhou / total) * circunferencia
+    comp_pendente = (pendente / total) * circunferencia
     return (
         f'<div class="donut-wrap"><svg width="120" height="120" viewBox="0 0 120 120" class="donut">'
         f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}" fill="none" stroke="#2a2a2a" stroke-width="{largura_traco}" />'
@@ -367,14 +386,16 @@ def donut_svg(passou, falhou, rotulo):
         f'stroke-dasharray="{comp_passou:.2f} {circunferencia:.2f}" stroke-dashoffset="-0.00" transform="rotate(-90 {cx:.1f} {cy:.1f})" />'
         f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}" fill="none" stroke="{COR_FALHOU}" stroke-width="{largura_traco}" '
         f'stroke-dasharray="{comp_falhou:.2f} {circunferencia:.2f}" stroke-dashoffset="-{comp_passou:.2f}" transform="rotate(-90 {cx:.1f} {cy:.1f})" />'
+        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}" fill="none" stroke="{COR_PENDENTE}" stroke-width="{largura_traco}" '
+        f'stroke-dasharray="{comp_pendente:.2f} {circunferencia:.2f}" stroke-dashoffset="-{(comp_passou + comp_falhou):.2f}" transform="rotate(-90 {cx:.1f} {cy:.1f})" />'
         f'<text x="{cx:.1f}" y="{cy:.1f}" class="donut-label" text-anchor="middle" dominant-baseline="central">{pct}%</text>'
         f'</svg><span>{rotulo}</span></div>'
     )
 
 
 # Badge global (linha de filtros): sempre visivel quando ha base de
-# comparacao, incluindo o caso "sem mudanca" (cinza) -- so some quando o
-# grafico de tendencia assume o lugar dele (ver renderizar_html).
+# comparacao, incluindo o caso "sem mudanca" (cinza) -- unico mecanismo de
+# comparacao historica do padrao atual (sem grafico de tendencia).
 def badge_comparacao_geral(pct_atual, pct_anterior, total_atual, total_anterior):
     delta = pct_atual - pct_anterior
     if delta > 0:
@@ -404,93 +425,6 @@ def badge_comparacao_feature(pct_atual, pct_anterior):
         f' <span class="comparacao comparacao-feature" title="{escape_html(titulo)}" '
         f'style="color:{cor};border-color:{cor}">{seta} {abs(round(delta))}%</span>'
     )
-
-
-def grafico_tendencia_svg(pontos):
-    largura, altura = 460, 90
-    margem = 12
-    n = len(pontos)
-    plot_w = largura - margem * 2
-    plot_h = altura - margem * 2
-
-    def x_de(i):
-        return margem + (plot_w * i / (n - 1) if n > 1 else plot_w / 2)
-
-    def y_de(pct):
-        return margem + plot_h * (1 - pct / 100)
-
-    grade = ''.join(
-        f'<line x1="{margem}" y1="{y_de(v):.1f}" x2="{largura - margem}" y2="{y_de(v):.1f}" '
-        f'stroke="#2a2a2a" stroke-width="1" stroke-dasharray="2,3"/>'
-        for v in (0, 50, 100)
-    )
-    pontos_svg = ' '.join(f'{x_de(i):.1f},{y_de(p["pct"]):.1f}' for i, p in enumerate(pontos))
-    cor = COR_PASSOU if pontos[-1]['pct'] >= pontos[0]['pct'] else COR_FALHOU
-    circulos = ''.join(
-        f'<circle cx="{x_de(i):.1f}" cy="{y_de(p["pct"]):.1f}" r="3.5" fill="{cor}">'
-        f'<title>{escape_html(p["data"])} - {p["pct"]}% ({p["total"]} cenarios)</title></circle>'
-        for i, p in enumerate(pontos)
-    )
-    titulo = escape_html(f'Tendência — últimas {n} execuções')
-    return (
-        f'<div class="stat tendencia"><div class="tendencia-titulo">{titulo}</div>'
-        f'<svg width="{largura}" height="{altura}" viewBox="0 0 {largura} {altura}">'
-        f'{grade}<polyline points="{pontos_svg}" fill="none" stroke="{cor}" stroke-width="2"/>{circulos}</svg>'
-        f'<div class="tendencia-legenda"><span>{pontos[0]["pct"]}%</span><span>{pontos[-1]["pct"]}%</span></div></div>'
-    )
-
-
-# Le o historico de commits do proprio dashboard.html versionado para
-# reconstruir uma serie temporal real, sem precisar de arquivo/banco
-# adicional -- cada commit anterior ja tem o snapshot embutido no seu HTML.
-def obter_historico_git(caminho_saida, limite=20):
-    caminho_rel = str(caminho_saida).replace('\\', '/')
-    try:
-        r = subprocess.run(
-            ['git', 'log', '--format=%H|%aI', '--follow', '-n', str(limite), '--', caminho_rel],
-            capture_output=True, text=True, timeout=15,
-        )
-    except (OSError, subprocess.SubprocessError):
-        return []
-    if r.returncode != 0 or not r.stdout.strip():
-        return []
-
-    pontos = []
-    for linha in r.stdout.strip().splitlines():
-        try:
-            commit_hash, data_iso = linha.split('|', 1)
-        except ValueError:
-            continue
-        try:
-            # cwd do script fica em testes/ui, um subdiretorio da raiz do
-            # repo -- "git show <rev>:<caminho>" sem o prefixo "./" resolve
-            # relativo a RAIZ do repo e falha com "path exists, but not...".
-            conteudo = subprocess.run(
-                ['git', 'show', f'{commit_hash}:./{caminho_rel}'],
-                capture_output=True, text=True, timeout=15,
-            )
-        except (OSError, subprocess.SubprocessError):
-            continue
-        if conteudo.returncode != 0:
-            continue
-        m = PADRAO_SNAPSHOT.search(conteudo.stdout)
-        if not m:
-            continue
-        try:
-            snap = json.loads(m.group(1))
-        except json.JSONDecodeError:
-            continue
-        geral = (snap.get('atual') or {}).get('geral') or {}
-        if 'pct' not in geral:
-            continue
-        pontos.append({
-            'data': data_iso,
-            'pct': geral['pct'],
-            'total': geral.get('passou', 0) + geral.get('falhou', 0),
-        })
-
-    pontos.reverse()  # git log vem do mais novo para o mais antigo
-    return pontos
 
 
 def obter_remote_origin():
@@ -584,8 +518,16 @@ def pr_badge_html(pr):
 def renderizar_card(f, indice, sem_screenshots, anterior_por_feature):
     executados = f['passou'] + f['falhou']
     total_cenarios = executados + f['pendente']
-    pct = pct_sucesso(f['passou'], f['falhou'])
-    cor_barra = COR_PASSOU if pct == 100 else COR_FALHOU
+    pct = pct_sucesso(f['passou'], f['falhou'], f['pendente'])
+    # Regra de 3 estados: vermelho se ha qualquer falha (mesmo que a maioria
+    # passe); ambar quando nao e 100% mas tambem nao ha falha (so pendentes
+    # de permeio); verde só quando 100% dos cenarios passaram.
+    if f['falhou'] > 0:
+        cor_barra = COR_FALHOU
+    elif f['pendente'] > 0:
+        cor_barra = COR_PENDENTE
+    else:
+        cor_barra = COR_PASSOU
     tipo_label = ROTULO_TIPO.get(f['tipo'], f['tipo'].upper())
 
     def renderizar_item_cenario(c):
@@ -626,7 +568,9 @@ def renderizar_card(f, indice, sem_screenshots, anterior_por_feature):
         plural = 's' if f['pendente'] > 1 else ''
         pendente_txt = f' (+{f["pendente"]} pendente{plural})'
 
-    return f'''    <article class="card" id="feature-{indice}" data-indice="{indice}" data-passou="{1 if f['passou'] else 0}" data-falhou="{1 if f['falhou'] else 0}" data-pendente="{1 if f['pendente'] else 0}">
+    busca_nome = escape_html(normalizar_busca(f'{f["nome"]} {f["caminho"]}'))
+
+    return f'''    <article class="card" id="feature-{indice}" data-indice="{indice}" data-passou="{1 if f['passou'] else 0}" data-falhou="{1 if f['falhou'] else 0}" data-pendente="{1 if f['pendente'] else 0}" data-busca-nome="{busca_nome}">
       <header class="card-header" onclick="toggle({indice})">
         <div>
           <span class="tag tag-{f['tipo']}">{tipo_label}</span>
@@ -660,8 +604,9 @@ h1{margin:0;font-size:22px}
 .stat{background:#1c1c1c;border:1px solid #2a2a2a;border-radius:10px;padding:16px 20px;min-width:140px}
 .stat .valor{font-size:26px;font-weight:700}
 .stat .rotulo{color:#999;font-size:13px}
-.stat-clicavel{cursor:pointer}
-.stat-clicavel.ativo{outline:2px solid #274D9B}
+.stat-clicavel{cursor:pointer;transition:border-color .15s,transform .15s}
+.stat-clicavel:hover{border-color:#555;transform:translateY(-1px)}
+.stat-clicavel.ativo{border-color:#274D9B;box-shadow:0 0 0 1px #274D9B inset}
 .donuts{display:flex;gap:24px;align-items:center}
 .donut-wrap{text-align:center}
 .donut-wrap span{display:block;font-size:13px;color:#999;margin-top:4px}
@@ -682,12 +627,12 @@ main{padding:0 32px 48px}
 .card-body{display:none;padding:0 18px 18px;border-top:1px solid #2a2a2a}
 .card-body.aberto{display:block}
 .lista-cenarios{list-style:none;padding:0;margin:14px 0}
-.lista-cenarios li{padding:6px 0;font-size:14px}
-.lista-cenarios li.destaque{background:rgba(39,77,155,.25);border-radius:6px;padding-left:6px}
+.lista-cenarios li{padding:6px 8px;font-size:14px;border-radius:6px}
+.lista-cenarios li.destaque{background:rgba(39,77,155,.18);outline:1px solid #274D9B}
 .cenario-linha{display:flex;align-items:center;gap:10px}
 .badge{font-size:11px;font-weight:700;color:#fff;padding:2px 8px;border-radius:20px;min-width:56px;text-align:center}
 .erro-msg{margin:6px 0 2px 66px;padding:6px 10px;font-family:Consolas,Menlo,monospace;font-size:12px;color:#f0a8a8;background:rgba(198,40,40,.12);border-left:3px solid #C62828;border-radius:2px;white-space:pre-wrap;word-break:break-word}
-.duracao{color:#999;font-size:12px}
+.duracao{color:#999;font-size:12px;min-width:44px}
 .evidencias{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
 .evidencias figure{margin:0;width:220px}
 .evidencias img{width:100%;border-radius:6px;border:1px solid #2a2a2a;cursor:zoom-in}
@@ -699,11 +644,13 @@ main{padding:0 32px 48px}
 .filtros button.ativo{background:#274D9B;border-color:#274D9B;color:#fff}
 .filtros select{background:#1c1c1c;border:1px solid #2a2a2a;color:#ccc;padding:8px 14px;border-radius:20px;cursor:pointer;font-size:13px;font-family:inherit;max-width:280px}
 .filtros select.ativo{border-color:#274D9B;color:#fff}
+.busca-wrap{position:relative}
+.busca-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;opacity:.7;pointer-events:none}
+.busca-wrap input{background:#1c1c1c;border:1px solid #2a2a2a;color:#ccc;padding:8px 14px 8px 32px;border-radius:20px;font-size:13px;width:220px;font-family:inherit}
+.busca-wrap input.ativo{border-color:#274D9B;color:#fff}
 .comparacao{font-size:13px;font-weight:700;padding:8px 16px;border-radius:20px;border:1px solid;background:transparent;margin-left:auto}
 .comparacao-feature{font-size:11px;padding:1px 8px;margin-left:8px;border-radius:20px;border:1px solid;vertical-align:middle}
-.tendencia{min-width:300px;padding:14px 18px}
-.tendencia-titulo{font-size:12px;color:#999}
-.tendencia-legenda{display:flex;justify-content:space-between;font-size:12px;color:#999;margin-top:4px}
+.aviso-vazio{color:#777;font-size:14px;padding:24px 0;text-align:center;font-style:italic}
 .pr-container{display:flex;align-items:center;gap:6px}
 .pr-info{background:#1c1c1c;border:1px solid #2a2a2a;padding:6px 14px;border-radius:20px;font-size:13px;color:#ccc;text-decoration:none;max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pr-info:hover{background:#222}
@@ -712,7 +659,7 @@ main{padding:0 32px 48px}
 .rodape{padding:20px 32px 32px;color:#666;font-size:11px}
 @media (prefers-color-scheme: light){
   body{background:#f5f5f5;color:#222}
-  header.topo,.stat,.card,.filtros button,.filtros select,.pr-info,.pr-refresh{background:#fff;border-color:#ddd}
+  header.topo,.stat,.card,.filtros button,.filtros select,.busca-wrap input,.pr-info,.pr-refresh{background:#fff;border-color:#ddd}
   .card-header:hover{background:#f0f0f0}
   .donut-label{fill:#222}
 }
@@ -722,18 +669,25 @@ JS = '''
 var filtroSistema = 'todos';
 var filtroStatus = null;
 var filtroFeature = null;
+var filtroBusca = '';
 function toggle(i){
   document.getElementById('body-' + i).classList.toggle('aberto');
 }
+function normalizarBusca(t){
+  return (t || '').normalize('NFD').replace(new RegExp('[\\u0300-\\u036f]', 'g'), '').toLowerCase();
+}
 function aplicarFiltros(){
+  var algumVisivel = false;
   document.querySelectorAll('.card').forEach(function(card){
     var tag = card.querySelector('.tag').textContent;
     var mostraSistema = filtroSistema === 'todos' || tag === filtroSistema;
     var mostraStatus = !filtroStatus || card.dataset[filtroStatus] === '1';
     var mostraFeature = !filtroFeature || card.dataset.indice === filtroFeature;
-    var mostra = mostraSistema && mostraStatus && mostraFeature;
+    var mostraBusca = !filtroBusca || card.dataset.buscaNome.indexOf(filtroBusca) !== -1;
+    var mostra = mostraSistema && mostraStatus && mostraFeature && mostraBusca;
     card.style.display = mostra ? '' : 'none';
-    if (mostra && (filtroStatus || filtroFeature)) {
+    if (mostra) algumVisivel = true;
+    if (mostra && (filtroStatus || filtroFeature || filtroBusca)) {
       document.getElementById('body-' + card.dataset.indice).classList.add('aberto');
     }
     var estadoAlvo = filtroStatus === 'passou' ? 'passed' : (filtroStatus === 'falhou' ? 'failed' : (filtroStatus === 'pendente' ? 'pending' : null));
@@ -741,6 +695,8 @@ function aplicarFiltros(){
       li.classList.toggle('destaque', Boolean(estadoAlvo) && li.dataset.estado === estadoAlvo);
     });
   });
+  var aviso = document.getElementById('aviso-vazio');
+  if (aviso) aviso.hidden = algumVisivel;
 }
 function filtrar(sistema){
   filtroSistema = sistema;
@@ -760,6 +716,12 @@ function filtrarFeature(valor){
   filtroFeature = (valor === 'todos') ? null : valor;
   var select = document.getElementById('filtro-feature');
   if (select) select.classList.toggle('ativo', Boolean(filtroFeature));
+  aplicarFiltros();
+}
+function buscarFeature(valor){
+  filtroBusca = normalizarBusca(valor);
+  var input = document.getElementById('busca-feature');
+  if (input) input.classList.toggle('ativo', Boolean(filtroBusca));
   aplicarFiltros();
 }
 // Throttle do auto-refresh (ver window.addEventListener('load', ...) abaixo):
@@ -808,14 +770,38 @@ if (document.getElementById('pr-container')) {
 }
 '''
 
+# Marca de proveniencia impressa no console do navegador (F12) ao abrir a
+# pagina -- nao aparece na tela pra quem so olha o dashboard, mas fica
+# visivel pra quem abre o DevTools ou inspeciona a pagina. ID fixo (sem
+# nome/e-mail pessoal), o mesmo em todos os dashboards gerados a partir da
+# implementacao original (dash_prinia e os demais projetos que a usam como
+# referencia) -- serve pra provar que vieram da mesma origem, nunca mudar
+# entre projetos/geracoes.
+ID_PROVENIENCIA = '86d24a45-0b0a-4f6f-9e16-d8ab545d7dbe'
 
-def renderizar_html(features, sem_screenshots, snapshot_novo, historico, pr, config):
+
+def js_assinatura(titulo):
+    titulo_js = json.dumps(titulo)
+    return f'''
+(function(){{
+  var linha1 = '[ QA ] ' + {titulo_js};
+  var traco = '\\u2500'.repeat(Math.max(linha1.length, 24));
+  console.log(
+    '%c' + linha1 + '\\n' + traco + '\\n%cAssinatura de origem: {ID_PROVENIENCIA}',
+    'font-weight:600;color:inherit',
+    'font-size:11px;color:#888'
+  );
+}})();
+'''
+
+
+def renderizar_html(features, sem_screenshots, snapshot_novo, pr, config):
     geral = snapshot_novo['atual']['geral']
     pct_geral = geral['pct']
     passou_gerais = geral['passou']
     falhou_gerais = geral['falhou']
+    pendente_geral = geral['pendente']
     executados_gerais = passou_gerais + falhou_gerais
-    pendente_geral = sum(f['pendente'] for f in features)
     duracao_total_ms = sum(f['duracao_ms'] for f in features)
 
     por_tipo = {}
@@ -827,27 +813,32 @@ def renderizar_html(features, sem_screenshots, snapshot_novo, historico, pr, con
     data_formatada = agora.strftime('%d/%m/%Y %H:%M')
     contagem_por_tipo = ' / '.join(f'{len(por_tipo[t])} {ROTULO_TIPO[t]}' for t in ordem_donuts)
 
-    donuts_html = donut_svg(passou_gerais, falhou_gerais, 'Geral') + '\n    ' + '\n    '.join(
-        donut_svg(sum(x['passou'] for x in por_tipo[t]), sum(x['falhou'] for x in por_tipo[t]), ROTULO_TIPO[t])
+    donuts_html = donut_svg(passou_gerais, falhou_gerais, pendente_geral, 'Geral') + '\n    ' + '\n    '.join(
+        donut_svg(
+            sum(x['passou'] for x in por_tipo[t]),
+            sum(x['falhou'] for x in por_tipo[t]),
+            sum(x['pendente'] for x in por_tipo[t]),
+            ROTULO_TIPO[t],
+        )
         for t in ordem_donuts
     )
 
+    # Badge de comparacao com a execucao anterior: sempre exibido quando ha
+    # base de comparacao (sem grafico de tendencia -- removido do padrao).
     anterior = snapshot_novo.get('anterior')
-    total_pontos_tendencia = len(historico) + 1
-
     badge_geral_html = ''
-    trend_html = ''
-    if total_pontos_tendencia >= 3:
-        pontos = historico + [{'data': snapshot_novo['gerado_em'], 'pct': pct_geral, 'total': executados_gerais}]
-        trend_html = grafico_tendencia_svg(pontos)
-    elif anterior:
+    if anterior:
         anterior_geral = anterior['geral']
+        total_atual = passou_gerais + falhou_gerais + pendente_geral
+        total_anterior = (
+            anterior_geral['passou'] + anterior_geral['falhou'] + anterior_geral.get('pendente', 0)
+        )
         badge_geral_html = badge_comparacao_geral(
-            pct_geral, anterior_geral['pct'], executados_gerais, anterior_geral['passou'] + anterior_geral['falhou']
+            pct_geral, anterior_geral['pct'], total_atual, total_anterior
         )
 
     pendente_stat = (
-        f'<div class="stat stat-clicavel" data-status="pendente" onclick="filtrarStatus(\'pendente\')">'
+        f'<div class="stat stat-clicavel stat-pendente" data-status="pendente" onclick="filtrarStatus(\'pendente\')">'
         f'<div class="valor">{pendente_geral}</div><div class="rotulo">Pendentes</div></div>'
     ) if pendente_geral else ''
     stats_html = f'''
@@ -856,8 +847,7 @@ def renderizar_html(features, sem_screenshots, snapshot_novo, historico, pr, con
     <div class="stat stat-clicavel" data-status="passou" onclick="filtrarStatus('passou')"><div class="valor">{passou_gerais}</div><div class="rotulo">Passaram</div></div>
     <div class="stat stat-clicavel" data-status="falhou" onclick="filtrarStatus('falhou')"><div class="valor">{falhou_gerais}</div><div class="rotulo">Falharam</div></div>
     <div class="stat"><div class="valor">{formatar_duracao(duracao_total_ms)}</div><div class="rotulo">Tempo total</div></div>
-    {pendente_stat}
-    {trend_html}'''
+    {pendente_stat}'''
 
     opcoes_feature = ''.join(
         f'<option value="{i}">{escape_html(ROTULO_TIPO.get(f["tipo"], f["tipo"].upper()))} — {escape_html(f["nome"])}</option>'
@@ -867,6 +857,10 @@ def renderizar_html(features, sem_screenshots, snapshot_novo, historico, pr, con
         f'<select id="filtro-feature" onchange="filtrarFeature(this.value)">'
         f'<option value="todos">Todas as features</option>{opcoes_feature}</select>'
     )
+    busca_html = (
+        '<div class="busca-wrap"><input type="search" id="busca-feature" '
+        'placeholder="Buscar feature..." oninput="buscarFeature(this.value)"></div>'
+    )
 
     filtros_html = (
         f'<button data-filtro="todos" class="ativo" onclick="filtrar(\'todos\')">Todas ({len(features)})</button>'
@@ -875,6 +869,7 @@ def renderizar_html(features, sem_screenshots, snapshot_novo, historico, pr, con
             for t in ordem_donuts
         )
         + select_feature_html
+        + busca_html
         + badge_geral_html
     )
 
@@ -921,11 +916,14 @@ def renderizar_html(features, sem_screenshots, snapshot_novo, historico, pr, con
 
 {cards_html}
 
+<p id="aviso-vazio" class="aviso-vazio" hidden>Nenhuma feature encontrada para os filtros atuais.</p>
+
 </main>
 
 <div class="rodape">gerar_dashboard.py v{VERSAO_SCRIPT} — geracao sempre local, nunca roda no CI.</div>
 
-<script>{JS}</script>
+<script>{JS}
+{js_assinatura(titulo)}</script>
 <script type="application/json" id="dashboard-snapshot">{snapshot_json}</script>
 </body>
 </html>'''
@@ -950,9 +948,10 @@ def gerar(sem_screenshots=False):
 
     por_tipo_totais = {}
     for f in features:
-        acc = por_tipo_totais.setdefault(f['tipo'], {'passou': 0, 'falhou': 0})
+        acc = por_tipo_totais.setdefault(f['tipo'], {'passou': 0, 'falhou': 0, 'pendente': 0})
         acc['passou'] += f['passou']
         acc['falhou'] += f['falhou']
+        acc['pendente'] += f['pendente']
 
     atual = construir_snapshot_atual(features, totais_gerais, por_tipo_totais)
     anterior = decidir_base_comparacao(snapshot_antigo, hash_novo)
@@ -965,11 +964,10 @@ def gerar(sem_screenshots=False):
         'anterior': anterior,
     }
 
-    historico = obter_historico_git(OUT_PATH)
     pr = obter_info_pr()
     config = carregar_config()
 
-    html = renderizar_html(features, sem_screenshots, snapshot_novo, historico, pr, config)
+    html = renderizar_html(features, sem_screenshots, snapshot_novo, pr, config)
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(html, encoding='utf-8')
     sufixo = ' (sem screenshots)' if sem_screenshots else ''

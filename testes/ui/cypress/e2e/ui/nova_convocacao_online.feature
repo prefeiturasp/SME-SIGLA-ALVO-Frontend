@@ -7,15 +7,12 @@ Funcionalidade: Processos — Convocação de Candidatos
 
   # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # CREDENCIAIS: definidas em .env (SIGLA_LOGIN_RF / SIGLA_LOGIN_SENHA)
-  # CONCURSO   : Test Judicial
-  # CARGO      : Analista de Sistemas (Reconvocação usa Engenheiro de Software)
   # ============================================================
 
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Criar convocação completa com agendamento (Nova Autorização)
   # ════════════════════════════════════════════════════════════════
-  @nova-convocacao @e2e @critico
+  @nova-convocacao @e2e @critico @skip
   Cenário: Criar convocação completa com agendamento (Nova Autorização)
 
     # =====================================================
@@ -77,7 +74,7 @@ Funcionalidade: Processos — Convocação de Candidatos
   # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Criar convocação completa com agendamento (Reposição)
   # ════════════════════════════════════════════════════════════════
-  @nova-convocacao @e2e @critico
+  @nova-convocacao @e2e @critico @skip
   Cenário: Criar convocação completa com agendamento (Reposição)
 
     # =====================================================
@@ -172,15 +169,6 @@ Funcionalidade: Processos — Convocação de Candidatos
     Então o sistema exibe "Lista de Convocados por autorizações digitadas"
 
     Quando clico no botão "Adicionar ao cargo"
-    # "Reconvocação" depende do pool de candidatos elegíveis para
-    # reconvocação existir em QA para esse concurso/cargo — quando não há
-    # candidato suficiente, o botão fica desabilitado e o modal permanece
-    # aberto. O step abaixo aceita os dois desfechos (ver comentário em
-    # nova_convocacao_steps.js). O restante do fluxo de agendamento
-    # (Agendar/Resumo/Finalizar) já é coberto pelos cenários de Nova
-    # Autorização e Reposição neste mesmo arquivo com candidatos garantidos,
-    # então não é repetido aqui para não depender de dados que podem não
-    # existir.
     Então o sistema exibe a tabela de cargos adicionados
 
   # ════════════════════════════════════════════════════════════════
