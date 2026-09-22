@@ -44,6 +44,7 @@ import {
 import {
   mapExtracaoDadosToIndicadores,
   mapExtracaoDadosTodosToIndicadores,
+  montarBreakdownIndicador,
 } from "./utils/mapIndicadores";
 import { mapExtracaoDadosToIndicadoresComparativo } from "./utils/mapIndicadoresComparativo";
 import {
@@ -437,6 +438,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       anoAntigo={indicadoresComparativo.anoAntigo}
                       anoRecente={indicadoresComparativo.anoRecente}
                       item={indicadoresComparativo.convocados}
+                      breakdown={indicadoresComparativo.convocados.breakdown}
                       description="Total de candidatos chamados oficialmente."
                     />
                   </Col>
@@ -447,6 +449,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       anoAntigo={indicadoresComparativo.anoAntigo}
                       anoRecente={indicadoresComparativo.anoRecente}
                       item={indicadoresComparativo.naoConvocados}
+                      breakdown={indicadoresComparativo.naoConvocados.breakdown}
                       description="Habilitados que ainda não foram convocados."
                     />
                   </Col>
@@ -467,6 +470,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       anoAntigo={indicadoresComparativo.anoAntigo}
                       anoRecente={indicadoresComparativo.anoRecente}
                       item={indicadoresComparativo.escolhasRealizadas}
+                      breakdown={indicadoresComparativo.escolhasRealizadas.breakdown}
                       description="Candidatos que realizaram escolha de vaga ou unidade."
                     />
                   </Col>
@@ -477,6 +481,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       anoAntigo={indicadoresComparativo.anoAntigo}
                       anoRecente={indicadoresComparativo.anoRecente}
                       item={indicadoresComparativo.semEscolha}
+                      breakdown={indicadoresComparativo.semEscolha.breakdown}
                       description="Convocados que decidiram pela não escolha."
                     />
                   </Col>
@@ -487,6 +492,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       anoAntigo={indicadoresComparativo.anoAntigo}
                       anoRecente={indicadoresComparativo.anoRecente}
                       item={indicadoresComparativo.reconvocacoes}
+                      breakdown={indicadoresComparativo.reconvocacoes.breakdown}
                       description="Candidatos que solicitaram participação em nova chamada."
                     />
                   </Col>
@@ -497,6 +503,7 @@ const ExtracaoDadosTela: React.FC = () => {
                       anoAntigo={indicadoresComparativo.anoAntigo}
                       anoRecente={indicadoresComparativo.anoRecente}
                       item={indicadoresComparativo.pendentesEscolha}
+                      breakdown={indicadoresComparativo.pendentesEscolha.breakdown}
                       description="Convocados que ainda não realizaram a escolha de vaga."
                     />
                   </Col>
@@ -520,16 +527,18 @@ const ExtracaoDadosTela: React.FC = () => {
                     <IndicadorCard
                       icon={<CampaignIcon fontSize="small" />}
                       title="Convocados"
-                      value={indicadores.convocados}
+                      value={indicadores.convocados.total}
                       description="Total de candidatos chamados oficialmente."
+                      breakdown={montarBreakdownIndicador(indicadores.convocados)}
                     />
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
                     <IndicadorCard
                       icon={<PersonOffIcon fontSize="small" />}
                       title="Não convocados"
-                      value={indicadores.naoConvocados}
+                      value={indicadores.naoConvocados.total}
                       description="Habilitados que ainda não foram convocados."
+                      breakdown={montarBreakdownIndicador(indicadores.naoConvocados)}
                     />
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
@@ -544,32 +553,36 @@ const ExtracaoDadosTela: React.FC = () => {
                     <IndicadorCard
                       icon={<HowToRegIcon fontSize="small" />}
                       title="Escolhas realizadas"
-                      value={indicadores.escolhasRealizadas}
+                      value={indicadores.escolhasRealizadas.total}
                       description="Candidatos que realizaram escolha de vaga ou unidade."
+                      breakdown={montarBreakdownIndicador(indicadores.escolhasRealizadas)}
                     />
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
                     <IndicadorCard
                       icon={<ScheduleIcon fontSize="small" />}
                       title="Não escolha"
-                      value={indicadores.semEscolha}
+                      value={indicadores.semEscolha.total}
                       description="Convocados que decidiram pela não escolha."
+                      breakdown={montarBreakdownIndicador(indicadores.semEscolha)}
                     />
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
                     <IndicadorCard
                       icon={<ReplayIcon fontSize="small" />}
                       title="Reconvocações"
-                      value={indicadores.reconvocacoes}
+                      value={indicadores.reconvocacoes.total}
                       description="Candidatos que solicitaram participação em nova chamada."
+                      breakdown={montarBreakdownIndicador(indicadores.reconvocacoes)}
                     />
                   </Col>
                   <Col xs={24} sm={12} lg={6}>
                     <IndicadorCard
                       icon={<PendingActionsIcon fontSize="small" />}
                       title="Pendentes de escolha"
-                      value={indicadores.pendentesEscolha}
+                      value={indicadores.pendentesEscolha.total}
                       description="Convocados que ainda não realizaram a escolha de vaga."
+                      breakdown={montarBreakdownIndicador(indicadores.pendentesEscolha)}
                     />
                   </Col>
                 </>

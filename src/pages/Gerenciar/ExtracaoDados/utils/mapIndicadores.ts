@@ -1,10 +1,27 @@
 import type {
   IExtracaoDadosCandidatosAno,
+  IExtracaoDadosContagem,
+  IExtracaoDadosEscolhasAno,
   IExtracaoDadosIndicadores,
   IExtracaoDadosResponse,
   IExtracaoDadosTodosResponse,
+  IIndicadorDetalhado,
 } from "../../../../services/resources/relatorios/IExtracaoDados";
 import { obterAutorizacoesDoAno } from "./obterAutorizacoesDoAno";
+
+export const CONTAGEM_VAZIA: IExtracaoDadosContagem = {
+  total: 0,
+  geral: 0,
+  pcd: 0,
+  nna: 0,
+};
+
+export const INDICADOR_DETALHADO_VAZIO: IIndicadorDetalhado = {
+  total: 0,
+  geral: 0,
+  pcd: 0,
+  nna: 0,
+};
 
 export const INDICADORES_VAZIOS: IExtracaoDadosIndicadores = {
   modoComparativo: false,
@@ -13,12 +30,12 @@ export const INDICADORES_VAZIOS: IExtracaoDadosIndicadores = {
   listaGeral: 0,
   listaPcd: 0,
   listaNna: 0,
-  convocados: 0,
-  escolhasRealizadas: 0,
-  naoConvocados: 0,
-  reconvocacoes: 0,
-  semEscolha: 0,
-  pendentesEscolha: 0,
+  convocados: { ...INDICADOR_DETALHADO_VAZIO },
+  escolhasRealizadas: { ...INDICADOR_DETALHADO_VAZIO },
+  naoConvocados: { ...INDICADOR_DETALHADO_VAZIO },
+  reconvocacoes: { ...INDICADOR_DETALHADO_VAZIO },
+  semEscolha: { ...INDICADOR_DETALHADO_VAZIO },
+  pendentesEscolha: { ...INDICADOR_DETALHADO_VAZIO },
   autorizacoes: 0,
 };
 
@@ -30,27 +47,76 @@ const isCandidatosAno = (
   "convocados" in value &&
   "nao-convocados" in value;
 
-/**
- * Pendentes de escolha: convocados que ainda nao registraram nenhuma situacao
- * de escolha (escolha, nao-escolha ou reconvocacao). Valores nulos sao tratados
- * como 0 e o resultado nunca e negativo.
- */
-const calcularPendentes = (
-  convocados: number | null,
-  escolhas: number | null,
-  semEscolha: number | null,
-  reconvocacoes: number | null
-): number =>
-  Math.max(
+const isEscolhasAno = (value: unknown): value is IExtracaoDadosEscolhasAno =>
+  typeof value === "object" &&
+  value !== null &&
+  "escolha" in value &&
+  "reconvocacao" in value &&
+  "nao-escolha" in value;
+
+/** Normaliza contagem da API (objeto) para o shape padrão. */
+export const obterContagem = (valor: unknown): IExtracaoDadosContagem => {
+  if (
+    typeof valor === "object" &&
+    valor !== null &&
+    "total" in valor &&
+    typeof (valor as { total: unknown }).total === "number"
+  ) {
+    const contagem = valor as Partial<IExtracaoDadosContagem>;
+    return {
+      total: contagem.total ?? 0,
+      geral: contagem.geral ?? 0,
+      pcd: contagem.pcd ?? 0,
+      nna: contagem.nna ?? 0,
+    };
+  }
+  return { ...CONTAGEM_VAZIA };
+};
+
+export const contagemParaIndicador = (
+  contagem: IExtracaoDadosContagem
+): IIndicadorDetalhado => ({
+  total: contagem.total,
+  geral: contagem.geral,
+  pcd: contagem.pcd,
+  nna: contagem.nna,
+});
+
+/** Breakdown visual no padrão Habilitados (Geral / PCD / NNA). */
+export const montarBreakdownIndicador = (
+  indicador: IIndicadorDetalhado
+): Array<{ label: string; value: number }> => [
+  { label: "Geral", value: indicador.geral },
+  { label: "PCD", value: indicador.pcd },
+  { label: "NNA", value: indicador.nna },
+];
+
+const calcularPendentesDetalhado = (
+  convocados: IExtracaoDadosContagem,
+  escolha: IExtracaoDadosContagem,
+  semEscolha: IExtracaoDadosContagem,
+  reconvocacao: IExtracaoDadosContagem
+): IIndicadorDetalhado => ({
+  total: Math.max(
     0,
-    (convocados ?? 0) -
-      (escolhas ?? 0) -
-      (semEscolha ?? 0) -
-      (reconvocacoes ?? 0)
-  );
+    convocados.total - escolha.total - semEscolha.total - reconvocacao.total
+  ),
+  geral: Math.max(
+    0,
+    convocados.geral - escolha.geral - semEscolha.geral - reconvocacao.geral
+  ),
+  pcd: Math.max(
+    0,
+    convocados.pcd - escolha.pcd - semEscolha.pcd - reconvocacao.pcd
+  ),
+  nna: Math.max(
+    0,
+    convocados.nna - escolha.nna - semEscolha.nna - reconvocacao.nna
+  ),
+});
 
 const obterIndicadoresHabilitados = (
-  habilitados: IExtracaoDadosResponse["candidatos"]["habilitados"] | undefined
+  habilitados: IExtracaoDadosContagem | undefined
 ) => {
   const listaGeral = habilitados?.geral ?? 0;
   const listaPcd = habilitados?.pcd ?? 0;
@@ -74,25 +140,34 @@ export const mapExtracaoDadosTodosToIndicadores = (
 
   const {
     habilitados,
-    convocados,
-    "nao-convocados": naoConvocados,
+    convocados: convocadosRaw,
+    "nao-convocados": naoConvocadosRaw,
   } = data.candidatos;
-  const { escolha, reconvocacao, "nao-escolha": semEscolha } = data.escolhas;
+  const {
+    escolha: escolhaRaw,
+    reconvocacao: reconvocacaoRaw,
+    "nao-escolha": semEscolhaRaw,
+  } = data.escolhas;
+
+  const convocados = obterContagem(convocadosRaw);
+  const naoConvocados = obterContagem(naoConvocadosRaw);
+  const escolha = obterContagem(escolhaRaw);
+  const reconvocacao = obterContagem(reconvocacaoRaw);
+  const semEscolha = obterContagem(semEscolhaRaw);
+
+  const pendentesEscolha = data.pendentes
+    ? contagemParaIndicador(obterContagem(data.pendentes))
+    : calcularPendentesDetalhado(convocados, escolha, semEscolha, reconvocacao);
 
   return {
     modoComparativo: false,
     ...obterIndicadoresHabilitados(habilitados),
-    convocados: convocados ?? 0,
-    escolhasRealizadas: escolha ?? 0,
-    naoConvocados: naoConvocados ?? 0,
-    reconvocacoes: reconvocacao ?? 0,
-    semEscolha: semEscolha ?? 0,
-    pendentesEscolha: calcularPendentes(
-      convocados,
-      escolha,
-      semEscolha,
-      reconvocacao
-    ),
+    convocados: contagemParaIndicador(convocados),
+    escolhasRealizadas: contagemParaIndicador(escolha),
+    naoConvocados: contagemParaIndicador(naoConvocados),
+    reconvocacoes: contagemParaIndicador(reconvocacao),
+    semEscolha: contagemParaIndicador(semEscolha),
+    pendentesEscolha,
     autorizacoes: data.concurso?.["autorizacoes-publicadas"] ?? 0,
   };
 };
@@ -109,31 +184,33 @@ export const mapExtracaoDadosToIndicadores = (
 
   const ano = anos[0];
   const candidatosAno = data.candidatos[ano];
-  const escolhasAno = data.escolhas[ano];
+  const escolhasAnoRaw = data.escolhas[ano];
+  const escolhasAno = isEscolhasAno(escolhasAnoRaw) ? escolhasAnoRaw : undefined;
 
   const convocados = isCandidatosAno(candidatosAno)
-    ? candidatosAno.convocados
-    : 0;
-  const escolhasRealizadas = escolhasAno?.escolha ?? 0;
-  const reconvocacoes = escolhasAno?.reconvocacao ?? 0;
-  const semEscolha = escolhasAno?.["nao-escolha"] ?? 0;
+    ? obterContagem(candidatosAno.convocados)
+    : { ...CONTAGEM_VAZIA };
+  const naoConvocados = isCandidatosAno(candidatosAno)
+    ? obterContagem(candidatosAno["nao-convocados"])
+    : { ...CONTAGEM_VAZIA };
+  const escolha = obterContagem(escolhasAno?.escolha);
+  const reconvocacao = obterContagem(escolhasAno?.reconvocacao);
+  const semEscolha = obterContagem(escolhasAno?.["nao-escolha"]);
+
+  const pendentesApi = data.pendentes?.[ano];
+  const pendentesEscolha = pendentesApi
+    ? contagemParaIndicador(obterContagem(pendentesApi))
+    : calcularPendentesDetalhado(convocados, escolha, semEscolha, reconvocacao);
 
   return {
     modoComparativo: false,
     ...habilitadosBase,
-    convocados,
-    escolhasRealizadas,
-    naoConvocados: isCandidatosAno(candidatosAno)
-      ? candidatosAno["nao-convocados"]
-      : 0,
-    reconvocacoes,
-    semEscolha,
-    pendentesEscolha: calcularPendentes(
-      convocados,
-      escolhasRealizadas,
-      semEscolha,
-      reconvocacoes
-    ),
+    convocados: contagemParaIndicador(convocados),
+    escolhasRealizadas: contagemParaIndicador(escolha),
+    naoConvocados: contagemParaIndicador(naoConvocados),
+    reconvocacoes: contagemParaIndicador(reconvocacao),
+    semEscolha: contagemParaIndicador(semEscolha),
+    pendentesEscolha,
     autorizacoes: obterAutorizacoesDoAno(data.concurso, ano, {
       permitirFallbackRaiz: true,
     }),

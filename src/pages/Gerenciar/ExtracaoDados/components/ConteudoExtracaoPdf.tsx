@@ -33,6 +33,7 @@ import TabelaVagasDre from "./TabelaVagasDre";
 import RelatoriosDetalhados from "./RelatoriosDetalhados";
 import AutorizacoesPublicadas from "./AutorizacoesPublicadas";
 import { IndicatorsCard, PdfHeader } from "@/components/ui";
+import { montarBreakdownIndicador } from "../utils/mapIndicadores";
 
 type ConteudoExtracaoPdfPropsBase = {
   relatoriosDetalhados: RelatorioDetalhadoItem[];
@@ -122,6 +123,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     anoAntigo={props.indicadoresComparativo.anoAntigo}
                     anoRecente={props.indicadoresComparativo.anoRecente}
                     item={props.indicadoresComparativo.convocados}
+                    breakdown={props.indicadoresComparativo.convocados.breakdown}
                     description="Total de candidatos chamados oficialmente."
                   />
                 </Col>
@@ -132,6 +134,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     anoAntigo={props.indicadoresComparativo.anoAntigo}
                     anoRecente={props.indicadoresComparativo.anoRecente}
                     item={props.indicadoresComparativo.naoConvocados}
+                    breakdown={props.indicadoresComparativo.naoConvocados.breakdown}
                     description="Habilitados que ainda não foram convocados."
                   />
                 </Col>
@@ -152,6 +155,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     anoAntigo={props.indicadoresComparativo.anoAntigo}
                     anoRecente={props.indicadoresComparativo.anoRecente}
                     item={props.indicadoresComparativo.escolhasRealizadas}
+                    breakdown={props.indicadoresComparativo.escolhasRealizadas.breakdown}
                     description="Candidatos que realizaram escolha de vaga ou unidade."
                   />
                 </Col>
@@ -162,6 +166,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     anoAntigo={props.indicadoresComparativo.anoAntigo}
                     anoRecente={props.indicadoresComparativo.anoRecente}
                     item={props.indicadoresComparativo.semEscolha}
+                    breakdown={props.indicadoresComparativo.semEscolha.breakdown}
                     description="Convocados que decidiram pela não escolha."
                   />
                 </Col>
@@ -172,6 +177,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     anoAntigo={props.indicadoresComparativo.anoAntigo}
                     anoRecente={props.indicadoresComparativo.anoRecente}
                     item={props.indicadoresComparativo.reconvocacoes}
+                    breakdown={props.indicadoresComparativo.reconvocacoes.breakdown}
                     description="Candidatos que solicitaram participação em nova chamada."
                   />
                 </Col>
@@ -182,6 +188,7 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                     anoAntigo={props.indicadoresComparativo.anoAntigo}
                     anoRecente={props.indicadoresComparativo.anoRecente}
                     item={props.indicadoresComparativo.pendentesEscolha}
+                    breakdown={props.indicadoresComparativo.pendentesEscolha.breakdown}
                     description="Convocados que ainda não realizaram a escolha de vaga."
                   />
                 </Col>
@@ -205,16 +212,18 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                   <IndicadorCard
                     icon={<CampaignIcon fontSize="small" />}
                     title="Convocados"
-                    value={props.indicadores.convocados}
+                    value={props.indicadores.convocados.total}
                     description="Total de candidatos chamados oficialmente."
+                    breakdown={montarBreakdownIndicador(props.indicadores.convocados)}
                   />
                 </Col>
                 <Col xs={24} sm={12} lg={6}>
                   <IndicadorCard
                     icon={<PersonOffIcon fontSize="small" />}
                     title="Não convocados"
-                    value={props.indicadores.naoConvocados}
+                    value={props.indicadores.naoConvocados.total}
                     description="Habilitados que ainda não foram convocados."
+                    breakdown={montarBreakdownIndicador(props.indicadores.naoConvocados)}
                   />
                 </Col>
                 <Col xs={24} sm={12} lg={6}>
@@ -229,32 +238,36 @@ const ConteudoExtracaoPdf: React.FC<ConteudoExtracaoPdfProps> = (props) => {
                   <IndicadorCard
                     icon={<HowToRegIcon fontSize="small" />}
                     title="Escolhas realizadas"
-                    value={props.indicadores.escolhasRealizadas}
+                    value={props.indicadores.escolhasRealizadas.total}
                     description="Candidatos que realizaram escolha de vaga ou unidade."
+                    breakdown={montarBreakdownIndicador(props.indicadores.escolhasRealizadas)}
                   />
                 </Col>
                 <Col xs={24} sm={12} lg={6}>
                   <IndicadorCard
                     icon={<ScheduleIcon fontSize="small" />}
                     title="Não escolha"
-                    value={props.indicadores.semEscolha}
+                    value={props.indicadores.semEscolha.total}
                     description="Convocados que decidiram pela não escolha."
+                    breakdown={montarBreakdownIndicador(props.indicadores.semEscolha)}
                   />
                 </Col>
                 <Col xs={24} sm={12} lg={6}>
                   <IndicadorCard
                     icon={<ReplayIcon fontSize="small" />}
                     title="Reconvocações"
-                    value={props.indicadores.reconvocacoes}
+                    value={props.indicadores.reconvocacoes.total}
                     description="Candidatos que solicitaram participação em nova chamada."
+                    breakdown={montarBreakdownIndicador(props.indicadores.reconvocacoes)}
                   />
                 </Col>
                 <Col xs={24} sm={12} lg={6}>
                   <IndicadorCard
                     icon={<PendingActionsIcon fontSize="small" />}
                     title="Pendentes de escolha"
-                    value={props.indicadores.pendentesEscolha}
+                    value={props.indicadores.pendentesEscolha.total}
                     description="Convocados que ainda não realizaram a escolha de vaga."
+                    breakdown={montarBreakdownIndicador(props.indicadores.pendentesEscolha)}
                   />
                 </Col>
               </>
