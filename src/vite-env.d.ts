@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
+  readonly VITE_BASE_PATH?: string;
   readonly VITE_PROCESSOS_CONVOCACAO_API_URL?: string;
   readonly VITE_CONCURSOS_API_URL?: string;
   readonly VITE_CANDIDATOS_API_URL?: string;

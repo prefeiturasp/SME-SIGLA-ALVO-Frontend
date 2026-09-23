@@ -205,3 +205,22 @@ export interface ICandidatoEnvioEmail {
 export interface IHistoricoEnvioEmailDetalhe extends IHistoricoEnvioEmail {
   candidatos: ICandidatoEnvioEmail[];
 }
+export interface IContagemHistoricoCandidatos {
+  total: number;
+  geral: number;
+  nna: number;
+  pcd: number;
+}
+
+export interface IHistoricoCandidatosItem {
+  descricao: string;
+  data_convocacao: string;
+  candidatos: IContagemHistoricoCandidatos;
+  escolha: IContagemHistoricoCandidatos;
+  "nao-escolha": IContagemHistoricoCandidatos;
+  reconvocacao: IContagemHistoricoCandidatos;
+}
+
+export interface IPostHistoricoCandidatosPayload {
+  processos_uuids: string[];
+}

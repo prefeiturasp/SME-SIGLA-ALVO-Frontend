@@ -1,15 +1,16 @@
-# just to create `build` directory
 FROM node:22.14-alpine as builder
 WORKDIR /app
 
-COPY . ./
-RUN export NODE_PATH=src/ \
-    && npm install \
-    && npm run build
+ARG VITE_BASE_PATH=/alvo/
+ENV VITE_BASE_PATH=$VITE_BASE_PATH
 
-# replace strings, this way we can pass parameters to static files.
-# For more details:
-# https://stackoverflow.com/questions/48595829/how-to-pass-environment-variables-to-a-frontend-web-application
+COPY . ./
+RUN echo "Building with VITE_BASE_PATH=${VITE_BASE_PATH}" \
+    && export NODE_PATH=src/ \
+    && npm install --loglevel verbose \
+    && npm list --depth=0 \
+    && npm run build 
+
 
 FROM nginx:alpine
 COPY entrypoint.sh /app/entrypoint.sh

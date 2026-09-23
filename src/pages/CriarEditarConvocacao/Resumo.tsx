@@ -16,8 +16,10 @@ import type { IAgenda } from "../../services/resources/agenda/IAgenda";
 import { useGetPermissions } from "../../routes/PermissionContextGuard";
 import { cursorPointer, cardSpacing } from "@/design-system/estilos";
 import { usePatchPassoProcessoConvocacao } from "./hooks/usePatchPassoProcessoConvocacao";
+import TabelaHistoricoCandidatos from "../HistoricoCandidatos/components/TabelaHistoricoCandidatos";
+import { useHistoricoCandidatos } from "../HistoricoCandidatos/hooks/useHistoricoCandidatos";
 
-import { AppButton, StyledCardWithoutBorder } from '@/components/ui';
+import { AppButton, StyledCardWithoutBorder, BuscaProcessosTitle, TextSubTituloCinza } from '@/components/ui';
 
 const resumoStyles = {
   breadcrumbItem: cursorPointer,
@@ -62,6 +64,10 @@ const Resumo: React.FC = () => {
   const { uuid } = useParams<{ uuid: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const processosUuids = useMemo(() => (uuid ? [uuid] : []), [uuid]);
+  const { linhas: linhasHistorico, carregando: historicoCarregando } =
+    useHistoricoCandidatos(processosUuids);
 
   // Buscar agendas do backend
   const { agendasData, agendasIsLoading } = useGetAgendas(
@@ -275,25 +281,41 @@ const Resumo: React.FC = () => {
                 : "Nenhuma agenda foi criada ainda. Retorne ao step anterior para criar agendas."}
             </div>
           )}
-
-          {isViewOnlyResumo ? (
-            <div style={{ marginTop: 24 }}>
-              <AppButton variant="secondary" size="large" onClick={() => navigate("/processos/convocacao")}>
-                Voltar
-              </AppButton>
-            </div>
-          ) : (
-            <StepActions
-              current={current}
-              steps={steps}
-              next={next}
-              prev={prev}
-              onCancel={() => navigate(`/processos/convocacao`)}
-              canSalvarEAvancar={canChangeProcessoConvocacao}
-              canVoltar={canChangeProcessoConvocacao}
-            />
-          )}
         </StyledCardWithoutBorder>
+
+        <StyledCardWithoutBorder
+          style={resumoStyles.cardWithMarginTop}
+          variant="borderless"
+        >
+          <BuscaProcessosTitle>Histórico de convocações</BuscaProcessosTitle>
+          <TextSubTituloCinza style={{ marginBottom: "1.5rem" }}>
+            Consulte o histórico de convocações por categoria: “Total”, “Geral”,
+            “PCD” e “NNA”.
+          </TextSubTituloCinza>
+          <TabelaHistoricoCandidatos
+            data={linhasHistorico}
+            loading={historicoCarregando}
+            mostrarDescricao={false}
+          />
+        </StyledCardWithoutBorder>
+
+        {isViewOnlyResumo ? (
+          <div style={{ marginTop: 24 }}>
+            <AppButton variant="secondary" size="large" onClick={() => navigate("/processos/convocacao")}>
+              Voltar
+            </AppButton>
+          </div>
+        ) : (
+          <StepActions
+            current={current}
+            steps={steps}
+            next={next}
+            prev={prev}
+            onCancel={() => navigate(`/processos/convocacao`)}
+            canSalvarEAvancar={canChangeProcessoConvocacao}
+            canVoltar={canChangeProcessoConvocacao}
+          />
+        )}
       </BaseTela>
     </>
   );

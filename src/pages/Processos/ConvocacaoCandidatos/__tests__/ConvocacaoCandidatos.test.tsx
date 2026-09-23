@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor, act } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider as SCThemeProvider } from 'styled-components';
 import { theme as appTheme } from '../../../../theme';
@@ -110,9 +110,6 @@ describe('ConvocacaoCandidatos', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/processos/convocacao/criar', { state: concursosOptions });
   });
 
-
-
-
   it('renderiza tabela com dados mockados', () => {
     renderComponent();
     
@@ -126,5 +123,4 @@ describe('ConvocacaoCandidatos', () => {
     // Verifica se a função showTotal está sendo chamada
     expect(screen.getByTestId('pagination-total')).toBeInTheDocument();
   });
-
-}); 
+});
