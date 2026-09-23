@@ -1,21 +1,30 @@
 import type {
+  IExtracaoDadosCandidatosAno,
+  IExtracaoDadosContagem,
+  IExtracaoDadosEscolhasAno,
+  IExtracaoDadosIndicadorBreakdownComparativo,
   IExtracaoDadosIndicadorComparativoItem,
   IExtracaoDadosIndicadoresComparativo,
   IExtracaoDadosResponse,
 } from "../../../../services/resources/relatorios/IExtracaoDados";
 import { calcularVariacaoPercentual } from "./calcularVariacaoPercentual";
+import { CONTAGEM_VAZIA, obterContagem } from "./mapIndicadores";
 import { obterAutorizacoesDoAno } from "./obterAutorizacoesDoAno";
 
 const isCandidatosAno = (
   value: unknown
-): value is {
-  convocados: number;
-  "nao-convocados": number;
-} =>
+): value is IExtracaoDadosCandidatosAno =>
   typeof value === "object" &&
   value !== null &&
   "convocados" in value &&
   "nao-convocados" in value;
+
+const isEscolhasAno = (value: unknown): value is IExtracaoDadosEscolhasAno =>
+  typeof value === "object" &&
+  value !== null &&
+  "escolha" in value &&
+  "reconvocacao" in value &&
+  "nao-escolha" in value;
 
 const somarListaEspecifica = (habilitados: {
   geral: number;
@@ -23,14 +32,47 @@ const somarListaEspecifica = (habilitados: {
   nna: number;
 }) => habilitados.geral + habilitados.pcd + habilitados.nna;
 
+const montarBreakdownComparativo = (
+  antigo: IExtracaoDadosContagem,
+  recente: IExtracaoDadosContagem
+): IExtracaoDadosIndicadorBreakdownComparativo[] => [
+  {
+    label: "Geral",
+    valorAnoAntigo: antigo.geral,
+    valorAnoRecente: recente.geral,
+  },
+  {
+    label: "PCD",
+    valorAnoAntigo: antigo.pcd,
+    valorAnoRecente: recente.pcd,
+  },
+  {
+    label: "NNA",
+    valorAnoAntigo: antigo.nna,
+    valorAnoRecente: recente.nna,
+  },
+];
+
 const montarItemComparativo = (
   valorAnoAntigo: number,
-  valorAnoRecente: number
+  valorAnoRecente: number,
+  breakdown?: IExtracaoDadosIndicadorBreakdownComparativo[]
 ): IExtracaoDadosIndicadorComparativoItem => ({
   valorAnoAntigo,
   valorAnoRecente,
   variacaoPercentual: calcularVariacaoPercentual(valorAnoAntigo, valorAnoRecente),
+  ...(breakdown ? { breakdown } : {}),
 });
+
+const montarItemComparativoPorContagem = (
+  antigo: IExtracaoDadosContagem,
+  recente: IExtracaoDadosContagem
+): IExtracaoDadosIndicadorComparativoItem =>
+  montarItemComparativo(
+    antigo.total,
+    recente.total,
+    montarBreakdownComparativo(antigo, recente)
+  );
 
 const montarItemArquivoConcurso = (
   valor: number
@@ -39,6 +81,30 @@ const montarItemArquivoConcurso = (
   valorAnoRecente: valor,
   valorUnico: valor,
   variacaoPercentual: 0,
+});
+
+const calcularPendentes = (
+  convocados: IExtracaoDadosContagem,
+  escolha: IExtracaoDadosContagem,
+  semEscolha: IExtracaoDadosContagem,
+  reconvocacao: IExtracaoDadosContagem
+): IExtracaoDadosContagem => ({
+  total: Math.max(
+    0,
+    convocados.total - escolha.total - semEscolha.total - reconvocacao.total
+  ),
+  geral: Math.max(
+    0,
+    convocados.geral - escolha.geral - semEscolha.geral - reconvocacao.geral
+  ),
+  pcd: Math.max(
+    0,
+    convocados.pcd - escolha.pcd - semEscolha.pcd - reconvocacao.pcd
+  ),
+  nna: Math.max(
+    0,
+    convocados.nna - escolha.nna - semEscolha.nna - reconvocacao.nna
+  ),
 });
 
 export const mapExtracaoDadosToIndicadoresComparativo = (
@@ -63,41 +129,54 @@ export const mapExtracaoDadosToIndicadoresComparativo = (
 
   const candidatosAntigo = data.candidatos[anoAntigo];
   const candidatosRecente = data.candidatos[anoRecente];
-  const escolhasAntigo = data.escolhas[anoAntigo];
-  const escolhasRecente = data.escolhas[anoRecente];
+  const escolhasAntigoRaw = data.escolhas[anoAntigo];
+  const escolhasRecenteRaw = data.escolhas[anoRecente];
+  const escolhasAntigo = isEscolhasAno(escolhasAntigoRaw)
+    ? escolhasAntigoRaw
+    : undefined;
+  const escolhasRecente = isEscolhasAno(escolhasRecenteRaw)
+    ? escolhasRecenteRaw
+    : undefined;
 
   const convocadosAntigo = isCandidatosAno(candidatosAntigo)
-    ? candidatosAntigo.convocados
-    : 0;
+    ? obterContagem(candidatosAntigo.convocados)
+    : { ...CONTAGEM_VAZIA };
   const convocadosRecente = isCandidatosAno(candidatosRecente)
-    ? candidatosRecente.convocados
-    : 0;
+    ? obterContagem(candidatosRecente.convocados)
+    : { ...CONTAGEM_VAZIA };
   const naoConvocadosAntigo = isCandidatosAno(candidatosAntigo)
-    ? candidatosAntigo["nao-convocados"]
-    : 0;
+    ? obterContagem(candidatosAntigo["nao-convocados"])
+    : { ...CONTAGEM_VAZIA };
   const naoConvocadosRecente = isCandidatosAno(candidatosRecente)
-    ? candidatosRecente["nao-convocados"]
-    : 0;
+    ? obterContagem(candidatosRecente["nao-convocados"])
+    : { ...CONTAGEM_VAZIA };
+
+  const escolhaAntigo = obterContagem(escolhasAntigo?.escolha);
+  const escolhaRecente = obterContagem(escolhasRecente?.escolha);
+  const reconvocacaoAntigo = obterContagem(escolhasAntigo?.reconvocacao);
+  const reconvocacaoRecente = obterContagem(escolhasRecente?.reconvocacao);
+  const semEscolhaAntigo = obterContagem(escolhasAntigo?.["nao-escolha"]);
+  const semEscolhaRecente = obterContagem(escolhasRecente?.["nao-escolha"]);
 
   const autorizacoesAntigo = obterAutorizacoesDoAno(data.concurso, anoAntigo);
   const autorizacoesRecente = obterAutorizacoesDoAno(data.concurso, anoRecente);
 
-  // Pendentes de escolha por ano: convocados que ainda nao registraram nenhuma
-  // situacao de escolha (escolha, nao-escolha ou reconvocacao). Nunca negativo.
-  const pendentesAntigo = Math.max(
-    0,
-    convocadosAntigo -
-      (escolhasAntigo?.escolha ?? 0) -
-      (escolhasAntigo?.["nao-escolha"] ?? 0) -
-      (escolhasAntigo?.reconvocacao ?? 0)
-  );
-  const pendentesRecente = Math.max(
-    0,
-    convocadosRecente -
-      (escolhasRecente?.escolha ?? 0) -
-      (escolhasRecente?.["nao-escolha"] ?? 0) -
-      (escolhasRecente?.reconvocacao ?? 0)
-  );
+  const pendentesAntigo = data.pendentes?.[anoAntigo]
+    ? obterContagem(data.pendentes[anoAntigo])
+    : calcularPendentes(
+        convocadosAntigo,
+        escolhaAntigo,
+        semEscolhaAntigo,
+        reconvocacaoAntigo
+      );
+  const pendentesRecente = data.pendentes?.[anoRecente]
+    ? obterContagem(data.pendentes[anoRecente])
+    : calcularPendentes(
+        convocadosRecente,
+        escolhaRecente,
+        semEscolhaRecente,
+        reconvocacaoRecente
+      );
 
   return {
     modoComparativo: true,
@@ -124,21 +203,30 @@ export const mapExtracaoDadosToIndicadoresComparativo = (
         },
       ],
     },
-    convocados: montarItemComparativo(convocadosAntigo, convocadosRecente),
-    escolhasRealizadas: montarItemComparativo(
-      escolhasAntigo?.escolha ?? 0,
-      escolhasRecente?.escolha ?? 0
+    convocados: montarItemComparativoPorContagem(
+      convocadosAntigo,
+      convocadosRecente
     ),
-    naoConvocados: montarItemComparativo(naoConvocadosAntigo, naoConvocadosRecente),
-    reconvocacoes: montarItemComparativo(
-      escolhasAntigo?.reconvocacao ?? 0,
-      escolhasRecente?.reconvocacao ?? 0
+    escolhasRealizadas: montarItemComparativoPorContagem(
+      escolhaAntigo,
+      escolhaRecente
     ),
-    semEscolha: montarItemComparativo(
-      escolhasAntigo?.["nao-escolha"] ?? 0,
-      escolhasRecente?.["nao-escolha"] ?? 0
+    naoConvocados: montarItemComparativoPorContagem(
+      naoConvocadosAntigo,
+      naoConvocadosRecente
     ),
-    pendentesEscolha: montarItemComparativo(pendentesAntigo, pendentesRecente),
+    reconvocacoes: montarItemComparativoPorContagem(
+      reconvocacaoAntigo,
+      reconvocacaoRecente
+    ),
+    semEscolha: montarItemComparativoPorContagem(
+      semEscolhaAntigo,
+      semEscolhaRecente
+    ),
+    pendentesEscolha: montarItemComparativoPorContagem(
+      pendentesAntigo,
+      pendentesRecente
+    ),
     autorizacoes: montarItemComparativo(autorizacoesAntigo, autorizacoesRecente),
   };
 };

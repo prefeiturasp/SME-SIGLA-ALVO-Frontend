@@ -1,14 +1,18 @@
-export interface IExtracaoDadosHabilitados {
+/** Contagem com quebra por categoria efetiva (Geral / PCD / NNA). */
+export interface IExtracaoDadosContagem {
   total: number;
   pcd: number;
   nna: number;
   geral: number;
 }
 
+/** @deprecated Use IExtracaoDadosContagem — mantido como alias de compatibilidade. */
+export type IExtracaoDadosHabilitados = IExtracaoDadosContagem;
+
 export interface IExtracaoDadosCandidatosAno {
-  convocados: number;
-  "nao-convocados": number;
-  habilitados?: IExtracaoDadosHabilitados;
+  convocados: IExtracaoDadosContagem;
+  "nao-convocados": IExtracaoDadosContagem;
+  habilitados?: IExtracaoDadosContagem;
 }
 
 export interface IExtracaoDadosEscolhasDre {
@@ -20,9 +24,9 @@ export interface IExtracaoDadosEscolhasDre {
 }
 
 export interface IExtracaoDadosEscolhasAno {
-  escolha: number;
-  reconvocacao: number;
-  "nao-escolha": number;
+  escolha: IExtracaoDadosContagem;
+  reconvocacao: IExtracaoDadosContagem;
+  "nao-escolha": IExtracaoDadosContagem;
   dres: IExtracaoDadosEscolhasDre[];
 }
 
@@ -76,14 +80,14 @@ export interface IExtracaoDadosEscolhasFiltrado extends Record<string, IExtracao
 }
 
 export interface IExtracaoDadosCandidatos {
-  habilitados: IExtracaoDadosHabilitados;
-  [ano: string]: IExtracaoDadosHabilitados | IExtracaoDadosCandidatosAno;
+  habilitados: IExtracaoDadosContagem;
+  [ano: string]: IExtracaoDadosContagem | IExtracaoDadosCandidatosAno;
 }
 
 export interface IExtracaoDadosCandidatosConsolidado {
-  habilitados: IExtracaoDadosHabilitados;
-  convocados: number;
-  "nao-convocados": number;
+  habilitados: IExtracaoDadosContagem;
+  convocados: IExtracaoDadosContagem;
+  "nao-convocados": IExtracaoDadosContagem;
 }
 
 export interface IExtracaoDadosComparativoIndicadores {
@@ -118,6 +122,7 @@ export interface IExtracaoDadosResponse {
   candidatos: IExtracaoDadosCandidatos;
   escolhas: IExtracaoDadosEscolhasFiltrado;
   concurso: IExtracaoDadosConcursoFiltrado;
+  pendentes?: Record<string, IExtracaoDadosContagem>;
   comparativo?: IExtracaoDadosComparativo;
 }
 
@@ -125,6 +130,7 @@ export interface IExtracaoDadosTodosResponse {
   candidatos: IExtracaoDadosCandidatosConsolidado;
   escolhas: IExtracaoDadosEscolhasTodos;
   concurso: IExtracaoDadosConcursoTodos;
+  pendentes?: IExtracaoDadosContagem;
 }
 
 export interface IExtracaoDadosParams {
@@ -134,6 +140,14 @@ export interface IExtracaoDadosParams {
 
 export type IndicadorValor = number | null;
 
+/** Indicador com total e quebra Geral/PCD/NNA (mesmo visual de Habilitados). */
+export interface IIndicadorDetalhado {
+  total: number;
+  geral: number;
+  pcd: number;
+  nna: number;
+}
+
 export interface IExtracaoDadosIndicadores {
   modoComparativo: false;
   habilitados: number;
@@ -141,12 +155,12 @@ export interface IExtracaoDadosIndicadores {
   listaGeral: number;
   listaPcd: number;
   listaNna: number;
-  convocados: IndicadorValor;
-  escolhasRealizadas: IndicadorValor;
-  naoConvocados: IndicadorValor;
-  reconvocacoes: IndicadorValor;
-  semEscolha: IndicadorValor;
-  pendentesEscolha: IndicadorValor;
+  convocados: IIndicadorDetalhado;
+  escolhasRealizadas: IIndicadorDetalhado;
+  naoConvocados: IIndicadorDetalhado;
+  reconvocacoes: IIndicadorDetalhado;
+  semEscolha: IIndicadorDetalhado;
+  pendentesEscolha: IIndicadorDetalhado;
   autorizacoes: IndicadorValor;
 }
 
@@ -155,6 +169,7 @@ export interface IExtracaoDadosIndicadorComparativoItem {
   valorAnoRecente: number;
   variacaoPercentual: number | null;
   valorUnico?: number;
+  breakdown?: IExtracaoDadosIndicadorBreakdownComparativo[];
 }
 
 export interface IExtracaoDadosIndicadorBreakdownComparativo {
