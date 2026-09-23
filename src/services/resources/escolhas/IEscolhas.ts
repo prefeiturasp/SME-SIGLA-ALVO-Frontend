@@ -38,6 +38,7 @@ export interface ISalvarEscolhaPayload {
   tipo_vaga: TipoVagaEscolha | null;
   e_retardatario: boolean;
   concurso_uuid?: string;
+  processo_uuid?: string;
 }
 
 // Interfaces para integração com MS-Escolhas

@@ -1,6 +1,10 @@
 import React, { useState, useCallback } from "react";
 import { Typography, Row, Col } from "antd";
-import { UsergroupAddOutlined, UserSwitchOutlined } from "@ant-design/icons";
+import {
+  HistoryOutlined,
+  UsergroupAddOutlined,
+  UserSwitchOutlined,
+} from "@ant-design/icons";
 import BaseTela, { type TitleItem } from "../../Base/BaseTela";
 import ConvocacaoTable from "./components/ConvocacaoTable";
 import ConvocacaoFiltros from "./components/ConvocacaoFiltros";
@@ -9,7 +13,7 @@ import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
 import { usePostFinalizarProcessoConvocacao } from "./hooks/usePostFinalizarProcessoConvocacao";
 import { useNavigate } from "react-router-dom";
 import type { IProcessoConvocacao } from "../../../services/resources/convocacao/IConvocacao";
-import { AppButton, BuscaProcessosTitle } from '@/components/ui';
+import { AppButton, BuscaProcessosTitle, StyledCardWithoutBorder } from "@/components/ui";
 import {
   PageContainer,
   ActionButton,
@@ -17,7 +21,9 @@ import {
   SearchTableContainer as TableContainer,
   ButtonGroup,
 } from "@/components/ui";
+import { cardSpacing } from "@/design-system/estilos";
 import { useGetPermissions } from "../../../routes/PermissionContextGuard";
+import type { HistoricoCandidatosLocationState } from "../../HistoricoCandidatos/HistoricoCandidatosTela";
 
 const { Text } = Typography;
 
@@ -25,7 +31,9 @@ const ConvocacaoCandidatosTela: React.FC = () => {
   const navigate = useNavigate();
   const [finalizandoUuid, setFinalizandoUuid] = useState<string | null>(null);
   const [modalFinalizarOpen, setModalFinalizarOpen] = useState(false);
-  const [processoParaFinalizar, setProcessoParaFinalizar] = useState<IProcessoConvocacao | null>(null);
+  const [processoParaFinalizar, setProcessoParaFinalizar] =
+    useState<IProcessoConvocacao | null>(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   const postFinalizar = usePostFinalizarProcessoConvocacao();
 
@@ -49,6 +57,13 @@ const ConvocacaoCandidatosTela: React.FC = () => {
       closeModalFinalizar();
     }
   }, [processoParaFinalizar, postFinalizar, closeModalFinalizar]);
+
+  const handleAbrirHistoricoCandidatos = useCallback(() => {
+    const state: HistoricoCandidatosLocationState = {
+      processos_uuids: selectedRowKeys.map(String),
+    };
+    navigate("/processos/convocacao/historico-candidatos", { state });
+  }, [navigate, selectedRowKeys]);
 
   const breadcrumbItems = [
     {
@@ -158,6 +173,8 @@ const ConvocacaoCandidatosTela: React.FC = () => {
                 canFinalizeProcessoConvocacao={canFinalizeProcessoConvocacao}
                 onFinalizar={openModalFinalizar}
                 finalizandoUuid={finalizandoUuid}
+                selectedRowKeys={selectedRowKeys}
+                onSelectedRowKeysChange={setSelectedRowKeys}
                 loading={processosConvocacaoIsLoading}
                 data={processosConvocacaoData?.results || []}
                 pagination={{
@@ -177,6 +194,30 @@ const ConvocacaoCandidatosTela: React.FC = () => {
             </TableContainer>
           </Col>
         </Row>
+
+        {selectedRowKeys.length > 0 ? (
+          <StyledCardWithoutBorder
+            style={cardSpacing.marginTop20}
+            variant="borderless"
+          >
+            <Row align="middle" justify="space-between" gutter={[16, 16]}>
+              <Col xs={24} md={16}>
+                <Text>
+                  Acesse o histórico de convocações dos processos selecionados.
+                </Text>
+              </Col>
+              <Col xs={24} md={8} style={{ textAlign: "right" }}>
+                <ActionButton
+                  size="large"
+                  icon={<HistoryOutlined />}
+                  onClick={handleAbrirHistoricoCandidatos}
+                >
+                  Histórico de candidatos
+                </ActionButton>
+              </Col>
+            </Row>
+          </StyledCardWithoutBorder>
+        ) : null}
 
         <FinalizarProcessoModal
           open={modalFinalizarOpen}
