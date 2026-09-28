@@ -11,7 +11,7 @@ Cypress.Commands.add('concurso_request', (method, path, options = {}) => {
 
   Cypress.log({ name: method, message: `CONCURSO → ${path}` })
 
-  return cy.request({
+  return cy.api({
     method,
     url,
     headers: {

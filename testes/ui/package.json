@@ -33,6 +33,7 @@
     "cypress": "13.17.0",
     "cypress-cloud": "^2.0.0-beta.1",
     "cypress-mochawesome-reporter": "^4.0.2",
+    "cypress-plugin-api": "2.11.2",
     "cypress-xpath": "^2.0.1",
     "dotenv": "^16.6.1",
     "mocha-allure-reporter": "^1.4.0",

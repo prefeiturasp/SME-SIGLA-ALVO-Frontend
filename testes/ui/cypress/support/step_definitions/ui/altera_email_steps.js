@@ -90,7 +90,7 @@ Then('o sistema exibe os campos do perfil do usuário:', (dataTable) => {
   const campos = dataTable.raw().flat().filter(Boolean)
   campos.forEach((campo) => {
     cy.contains(criarRegex(campo), { timeout: 8000 }).should('be.visible')
-    cy.log(`✅ Campo "${campo.trim()}" exibido`)
+    cy.log(`Campo "${campo.trim()}" exibido`)
   })
 })
 
@@ -110,7 +110,7 @@ Then('o modal de alterar e-mail é exibido', () => {
     .filter(':visible')
     .should('exist')
   cy.contains(/Alterar e-mail/i, { timeout: 8000 }).should('be.visible')
-  cy.log('✅ Modal "Alterar e-mail" exibido')
+  cy.log('Modal "Alterar e-mail" exibido')
 })
 
 Then('o modal de alterar e-mail exibe o campo {string}', (campo) => {
@@ -118,7 +118,7 @@ Then('o modal de alterar e-mail exibe o campo {string}', (campo) => {
     .filter(':visible')
     .contains(criarRegex(campo))
     .should('be.visible')
-  cy.log(`✅ Campo "${campo}" encontrado no modal`)
+  cy.log(`Campo "${campo}" encontrado no modal`)
 })
 
 Then('o modal de alterar e-mail exibe os botões {string} e {string}', (botao1, botao2) => {
@@ -127,7 +127,7 @@ Then('o modal de alterar e-mail exibe os botões {string} e {string}', (botao1, 
 
   modal().contains('button', criarRegex(botao1)).should('be.visible')
   modal().contains('button', criarRegex(botao2)).should('be.visible')
-  cy.log(`✅ Botões "${botao1}" e "${botao2}" encontrados no modal`)
+  cy.log(`Botões "${botao1}" e "${botao2}" encontrados no modal`)
 })
 
 When('preencho o campo {string} no modal com {string}', (campo, valor) => {
@@ -152,7 +152,7 @@ When('preencho o campo {string} no modal com {string}', (campo, valor) => {
       })
   }
   cy.wait(600)
-  cy.log(`✅ Campo "${campo}" preenchido com "${valor}"`)
+  cy.log(`Campo "${campo}" preenchido com "${valor}"`)
 })
 
 When('clico em {string} no modal de alterar e-mail', (botao) => {
@@ -174,11 +174,11 @@ Then('o modal de alterar e-mail é fechado', () => {
       cy.get(meusDadosSelectors.modal.container).should('not.exist')
     }
   })
-  cy.log('✅ Modal de alteração de e-mail fechado')
+  cy.log('Modal de alteração de e-mail fechado')
 })
 
 Then('permaneço na tela de meus dados', () => {
   cy.url({ timeout: 8000 }).should('include', 'meus-dados')
   cy.contains(/Meus Dados/i, { timeout: 8000 }).should('be.visible')
-  cy.log('✅ Permanece na tela Meus Dados')
+  cy.log('Permanece na tela Meus Dados')
 })

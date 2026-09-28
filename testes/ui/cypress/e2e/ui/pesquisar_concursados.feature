@@ -5,10 +5,8 @@ Funcionalidade: Pesquisar Concursados
   Quero pesquisar candidatos já concursados
   Para consultar seus dados, alterar contato e ver o histórico de escolhas
 
-  # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
   # URL DIRETA : /processo/pesquisar-concursado
-  # ============================================================
 
   Contexto:
     Dado que estou logado no SIGLA com perfil administrador
@@ -23,9 +21,7 @@ Funcionalidade: Pesquisar Concursados
       | CPF  |
     E exibe os botões "Limpar" e "Filtrar" da pesquisa de concursados
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Consulta por CPF
-  # ════════════════════════════════════════════════════════════════
   @busca-cpf @critico
   Cenário: Consultar concursado por CPF
     Quando preencho o CPF "96728566287" na pesquisa de concursados
@@ -46,9 +42,7 @@ Funcionalidade: Pesquisar Concursados
       | Alterar          |
       | Histórico        |
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Consulta por RF
-  # ════════════════════════════════════════════════════════════════
   @busca-rf
   Cenário: Consultar concursado por RF
     Quando preencho o RF "RF134393" na pesquisa de concursados
@@ -56,9 +50,7 @@ Funcionalidade: Pesquisar Concursados
 
     Então o sistema exibe o concursado correspondente na pesquisa de concursados
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Consulta sem resultado
-  # ════════════════════════════════════════════════════════════════
   @busca-sem-resultado @negativo
   Cenário: Consultar concursado com CPF inexistente não retorna registros
     Quando preencho o CPF "00000000000" na pesquisa de concursados
@@ -66,9 +58,7 @@ Funcionalidade: Pesquisar Concursados
 
     Então o sistema exibe a mensagem "Nenhum candidato encontrado" na pesquisa de concursados
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 4 — Limpar filtros
-  # ════════════════════════════════════════════════════════════════
   @limpar-filtros
   Cenário: Limpar filtros da pesquisa de concursados
     Dado que preenchi os filtros da pesquisa de concursados
@@ -76,9 +66,7 @@ Funcionalidade: Pesquisar Concursados
 
     Então os filtros da pesquisa de concursados retornam para o estado inicial
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 5 — Alterar dados de contato do concursado
-  # ════════════════════════════════════════════════════════════════
   @alterar-candidato @critico
   Cenário: Alterar telefone e e-mail de um concursado
     Quando realizo uma consulta válida na pesquisa de concursados
@@ -97,9 +85,7 @@ Funcionalidade: Pesquisar Concursados
 
     Então o modal de alterar candidato é fechado
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 6 — Cancelar alteração
-  # ════════════════════════════════════════════════════════════════
   @alterar-candidato @cancelamento
   Cenário: Cancelar alteração de concursado fecha o modal sem salvar
     Quando realizo uma consulta válida na pesquisa de concursados
@@ -111,9 +97,7 @@ Funcionalidade: Pesquisar Concursados
 
     Então o modal de alterar candidato é fechado
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 7 — Histórico de alterações
-  # ════════════════════════════════════════════════════════════════
   @historico @funcional
   Cenário: Visualizar histórico de alterações de um concursado
     Quando realizo uma consulta válida na pesquisa de concursados

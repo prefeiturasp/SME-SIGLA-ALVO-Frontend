@@ -8,22 +8,18 @@ Funcionalidade: Meus Dados — Alteração de Senha
   Contexto:
     Dado que estou logado no SIGLA com perfil administrador
 
-  # ============================================================
   # BASE URL : https://qa-sigla.sme.prefeitura.sp.gov.br
   # REGRAS DA NOVA SENHA:
-  # ✅ Ao menos uma letra minúscula
-  # ✅ Ao menos uma letra maiúscula
-  # ✅ Entre 8 e 12 caracteres
-  # ✅ Ao menos um caractere numérico
-  # ✅ Ao menos um caractere especial (#$@!%&*?)
-  # ❌ SEM espaço em branco
-  # ❌ SEM caracteres acentuados
+  # Ao menos uma letra minúscula
+  # Ao menos uma letra maiúscula
+  # Entre 8 e 12 caracteres
+  # Ao menos um caractere numérico
+  # Ao menos um caractere especial (#$@!%&*?)
+  # Sem espaço em branco
+  # Sem caracteres acentuados
   # Senha usada nos testes: "Test@123" — valor de teste, nunca submetido (cancela sempre)
-  # ============================================================
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Preencher campos do modal de alteração de senha e cancelar
-  # ════════════════════════════════════════════════════════════════
   @alterar-senha @preenchimento @cancelar @critico
   Cenário: Preencher campos do modal de alteração de senha e cancelar
     Quando acesso o menu de perfil do usuário
@@ -38,9 +34,7 @@ Funcionalidade: Meus Dados — Alteração de Senha
     Então o modal de alterar senha é fechado
     E permaneço na tela de meus dados
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Preencher campos com senha válida e fechar modal pelo botão X
-  # ════════════════════════════════════════════════════════════════
   @alterar-senha @preenchimento @fechar-x @critico
   Cenário: Preencher campos com senha válida e fechar modal pelo botão X
     Quando acesso o menu de perfil do usuário
@@ -55,9 +49,7 @@ Funcionalidade: Meus Dados — Alteração de Senha
     Então o modal de alterar senha é fechado
     E permaneço na tela de meus dados
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Validar modal de alteração de senha
-  # ════════════════════════════════════════════════════════════════
   @alterar-senha @critico
   Cenário: Validar modal de alteração de senha
     Quando acesso o menu de perfil do usuário
@@ -69,9 +61,7 @@ Funcionalidade: Meus Dados — Alteração de Senha
     E o modal de alterar senha exibe o campo "Confirmação da nova senha"
     E o modal de alterar senha exibe os botões "Cancelar" e "Salvar senha"
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 4 — Cancelar alteração de senha fecha o modal
-  # ════════════════════════════════════════════════════════════════
   @alterar-senha @cancelamento @critico
   Cenário: Cancelar alteração de senha fecha o modal
     Quando acesso o menu de perfil do usuário
@@ -83,9 +73,7 @@ Funcionalidade: Meus Dados — Alteração de Senha
     Então o modal de alterar senha é fechado
     E permaneço na tela de meus dados
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 5 — Validar campos exibidos na tela Meus Dados
-  # ════════════════════════════════════════════════════════════════
   @meus-dados @critico
   Cenário: Validar campos exibidos na tela Meus Dados
     Quando acesso o menu de perfil do usuário
@@ -98,9 +86,7 @@ Funcionalidade: Meus Dados — Alteração de Senha
       | RF               |
       | Perfil de acesso |
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 6 — Validar textos institucionais da página inicial
-  # ════════════════════════════════════════════════════════════════
   @pagina-inicial @smoke
   Cenário: Validar textos institucionais da página inicial
     Dado que estou na página inicial do SIGLA
@@ -112,9 +98,7 @@ Funcionalidade: Meus Dados — Alteração de Senha
       | Relatórios detalhados.         |
       | Acompanhamento em tempo real.  |
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 7 — Fluxo completo — da página inicial ao cancelamento de alteração de senha
-  # ════════════════════════════════════════════════════════════════
   @fluxo-completo @critico
   Cenário: Fluxo completo — da página inicial ao cancelamento de alteração de senha
     Dado que estou na página inicial do SIGLA
