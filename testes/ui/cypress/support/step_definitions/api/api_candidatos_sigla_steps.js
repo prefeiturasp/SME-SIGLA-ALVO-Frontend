@@ -22,14 +22,14 @@ When('eu crio um candidato SIGLA com payload {string}', (payloadKey) => {
     const payload = payloads[payloadKey]
     const url = 'https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/candidatos/'
     
-    cy.log(`🔍 Payload enviado: ${JSON.stringify(payload, null, 2)}`)
+    cy.log(`Payload enviado: ${JSON.stringify(payload, null, 2)}`)
     
     cy.sigla_post(url, payload).then((res) => {
       cy.wrap(res).as('response')
       
       // Log detalhado da resposta
-      cy.log(`📋 Response Status: ${res.status}`)
-      cy.log(`📋 Response Body: ${JSON.stringify(res.body, null, 2)}`)
+      cy.log(`Response Status: ${res.status}`)
+      cy.log(`Response Body: ${JSON.stringify(res.body, null, 2)}`)
       
       Cypress.log({ 
         name: 'POST Candidato', 

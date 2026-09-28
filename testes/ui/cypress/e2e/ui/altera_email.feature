@@ -8,13 +8,9 @@ Funcionalidade: Meus Dados — Alteração de E-mail
   Contexto:
     Dado que estou logado no SIGLA com perfil administrador
 
-  # ============================================================
   # BASE URL : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # ============================================================
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Preencher campos do modal de alteração de e-mail e cancelar
-  # ════════════════════════════════════════════════════════════════
   @alterar-email @preenchimento @critico
   Cenário: Preencher campos do modal de alteração de e-mail e cancelar
     Quando acesso o menu de perfil do usuário
@@ -30,9 +26,7 @@ Funcionalidade: Meus Dados — Alteração de E-mail
     Então o modal de alterar e-mail é fechado
     E permaneço na tela de meus dados
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Validar textos institucionais da página inicial
-  # ════════════════════════════════════════════════════════════════
   @pagina-inicial @smoke
   Cenário: Validar textos institucionais da página inicial
     Dado que estou na página inicial do SIGLA
@@ -44,9 +38,7 @@ Funcionalidade: Meus Dados — Alteração de E-mail
       | Relatórios detalhados.         |
       | Acompanhamento em tempo real.  |
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Validar campos exibidos na tela Meus Dados
-  # ════════════════════════════════════════════════════════════════
   @meus-dados @critico
   Cenário: Validar campos exibidos na tela Meus Dados
     Quando acesso o menu de perfil do usuário
@@ -59,9 +51,7 @@ Funcionalidade: Meus Dados — Alteração de E-mail
       | RF               |
       | Perfil de acesso |
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 4 — Validar modal de alteração de e-mail
-  # ════════════════════════════════════════════════════════════════
   @alterar-email @critico
   Cenário: Validar modal de alteração de e-mail
     Quando acesso o menu de perfil do usuário
@@ -73,9 +63,7 @@ Funcionalidade: Meus Dados — Alteração de E-mail
     E o modal de alterar e-mail exibe o campo "Confirmação do novo e-mail"
     E o modal de alterar e-mail exibe os botões "Cancelar" e "Confirmar"
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 5 — Cancelar alteração de e-mail fecha o modal
-  # ════════════════════════════════════════════════════════════════
   @alterar-email @cancelamento @critico
   Cenário: Cancelar alteração de e-mail fecha o modal
     Quando acesso o menu de perfil do usuário
@@ -87,9 +75,7 @@ Funcionalidade: Meus Dados — Alteração de E-mail
     Então o modal de alterar e-mail é fechado
     E permaneço na tela de meus dados
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 6 — Fluxo completo — da página inicial ao cancelamento de alteração de e-mail
-  # ════════════════════════════════════════════════════════════════
   @fluxo-completo @critico
   Cenário: Fluxo completo — da página inicial ao cancelamento de alteração de e-mail
     Dado que estou na página inicial do SIGLA

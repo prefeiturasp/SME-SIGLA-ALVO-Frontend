@@ -5,19 +5,13 @@ Funcionalidade: Processos — Convocação de Candidatos
   Contexto:
     Dado que estou logado no SIGLA com perfil administrador
 
-  # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # ============================================================
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Criar convocação completa com agendamento (Nova Autorização)
-  # ════════════════════════════════════════════════════════════════
   @nova-convocacao @e2e @critico @skip
   Cenário: Criar convocação completa com agendamento (Nova Autorização)
 
-    # =====================================================
     # ETAPA 1 — DADOS DO PROCESSO
-    # =====================================================
     Quando navego até a opção "Processos"
     E seleciono a opção "Convocação de Candidatos"
     E clico em "Nova convocação" na lista de convocações
@@ -30,9 +24,7 @@ Funcionalidade: Processos — Convocação de Candidatos
     E seleciono a data corte de vagas como sendo "amanhã"
     E clico no botão "Salvar e avançar"
 
-    # =====================================================
     # ETAPA 2 — CONFIGURAÇÃO DE CARGOS
-    # =====================================================
     Então o sistema exibe a etapa "Seleção e configuração do(s) cargo(s)"
     E o sistema exibe o resumo dos dados do processo
 
@@ -49,9 +41,7 @@ Funcionalidade: Processos — Convocação de Candidatos
 
     Quando clico no botão "Salvar e avançar"
 
-    # =====================================================
     # ETAPA 3 — AGENDAR
-    # =====================================================
     Então o sistema exibe a etapa "Agendar"
 
     Quando clico em "Agendar" na linha do cargo
@@ -63,23 +53,17 @@ Funcionalidade: Processos — Convocação de Candidatos
     E adiciono um novo período
     E clico no botão "Salvar e avançar"
 
-    # =====================================================
     # ETAPA 4 — RESUMO
-    # =====================================================
     Então o sistema exibe a etapa "Resumo"
 
     Quando clico no botão "Finalizar"
     Então o sistema retorna para a lista de convocações
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Criar convocação completa com agendamento (Reposição)
-  # ════════════════════════════════════════════════════════════════
   @nova-convocacao @e2e @critico @skip
   Cenário: Criar convocação completa com agendamento (Reposição)
 
-    # =====================================================
     # ETAPA 1 — DADOS DO PROCESSO
-    # =====================================================
     Quando navego até a opção "Processos"
     E seleciono a opção "Convocação de Candidatos"
     E clico em "Nova convocação" na lista de convocações
@@ -92,9 +76,7 @@ Funcionalidade: Processos — Convocação de Candidatos
     E seleciono a data corte de vagas como sendo "amanhã"
     E clico no botão "Salvar e avançar"
 
-    # =====================================================
     # ETAPA 2 — CONFIGURAÇÃO DE CARGOS
-    # =====================================================
     Então o sistema exibe a etapa "Seleção e configuração do(s) cargo(s)"
     E o sistema exibe o resumo dos dados do processo
 
@@ -111,9 +93,7 @@ Funcionalidade: Processos — Convocação de Candidatos
 
     Quando clico no botão "Salvar e avançar"
 
-    # =====================================================
     # ETAPA 3 — AGENDAR
-    # =====================================================
     Então o sistema exibe a etapa "Agendar"
 
     Quando clico em "Agendar" na linha do cargo
@@ -125,23 +105,17 @@ Funcionalidade: Processos — Convocação de Candidatos
     E adiciono um novo período
     E clico no botão "Salvar e avançar"
 
-    # =====================================================
     # ETAPA 4 — RESUMO
-    # =====================================================
     Então o sistema exibe a etapa "Resumo"
 
     Quando clico no botão "Finalizar"
     Então o sistema retorna para a lista de convocações
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Criar convocação completa com agendamento (Reconvocação)
-  # ════════════════════════════════════════════════════════════════
   @nova-convocacao2 @e2e @critico
   Cenário: Criar convocação completa com agendamento (Reconvocação)
 
-    # =====================================================
     # ETAPA 1 — DADOS DO PROCESSO
-    # =====================================================
     Quando navego até a opção "Processos"
     E seleciono a opção "Convocação de Candidatos"
     E clico em "Nova convocação" na lista de convocações
@@ -154,9 +128,7 @@ Funcionalidade: Processos — Convocação de Candidatos
     E seleciono a data corte de vagas como sendo "amanhã"
     E clico no botão "Salvar e avançar"
 
-    # =====================================================
     # ETAPA 2 — CONFIGURAÇÃO DE CARGOS
-    # =====================================================
     Então o sistema exibe a etapa "Seleção e configuração do(s) cargo(s)"
     E o sistema exibe o resumo dos dados do processo
 
@@ -171,9 +143,7 @@ Funcionalidade: Processos — Convocação de Candidatos
     Quando clico no botão "Adicionar ao cargo"
     Então o sistema exibe a tabela de cargos adicionados
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 4 — Validar bloqueio ao tentar avançar sem preencher campos obrigatórios
-  # ════════════════════════════════════════════════════════════════
   @validacao @negativo @critico
   Cenário: Validar bloqueio ao tentar avançar sem preencher campos obrigatórios
 
@@ -186,9 +156,7 @@ Funcionalidade: Processos — Convocação de Candidatos
     Então o sistema exibe mensagens de erro nos campos obrigatórios
     E o sistema exibe a tela "Nova convocação"
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 5 — Navegar até a lista de convocações pelo menu Processos
-  # ════════════════════════════════════════════════════════════════
   @navegacao @smoke
   Cenário: Navegar até a lista de convocações pelo menu Processos
     Dado que estou na página inicial do SIGLA
@@ -197,9 +165,7 @@ Funcionalidade: Processos — Convocação de Candidatos
     Então o sistema exibe a tela "Lista de Convocações"
     E a lista de convocações exibe o botão "Nova convocação"
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 6 — Validar estrutura do formulário de nova convocação
-  # ════════════════════════════════════════════════════════════════
   @nova-convocacao @validacao @critico
   Cenário: Validar estrutura do formulário de nova convocação
     Quando navego até a opção "Processos"
@@ -220,9 +186,7 @@ Funcionalidade: Processos — Convocação de Candidatos
       | Data corte de vagas |
     E o formulário exibe os botões "Cancelar" e "Salvar e avançar" na etapa 1
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 7 — Validar filtros de busca na lista de convocações
-  # ════════════════════════════════════════════════════════════════
   @filtros @validacao
   Cenário: Validar filtros de busca na lista de convocações
     Quando navego até a opção "Processos"

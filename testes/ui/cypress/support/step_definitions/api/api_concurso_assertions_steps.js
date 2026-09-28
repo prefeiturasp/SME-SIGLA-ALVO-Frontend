@@ -105,3 +105,20 @@ Then('a contagem total CONCURSO deve ser maior que zero', () => {
     Cypress.log({ name: 'Validação', message: `Total: ${count} registro(s)` })
   })
 })
+
+Then('o concurso criado deve aparecer na listagem geral de concursos', () => {
+  cy.get('@concursoUuid').then((uuid) => {
+    cy.get('@response').then((res) => {
+      const nome = res.body.nome
+      const baseUrl = Cypress.env('CONCURSO_BASE_URL') || 'https://qa-api-sigla.sme.prefeitura.sp.gov.br'
+      const url = `${baseUrl}/ms-processos-concursos/api/v1/concursos/?search=${encodeURIComponent(nome)}`
+
+      cy.concurso_get(url).then((listagemRes) => {
+        expect(listagemRes.status, 'Listagem filtrada deve retornar 200').to.eq(200)
+        const found = (listagemRes.body.results || []).some((c) => c.uuid === uuid)
+        expect(found, `Concurso ${uuid} deve aparecer na listagem`).to.be.true
+        Cypress.log({ name: 'Consistência listagem', message: `UUID ${uuid} encontrado` })
+      })
+    })
+  })
+})

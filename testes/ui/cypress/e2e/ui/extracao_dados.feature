@@ -5,17 +5,13 @@ Funcionalidade: Gerenciar — Extração de Dados
   Quero consultar o dashboard de indicadores e relatórios consolidados dos concursos
   Para acompanhar habilitados, convocações, escolhas e vagas por DRE
 
-  # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # ============================================================
 
   Contexto:
     Dado que estou logado no SIGLA com perfil administrador
     Quando acesso a tela de extração de dados
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 (PRINCIPAL) — Fluxo de filtro por concurso e ano
-  # ════════════════════════════════════════════════════════════════
   @smoke @critico
   Cenário: Validar estrutura da tela e fluxo principal de filtro por concurso e ano
     Então o sistema exibe o título "Extração de dados"
@@ -33,9 +29,7 @@ Funcionalidade: Gerenciar — Extração de Dados
     Quando clico no botão Filtrar do filtro principal de extração de dados
     Então o sistema atualiza os indicadores de extração de dados de acordo com o filtro aplicado
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Relatórios detalhados: cargo "Todos" + DRE sorteada
-  # ════════════════════════════════════════════════════════════════
   @relatorios-detalhados @critico
   Cenário: Filtrar a tabela de Relatórios detalhados por cargo Todos e DRE sorteada
     Quando seleciono o cargo "Todos" nos relatórios detalhados de extração de dados
@@ -44,9 +38,7 @@ Funcionalidade: Gerenciar — Extração de Dados
 
     Então a tabela de relatórios detalhados de extração de dados exibe resultados para a DRE selecionada
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Geração de relatório
-  # ════════════════════════════════════════════════════════════════
   @exportacao @funcional
   Cenário: Gerar relatório a partir do dashboard de Extração de Dados
     Quando clico no botão "Gerar relatório"

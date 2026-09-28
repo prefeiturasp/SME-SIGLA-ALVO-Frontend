@@ -25,7 +25,7 @@ Cypress.Commands.add('escolha_request', (method, path, options = {}) => {
 
   Cypress.log({ name: method, message: `ESCOLHA → ${path}` })
 
-  return cy.request({
+  return cy.api({
     method,
     url,
     headers: {

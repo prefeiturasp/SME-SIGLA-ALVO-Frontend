@@ -5,21 +5,15 @@ Funcionalidade: Recuperação de Senha no Sistema SIGLA
   Quero recuperar minha senha através do fluxo de recuperação
   Para poder acessar o sistema quando esquecer minha senha
 
-  # ============================================================================
   # BASE URL : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # ============================================================================
 
   Contexto:
     Dado que eu acesso o sistema SIGLA
     E valido a existência do link "Esqueci minha senha"
 
-  # ============================================================================
   # CENÁRIOS ESSENCIAIS — RECUPERAÇÃO DE SENHA
-  # ============================================================================
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Fluxo esqueci a senha com RF válido
-  # ════════════════════════════════════════════════════════════════
   @recuperacao-sucesso @critico
   Cenário: Fluxo esqueci a senha com RF válido
     Quando clico na opção "Esqueci minha senha"
@@ -32,9 +26,7 @@ Funcionalidade: Recuperação de Senha no Sistema SIGLA
     E clico no botão continuar para voltar ao login
     Então devo estar na página de login
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Fluxo esqueci a senha com RF inválido
-  # ════════════════════════════════════════════════════════════════
   @recuperacao-falha @validacao
   Cenário: Fluxo esqueci a senha com RF inválido
     Quando clico na opção "Esqueci minha senha"

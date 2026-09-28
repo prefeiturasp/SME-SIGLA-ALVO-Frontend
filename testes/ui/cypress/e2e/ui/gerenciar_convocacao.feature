@@ -5,9 +5,7 @@ Funcionalidade: Processos — Editar e Excluir Convocação
   Quero editar ou excluir uma convocação já cadastrada
   Para corrigir ou remover processos de convocação existentes
 
-  # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # ============================================================
 
   Contexto:
     Dado que estou logado no SIGLA com perfil administrador
@@ -15,9 +13,7 @@ Funcionalidade: Processos — Editar e Excluir Convocação
     E seleciono a opção "Convocação de Candidatos"
     Então o sistema exibe a tela "Lista de Convocações"
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Editar convocação existente
-  # ════════════════════════════════════════════════════════════════
   @editar @critico
   Cenário: Editar uma convocação existente reabre o formulário na etapa de cargos
     Quando clico em "Editar" na convocação "Processo de Teste Automacao"
@@ -32,9 +28,7 @@ Funcionalidade: Processos — Editar e Excluir Convocação
       | Data corte de vagas: |
       | Descrição:           |
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Cancelar edição
-  # ════════════════════════════════════════════════════════════════
   @editar @cancelamento
   Cenário: Cancelar edição de uma convocação retorna à lista sem alterações
     Quando clico em "Editar" na convocação "Processo de Teste Automacao"
@@ -44,9 +38,7 @@ Funcionalidade: Processos — Editar e Excluir Convocação
 
     Então o sistema exibe a tela "Lista de Convocações"
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Excluir convocação
-  # ════════════════════════════════════════════════════════════════
   @excluir @critico
   Cenário: Excluir uma convocação solicita confirmação antes de remover
     Dado que anoto a quantidade total de convocações exibida na lista
@@ -61,9 +53,7 @@ Funcionalidade: Processos — Editar e Excluir Convocação
     Então o diálogo de exclusão é fechado
     E a quantidade total de convocações na lista diminui em 1
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 4 — Cancelar exclusão
-  # ════════════════════════════════════════════════════════════════
   @excluir @cancelamento
   Cenário: Cancelar exclusão de uma convocação mantém o registro na lista
     Dado que anoto a quantidade total de convocações exibida na lista

@@ -9,13 +9,9 @@ Funcionalidade: Cadastro de Concursos
   Contexto:
     Dado que estou logado no SIGLA com perfil administrador
 
-  # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # ============================================================
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Cadastrar concurso com sucesso
-  # ════════════════════════════════════════════════════════════════
   @cadastro-concurso @e2e
   Cenário: Cadastrar concurso com sucesso
 
@@ -76,9 +72,7 @@ Funcionalidade: Cadastro de Concursos
     Então o sistema exibe uma mensagem de sucesso no cadastro de concurso
     E apresenta o concurso cadastrado na listagem de concursos
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Cancelar o cadastro de concurso e retornar à listagem
-  # ════════════════════════════════════════════════════════════════
   @cadastro-concurso @cancelamento
   Cenário: Cancelar o cadastro de concurso e retornar à listagem
 
@@ -89,9 +83,7 @@ Funcionalidade: Cadastro de Concursos
     Quando clico em "Cancelar" no cadastro de concurso
     Então o sistema exibe a listagem de concursos
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Validar bloqueio ao avançar sem preencher os campos obrigatórios
-  # ════════════════════════════════════════════════════════════════
   @validacao @negativo
   Cenário: Validar bloqueio ao avançar sem preencher os campos obrigatórios
 
@@ -104,9 +96,7 @@ Funcionalidade: Cadastro de Concursos
     E preencho o Nome do concurso com um nome aleatório da lista
     Então o botão "Próximo" permanece desabilitado no cadastro de concurso
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 4 — Validar bloqueio ao cadastrar concurso com Processo SEI já utilizado
-  # ════════════════════════════════════════════════════════════════
   @validacao @negativo @unicidade
   Cenário: Validar bloqueio ao cadastrar concurso com Processo SEI já utilizado
 

@@ -121,13 +121,25 @@ When('eu crio um concurso CONCURSO com payload {string}', (payloadKey) => {
       // Salvar UUID do concurso criado para testes futuros
       if (res.status === 201 && res.body.uuid) {
         cy.wrap(res.body.uuid).as('concursoUuid')
-        cy.log(`💾 Concurso UUID salvo: ${res.body.uuid}`)
+        cy.log(`Concurso UUID salvo: ${res.body.uuid}`)
       }
       
       Cypress.log({ 
         name: 'POST Concurso', 
         message: `Payload: ${payloadKey} → HTTP ${res.status}` 
       })
+    })
+  })
+})
+
+When('eu busco o concurso CONCURSO pelo UUID criado', () => {
+  cy.get('@concursoUuid').then((uuid) => {
+    const baseUrl = Cypress.env('CONCURSO_BASE_URL') || 'https://qa-api-sigla.sme.prefeitura.sp.gov.br'
+    const url = `${baseUrl}/ms-processos-concursos/api/v1/concursos/${uuid}/`
+
+    cy.concurso_get(url).then((res) => {
+      cy.wrap(res).as('response')
+      Cypress.log({ name: 'Buscar Concurso', message: `UUID: ${uuid} → HTTP ${res.status}` })
     })
   })
 })

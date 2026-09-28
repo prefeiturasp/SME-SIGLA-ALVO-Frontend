@@ -65,6 +65,9 @@ module.exports = defineConfig({
       // Detectar contexto de execução (CI=true na esteira Jenkins)
       CI: process.env.CI || false,
 
+      // cypress-plugin-api — mascara Authorization/credenciais no painel de requests
+      hideCredentials: true,
+
       // API SIGLA — Processos Convocação (sem autenticação)
       SIGLA_BASE_URL: process.env.SIGLA_BASE_URL || 'https://qa-api-sigla.sme.prefeitura.sp.gov.br',
       SIGLA_BASE_PATH: '/ms-processos-convocacao/api/v1',

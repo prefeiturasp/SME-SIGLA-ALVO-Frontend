@@ -7,7 +7,7 @@ Cypress.Commands.add('sigla_request', (method, path, options = {}) => {
 
   Cypress.log({ name: method, message: `SIGLA → ${path}` })
 
-  return cy.request({
+  return cy.api({
     method,
     url,
     headers: {
