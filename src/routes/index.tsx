@@ -3,6 +3,7 @@ import { DashboardTela } from "../pages/Dashboard/DashboardTela";
 import ProtectedRoute from "./AuthGuard";
 
 import ConvocacaoCandidatosTela from "../pages/Processos/ConvocacaoCandidatos/ConvocacaoCandidatosTela";
+import HistoricoCandidatosTela from "../pages/HistoricoCandidatos/HistoricoCandidatosTela";
 import ImportacaoDadosTela from "../pages/ImportacaoDados/ImportacaoDadosTela";
 import ExportacaoDadosTela from "../pages/ExportacaoDados/ExportacaoDadosTela";
 import ImportacaoDados2 from "../pages/Processos/ImportacaoDados/ImportacaoDados2";
@@ -46,9 +47,14 @@ import MeusDadosTela from "../pages/MeusDados/MeusDadosTela";
 import ExtracaoDadosTela from "../pages/Gerenciar/ExtracaoDados/ExtracaoDadosTela";
 import { LocusApp } from "../../modules/locus/app/App";
 
+/** Basename do React Router a partir do `base` do Vite (sem barra final). */
+function basenameDaApp(): string | undefined {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+  return base.length > 0 ? base : undefined;
+}
 
-const router = createBrowserRouter([
-  {
+const router = createBrowserRouter(
+  [  {
     path: "/",
     element: (
       <ProtectedRoute>
@@ -278,11 +284,22 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <PermissionContextGuard model="processoconvocacao,importacaoarquivovagas" permissaoDeExibirATELA="view_processoconvocacao">
         <ConvocacaoCandidatosTela />
-        </PermissionContextGuard>        
+        </PermissionContextGuard>
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,
-  },  
+  },
+  {
+    path: "/processos/convocacao/historico-candidatos",
+    element: (
+      <ProtectedRoute>
+        <PermissionContextGuard model="processoconvocacao,importacaoarquivovagas" permissaoDeExibirATELA="view_processoconvocacao">
+          <HistoricoCandidatosTela />
+        </PermissionContextGuard>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteError />,
+  },
   {
     path: "/gerenciar/gerenciamento-usuarios",
     element: (
@@ -506,7 +523,9 @@ const router = createBrowserRouter([
     element: <ForbiddenTela />,
     errorElement: <RouteError />,
   },
-]);
+  ],
+  { basename: basenameDaApp() },
+);
 
 export function AppRoutes() {
   return <RouterProvider router={router} />;

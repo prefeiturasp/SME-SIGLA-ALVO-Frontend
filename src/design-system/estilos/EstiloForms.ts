@@ -46,6 +46,20 @@ export const formInputStyle = {
 export const StyledFormInput = styled(Input)`
   width: 100%;
   height: ${controlHeight}px;
+  line-height: ${controlHeight}px;
+  padding-block: 0;
+  display: inline-flex;
+  align-items: center;
+
+  &.ant-input-affix-wrapper {
+    padding-block: 0;
+
+    .ant-input {
+      height: 100%;
+      line-height: ${controlHeight}px;
+      padding-block: 0;
+    }
+  }
 `;
 
 /** Mensagens de erro em formulários */
@@ -1206,8 +1220,9 @@ export const IndicatorDescription = styled.p`
 
 export const IndicatorBreakdown = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
   font-size: 0.75rem;
   color: rgba(0, 0, 0, 0.75);
 
@@ -1215,7 +1230,8 @@ export const IndicatorBreakdown = styled.div`
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    margin-right: 4rem;
+    flex: 1;
+    min-width: 0;
   }
 
   span {

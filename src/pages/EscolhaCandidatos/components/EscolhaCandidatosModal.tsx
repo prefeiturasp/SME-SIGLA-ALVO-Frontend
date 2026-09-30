@@ -605,6 +605,7 @@ const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
         ? modalRetardatario 
         : false,
       concurso_uuid: selectedConcursoUuid,
+      processo_uuid: selectedProcesso,
     };
 
     try {

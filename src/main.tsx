@@ -28,6 +28,7 @@ function ThemedApp() {
   );
 }
 
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ConfigProvider locale={ptBR} theme={appTheme}>

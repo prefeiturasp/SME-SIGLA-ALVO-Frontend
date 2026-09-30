@@ -9,6 +9,9 @@ import './commands'
 // Plugin XPath
 import 'cypress-xpath'
 
+// Exibe request/response das chamadas de API (cy.api) na tela do runner
+import 'cypress-plugin-api'
+
 // Comandos de API SIGLA
 import './api/commands'
 import './api/commands_concurso'

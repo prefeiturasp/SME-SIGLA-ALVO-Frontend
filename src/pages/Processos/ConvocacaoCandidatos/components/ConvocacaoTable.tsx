@@ -36,13 +36,35 @@ interface ConvocacaoTableProps extends TableProps<IProcessoConvocacao> {
   canFinalizeProcessoConvocacao: boolean;
   onFinalizar?: (record: IProcessoConvocacao) => void | Promise<void>;
   finalizandoUuid?: string | null;
+  selectedRowKeys?: React.Key[];
+  onSelectedRowKeysChange?: (keys: React.Key[]) => void;
 }
 
-const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProcessoConvocacao, canDeleteProcessoConvocacao, canViewDetailsProcessoConvocacao, canFinalizeProcessoConvocacao, onFinalizar, finalizandoUuid, ...rest }) => {
+const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({
+  data,
+  canChangeProcessoConvocacao,
+  canDeleteProcessoConvocacao,
+  canViewDetailsProcessoConvocacao,
+  canFinalizeProcessoConvocacao,
+  onFinalizar,
+  finalizandoUuid,
+  selectedRowKeys: selectedRowKeysProp,
+  onSelectedRowKeysChange,
+  ...rest
+}) => {
   const navigate = useNavigate();
   const { deletarProcesso, isDeleting } = useDeleteProcessoConvocacao();
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [deletingUuidState, setDeletingUuidState] = React.useState<string | null>(null);
+  const [selectedRowKeysInterno, setSelectedRowKeysInterno] = React.useState<React.Key[]>([]);
+
+  const selectedRowKeys = selectedRowKeysProp ?? selectedRowKeysInterno;
+  const setSelectedRowKeys = (keys: React.Key[]) => {
+    onSelectedRowKeysChange?.(keys);
+    if (selectedRowKeysProp === undefined) {
+      setSelectedRowKeysInterno(keys);
+    }
+  };
   
   const handleEdit = (editData: IProcessoConvocacao) => {    
     const passo = Number(editData.passo ?? 1);
@@ -76,7 +98,7 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
   const SortIcon = ({ onSort, field }: { onSort: (order: 'ascend' | 'descend' | null, field: string) => void, field: string }) => {
     const handleSort = () => {
       let newOrder: 'ascend' | 'descend' | null;
-      
+
       if (sortField !== field) {
         newOrder = 'ascend';
         setSortField(field);
@@ -88,7 +110,7 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
         newOrder = null;
         setSortField(null);
       }
-      
+
       setSortOrder(newOrder);
       onSort(newOrder, field);
     };
@@ -113,7 +135,7 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
   const StatusRenderer = ({ status }: { status: string }) => {
     const getStatusConfig = (status: string) => {
       const statusLower = status.toLowerCase();
-      
+
       if (statusLower.includes('andamento') || statusLower.includes('em andamento')) {
         return {
           color: '#6691D3',
@@ -153,11 +175,11 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
 
   const getSortedData = () => {
     if (!sortOrder || !sortField) return data;
-    
+
     return [...data].sort((a, b) => {
       let aValue: any;
       let bValue: any;
-      
+
       switch (sortField) {
         case 'status':
           aValue = a.status;
@@ -196,6 +218,12 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
 
   const handleSort = (order: 'ascend' | 'descend' | null, field: string) => {
     console.log(`Ordenar por ${field}:`, order);
+  };
+
+  const rowSelection: TableProps<IProcessoConvocacao>["rowSelection"] = {
+    selectedRowKeys,
+    onChange: (keys) => setSelectedRowKeys(keys),
+    columnWidth: 48,
   };
 
   const columns: ColumnsType<IProcessoConvocacao> = [
@@ -328,6 +356,7 @@ const ConvocacaoTable: React.FC<ConvocacaoTableProps> = ({ data, canChangeProces
           )
         }}
         {...rest}
+        rowSelection={rowSelection}
       />
       <ConfirmarExclusaoProcessoModal
         open={deleteModalOpen}

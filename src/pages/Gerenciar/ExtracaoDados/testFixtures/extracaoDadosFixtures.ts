@@ -1,7 +1,15 @@
 import type {
+  IExtracaoDadosContagem,
   IExtracaoDadosResponse,
   IExtracaoDadosTodosResponse,
 } from "../../../services/resources/relatorios/IExtracaoDados";
+
+const contagem = (
+  total: number,
+  geral = total,
+  pcd = 0,
+  nna = 0
+): IExtracaoDadosContagem => ({ total, geral, pcd, nna });
 
 export const concursosOptionsMock = [
   { value: "uuid-concurso-1", label: "Concurso Teste 1" },
@@ -11,13 +19,13 @@ export const concursosOptionsMock = [
 export const extracaoDadosTodosMock: IExtracaoDadosTodosResponse = {
   candidatos: {
     habilitados: { total: 1000, geral: 800, pcd: 100, nna: 100 },
-    convocados: 500,
-    "nao-convocados": 500,
+    convocados: contagem(500, 400, 50, 50),
+    "nao-convocados": contagem(500, 400, 50, 50),
   },
   escolhas: {
-    escolha: 300,
-    reconvocacao: 50,
-    "nao-escolha": 150,
+    escolha: contagem(300, 240, 30, 30),
+    reconvocacao: contagem(50, 40, 5, 5),
+    "nao-escolha": contagem(150, 120, 15, 15),
     dres: [
       {
         nome: "Diretoria Regional de Educação Butantã",
@@ -52,6 +60,7 @@ export const extracaoDadosTodosMock: IExtracaoDadosTodosResponse = {
     },
     ultima_escolha_em: "2025-07-20T09:42:00",
   },
+  pendentes: contagem(0),
   concurso: {
     "autorizacoes-publicadas": 25,
     cargos: [
@@ -83,13 +92,16 @@ export const extracaoDadosFiltradoMock: IExtracaoDadosResponse = {
   ],
   candidatos: {
     habilitados: { total: 200, geral: 150, pcd: 30, nna: 20 },
-    "2024": { convocados: 80, "nao-convocados": 120 },
+    "2024": {
+      convocados: contagem(80, 60, 10, 10),
+      "nao-convocados": contagem(120, 90, 20, 10),
+    },
   },
   escolhas: {
     "2024": {
-      escolha: 60,
-      reconvocacao: 10,
-      "nao-escolha": 20,
+      escolha: contagem(60, 45, 8, 7),
+      reconvocacao: contagem(10, 8, 1, 1),
+      "nao-escolha": contagem(20, 15, 3, 2),
       dres: [
         {
           nome: "Diretoria Regional de Educação Butantã",
@@ -119,6 +131,9 @@ export const extracaoDadosFiltradoMock: IExtracaoDadosResponse = {
       ],
     },
     ultima_escolha_em: "2024-09-15T11:15:00",
+  },
+  pendentes: {
+    "2024": contagem(0),
   },
   concurso: {
     "2024": {
@@ -158,21 +173,21 @@ export const extracaoDadosComparativoMock: IExtracaoDadosResponse = {
   candidatos: {
     habilitados: { total: 200, geral: 150, pcd: 30, nna: 20 },
     "2024": {
-      convocados: 80,
-      "nao-convocados": 120,
+      convocados: contagem(80, 60, 10, 10),
+      "nao-convocados": contagem(120, 90, 20, 10),
       habilitados: { total: 180, geral: 130, pcd: 30, nna: 20 },
     },
     "2025": {
-      convocados: 100,
-      "nao-convocados": 100,
+      convocados: contagem(100, 75, 15, 10),
+      "nao-convocados": contagem(100, 75, 15, 10),
       habilitados: { total: 220, geral: 160, pcd: 35, nna: 25 },
     },
   },
   escolhas: {
     "2024": {
-      escolha: 60,
-      reconvocacao: 10,
-      "nao-escolha": 20,
+      escolha: contagem(60, 45, 8, 7),
+      reconvocacao: contagem(10, 8, 1, 1),
+      "nao-escolha": contagem(20, 15, 3, 2),
       dres: [
         {
           nome: "Diretoria Regional de Educação Butantã",
@@ -182,9 +197,9 @@ export const extracaoDadosComparativoMock: IExtracaoDadosResponse = {
       ],
     },
     "2025": {
-      escolha: 75,
-      reconvocacao: 5,
-      "nao-escolha": 10,
+      escolha: contagem(75, 55, 12, 8),
+      reconvocacao: contagem(5, 4, 1, 0),
+      "nao-escolha": contagem(10, 8, 1, 1),
       dres: [
         {
           nome: "Diretoria Regional de Educação Butantã",
@@ -206,6 +221,10 @@ export const extracaoDadosComparativoMock: IExtracaoDadosResponse = {
       ],
     },
     ultima_escolha_em: "2025-06-15T16:45:00",
+  },
+  pendentes: {
+    "2024": contagem(0),
+    "2025": contagem(10, 8, 1, 1),
   },
   concurso: {
     "2024": {

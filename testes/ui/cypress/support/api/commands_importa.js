@@ -11,7 +11,7 @@ Cypress.Commands.add('importa_request', (method, path, options = {}) => {
 
   Cypress.log({ name: method, message: `IMPORTA → ${path}` })
 
-  return cy.request({
+  return cy.api({
     method,
     url,
     headers: {

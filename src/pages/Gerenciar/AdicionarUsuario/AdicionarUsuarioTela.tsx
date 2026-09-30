@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, Col, Input, Row, Typography } from "antd";
+import { Alert, Col, Row, Typography } from "antd";
 
 import { useNavigate } from "react-router-dom";
 
@@ -9,8 +9,15 @@ import { postBuscarUsuarioEol } from "../../../services/resources/usuarios";
 import type { IBuscarUsuarioEolResponse } from "../../../services/resources/usuarios";
 import { usePostCriarUsuario } from "./hooks/usePostCriarUsuario";
 
-import { AppButton, AppFormItem, FieldLabel, FilterActionSlot, FilterInlineRow, FilterFieldCol, FilterActionCol } from '@/components/ui';
 import {
+  AppButton,
+  AppFormItem,
+  AppInput,
+  FieldLabel,
+  FilterActionSlot,
+  FilterInlineRow,
+  FilterFieldCol,
+  FilterActionsGroup,
   PageContainer,
   ConteudoPagina,
 } from "@/components/ui";
@@ -115,12 +122,12 @@ const AdicionarUsuarioTela: React.FC = () => {
             Preencha os campos para adicionar um novo usuário
           </Text>
           <FilterInlineRow gutter={[16, 0]}>
-            <FilterFieldCol xs={24} md={20}>
+            <FilterFieldCol xs={24} md={12}>
               <AppFormItem
                 label={<FieldLabel>Registro funcional (RF)</FieldLabel>}
                 labelCol={{ span: 24 }}
               >
-                <Input
+                <AppInput
                   allowClear
                   value={rf}
                   onChange={(e) => {
@@ -135,19 +142,21 @@ const AdicionarUsuarioTela: React.FC = () => {
                 />
               </AppFormItem>
             </FilterFieldCol>
-            <FilterActionCol xs={24} md={4}>
+            <Col xs={24} flex="none">
               <FilterActionSlot>
-                <AppButton
-                  variant="secondary"
-                  size="large"
-                  onClick={handleBuscar}
-                  disabled={!rf.trim()}
-                  style={{ width: "100%" }}
-                >
-                  Buscar usuário
-                </AppButton>
+                <FilterActionsGroup>
+                  <AppButton
+                    variant="secondary"
+                    size="large"
+                    onClick={handleBuscar}
+                    disabled={!rf.trim()}
+                    loading={buscando}
+                  >
+                    Buscar usuário
+                  </AppButton>
+                </FilterActionsGroup>
               </FilterActionSlot>
-            </FilterActionCol>
+            </Col>
           </FilterInlineRow>
 
           {erro && (
@@ -167,7 +176,7 @@ const AdicionarUsuarioTela: React.FC = () => {
                     label={<FieldLabel>Nome</FieldLabel>}
                     labelCol={{ span: 24 }}
                   >
-                    <Input value={dadosUsuario.nome} disabled />
+                    <AppInput value={dadosUsuario.nome} disabled />
                   </AppFormItem>
                 </Col>
                 <Col xs={24} md={12}>
@@ -175,7 +184,7 @@ const AdicionarUsuarioTela: React.FC = () => {
                     label={<FieldLabel>E-mail</FieldLabel>}
                     labelCol={{ span: 24 }}
                   >
-                    <Input value={dadosUsuario.email} disabled />
+                    <AppInput value={dadosUsuario.email} disabled />
                   </AppFormItem>
                 </Col>
               </Row>

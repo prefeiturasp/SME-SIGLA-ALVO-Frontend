@@ -1,4 +1,5 @@
 import {
+  INDICADOR_DETALHADO_VAZIO,
   INDICADORES_VAZIOS,
   mapExtracaoDadosToIndicadores,
   mapExtracaoDadosTodosToIndicadores,
@@ -14,7 +15,7 @@ describe("mapIndicadores", () => {
       expect(mapExtracaoDadosTodosToIndicadores(undefined)).toEqual(INDICADORES_VAZIOS);
     });
 
-    it("mapeia corretamente os indicadores consolidados", () => {
+    it("mapeia corretamente os indicadores consolidados com breakdown", () => {
       expect(mapExtracaoDadosTodosToIndicadores(extracaoDadosTodosMock)).toEqual({
         modoComparativo: false,
         habilitados: 1000,
@@ -22,13 +23,12 @@ describe("mapIndicadores", () => {
         listaGeral: 800,
         listaPcd: 100,
         listaNna: 100,
-        convocados: 500,
-        escolhasRealizadas: 300,
-        naoConvocados: 500,
-        reconvocacoes: 50,
-        semEscolha: 150,
-        // pendentes = 500 - 300 - 150 - 50 = 0 (clampado)
-        pendentesEscolha: 0,
+        convocados: { total: 500, geral: 400, pcd: 50, nna: 50 },
+        escolhasRealizadas: { total: 300, geral: 240, pcd: 30, nna: 30 },
+        naoConvocados: { total: 500, geral: 400, pcd: 50, nna: 50 },
+        reconvocacoes: { total: 50, geral: 40, pcd: 5, nna: 5 },
+        semEscolha: { total: 150, geral: 120, pcd: 15, nna: 15 },
+        pendentesEscolha: { total: 0, geral: 0, pcd: 0, nna: 0 },
         autorizacoes: 25,
       });
     });
@@ -52,13 +52,12 @@ describe("mapIndicadores", () => {
         listaGeral: 150,
         listaPcd: 30,
         listaNna: 20,
-        convocados: 80,
-        escolhasRealizadas: 60,
-        naoConvocados: 120,
-        reconvocacoes: 10,
-        semEscolha: 20,
-        // pendentes = 80 - 60 - 20 - 10 = 0 (clampado)
-        pendentesEscolha: 0,
+        convocados: { total: 80, geral: 60, pcd: 10, nna: 10 },
+        escolhasRealizadas: { total: 60, geral: 45, pcd: 8, nna: 7 },
+        naoConvocados: { total: 120, geral: 90, pcd: 20, nna: 10 },
+        reconvocacoes: { total: 10, geral: 8, pcd: 1, nna: 1 },
+        semEscolha: { total: 20, geral: 15, pcd: 3, nna: 2 },
+        pendentesEscolha: { total: 0, geral: 0, pcd: 0, nna: 0 },
         autorizacoes: 8,
       });
     });
@@ -68,57 +67,84 @@ describe("mapIndicadores", () => {
         "2023",
       ]);
 
-      expect(indicadores.convocados).toBe(0);
-      expect(indicadores.escolhasRealizadas).toBe(0);
-      expect(indicadores.pendentesEscolha).toBe(0);
+      expect(indicadores.convocados).toEqual(INDICADOR_DETALHADO_VAZIO);
+      expect(indicadores.escolhasRealizadas).toEqual(INDICADOR_DETALHADO_VAZIO);
+      expect(indicadores.pendentesEscolha).toEqual(INDICADOR_DETALHADO_VAZIO);
       expect(indicadores.habilitados).toBe(200);
     });
 
-    it("calcula pendentes pela fórmula (convocados − escolha − não-escolha − reconvocação)", () => {
+    it("usa pendentes da API quando disponível", () => {
       const dados = {
         ...extracaoDadosFiltradoMock,
+        pendentes: {
+          "2024": { total: 30, geral: 20, pcd: 5, nna: 5 },
+        },
+      };
+
+      expect(mapExtracaoDadosToIndicadores(dados, ["2024"]).pendentesEscolha).toEqual({
+        total: 30,
+        geral: 20,
+        pcd: 5,
+        nna: 5,
+      });
+    });
+
+    it("calcula pendentes pela fórmula quando a API não envia", () => {
+      const dados = {
+        ...extracaoDadosFiltradoMock,
+        pendentes: undefined,
         candidatos: {
           ...extracaoDadosFiltradoMock.candidatos,
-          "2024": { convocados: 100, "nao-convocados": 120 },
+          "2024": {
+            convocados: { total: 100, geral: 70, pcd: 20, nna: 10 },
+            "nao-convocados": { total: 120, geral: 90, pcd: 20, nna: 10 },
+          },
         },
         escolhas: {
           ...extracaoDadosFiltradoMock.escolhas,
           "2024": {
-            escolha: 40,
-            reconvocacao: 10,
-            "nao-escolha": 20,
+            escolha: { total: 40, geral: 30, pcd: 5, nna: 5 },
+            reconvocacao: { total: 10, geral: 5, pcd: 3, nna: 2 },
+            "nao-escolha": { total: 20, geral: 10, pcd: 5, nna: 5 },
             dres: [],
           },
         },
       };
 
       // 100 - 40 - 20 - 10 = 30
-      expect(
-        mapExtracaoDadosToIndicadores(dados, ["2024"]).pendentesEscolha
-      ).toBe(30);
+      expect(mapExtracaoDadosToIndicadores(dados, ["2024"]).pendentesEscolha).toEqual({
+        total: 30,
+        geral: 25,
+        pcd: 7,
+        nna: 0,
+      });
     });
 
     it("nunca retorna pendentes negativos (clamp em 0)", () => {
       const dados = {
         ...extracaoDadosFiltradoMock,
+        pendentes: undefined,
         candidatos: {
           ...extracaoDadosFiltradoMock.candidatos,
-          "2024": { convocados: 10, "nao-convocados": 5 },
+          "2024": {
+            convocados: { total: 10, geral: 10, pcd: 0, nna: 0 },
+            "nao-convocados": { total: 5, geral: 5, pcd: 0, nna: 0 },
+          },
         },
         escolhas: {
           ...extracaoDadosFiltradoMock.escolhas,
           "2024": {
-            escolha: 40,
-            reconvocacao: 10,
-            "nao-escolha": 20,
+            escolha: { total: 40, geral: 40, pcd: 0, nna: 0 },
+            reconvocacao: { total: 10, geral: 10, pcd: 0, nna: 0 },
+            "nao-escolha": { total: 20, geral: 20, pcd: 0, nna: 0 },
             dres: [],
           },
         },
       };
 
-      expect(
-        mapExtracaoDadosToIndicadores(dados, ["2024"]).pendentesEscolha
-      ).toBe(0);
+      expect(mapExtracaoDadosToIndicadores(dados, ["2024"]).pendentesEscolha).toEqual(
+        INDICADOR_DETALHADO_VAZIO
+      );
     });
   });
 });

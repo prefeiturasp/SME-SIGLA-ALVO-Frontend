@@ -5,9 +5,7 @@ Funcionalidade: Consulta de candidatos para eliminação e reclassificação
   Quero consultar candidatos
   Para verificar informações de classificação e situação
 
-  # ============================================================
   # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
-  # ============================================================
 
   Contexto:
     Dado que estou logado no SIGLA com perfil administrador
@@ -23,9 +21,7 @@ Funcionalidade: Consulta de candidatos para eliminação e reclassificação
       | CPF      |
     E exibe os botões "Limpar" e "Filtrar" da eliminação e reclassificação
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 1 — Consulta por CPF
-  # ════════════════════════════════════════════════════════════════
   @consulta-cpf @critico
   Cenário: Consultar candidato por CPF
     Quando seleciono o concurso "Test Judicial" na eliminação e reclassificação
@@ -43,9 +39,7 @@ Funcionalidade: Consulta de candidatos para eliminação e reclassificação
       | Classificação geral |
       | Situação |
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 2 — Consulta por RF
-  # ════════════════════════════════════════════════════════════════
   @consulta-rf
   Cenário: Consultar candidato por RF
     Quando seleciono o concurso "Test Judicial" na eliminação e reclassificação
@@ -55,9 +49,7 @@ Funcionalidade: Consulta de candidatos para eliminação e reclassificação
 
     Então o sistema exibe o candidato correspondente na eliminação e reclassificação
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 3 — Consulta por Nome
-  # ════════════════════════════════════════════════════════════════
   @consulta-nome
   Cenário: Consultar candidato por nome
     Quando seleciono o concurso "Test Judicial" na eliminação e reclassificação
@@ -67,9 +59,7 @@ Funcionalidade: Consulta de candidatos para eliminação e reclassificação
 
     Então a busca por nome é executada na eliminação e reclassificação
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 4 — Limpar filtros
-  # ════════════════════════════════════════════════════════════════
   @limpar-filtros
   Cenário: Limpar filtros da consulta
     Dado que preenchi os filtros da eliminação e reclassificação
@@ -77,9 +67,7 @@ Funcionalidade: Consulta de candidatos para eliminação e reclassificação
 
     Então os filtros da eliminação e reclassificação retornam para o estado inicial
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 5 — Validar resultado da consulta
-  # ════════════════════════════════════════════════════════════════
   @resultado-consulta @critico
   Cenário: Validar informações exibidas na tabela
     Quando realizo uma consulta válida na eliminação e reclassificação
@@ -98,9 +86,7 @@ Funcionalidade: Consulta de candidatos para eliminação e reclassificação
 
     E a tabela de eliminação e reclassificação apresenta pelo menos um registro
 
-  # ════════════════════════════════════════════════════════════════
   # CENÁRIO 6 — Ação de alteração em candidato eliminado
-  # ════════════════════════════════════════════════════════════════
   @reclassificacao
   Cenário: Consultar ação de alteração para candidato eliminado
     Quando realizo uma consulta válida na eliminação e reclassificação

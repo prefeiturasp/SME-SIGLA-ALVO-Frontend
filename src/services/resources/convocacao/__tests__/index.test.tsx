@@ -70,6 +70,12 @@ describe('Convocacao Service', () => {
       expect(URL.getProcessoConvocacaoById('uuid-123')).toBe(
         '/api/v1/processos-convocacao/uuid-123/'
       );
+      expect(URL.postFinalizarProcessoConvocacao('uuid-123')).toBe(
+        '/api/v1/processos-convocacao/uuid-123/finalizar/'
+      );
+      expect(URL.postHistoricoCandidatos()).toBe(
+        '/api/v1/processos-convocacao/historico-candidatos/'
+      );
       expect(URL.getProcessosConvocacaoOptions()).toBe(
         '/api/v1/processos-convocacao/?formato=select'
       );
