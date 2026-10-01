@@ -45,7 +45,6 @@ import HistoricoEnvioEmailsTela from "../pages/Gerenciar/EnvioEmails/HistoricoEn
 import PesquisarConcursadosTela from "../pages/Processos/PesquisarConcursados/PesquisarConcursadosTela";
 import MeusDadosTela from "../pages/MeusDados/MeusDadosTela";
 import ExtracaoDadosTela from "../pages/Gerenciar/ExtracaoDados/ExtracaoDadosTela";
-import { LocusApp } from "../../modules/locus/app/App";
 
 /** Basename do React Router a partir do `base` do Vite (sem barra final). */
 function basenameDaApp(): string | undefined {
@@ -59,15 +58,6 @@ const router = createBrowserRouter(
     element: (
       <ProtectedRoute>
         <HomeTela />
-      </ProtectedRoute>
-    ),
-    errorElement: <RouteError />,
-  },
-  {
-    path: "/locus/*",
-    element: (
-      <ProtectedRoute>
-        <LocusApp />
       </ProtectedRoute>
     ),
     errorElement: <RouteError />,

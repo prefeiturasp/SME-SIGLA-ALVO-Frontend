@@ -33,7 +33,6 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
-        "@locus": path.resolve(__dirname, "./modules/locus"),
       },
     },
   };
