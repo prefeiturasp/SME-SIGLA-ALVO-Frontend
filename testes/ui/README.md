@@ -81,6 +81,7 @@ npm run cy:run:firefox
 - api_agenda_sigla.feature (15 cenários)
 - api_processos_convocacao_reduzido.feature (39 cenários)
 - api_concurso_sigla.feature (21 cenários)
+- api_sigla.feature — cobertura complementar dos microsserviços (50 cenários)
 
 ### UI
 - login.feature (3 cenários)

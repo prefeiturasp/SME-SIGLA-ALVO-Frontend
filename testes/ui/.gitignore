@@ -59,8 +59,7 @@ cypress/fixtures/**/senha*
 cypress/fixtures/**/password*
 
 # Features incompletas - nao subir
-cypress/e2e/api/api_usuario_sigla.feature
-cypress/e2e/api/api_relatorios_sigla.feature
+cypress/e2e/em-andamento/
 
 # Documentacao auxiliar - nao necessaria para rodar a automacao
 README_EXECUTIVO.md
