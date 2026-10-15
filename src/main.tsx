@@ -22,7 +22,7 @@ function ThemedApp() {
   const { token } = useToken();
 
   return (
-    <ThemeProvider theme={{ token } as never}>
+    <ThemeProvider theme={{ token }}>
       <App />
     </ThemeProvider>
   );
