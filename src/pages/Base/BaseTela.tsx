@@ -8,7 +8,7 @@ import prefSPLogo from "../../assets/logo_PrefSP_sem fundo_horizontal_fundo clar
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 import { UserAvatar } from "../../components/UserAvatar";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   GlobalMenuWidth,
   StyledLayout,
@@ -256,7 +256,9 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
       <Layout>
         <StyledSider width={106}>
           <SidebarHeader>
-            <AlvoLogo src={alvoIcon} alt="ALVO" />
+            <Link to="/" aria-label="Ir para a página inicial">
+              <AlvoLogo src={alvoIcon} alt="ALVO" />
+            </Link>
           </SidebarHeader>
           <CustomMenu>
             {menuItems.map((item) => (

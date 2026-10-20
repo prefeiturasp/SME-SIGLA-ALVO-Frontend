@@ -1,49 +1,45 @@
 import React from "react";
-import { Space, Dropdown } from "antd";
-import type { MenuProps } from "antd";
-import { UserLabel, StyledUserAvatar, UserAvatarIcon } from "@/components/ui";
+import PowerSettingsNewOutlinedIcon from "@mui/icons-material/PowerSettingsNewOutlined";
+import {
+  UsuarioCabecalho,
+  UsuarioLogadoBotao,
+  UsuarioRf,
+  UsuarioNome,
+  BotaoSairCabecalho,
+  IconeSairCabecalho,
+} from "@/components/ui";
 import { useNavigate } from "react-router-dom";
 
 export const UserAvatar: React.FC = () => {
-  const primeiroNome = localStorage.getItem("NOME_USUARIO") || "Usuário";
+  const rf =
+    localStorage.getItem("RF_USUARIO") || localStorage.getItem("USUARIO") || "";
+  const nome = localStorage.getItem("NOME_USUARIO") || "Usuário";
   const navigate = useNavigate();
 
-    const handleLogout = () => {
+  const handleLogout = () => {
     localStorage.removeItem("TOKEN");
     localStorage.removeItem("USUARIO");
+    localStorage.removeItem("RF_USUARIO");
+    localStorage.removeItem("NOME_USUARIO");
     navigate("/login");
   };
 
-  const menuItems: MenuProps["items"] = [
-    {
-      key: "meus-dados",
-      label: "Dados do usuário",
-      onClick: () => navigate("/meus-dados"),
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "sair",
-      label: "Sair",
-      danger: true,
-      onClick: handleLogout,
-    },
-  ];
-
   return (
-    <Space size="small">
-      <UserLabel>
-        Seja bem vindo(a), {primeiroNome}
-      </UserLabel>
-
-      <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
-        <StyledUserAvatar
-          size="default"
-          icon={<UserAvatarIcon />}
-          style={{ cursor: "pointer" }}
-        />
-      </Dropdown>
-    </Space>
+    <UsuarioCabecalho>
+      <UsuarioLogadoBotao
+        type="button"
+        onClick={() => navigate("/meus-dados")}
+        aria-label="Dados do usuário"
+      >
+        <UsuarioRf>RF: {rf}</UsuarioRf>
+        <UsuarioNome title={nome}>{nome}</UsuarioNome>
+      </UsuarioLogadoBotao>
+      <BotaoSairCabecalho type="button" onClick={handleLogout} aria-label="Sair">
+        <IconeSairCabecalho aria-hidden>
+          <PowerSettingsNewOutlinedIcon fontSize="inherit" />
+        </IconeSairCabecalho>
+        Sair
+      </BotaoSairCabecalho>
+    </UsuarioCabecalho>
   );
 };

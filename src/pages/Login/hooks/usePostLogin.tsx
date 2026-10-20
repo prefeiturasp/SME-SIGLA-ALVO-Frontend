@@ -12,6 +12,7 @@ export const usePostLogin = () => {
       // USUARIO deve vir do login; se não vier, usa o codigoRf
       const usuario = data.login ?? data.codigoRf;
       localStorage.setItem("USUARIO", usuario);
+      if (data.codigoRf) localStorage.setItem("RF_USUARIO", data.codigoRf);
       // Nome para exibir no header
       const nome =
         (data as any)?.usuario?.first_name ??
