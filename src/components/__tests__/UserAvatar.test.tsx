@@ -22,8 +22,7 @@ describe('UserAvatar', () => {
   });
 
   it('mostra RF e nome do usuário logado', () => {
-    localStorage.setItem('RF_USUARIO', '1234567');
-    localStorage.setItem('USUARIO', 'login-qualquer');
+    localStorage.setItem('USUARIO', '1234567');
     localStorage.setItem('NOME_USUARIO', 'Marcus Paulo de Souza Andrade');
 
     renderizar();
@@ -34,7 +33,7 @@ describe('UserAvatar', () => {
     ).toBeInTheDocument();
   });
 
-  it('usa USUARIO como RF quando RF_USUARIO não existe', () => {
+  it('mostra "Usuário" quando o nome não está salvo', () => {
     localStorage.setItem('USUARIO', '7654321');
 
     renderizar();
@@ -54,7 +53,6 @@ describe('UserAvatar', () => {
   it('limpa a sessão e volta para o login ao clicar em Sair', () => {
     localStorage.setItem('TOKEN', 'token');
     localStorage.setItem('USUARIO', '1234567');
-    localStorage.setItem('RF_USUARIO', '1234567');
     localStorage.setItem('NOME_USUARIO', 'Marcus');
 
     renderizar();
@@ -63,7 +61,6 @@ describe('UserAvatar', () => {
 
     expect(localStorage.getItem('TOKEN')).toBeNull();
     expect(localStorage.getItem('USUARIO')).toBeNull();
-    expect(localStorage.getItem('RF_USUARIO')).toBeNull();
     expect(localStorage.getItem('NOME_USUARIO')).toBeNull();
     expect(mockNavigate).toHaveBeenCalledWith('/login');
   });
