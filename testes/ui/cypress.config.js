@@ -68,6 +68,10 @@ module.exports = defineConfig({
       // cypress-plugin-api — mascara Authorization/credenciais no painel de requests
       hideCredentials: true,
 
+      // Pausa (ms) após cada passo de API no modo interativo, para acompanhar
+      // a execução no runner. Não se aplica ao cypress run nem ao Jenkins.
+      API_STEP_DELAY_MS: process.env.API_STEP_DELAY_MS || 800,
+
       // API SIGLA — Processos Convocação (sem autenticação)
       SIGLA_BASE_URL: process.env.SIGLA_BASE_URL || 'https://qa-api-sigla.sme.prefeitura.sp.gov.br',
       SIGLA_BASE_PATH: '/ms-processos-convocacao/api/v1',

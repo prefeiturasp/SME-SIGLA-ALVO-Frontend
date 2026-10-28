@@ -18,7 +18,6 @@ import {
   Button,
   Divider,
   Table,
-  Avatar,
   Space,
 } from "antd";
 import { tokens } from "../tokens";
@@ -28,7 +27,6 @@ import { CardTitleStyled } from "./EstiloTituloCard";
 import { PageTitleStyled } from "./EstiloTituloPagina";
 import { tableConfirmIcon, tableCancelIcon } from "./EstiloIcones";
 import { QuestionCircleOutlined, UserOutlined, BarChartOutlined, SettingOutlined } from "@ant-design/icons";
-import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import { AppFormItemStyled } from "@/components/ui/Form/AppFormItem";
 
 const { controlHeight, borderRadius, colors, fontFamily } = tokens;
@@ -1386,24 +1384,77 @@ export const CustomLabel = styled.span`
 `;
 
 // Estilos do UserAvatar
-export const UserLabel = styled.span`
+const fonteUsuarioCabecalho =
+  'Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+
+export const UsuarioCabecalho = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+`;
+
+export const UsuarioLogadoBotao = styled.button`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 219px;
+  padding: 4px 8px;
+  border: 1px solid #dadada;
+  border-radius: 4px;
+  background: #f5f6f8;
+  text-align: center;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+`;
+
+export const UsuarioRf = styled.span`
+  font-family: ${fonteUsuarioCabecalho};
+  font-size: 14px;
+  color: #42474a;
+  white-space: nowrap;
+`;
+
+export const UsuarioNome = styled.span`
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: ${fonteUsuarioCabecalho};
+  font-size: 14px;
+  color: #42474a;
+  white-space: nowrap;
+`;
+
+export const BotaoSairCabecalho = styled.button`
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: #929494;
+  font-family: ${fonteUsuarioCabecalho};
+  font-size: 14px;
+  line-height: 1.15;
+`;
+
+export const IconeSairCabecalho = styled.span`
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  font-family: "Open Sans", sans-serif;
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 100%;
-  letter-spacing: 0px;
-`;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #0068bc;
+  color: #ffffff;
 
-export const StyledUserAvatar = styled(Avatar)`
-  background: none !important;
-`;
-
-export const UserAvatarIcon = styled(AccountCircleRoundedIcon)`
-  font-size: 2.5rem !important;
-  color: #1c1d22 !important;
+  & svg {
+    font-size: 16px;
+  }
 `;
 
 export const GlobalMenuWidth = createGlobalStyle`
@@ -1531,6 +1582,10 @@ export const SidebarHeader = styled.div`
   padding: 1.5rem 0.5rem;
   margin: 0.25rem 0.5rem;
   background: #1c1d22;
+
+  & > a {
+    display: flex;
+  }
 `;
 
 export const AlvoLogo = styled.img`

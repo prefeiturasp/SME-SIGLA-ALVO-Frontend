@@ -156,6 +156,15 @@ describe('BaseTela Component', () => {
       expect(screen.getByText(/Sistema Alvo/)).toBeInTheDocument();
     });
 
+    it('deve levar para a Home ao clicar na logo do ALVO', () => {
+      const wrapper = createWrapper();
+      render(<BaseTela {...defaultProps} />, { wrapper });
+
+      const link = screen.getByRole('link', { name: 'Ir para a página inicial' });
+      expect(link).toHaveAttribute('href', '/');
+      expect(within(link).getByAltText('ALVO')).toBeInTheDocument();
+    });
+
     it('deve renderizar breadcrumb corretamente', () => {
       const wrapper = createWrapper();
       render(<BaseTela {...defaultProps} />, { wrapper });

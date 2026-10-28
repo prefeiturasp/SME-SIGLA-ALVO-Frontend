@@ -151,6 +151,12 @@ def coletar_jsons_mais_recentes_por_spec(arquivos_json):
         spec_file = primeiro.get('file') if primeiro else None
         if not spec_file:
             continue
+        # Spec renomeado ou excluido: o JSON antigo continua em .jsons/ e
+        # viraria um card de uma feature que nao existe mais (duplicado, no
+        # caso de renomeacao). O caminho gravado pelo reporter e relativo a
+        # raiz do projeto Cypress, de onde o script roda.
+        if not Path(spec_file.replace('\\', '/')).exists():
+            continue
         mtime = caminho.stat().st_mtime
         existente = mais_recente_por_spec.get(spec_file)
         if existente is None or mtime > existente[0]:
