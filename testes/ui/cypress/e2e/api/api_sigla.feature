@@ -24,11 +24,11 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
   # em 13/10/2026, está no comentário de cada um. Remover o @skip quando o
   # backend corrigir.
   #
-  # Entrega em duas partes. A entrega 1 (ativa) cobre o ciclo de vida do
-  # concurso. A entrega 2 (@entrega_2, com @skip, aparece como pendente no
-  # dashboard) cobre cargos, autorizações publicadas e a listagem avançada de
-  # concursos (múltiplas situações, ordenação e performance). Esses cenários já
-  # passam na QA; para liberar a entrega 2, remover "@skip @entrega_2" das tags.
+  # Entrega em duas partes. A entrega 1 cobre o ciclo de vida do concurso. A
+  # entrega 2 (@entrega_2) cobre cargos, autorizações publicadas e a listagem
+  # avançada de concursos (múltiplas situações, ordenação e performance). Ambas
+  # estão ativas; a tag @entrega_2 permite executar só esse recorte com
+  # --env tags=@entrega_2.
 
   Contexto:
     Dado que as APIs do SIGLA estão acessíveis
@@ -139,7 +139,7 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
     E todos os registros CONCURSO retornados devem ter o campo "situacao" igual a "EM_ANDAMENTO"
 
   # CENÁRIO 10 — Filtro por múltiplas situações (situacao__in)
-  @concurso_sigla @filtro @skip @entrega_2 @concursos_filtro_situacao_in
+  @concurso_sigla @filtro @entrega_2 @concursos_filtro_situacao_in
   Cenário: Filtrar concursos por múltiplas situações retorna apenas as situações pedidas
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/concursos/?situacao__in=COMPLETO,INCOMPLETO&page_size=50"
     Então o status CONCURSO deve ser 200
@@ -161,21 +161,21 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
     E a mensagem de erro CONCURSO do campo "status" deve ser "Faça uma escolha válida. XYZ não é uma das escolhas disponíveis."
 
   # CENÁRIO 13 — Ordenação crescente por nome é respeitada
-  @concurso_sigla @ordenacao @skip @entrega_2 @concursos_ordenacao_crescente
+  @concurso_sigla @ordenacao @entrega_2 @concursos_ordenacao_crescente
   Cenário: Ordenar concursos por nome crescente retorna a lista ordenada
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/concursos/?ordering=nome&page_size=50"
     Então o status CONCURSO deve ser 200
     E os registros CONCURSO devem estar ordenados por "nome" em ordem "crescente"
 
   # CENÁRIO 14 — Ordenação decrescente por nome é respeitada
-  @concurso_sigla @ordenacao @skip @entrega_2 @concursos_ordenacao_decrescente
+  @concurso_sigla @ordenacao @entrega_2 @concursos_ordenacao_decrescente
   Cenário: Ordenar concursos por nome decrescente retorna a lista ordenada
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/concursos/?ordering=-nome&page_size=50"
     Então o status CONCURSO deve ser 200
     E os registros CONCURSO devem estar ordenados por "nome" em ordem "decrescente"
 
   # CENÁRIO 15 — Listagem de concursos responde em tempo aceitável
-  @concurso_sigla @performance @skip @entrega_2 @concursos_tempo_resposta
+  @concurso_sigla @performance @entrega_2 @concursos_tempo_resposta
   Cenário: Listagem de concursos responde em menos de 5 segundos
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/concursos/"
     Então o status CONCURSO deve ser 200
@@ -371,7 +371,7 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
   # GET /ms-processos-concursos/api/v1/cargos/{uuid}/ e filtros de cargos
 
   # CENÁRIO 35 — Buscar cargo por UUID retorna o cargo correto
-  @concurso_sigla @smoke @skip @entrega_2 @cargos_buscar_uuid
+  @concurso_sigla @smoke @entrega_2 @cargos_buscar_uuid
   Cenário: Buscar cargo por UUID válido retorna o cargo correto
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/cargos/7c74d239-bdf4-4d83-a457-7cfb3920c34c/"
     Então o status CONCURSO deve ser 200
@@ -380,13 +380,13 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
     E o campo "criado_em" da resposta CONCURSO deve ser uma data válida
 
   # CENÁRIO 36 — Buscar cargo com UUID inexistente retorna 404
-  @concurso_sigla @negativo @skip @entrega_2 @cargos_buscar_uuid_inexistente
+  @concurso_sigla @negativo @entrega_2 @cargos_buscar_uuid_inexistente
   Cenário: Buscar cargo com UUID inexistente retorna 404
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/cargos/00000000-0000-0000-0000-000000000000/"
     Então o status CONCURSO deve ser 404
 
   # CENÁRIO 37 — Filtro de cargos por código retorna apenas o cargo pedido
-  @concurso_sigla @filtro @skip @entrega_2 @cargos_filtro_codigo
+  @concurso_sigla @filtro @entrega_2 @cargos_filtro_codigo
   Cenário: Filtrar cargos por código retorna apenas o cargo com esse código
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/cargos/?codigo=3360"
     Então o status CONCURSO deve ser 200
@@ -405,7 +405,7 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
   # CENÁRIO 39 — Alterar ou excluir cargo sem autenticação é bloqueado
   # Usa UUID inexistente de propósito: a permissão é checada antes da busca do
   # registro, então o 403 é garantido sem risco de alterar um cargo real.
-  @concurso_sigla @negativo @seguranca @skip @entrega_2 @cargos_escrita_sem_autenticacao
+  @concurso_sigla @negativo @seguranca @entrega_2 @cargos_escrita_sem_autenticacao
   Esquema do Cenário: <metodo> em cargo sem autenticação retorna 403
     Quando eu faço uma requisição CONCURSO de método "<metodo>" para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/cargos/00000000-0000-0000-0000-000000000000/"
     Então o status CONCURSO deve ser 403
@@ -420,7 +420,7 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
   # GET /ms-processos-concursos/api/v1/cargos/autorizacoes-publicadas/
 
   # CENÁRIO 40 — Resumo de autorizações por cargo expõe o contrato esperado
-  @concurso_sigla @contrato @skip @entrega_2 @cargos_autorizacoes_resumo
+  @concurso_sigla @contrato @entrega_2 @cargos_autorizacoes_resumo
   Cenário: Listar resumo de autorizações por cargo retorna o contrato esperado
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/cargos/autorizacoes-publicadas/"
     Então o status CONCURSO deve ser 200
@@ -437,7 +437,7 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
   # /ms-processos-concursos/api/v1/autorizacoes-publicadas/ — filtros e ciclo de vida
 
   # CENÁRIO 41 — Filtro de autorizações por cargo retorna apenas aquele cargo
-  @concurso_sigla @filtro @skip @entrega_2 @autorizacoes_filtro_cargo
+  @concurso_sigla @filtro @entrega_2 @autorizacoes_filtro_cargo
   Cenário: Filtrar autorizações por UUID do cargo retorna apenas autorizações desse cargo
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/autorizacoes-publicadas/?cargo__uuid=7c74d239-bdf4-4d83-a457-7cfb3920c34c"
     Então o status CONCURSO deve ser 200
@@ -445,21 +445,21 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
     E todos os registros CONCURSO retornados devem ter o campo "cargo" igual a "7c74d239-bdf4-4d83-a457-7cfb3920c34c"
 
   # CENÁRIO 42 — Filtro por código de cargo inexistente retorna lista vazia
-  @concurso_sigla @filtro @skip @entrega_2 @autorizacoes_filtro_cargo_inexistente
+  @concurso_sigla @filtro @entrega_2 @autorizacoes_filtro_cargo_inexistente
   Cenário: Filtrar autorizações por código de cargo inexistente retorna lista vazia
     Quando eu faço uma requisição CONCURSO GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/autorizacoes-publicadas/?cargo__codigo=999999999"
     Então o status CONCURSO deve ser 200
     E a lista de resultados CONCURSO deve estar vazia
 
   # CENÁRIO 43 — Criar autorização sem cargo retorna 400
-  @concurso_sigla @negativo @skip @entrega_2 @autorizacoes_criar_sem_cargo
+  @concurso_sigla @negativo @entrega_2 @autorizacoes_criar_sem_cargo
   Cenário: Criar autorização sem cargo retorna 400
     Quando eu crio uma autorização CONCURSO sem cargo
     Então o status CONCURSO deve ser 400
     E a mensagem de erro CONCURSO do campo "cargo" deve ser "Este campo é obrigatório."
 
   # CENÁRIO 44 — PATCH na autorização persiste a nova quantidade
-  @concurso_sigla @smoke @skip @entrega_2 @autorizacoes_patch
+  @concurso_sigla @smoke @entrega_2 @autorizacoes_patch
   Cenário: Atualizar parcialmente autorização persiste a nova quantidade
     Dado que tenho uma autorização CONCURSO de teste criada
     Quando eu atualizo parcialmente a autorização CONCURSO criada com:
@@ -470,7 +470,7 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
     E ao consultar a autorização CONCURSO criada o campo "autorizacoes" deve ser "150"
 
   # CENÁRIO 45 — PUT na autorização substitui todos os campos
-  @concurso_sigla @smoke @skip @entrega_2 @autorizacoes_put
+  @concurso_sigla @smoke @entrega_2 @autorizacoes_put
   Cenário: Atualizar autorização via PUT persiste todos os campos enviados
     Dado que tenho uma autorização CONCURSO de teste criada
     Quando eu atualizo a autorização CONCURSO criada via PUT com:
@@ -484,7 +484,7 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
     E ao consultar a autorização CONCURSO criada o campo "observacao" deve ser "Autorização atualizada via PUT"
 
   # CENÁRIO 46 — Quantidade não numérica é rejeitada
-  @concurso_sigla @negativo @skip @entrega_2 @autorizacoes_patch_quantidade_invalida
+  @concurso_sigla @negativo @entrega_2 @autorizacoes_patch_quantidade_invalida
   Cenário: Atualizar autorização com quantidade não numérica retorna 400
     Dado que tenho uma autorização CONCURSO de teste criada
     Quando eu atualizo parcialmente a autorização CONCURSO criada com:
@@ -494,7 +494,7 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
     E a mensagem de erro CONCURSO do campo "autorizacoes" deve ser "Um número inteiro válido é exigido."
 
   # CENÁRIO 47 — Data fora do formato ISO é rejeitada
-  @concurso_sigla @negativo @skip @entrega_2 @autorizacoes_patch_data_invalida
+  @concurso_sigla @negativo @entrega_2 @autorizacoes_patch_data_invalida
   Cenário: Atualizar autorização com data fora do formato ISO retorna 400
     Dado que tenho uma autorização CONCURSO de teste criada
     Quando eu atualizo parcialmente a autorização CONCURSO criada com:
@@ -514,7 +514,7 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
     Então o status CONCURSO deve ser 400
 
   # CENÁRIO 49 — Excluir autorização remove o registro
-  @concurso_sigla @smoke @skip @entrega_2 @autorizacoes_delete
+  @concurso_sigla @smoke @entrega_2 @autorizacoes_delete
   Cenário: Excluir autorização remove o registro definitivamente
     Dado que tenho uma autorização CONCURSO de teste criada
     Quando eu excluo a autorização CONCURSO criada
@@ -522,7 +522,7 @@ Funcionalidade: API SIGLA - Cobertura Complementar dos Microsserviços
     E a autorização CONCURSO criada não deve mais existir
 
   # CENÁRIO 50 — Alterar ou excluir autorização inexistente retorna 404
-  @concurso_sigla @negativo @skip @entrega_2 @autorizacoes_inexistente
+  @concurso_sigla @negativo @entrega_2 @autorizacoes_inexistente
   Esquema do Cenário: <metodo> em autorização inexistente retorna 404
     Quando eu faço uma requisição CONCURSO de método "<metodo>" para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-processos-concursos/api/v1/autorizacoes-publicadas/00000000-0000-0000-0000-000000000000/"
     Então o status CONCURSO deve ser 404
