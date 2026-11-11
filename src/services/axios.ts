@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { AxiosInstance, InternalAxiosRequestConfig } from "axios";
+import { encerrarSessao, redirecionarParaLogin } from "../utils/autenticacao";
 
 // Em runtime (Docker/Rancher) as URLs vêm de window.__ENV__ (env.js gerado pelo entrypoint); localmente de import.meta.env
 function getBaseUrl(key: string): string | undefined {
@@ -8,25 +9,14 @@ function getBaseUrl(key: string): string | undefined {
   return (import.meta.env as Record<string, string | undefined>)[key];
 }
 
-// URLs que NÃO devem ter o token no header
-const PUBLIC_URLS = [
-  '/api/v1/login/',
-  '/api/v1/esqueci-minha-senha/',
-  '/api/v1/criar-nova-senha/',
-];
-
 // Função para adicionar interceptor de autenticação
 const addAuthInterceptor = (axiosInstance: AxiosInstance) => {
   axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      const isPublicUrl = PUBLIC_URLS.some(url => config.url?.includes(url));
+      const token = localStorage.getItem("TOKEN");
 
-      if (!isPublicUrl) {
-        const token = localStorage.getItem('TOKEN');
-
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
 
       return config;
@@ -40,13 +30,12 @@ const addAuthInterceptor = (axiosInstance: AxiosInstance) => {
   axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error.response?.status === 401 || error.response?.data?.code === 'token_not_valid') {
-        localStorage.removeItem('TOKEN');
-        localStorage.removeItem('USUARIO');
-        window.location.href = '/login';
-      }
-      else if (error.response?.status === 403) {
-        window.location.href = '/403';
+      console.log("dota 2");
+      console.log(error);
+      if (error.response?.status === 401 || error.response?.data?.code === "token_not_valid") {
+        encerrarSessao(redirecionarParaLogin);
+      } else if (error.response?.status === 403) {
+        window.location.href = "/403";
       }
       return Promise.reject(error);
     }

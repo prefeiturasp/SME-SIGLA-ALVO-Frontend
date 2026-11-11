@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { redirecionarParaLogin } from "../utils/autenticacao";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -7,19 +7,18 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const isAuthenticated = Boolean(localStorage.getItem("TOKEN"));
-  const navigate = useNavigate();
-  
+
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login', { replace: true });
+      redirecionarParaLogin();
     }
-  });
+  }, [isAuthenticated]);
 
   window.addEventListener("pageshow", (event) => {
     if (event.persisted) {
       window.location.reload();
     }
-  });  
+  });
 
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+  return isAuthenticated ? <>{children}</> : null;
 }
