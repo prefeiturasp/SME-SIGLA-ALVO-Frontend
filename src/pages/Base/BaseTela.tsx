@@ -9,6 +9,7 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 import { UserAvatar } from "../../components/UserAvatar";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { encerrarSessao } from "../../utils/autenticacao";
 import {
   GlobalMenuWidth,
   StyledLayout,
@@ -235,9 +236,7 @@ const BaseTela: React.FC<INewSampleModalProps> = ({
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("TOKEN");
-    localStorage.removeItem("USUARIO");
-    navigate("/login");
+    encerrarSessao();
   };
 
   return (

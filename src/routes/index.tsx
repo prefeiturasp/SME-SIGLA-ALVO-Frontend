@@ -13,10 +13,6 @@ import HistoricoEscolhasTela from "../pages/ImportacaoDados/Escolhas/HistoricoEs
 import HistoricoHabilitadosTela from "../pages/ImportacaoDados/Habilitados/HistoricoHabilitadosTela";
 import HistoricoLotesTela from "../pages/ImportacaoDados/Lotes/HistoricoLotesTela";
 import NotFoundTela from "../pages/NotFound/NotFoundTela";
-import LoginTela from "../pages/Login/LoginTela";
-import EsqueceuSenhaTela from "../pages/Login/EsqueceuSenhaTela";
-import EsqueceuSenhaSucesso from "../pages/Login/EsqueceuSenhaSucesso";
-import NovaSenhaTela from "../pages/Login/NovaSenhaTela";
 import RouteError from "./RouteError";
 import GerenciamentoVagasTela from "../pages/GerenciamentoVagas/GerenciamentoVagasTela";
 import EscolhaCandidatosTela from "../pages/EscolhaCandidatos/EscolhaCandidatosTela";
@@ -237,26 +233,6 @@ const router = createBrowserRouter(
     ),
     errorElement: <RouteError />,
   },
-  {
-    path: "/login",
-    element: <LoginTela />,
-    errorElement: <RouteError />,
-  },
-  {
-    path: "/esqueci-minha-senha",
-    element: <EsqueceuSenhaTela />,
-    errorElement: <RouteError />,
-  },
-  {
-    path: "/esqueci-minha-senha-sucesso",
-    element: <EsqueceuSenhaSucesso />,
-    errorElement: <RouteError />,
-  },
-  {
-    path: "/criar-nova-senha/:uid/:token",
-    element: <NovaSenhaTela />,
-    errorElement: <RouteError />,
-  },  
   {
     path: "/processos/gerenciamento-vagas",
     element: (
