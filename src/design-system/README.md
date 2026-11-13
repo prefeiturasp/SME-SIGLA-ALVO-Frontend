@@ -112,7 +112,6 @@ Em tabelas legadas, use `EditActionIcon` / `ViewActionIcon` / `DeleteActionIcon`
 | `novaConvocacaoCargo` | Tela Cargo legada Nova Convocação |
 | `novaConvocacaoSelecionarCandidatos` | Modal Selecionar Candidatos |
 | `quillEditor` | Wrapper do Quill (`QuillEditorWrapper`) |
-| `login` | Fluxo de autenticação (`LoginFieldLabel`, `LoginText`, etc.) |
 | `meusDados` | Modais de perfil (`MeusDadosFieldLabel`, etc.) |
 | `parametros` | Abas de parametrização (`ParametrosButtonContainer`) |
 | `escolhaCandidatos` | Toolbar de filtros da Escolha |
@@ -201,8 +200,7 @@ import { AppTabs } from "@/components/ui";
 
 1. **Não criar** `styles.ts` em `pages/` para botões, ícones, títulos ou tabs — use `@/components/ui`.
 2. **Pontes removidas:** `Base/styles`, `ConvocacaoCandidatos/style`, `ExtracaoDados/styles`, `AdicionarUsuario/styles`, e demais arquivos listados acima.
-3. **Exceção intencional:** Login mantém estilo roxo em `layout/login.ts`.
-4. Estilos muito específicos de uma tela (~30 linhas) podem ficar em `layout/<feature>.ts`, não em `pages/`.
+3. Estilos muito específicos de uma tela (~30 linhas) podem ficar em `layout/<feature>.ts`, não em `pages/`.
 
 ### Checklist para nova tela
 

@@ -20,7 +20,6 @@ export {
   BlockFormLabel,
   ModalInfoLabel,
   ModalFieldLabel,
-  LoginFieldLabel,
   ProfileFieldLabel,
   MeusDadosFieldLabel,
 } from "../../../design-system/estilos/EstiloLabels";

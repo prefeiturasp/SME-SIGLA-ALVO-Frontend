@@ -65,7 +65,7 @@ npm run cy:open
 npm run cy:run:api
 
 # Feature específica
-npx cypress run --spec "cypress/e2e/ui/login.feature"
+npx cypress run --spec "cypress/e2e/ui/consulta_processos.feature"
 
 # Chrome
 npm run cy:run:chrome
@@ -84,8 +84,7 @@ npm run cy:run:firefox
 - api_sigla.feature — cobertura complementar dos microsserviços (50 cenários)
 
 ### UI
-- login.feature (3 cenários)
-- esqueci_senha.feature (2 cenários)
+- Features de fluxos autenticados (convocação, concursos, escolha, etc.)
 
 ## Padrões de Código
 

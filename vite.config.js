@@ -16,12 +16,17 @@ export default defineConfig(({ mode }) => {
   const basePath = process.env.VITE_BASE_PATH ?? env.VITE_BASE_PATH;
   const base = normalizarBase(basePath);
 
+  const environment = process.env.ENVIRONMENT ?? env.ENVIRONMENT ?? "";
+
   console.info(
     `[vite] base = ${base} (VITE_BASE_PATH=${basePath ?? "(nao definido)"})`,
   );
 
   return {
     base,
+    define: {
+      "import.meta.env.ENVIRONMENT": JSON.stringify(environment),
+    },
     plugins: [
       react(),
       svgr({
