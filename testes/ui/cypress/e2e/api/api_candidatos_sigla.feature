@@ -222,9 +222,12 @@ Funcionalidade: API Candidatos SIGLA
   # GET /ms-candidatos/api/v1/habilitados/ — listar candidatos habilitados
 
   # CENÁRIO 27 — Listar habilitados sem filtros retorna 200
+  # O endpoint não pagina: sem filtros devolve todos os habilitados (~6 MB),
+  # o que derrubava o renderer do Cypress. "fields=id" só reduz os campos de
+  # cada item (projeção), sem filtrar registros — a listagem continua completa.
   @smoke @habilitados_listagem
   Cenário: Listar habilitados sem filtros retorna 200
-    Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/habilitados/"
+    Quando eu faço uma requisição SIGLA GET para "https://qa-api-sigla.sme.prefeitura.sp.gov.br/ms-candidatos/api/v1/habilitados/?fields=id"
     Então o status SIGLA deve ser 200
     E a resposta SIGLA deve ser uma lista
 

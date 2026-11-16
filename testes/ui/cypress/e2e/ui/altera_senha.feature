@@ -8,7 +8,8 @@ Funcionalidade: Meus Dados — Alteração de Senha
   Contexto:
     Dado que estou logado no SIGLA com perfil administrador
 
-  # BASE URL : https://qa-sigla.sme.prefeitura.sp.gov.br
+  # BASE URL  : https://qa-sigla.sme.prefeitura.sp.gov.br/alvo
+  # LOGIN URL : https://qa-sigla.sme.prefeitura.sp.gov.br/sigla/login
   # REGRAS DA NOVA SENHA:
   # Ao menos uma letra minúscula
   # Ao menos uma letra maiúscula
@@ -23,7 +24,6 @@ Funcionalidade: Meus Dados — Alteração de Senha
   @alterar-senha @preenchimento @cancelar @critico
   Cenário: Preencher campos do modal de alteração de senha e cancelar
     Quando acesso o menu de perfil do usuário
-    E seleciono "Dados do Usuário" no menu de perfil
     Então o sistema exibe a tela "Meus Dados"
     Quando clico em "Alterar senha" nos meus dados
     Então o modal de alterar senha é exibido
@@ -38,7 +38,6 @@ Funcionalidade: Meus Dados — Alteração de Senha
   @alterar-senha @preenchimento @fechar-x @critico
   Cenário: Preencher campos com senha válida e fechar modal pelo botão X
     Quando acesso o menu de perfil do usuário
-    E seleciono "Dados do Usuário" no menu de perfil
     Então o sistema exibe a tela "Meus Dados"
     Quando clico em "Alterar senha" nos meus dados
     Então o modal de alterar senha é exibido
@@ -53,7 +52,6 @@ Funcionalidade: Meus Dados — Alteração de Senha
   @alterar-senha @critico
   Cenário: Validar modal de alteração de senha
     Quando acesso o menu de perfil do usuário
-    E seleciono "Dados do Usuário" no menu de perfil
     Então o sistema exibe a tela "Meus Dados"
     Quando clico em "Alterar senha" nos meus dados
     Então o modal de alterar senha é exibido
@@ -65,7 +63,6 @@ Funcionalidade: Meus Dados — Alteração de Senha
   @alterar-senha @cancelamento @critico
   Cenário: Cancelar alteração de senha fecha o modal
     Quando acesso o menu de perfil do usuário
-    E seleciono "Dados do Usuário" no menu de perfil
     Então o sistema exibe a tela "Meus Dados"
     Quando clico em "Alterar senha" nos meus dados
     Então o modal de alterar senha é exibido
@@ -77,7 +74,6 @@ Funcionalidade: Meus Dados — Alteração de Senha
   @meus-dados @critico
   Cenário: Validar campos exibidos na tela Meus Dados
     Quando acesso o menu de perfil do usuário
-    E seleciono "Dados do Usuário" no menu de perfil
     Então o sistema exibe a tela "Meus Dados"
     E o sistema exibe os campos do perfil do usuário:
       | Nome completo    |
@@ -109,7 +105,6 @@ Funcionalidade: Meus Dados — Alteração de Senha
       | Relatórios detalhados.         |
       | Acompanhamento em tempo real.  |
     Quando acesso o menu de perfil do usuário
-    E seleciono "Dados do Usuário" no menu de perfil
     Então o sistema exibe a tela "Meus Dados"
     E o sistema exibe os campos do perfil do usuário:
       | Nome completo    |
