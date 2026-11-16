@@ -1,0 +1,233 @@
+import React, { useState, useCallback } from "react";
+import { Typography, Row, Col } from "antd";
+import {
+  HistoryOutlined,
+  UsergroupAddOutlined,
+  UserSwitchOutlined,
+} from "@ant-design/icons";
+import BaseTela, { type TitleItem } from "../../Base/BaseTela";
+import ConvocacaoTable from "./components/ConvocacaoTable";
+import ConvocacaoFiltros from "./components/ConvocacaoFiltros";
+import FinalizarProcessoModal from "./components/FinalizarProcessoModal";
+import { useProcessosConvocacao } from "./hooks/useProcessosConvocacao";
+import { usePostFinalizarProcessoConvocacao } from "./hooks/usePostFinalizarProcessoConvocacao";
+import { useNavigate } from "react-router-dom";
+import type { IProcessoConvocacao } from "../../../services/resources/convocacao/IConvocacao";
+import { AppButton, BuscaProcessosTitle, StyledCardWithoutBorder } from "@/components/ui";
+import {
+  PageContainer,
+  ActionButton,
+  ConteudoPagina,
+  SearchTableContainer as TableContainer,
+  ButtonGroup,
+} from "@/components/ui";
+import { cardSpacing } from "@/design-system/estilos";
+import { useGetPermissions } from "../../../routes/PermissionContextGuard";
+import type { HistoricoCandidatosLocationState } from "../../HistoricoCandidatos/HistoricoCandidatosTela";
+
+const { Text } = Typography;
+
+const ConvocacaoCandidatosTela: React.FC = () => {
+  const navigate = useNavigate();
+  const [finalizandoUuid, setFinalizandoUuid] = useState<string | null>(null);
+  const [modalFinalizarOpen, setModalFinalizarOpen] = useState(false);
+  const [processoParaFinalizar, setProcessoParaFinalizar] =
+    useState<IProcessoConvocacao | null>(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+  const postFinalizar = usePostFinalizarProcessoConvocacao();
+
+  const openModalFinalizar = useCallback((record: IProcessoConvocacao) => {
+    setProcessoParaFinalizar(record);
+    setModalFinalizarOpen(true);
+  }, []);
+
+  const closeModalFinalizar = useCallback(() => {
+    setModalFinalizarOpen(false);
+    setProcessoParaFinalizar(null);
+  }, []);
+
+  const handleConfirmFinalizar = useCallback(async () => {
+    if (!processoParaFinalizar) return;
+    setFinalizandoUuid(processoParaFinalizar.uuid);
+    try {
+      await postFinalizar.mutateAsync(processoParaFinalizar.uuid);
+    } finally {
+      setFinalizandoUuid(null);
+      closeModalFinalizar();
+    }
+  }, [processoParaFinalizar, postFinalizar, closeModalFinalizar]);
+
+  const handleAbrirHistoricoCandidatos = useCallback(() => {
+    const state: HistoricoCandidatosLocationState = {
+      processos_uuids: selectedRowKeys.map(String),
+    };
+    navigate("/processos/convocacao/historico-candidatos", { state });
+  }, [navigate, selectedRowKeys]);
+
+  const breadcrumbItems = [
+    {
+      title: (
+        <Text
+          strong
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate("/")}
+        >
+          Home
+        </Text>
+      ),
+    },
+    {
+      title: (
+        <Text
+          strong
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate("/processos")}
+        >
+          Processos
+        </Text>
+      ),
+    },
+    { title: "Lista de Convocações" },
+  ] as TitleItem[];
+
+  const { can } = useGetPermissions();
+  const canAddProcessoConvocacao = can("add_processoconvocacao");
+  const canChangeProcessoConvocacao = can("change_processoconvocacao");
+  const canDeleteProcessoConvocacao = can("delete_processoconvocacao");
+  const canViewDetailsProcessoConvocacao = can("details_processoconvocacao");
+  const canFinalizeProcessoConvocacao = can("finalize_processoconvocacao");
+  const canAddImportacaoArquivoVagas = can("add_importacaoarquivovagas");
+  const canViewProcessoConvocacao = can("view_processoconvocacao");
+  const {
+    control,
+    handleSubmit,
+    formErrors,
+    concursosOptions,
+    concursosOptionsIsLoading,
+    processosConvocacaoData,
+    processosConvocacaoIsLoading,
+    listRequest,
+    onAntTableChange,
+    handleSub,
+    handleReset,
+    dayjs,
+  } = useProcessosConvocacao();
+
+  return (
+    <PageContainer>
+      <BaseTela
+        breadcrumbItems={breadcrumbItems}
+        title="Lista de Convocações"
+        buttons={
+          <ButtonGroup>
+            <ActionButton
+              size="large"
+              disabled={!canAddImportacaoArquivoVagas}
+              icon={<UserSwitchOutlined />}
+              onClick={() => navigate("/processos/gerenciamento-vagas")}
+            >
+              Gerenciamento de vagas
+            </ActionButton>
+            <AppButton
+              variant="primary"
+              size="large"
+              icon={<UsergroupAddOutlined />}
+              disabled={!concursosOptions || !canAddProcessoConvocacao}
+              onClick={() =>
+                navigate("/processos/convocacao/dados-processo/criar", {
+                  state: concursosOptions,
+                })
+              }
+            >
+              Nova convocação
+            </AppButton>
+          </ButtonGroup>
+        }
+      >
+        <ConteudoPagina>
+          <BuscaProcessosTitle>Busca processos</BuscaProcessosTitle>
+
+          <ConvocacaoFiltros
+            canViewProcessoConvocacao={canViewProcessoConvocacao}
+            control={control}
+            formErrors={formErrors}
+            concursosOptions={concursosOptions}
+            concursosOptionsIsLoading={concursosOptionsIsLoading}
+            handleSubmit={handleSubmit}
+            handleSub={handleSub as any}
+            handleReset={handleReset}
+            dayjs={dayjs}
+          />
+        </ConteudoPagina>
+
+        <Row>
+          <Col xs={24}>
+            <TableContainer>
+              <ConvocacaoTable
+                canChangeProcessoConvocacao={canChangeProcessoConvocacao}
+                canDeleteProcessoConvocacao={canDeleteProcessoConvocacao}
+                canViewDetailsProcessoConvocacao={
+                  canViewDetailsProcessoConvocacao
+                }
+                canFinalizeProcessoConvocacao={canFinalizeProcessoConvocacao}
+                onFinalizar={openModalFinalizar}
+                finalizandoUuid={finalizandoUuid}
+                selectedRowKeys={selectedRowKeys}
+                onSelectedRowKeysChange={setSelectedRowKeys}
+                loading={processosConvocacaoIsLoading}
+                data={processosConvocacaoData?.results || []}
+                pagination={{
+                  current: listRequest.pagination.page,
+                  pageSize: 10,
+                  defaultPageSize: 10,
+                  position: ["bottomLeft"],
+                  total: processosConvocacaoData?.count,
+                  showTotal: (total, range) => (
+                    <span style={{ marginLeft: 16 }}>
+                      {`Mostrando ${range?.[0] ?? 0}-${range?.[1] ?? 0} de ${total ?? 0} registro(s)`}
+                    </span>
+                  ),
+                }}
+                onChange={onAntTableChange}
+              />
+            </TableContainer>
+          </Col>
+        </Row>
+
+        {selectedRowKeys.length > 0 ? (
+          <StyledCardWithoutBorder
+            style={cardSpacing.marginTop20}
+            variant="borderless"
+          >
+            <Row align="middle" justify="space-between" gutter={[16, 16]}>
+              <Col xs={24} md={16}>
+                <Text>
+                  Acesse o histórico de convocações dos processos selecionados.
+                </Text>
+              </Col>
+              <Col xs={24} md={8} style={{ textAlign: "right" }}>
+                <ActionButton
+                  size="large"
+                  icon={<HistoryOutlined />}
+                  onClick={handleAbrirHistoricoCandidatos}
+                >
+                  Histórico de candidatos
+                </ActionButton>
+              </Col>
+            </Row>
+          </StyledCardWithoutBorder>
+        ) : null}
+
+        <FinalizarProcessoModal
+          open={modalFinalizarOpen}
+          confirmLoading={!!finalizandoUuid}
+          onCancel={closeModalFinalizar}
+          onConfirm={handleConfirmFinalizar}
+        />
+      </BaseTela>
+    </PageContainer>
+  );
+};
+
+export default ConvocacaoCandidatosTela;

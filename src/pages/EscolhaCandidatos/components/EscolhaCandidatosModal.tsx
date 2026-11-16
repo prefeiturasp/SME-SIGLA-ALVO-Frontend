@@ -1,0 +1,846 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Col, Modal, Spin, message, Form } from "antd";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { DefaultOptionType } from "antd/es/select";
+import type {
+  ISalvarEscolhaPayload,
+  SituacaoEscolha,
+  TipoVagaEscolha,
+} from "../../../services/resources/escolhas/IEscolhas";
+import type { IVagasResponse } from "../../../services/resources/convocacao/IConvocacao";
+import type { EscolhaCandidatosModalProps } from "../hooks/types";
+import { API } from "../../../services";
+import { useGetVagasPorProcessoECargo } from "../../CriarEditarConvocacao/SelecaoCargos/hooks/useGetVagasPorProcessoECargo";
+import type { IAgenda } from "../../../services/resources/agenda/IAgenda";
+import { ModalButtonContainer, modalInlineStyles } from "@/components/ui";
+import { usePatchStatusProcessoConvocacao } from "../hooks/usePatchStatusProcessoConvocacao";
+import {
+  ModalWrapper,
+  ModalHeading,
+  ModalSection,
+  ModalRadioGroup,
+  ModalFieldsRow,
+  ModalSelect,
+  ModalRadio,
+  ModalInfoCard,
+  ModalInfoItem,
+  ModalInfoLabel,
+  ModalInfoValue,
+  AppButton,
+  AppFormItem,
+} from '@/components/ui';
+
+const formatVacancyValue = (value: unknown): string => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+  if (typeof value === "string" && value.trim().length > 0) {
+    return value.trim();
+  }
+  return "0";
+};
+
+const filterOptionByLabel = (input: string, option?: DefaultOptionType) => {
+  const label = option?.label;
+
+  if (typeof label === "string") {
+    return label.toLowerCase().includes(input.toLowerCase());
+  }
+
+  if (Array.isArray(label)) {
+    return label.join(" ").toLowerCase().includes(input.toLowerCase());
+  }
+
+  if (label && typeof label === "object" && "props" in label) {
+    const children = (label as { props?: { children?: unknown } }).props?.children;
+    if (typeof children === "string") {
+      return children.toLowerCase().includes(input.toLowerCase());
+    }
+  }
+
+  if (typeof option?.value === "string") {
+    return option.value.toLowerCase().includes(input.toLowerCase());
+  }
+
+  return false;
+};
+
+const EscolhaCandidatosModal: React.FC<EscolhaCandidatosModalProps> = ({
+  visible,
+  context,
+  selectedProcesso,
+  selectedProcessoStatus,
+  selectedConcursoUuid,
+  selectedAgendaData,
+  cargoCodigoNumericoParam,
+  onClose,
+  onSuccess,
+  canViewEscolha: _canViewEscolha,
+  canAddEscolha,
+}) => {
+  const [modalSituacao, setModalSituacao] = useState<SituacaoEscolha>("escolha");
+  const [modalTipoVaga, setModalTipoVaga] = useState<TipoVagaEscolha | undefined>(
+    "precaria"
+  );
+  const [modalRetardatario, setModalRetardatario] = useState(false);
+  const [modalDre, setModalDre] = useState<string | undefined>(undefined);
+  const [modalDreCodigo, setModalDreCodigo] = useState<string | undefined>(
+    undefined
+  );
+  const [modalUnidadeEscolar, setModalUnidadeEscolar] = useState<
+    string | undefined
+  >(undefined);
+
+  const previousVisibleRef = useRef(visible);
+  const previousContextRef = useRef(context);
+  const syncPendingRef = useRef(false);
+  const processosComStatusAtualizadoRef = useRef<Set<string>>(new Set());
+
+  const initialValues = useMemo(() => {
+    if (!visible) {
+      return {
+        situacao: "escolha" as SituacaoEscolha,
+        tipoVaga: "precaria" as TipoVagaEscolha | undefined,
+        retardatario: false,
+        dre: undefined as string | undefined,
+        dreCodigo: undefined as string | undefined,
+        unidadeEscolar: undefined as string | undefined,
+      };
+    }
+
+    const situacaoFromContext = context?.situacaoCodigo;
+    const tipoVagaFromContext = context?.tipoVagaCodigo;
+
+    return {
+      situacao:
+        situacaoFromContext && situacaoFromContext !== "pendente"
+          ? situacaoFromContext
+          : ("escolha" as SituacaoEscolha),
+      tipoVaga:
+        tipoVagaFromContext === "definitiva"
+          ? ("definitiva" as TipoVagaEscolha)
+          : ("precaria" as TipoVagaEscolha),
+      retardatario: Boolean(context?.retardatario),
+      dre: context?.dreUuid,
+      dreCodigo: context?.dreCodigo,
+      unidadeEscolar: context?.vagaEscolaUuid,
+    };
+  }, [visible, context]);
+
+  const syncInitialValues = useCallback(() => {
+    if (
+      (visible !== previousVisibleRef.current ||
+        context !== previousContextRef.current) &&
+      !syncPendingRef.current
+    ) {
+      syncPendingRef.current = true;
+      previousVisibleRef.current = visible;
+      previousContextRef.current = context;
+      setModalSituacao(initialValues.situacao);
+      setModalTipoVaga(initialValues.tipoVaga);
+      setModalRetardatario(initialValues.retardatario);
+      setModalDre(initialValues.dre);
+      // Usar dreCodigo do context diretamente se disponível (modo somente leitura)
+      setModalDreCodigo(context?.dreCodigo || initialValues.dreCodigo);
+      setModalUnidadeEscolar(initialValues.unidadeEscolar);
+      Promise.resolve().then(() => {
+        syncPendingRef.current = false;
+      });
+    }
+  }, [visible, context, initialValues]);
+
+  const needsInitialSync =
+    visible !== previousVisibleRef.current ||
+    context !== previousContextRef.current;
+
+  if (needsInitialSync) {
+    requestAnimationFrame(() => {
+      syncInitialValues();
+    });
+  }
+
+  // Captura se, ao abrir, é agenda de retardatários e a situação do candidato é "não-escolha"
+  const initialNaoEscolhaRef = useRef<boolean>(false);
+  useEffect(() => {
+    if (visible) {
+      initialNaoEscolhaRef.current = Boolean(
+        selectedAgendaData?.retardatario && context?.situacaoCodigo === "nao-escolha"
+      );
+    }
+  }, [visible, selectedAgendaData?.retardatario, context?.situacaoCodigo]);
+
+  const shouldFetchVagas = useMemo(
+    () =>
+      visible &&
+      Boolean(selectedProcesso && cargoCodigoNumericoParam),
+    [visible, selectedProcesso, cargoCodigoNumericoParam]
+  );
+
+  const { vagasData, vagasIsLoading } = useGetVagasPorProcessoECargo(
+    selectedProcesso,
+    cargoCodigoNumericoParam,
+    shouldFetchVagas
+  );
+
+// Verifica se o modal está em modo somente leitura (candidato já tem escolha feita)
+  const isReadOnly = useMemo(() => {
+    const agendaEhRetardatario = selectedAgendaData?.retardatario === true;
+    const isNaoEscolha = modalSituacao === "nao-escolha";
+    // Se abriu em retardatário com "não-escolha", mantém editável mesmo após trocar a situação
+    if (agendaEhRetardatario && (initialNaoEscolhaRef.current || isNaoEscolha)) return false;
+    return context?.situacaoCodigo !== "pendente";
+  }, [context?.situacaoCodigo, selectedAgendaData?.retardatario, modalSituacao]);
+
+  const vagasDisponiveis = useMemo(() => {
+    if (!vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
+      return [];
+    }
+
+    let vagasElegiveis = [...vagasData.vagas];
+
+    // Em modo somente leitura, garante que a escola escolhida continue exibida.
+    if (isReadOnly && context?.vagaEscolaUuid) {
+      const escolaSelecionada = vagasData.vagas.find(
+        (vaga: any) => vaga.uuid === context.vagaEscolaUuid
+      );
+      if (
+        escolaSelecionada &&
+        !vagasElegiveis.some((vaga: any) => vaga.uuid === escolaSelecionada.uuid)
+      ) {
+        vagasElegiveis = [...vagasElegiveis, escolaSelecionada];
+      }
+    }
+
+    return vagasElegiveis;
+  }, [vagasData?.vagas, isReadOnly, context?.vagaEscolaUuid]);
+
+  const dreOptions = useMemo(() => {
+    const dreMap = new Map<string, { value: string; label: string; codigo: string; raw: any }>();
+
+    vagasDisponiveis.forEach((vaga: any) => {
+      const dre = vaga?.escola?.dre;
+      if (!dre?.uuid || !dre?.codigo) {
+        return;
+      }
+      dreMap.set(dre.uuid, {
+        value: dre.uuid,
+        label: dre.nome.replace(/DIRETORIA REGIONAL DE EDUCACAO\s*/gi, "").trim(),
+        codigo: dre.codigo,
+        raw: dre,
+      });
+    });
+
+    const options = Array.from(dreMap.values()).sort((a, b) =>
+      a.label.localeCompare(b.label, "pt-BR")
+    );
+
+    // Se estiver em modo somente leitura e tiver dreUuid no context mas não estiver nas opções, adicionar.
+    if (isReadOnly && context?.dreUuid && context?.dreCodigo) {
+      const exists = options.some((opt) => opt.value === context.dreUuid);
+      if (!exists) {
+        options.push({
+          value: context.dreUuid,
+          label: `DRE ${context.dreCodigo}`,
+          codigo: context.dreCodigo,
+          raw: { uuid: context.dreUuid, codigo: context.dreCodigo },
+        });
+      }
+    }
+
+    return options;
+  }, [vagasDisponiveis, isReadOnly, context?.dreUuid, context?.dreCodigo]);
+
+  // Lista de escolas filtradas por DRE já considerando o tipo de vaga selecionado.
+  const escolasPorDre = useMemo(() => {
+    if (!modalDreCodigo) {
+      return [];
+    }
+
+    return vagasDisponiveis
+      .filter((vaga: any) => vaga?.escola?.dre?.codigo === modalDreCodigo)
+      .map((vaga: any) => {
+        const vagasPrecariasRestantes = vaga.vagas_precarias_restantes ?? 0;
+        const vagasDefinitivasRestantes = vaga.vagas_definitivas_restantes ?? 0;
+
+      return {
+        value: vaga.uuid,
+        label: vaga?.escola?.nome_oficial || "",
+        vagasPrecariasRestantes,
+        vagasDefinitivasRestantes,
+        vagaData: vaga,
+      };
+    });
+  }, [vagasDisponiveis, modalDreCodigo]);
+
+  const syncedModalDre = useMemo(() => {
+    if (!visible) {
+      return modalDre;
+    }
+    if (!modalDre && context?.dreUuid) {
+      return context.dreUuid;
+    }
+    return modalDre;
+  }, [visible, modalDre, context?.dreUuid]);
+
+  const syncModalDreCallback = useCallback(() => {
+    if (syncedModalDre !== modalDre && visible) {
+      setModalDre(syncedModalDre);
+    }
+  }, [syncedModalDre, modalDre, visible]);
+
+  const needsModalDreSync = syncedModalDre !== modalDre && visible;
+  if (needsModalDreSync) {
+    requestAnimationFrame(() => {
+      syncModalDreCallback();
+    });
+  }
+
+  const calculatedDreCodigo = useMemo(() => {
+    if (!visible) {
+      return undefined;
+    }
+    // Se tiver dreCodigo no context, usar ele diretamente
+    if (context?.dreCodigo) {
+      return context.dreCodigo;
+    }
+    // Caso contrário, buscar nas opções
+    if (!modalDre) {
+      return undefined;
+    }
+    const matchedDre = dreOptions.find((option) => option.value === modalDre);
+    return matchedDre?.codigo;
+  }, [visible, modalDre, dreOptions, context?.dreCodigo]);
+
+  const syncModalDreCodigoCallback = useCallback(() => {
+    // Priorizar dreCodigo do context se disponível (modo somente leitura)
+    const targetDreCodigo = context?.dreCodigo || calculatedDreCodigo;
+    if (targetDreCodigo !== modalDreCodigo && visible && targetDreCodigo) {
+      setModalDreCodigo(targetDreCodigo);
+    }
+  }, [calculatedDreCodigo, modalDreCodigo, visible, context?.dreCodigo]);
+
+  const needsModalDreCodigoSync = (context?.dreCodigo || calculatedDreCodigo) !== modalDreCodigo && visible;
+  if (needsModalDreCodigoSync) {
+    requestAnimationFrame(() => {
+      syncModalDreCodigoCallback();
+    });
+  }
+
+
+  const vagasTotals = vagasData as
+    | (IVagasResponse & {
+        total_vagas_definitivas?: number | null;
+        total_vagas_precarias?: number | null;
+      })
+    | undefined;
+
+  // Busca a vaga selecionada para obter vagas restantes
+  const vagaSelecionada = useMemo(() => {
+    if (!modalUnidadeEscolar || !vagasData?.vagas || !Array.isArray(vagasData.vagas)) {
+      return null;
+    }
+    return vagasData.vagas.find((vaga: any) => vaga.uuid === modalUnidadeEscolar) || null;
+  }, [modalUnidadeEscolar, vagasData?.vagas]);
+
+  // Atualiza vagas no card: mostra restantes da escola selecionada ou totais gerais
+  const modalVagasDefinitivas = useMemo(() => {
+    // Se uma escola está selecionada, mostra vagas restantes dessa escola
+    if (vagaSelecionada && vagaSelecionada.vagas_definitivas_restantes !== undefined) {
+      return formatVacancyValue(vagaSelecionada.vagas_definitivas_restantes);
+    }
+    // Caso contrário, mostra totais gerais
+    return formatVacancyValue(
+      vagasTotals?.total_vagas_definitivas ?? context?.vagasDefinitivas
+    );
+  }, [vagaSelecionada, context?.vagasDefinitivas, vagasTotals?.total_vagas_definitivas]);
+
+  const modalVagasPrecarias = useMemo(() => {
+    // Se uma escola está selecionada, mostra vagas restantes dessa escola
+    if (vagaSelecionada && vagaSelecionada.vagas_precarias_restantes !== undefined) {
+      return formatVacancyValue(vagaSelecionada.vagas_precarias_restantes);
+    }
+    // Caso contrário, mostra totais gerais
+    return formatVacancyValue(
+      vagasTotals?.total_vagas_precarias ?? context?.vagasPrecarias
+    );
+  }, [vagaSelecionada, context?.vagasPrecarias, vagasTotals?.total_vagas_precarias]);
+
+  const modalVagasTotais = useMemo(
+    () =>
+      formatVacancyValue(
+        vagasTotals?.total_vagas ?? context?.vagas
+      ),
+    [context?.vagas, vagasTotals?.total_vagas]
+  );
+
+  const handleModalDreChange = useCallback(
+    (value?: string) => {
+      setModalDre(value);
+      setModalUnidadeEscolar(undefined);
+      if (!value) {
+        setModalDreCodigo(undefined);
+        return;
+      }
+      const matched = dreOptions.find((option) => option.value === value);
+      setModalDreCodigo(matched?.codigo);
+    },
+    [dreOptions]
+  );
+
+  const disponibilidadeTipoVaga = useMemo(() => {
+    if (!modalUnidadeEscolar) {
+      return {
+        temPrecaria: true,
+        temDefinitiva: true,
+      };
+    }
+
+    const escolaSelecionada = vagasDisponiveis.find(
+      (vaga: any) => vaga.uuid === modalUnidadeEscolar
+    );
+
+    return {
+      temPrecaria: (escolaSelecionada?.vagas_precarias_restantes ?? 0) > 0,
+      temDefinitiva: (escolaSelecionada?.vagas_definitivas_restantes ?? 0) > 0,
+    };
+  }, [modalUnidadeEscolar, vagasDisponiveis]);
+
+  useEffect(() => {
+    if (isReadOnly || modalSituacao !== "escolha") {
+      return;
+    }
+
+    const { temPrecaria, temDefinitiva } = disponibilidadeTipoVaga;
+    const tipoAtualInvalido =
+      !modalTipoVaga ||
+      (modalTipoVaga === "precaria" && !temPrecaria) ||
+      (modalTipoVaga === "definitiva" && !temDefinitiva);
+
+    if (!tipoAtualInvalido) {
+      return;
+    }
+
+    if (temPrecaria) {
+      setModalTipoVaga("precaria");
+      return;
+    }
+
+    if (temDefinitiva) {
+      setModalTipoVaga("definitiva");
+      return;
+    }
+
+    setModalTipoVaga(undefined);
+  }, [
+    disponibilidadeTipoVaga,
+    isReadOnly,
+    modalSituacao,
+    modalTipoVaga,
+  ]);
+
+  const queryClient = useQueryClient();
+
+  const salvarEscolhaMutation = useMutation<
+    unknown,
+    unknown,
+    ISalvarEscolhaPayload
+  >({
+    mutationFn: (payload) => API.Escolhas.postEscolha(payload).response,
+  });
+  const { mutateAsync: salvarEscolhaMutateAsync, isPending: salvarEscolhaIsPending } =
+    salvarEscolhaMutation;
+  const patchStatusProcessoMutation = usePatchStatusProcessoConvocacao();
+  const { mutateAsync: patchStatusProcessoMutateAsync } = patchStatusProcessoMutation;
+
+  const atualizarStatusProcessoAoIniciarEscolha = useCallback(async () => {
+    if (!selectedProcesso || selectedProcessoStatus !== "PENDENTE") {
+      return;
+    }
+
+    if (processosComStatusAtualizadoRef.current.has(selectedProcesso)) {
+      return;
+    }
+
+    try {
+      await patchStatusProcessoMutateAsync(selectedProcesso);
+      processosComStatusAtualizadoRef.current.add(selectedProcesso);
+    } catch {
+      message.warning(
+        "Escolha salva, mas não foi possível atualizar o status do processo para Em Andamento."
+      );
+    }
+  }, [
+    patchStatusProcessoMutateAsync,
+    selectedProcesso,
+    selectedProcessoStatus,
+  ]);
+
+  // Função para sincronizar agendas após salvar escolha
+  const sincronizarAgendas = useCallback(async (
+    candidatoUuid: string,
+    processoUuid?: string,
+    agendaAtual?: IAgenda
+  ) => {
+    if (!processoUuid || !agendaAtual) {
+      return;
+    }
+
+    try {
+      // Buscar todas as agendas do processo
+      const todasAgendas = await API.Agenda.getAgendas({
+        pagination: { page: 1, page_size: 100 },
+        filters: { processo_convocacao_uuid: processoUuid },
+      }).response;
+
+      const agendasList: IAgenda[] = Array.isArray(todasAgendas)
+        ? todasAgendas
+        : todasAgendas?.results || [];
+
+      // Filtrar apenas agendas do mesmo cargo
+      const agendasMesmoCargo = agendasList.filter(
+        (agenda) => agenda.cargo_uuid === agendaAtual.cargo_uuid
+      );
+
+      const isAgendaRetardatario = agendaAtual.retardatario === true;
+
+      if (isAgendaRetardatario) {
+        // Caso 1: Escolha feita na agenda de retardatários
+        // Encontrar a agenda normal que contém o candidato
+        const agendaNormalComCandidato = agendasMesmoCargo.find(
+          (agenda) =>
+            !agenda.retardatario &&
+            agenda.candidatos_uuids?.includes(candidatoUuid)
+        );
+
+        // Atualizar a escolha na agenda normal (se encontrada)
+        if (agendaNormalComCandidato) {
+          // A escolha já foi salva, então apenas precisamos garantir que está atualizada
+          // O backend já deve ter atualizado a escolha, mas podemos invalidar a query
+          queryClient.invalidateQueries({
+            queryKey: ["postEscolhasPorCandidatos"],
+          });
+        }
+
+        // Remover candidato da agenda de retardatários
+        const candidatosAtualizados = (agendaAtual.candidatos_uuids || []).filter(
+          (uuid) => uuid !== candidatoUuid
+        );
+
+        await API.Agenda.patchAgenda(agendaAtual.uuid, {
+          candidatos_uuids: candidatosAtualizados,
+        }).response;
+      } else {
+        // Caso 2: Escolha feita em agenda normal
+        // Encontrar e atualizar a agenda de retardatários
+        const agendaRetardatarios = agendasMesmoCargo.find(
+          (agenda) => agenda.retardatario === true
+        );
+
+        if (agendaRetardatarios && agendaRetardatarios.candidatos_uuids?.includes(candidatoUuid)) {
+          // Remover candidato da agenda de retardatários
+          const candidatosAtualizados = (agendaRetardatarios.candidatos_uuids || []).filter(
+            (uuid) => uuid !== candidatoUuid
+          );
+
+          await API.Agenda.patchAgenda(agendaRetardatarios.uuid, {
+            candidatos_uuids: candidatosAtualizados,
+          }).response;
+        }
+      }
+
+      // Invalidar queries de agendas para atualizar a UI
+      queryClient.invalidateQueries({
+        queryKey: ["getAgendasPorProcessoConvocacao"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["getAgendas"],
+      });
+    } catch (error) {
+      console.error("Erro ao sincronizar agendas:", error);
+      // Não mostrar erro ao usuário aqui, pois a escolha já foi salva
+      // Apenas logar o erro
+    }
+  }, [queryClient]);
+
+  const handleSalvarEscolha = useCallback(async () => {
+    if (!context?.candidatoUuid) {
+      message.error("Não foi possível identificar o candidato selecionado.");
+      return;
+    }
+
+    // Não permitir salvar se estiver em modo somente leitura
+    if (isReadOnly) {
+      return;
+    }
+
+    // Validação apenas quando a situação for "escolha"
+    if (modalSituacao === "escolha" && !modalUnidadeEscolar) {
+      message.warning("Selecione a unidade escolar para salvar a escolha.");
+      return;
+    }
+
+    if (
+      modalSituacao === "escolha" &&
+      (!modalTipoVaga ||
+        (modalTipoVaga === "precaria" && !disponibilidadeTipoVaga.temPrecaria) ||
+        (modalTipoVaga === "definitiva" && !disponibilidadeTipoVaga.temDefinitiva))
+    ) {
+      message.warning(
+        "A unidade escolar selecionada não possui vagas disponíveis para o tipo de vaga informado."
+      );
+      return;
+    }
+
+    // Quando não for "escolha", enviar null para os campos não visíveis
+    const payload: ISalvarEscolhaPayload = {
+      candidato_uuid: context.candidatoUuid,
+      situacao: modalSituacao,
+      vaga_escola_uuid: modalSituacao === "escolha" 
+        ? (modalUnidadeEscolar || null) 
+        : null,
+      tipo_vaga: modalSituacao === "escolha" 
+        ? (modalTipoVaga ?? null)
+        : null,
+      e_retardatario: modalSituacao === "escolha" 
+        ? modalRetardatario 
+        : false,
+      concurso_uuid: selectedConcursoUuid,
+      processo_uuid: selectedProcesso,
+    };
+
+    try {
+      await salvarEscolhaMutateAsync(payload);
+      await atualizarStatusProcessoAoIniciarEscolha();
+      message.success("Escolha salva com sucesso.");
+      onClose();
+      onSuccess();
+    } catch (error: unknown) {
+      const fallbackMessage = "Não foi possível salvar a escolha do candidato.";
+      if (
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        error.response &&
+        typeof (error as any).response === "object" &&
+        "data" in (error as any).response &&
+        (error as any).response.data &&
+        typeof (error as any).response.data === "object"
+      ) {
+        const detail =
+          (error as any).response.data.detail ??
+          (error as any).response.data.message;
+        if (typeof detail === "string" && detail.trim().length > 0) {
+          message.error(detail);
+          return;
+        }
+      }
+      if (error instanceof Error && error.message) {
+        message.error(error.message);
+        return;
+      }
+      message.error(fallbackMessage);
+    }
+  }, [
+    context?.candidatoUuid,
+    modalRetardatario,
+    modalSituacao,
+    modalTipoVaga,
+    modalUnidadeEscolar,
+    onClose,
+    onSuccess,
+    salvarEscolhaMutateAsync,
+    atualizarStatusProcessoAoIniciarEscolha,
+    selectedConcursoUuid,
+    selectedProcesso,
+    selectedAgendaData,
+    sincronizarAgendas,
+    isReadOnly,
+    disponibilidadeTipoVaga.temDefinitiva,
+    disponibilidadeTipoVaga.temPrecaria,
+  ]);
+
+  return (
+    <Modal
+      open={visible}
+      onCancel={onClose}
+      footer={
+        <ModalButtonContainer>
+          <AppButton
+            variant="secondary"
+            size="large"
+            onClick={onClose}
+          >
+            {isReadOnly ? "Fechar" : "Cancelar"}
+          </AppButton>
+          {!isReadOnly && canAddEscolha && (
+            <AppButton
+              size="large"
+              onClick={handleSalvarEscolha}
+              loading={salvarEscolhaIsPending}
+              disabled={
+                salvarEscolhaIsPending || 
+                (modalSituacao === "escolha" &&
+                  (!modalUnidadeEscolar ||
+                    (modalTipoVaga === "precaria" &&
+                      !disponibilidadeTipoVaga.temPrecaria) ||
+                    !modalTipoVaga ||
+                    (modalTipoVaga === "definitiva" &&
+                      !disponibilidadeTipoVaga.temDefinitiva)))
+              }
+            >
+              Salvar
+            </AppButton>
+          )}
+        </ModalButtonContainer>
+      }
+      width={950}
+      style={modalInlineStyles.modalMaxSize}
+      styles={{ body: { padding: "24px 32px 32px" } }}
+      title={null}
+    >
+      <ModalWrapper>
+        <ModalHeading>
+          {isReadOnly ? "Visualizar escolha de candidato" : "Efetuar escolha de candidato"}
+        </ModalHeading>
+
+        <ModalInfoCard>
+          <ModalInfoItem>
+            <ModalInfoLabel>Cargo</ModalInfoLabel>
+            <ModalInfoValue>
+              {context?.cargo ??
+                selectedAgendaData?.cargo_nome ??
+                "—"}
+            </ModalInfoValue>
+          </ModalInfoItem>
+          <ModalInfoItem>
+            <ModalInfoLabel>Candidato</ModalInfoLabel>
+            <ModalInfoValue>
+              {context?.nome ?? "—"}
+            </ModalInfoValue>
+          </ModalInfoItem>
+          <ModalInfoItem>
+            <ModalInfoLabel>Classificação</ModalInfoLabel>
+            <ModalInfoValue>
+              {context?.classificacao ?? "—"}
+            </ModalInfoValue>
+          </ModalInfoItem>
+          <ModalInfoItem>
+            <ModalInfoLabel>Vagas definitivas</ModalInfoLabel>
+            <ModalInfoValue>
+              {vagasIsLoading ? <Spin size="small" /> : modalVagasDefinitivas}
+            </ModalInfoValue>
+          </ModalInfoItem>
+          <ModalInfoItem>
+            <ModalInfoLabel>Vagas precárias</ModalInfoLabel>
+            <ModalInfoValue>
+              {vagasIsLoading ? <Spin size="small" /> : modalVagasPrecarias}
+            </ModalInfoValue>
+          </ModalInfoItem>
+          <ModalInfoItem>
+            <ModalInfoLabel>Vagas Publicadas</ModalInfoLabel>
+            <ModalInfoValue>
+              {vagasIsLoading ? <Spin size="small" /> : modalVagasTotais}
+            </ModalInfoValue>
+          </ModalInfoItem>
+        </ModalInfoCard>
+
+        <ModalSection>
+          <Form layout="vertical" disabled={isReadOnly}>
+            <AppFormItem label="Situação">
+              <ModalRadioGroup
+                value={modalSituacao}
+                onChange={(event) =>
+                  setModalSituacao(
+                    event.target.value as "escolha" | "reconvocacao" | "nao-escolha"
+                  )
+                }
+              >
+                <ModalRadio value="escolha">Escolha</ModalRadio>
+                <ModalRadio value="reconvocacao">Reconvocação</ModalRadio>
+                <ModalRadio value="nao-escolha">Não escolha</ModalRadio>
+              </ModalRadioGroup>
+            </AppFormItem>
+
+            {/* Removido: Tipo de vaga superior - manter apenas o bloco inferior */}
+          </Form>
+        </ModalSection>
+
+        {modalSituacao === "escolha" && (
+          <>
+            <ModalSection>
+              <Form layout="vertical" disabled={isReadOnly}>
+                <ModalFieldsRow gutter={[24, 16]}>
+                  <Col xs={24} md={12}>
+                    <AppFormItem label="DRE">
+                      <ModalSelect
+                        value={modalDre}
+                        placeholder="Selecione a DRE"
+                        onChange={(value) =>
+                          handleModalDreChange(value as string | undefined)
+                        }
+                        options={dreOptions}
+                        allowClear
+                        loading={vagasIsLoading}
+                        showSearch
+                        optionFilterProp="label"
+                        filterOption={filterOptionByLabel}
+                      />
+                    </AppFormItem>
+                  </Col>
+                  <Col xs={24} md={12}>
+                    <AppFormItem label="Unidade escolar">
+                      <ModalSelect
+                        value={modalUnidadeEscolar}
+                        placeholder="Selecione a unidade escolar"
+                        onChange={(value) =>
+                          setModalUnidadeEscolar(value as string | undefined)
+                        }
+                        options={escolasPorDre}
+                        allowClear
+                        showSearch
+                        optionFilterProp="label"
+                        filterOption={filterOptionByLabel}
+                      />
+                    </AppFormItem>
+                  </Col>
+                </ModalFieldsRow>
+              </Form>
+            </ModalSection>
+
+            <ModalSection>
+              <Form layout="vertical" disabled={isReadOnly}>
+                <AppFormItem label="Tipo de vaga" style={{ marginTop: "0.5rem" }}>
+                  <ModalRadioGroup
+                    value={modalTipoVaga}
+                    onChange={(event) =>
+                      setModalTipoVaga(
+                        event.target.value as "precaria" | "definitiva"
+                      )
+                    }
+                  >
+                    <ModalRadio
+                      value="definitiva"
+                      disabled={!disponibilidadeTipoVaga.temDefinitiva}
+                    >
+                      Definitiva
+                    </ModalRadio>
+                    <ModalRadio
+                      value="precaria"
+                      disabled={!disponibilidadeTipoVaga.temPrecaria}
+                    >
+                      Precária
+                    </ModalRadio>
+                  </ModalRadioGroup>
+                </AppFormItem>
+              </Form>
+            </ModalSection>
+
+          </>
+        )}
+      </ModalWrapper>
+    </Modal>
+  );
+};
+
+export default EscolhaCandidatosModal;
+

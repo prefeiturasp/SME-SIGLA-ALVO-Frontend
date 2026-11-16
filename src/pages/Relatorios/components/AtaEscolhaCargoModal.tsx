@@ -1,0 +1,90 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { Modal } from "antd";
+import { FilterSelect, AppFormItem } from "@/components/ui";
+import { API } from "../../../services";
+
+type CargoItem = { cargo_codigo: string; cargo_nome: string };
+
+type Props = {
+  open: boolean;
+  processoUuid?: string;
+  onOk: (payload: { cargoCodigo?: string }) => void;
+  onCancel: () => void;
+};
+
+const AtaEscolhaCargoModal: React.FC<Props> = ({
+  open,
+  processoUuid,
+  onOk,
+  onCancel,
+}) => {
+  const [cargos, setCargos] = useState<CargoItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedCargoCodigo, setSelectedCargoCodigo] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!open || !processoUuid) {
+      setCargos([]);
+      setSelectedCargoCodigo(undefined);
+      return;
+    }
+    setLoading(true);
+    API.Convocacao.getProcessoConvocacaoPorUUID(processoUuid)
+      .response.then((data) => {
+        const cargosProcesso = data?.cargos_processo ?? [];
+        const cargosMapeados: CargoItem[] = cargosProcesso.map((c) => ({
+          cargo_codigo: c.cargo_codigo,
+          cargo_nome: c.cargo_nome,
+        }));
+        setCargos(cargosMapeados);
+        if (cargosMapeados.length === 1) {
+          setSelectedCargoCodigo(cargosMapeados[0].cargo_codigo);
+        } else {
+          setSelectedCargoCodigo(undefined);
+        }
+      })
+      .catch(() => setCargos([]))
+      .finally(() => setLoading(false));
+  }, [open, processoUuid]);
+
+  const cargoOptions = useMemo(
+    () =>
+      cargos.map((c) => ({
+        value: c.cargo_codigo,
+        label: c.cargo_nome,
+      })),
+    [cargos]
+  );
+
+  const handleOk = () => {
+    onOk({ cargoCodigo: selectedCargoCodigo });
+  };
+
+  return (
+    <Modal
+      open={open}
+      onCancel={onCancel}
+      onOk={handleOk}
+      title="Ata de Escolha - Selecione o cargo"
+      okText="Gerar"
+      okButtonProps={{ disabled: !selectedCargoCodigo }}
+    >
+      <div style={{ padding: 16 }}>
+        <AppFormItem label="Cargo" labelCol={{ span: 24 }}>
+          <FilterSelect
+            allowClear
+            placeholder="Selecione um cargo"
+            style={{ width: "100%" }}
+            value={selectedCargoCodigo}
+            options={cargoOptions}
+            loading={loading}
+            disabled={!processoUuid}
+            onChange={(value) => setSelectedCargoCodigo(value as string | undefined)}
+          />
+        </AppFormItem>
+      </div>
+    </Modal>
+  );
+};
+
+export default AtaEscolhaCargoModal;

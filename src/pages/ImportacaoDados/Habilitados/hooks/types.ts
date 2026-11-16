@@ -1,0 +1,20 @@
+export interface IImportacaoHabilitadosFiltros {
+  concurso: string | undefined;
+  arquivo: File | null;
+  observacao?: string;
+  mandado_judicial?: boolean;
+}
+
+export interface IUltimaImportacaoHabilitados {
+  arquivo: string;
+  concurso: string;
+}
+
+export interface IImportacaoHabilitadosPayload {
+  concurso_nome: string;
+  concurso_uuid: string;
+  arquivo: File;
+  tipo: string;
+  observacao?: string;
+  mandado_judicial?: boolean;
+}

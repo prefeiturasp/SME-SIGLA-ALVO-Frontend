@@ -1,0 +1,102 @@
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { App } from "antd";
+import useListRequest from "../../../../hooks/useListRequest";
+import useConvocacao from "../../../Processos/ConvocacaoCandidatos/hooks/useConvocacao";
+// import { API } from "../../../../services";
+import usePostEnvioEmail from "./usePostEnvioEmail";
+
+export type TipoEnvio = "CONVOCACAO" | "VAGAS" | "RESULTADOS";
+
+export interface IEnvioEmailsForm {
+  processo_convocacao?: string;
+  tipo?: TipoEnvio;
+  assunto: string;
+  conteudo_gabarito: string;
+  conteudo: string;
+}
+
+const defaultValues: IEnvioEmailsForm = {
+  processo_convocacao: undefined,
+  tipo: undefined,
+  assunto: "",
+  conteudo_gabarito: "",
+  conteudo: "",
+};
+
+export const useEnvioEmails = () => {
+  const { notification } = App.useApp();
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors: formErrors },
+  } = useForm<IEnvioEmailsForm>({
+    defaultValues,
+    mode: "onChange",
+  });
+
+  const { listRequest: paramsProcessosConvocacao } = useListRequest<{}>({
+    pagination: { page: 1, page_size: 100 },
+  });
+  const { processosConvocacaoData, processosConvocacaoIsLoading } =
+    useConvocacao(paramsProcessosConvocacao);
+
+  const processosConvocacaoOptions = useMemo(() => {
+    if (!processosConvocacaoData?.results) {
+      return [];
+    }
+    return processosConvocacaoData.results.map((processo: { uuid: string; descricao: string }) => ({
+      value: processo.uuid,
+      label: processo.descricao,
+    }));
+  }, [processosConvocacaoData]);
+
+  const postEnvioEmailMutation = usePostEnvioEmail();
+
+  const handleEnviarForm = async (data: IEnvioEmailsForm) => {
+    if (!data.processo_convocacao || !data.tipo) {
+      notification.error({
+        message: "Dados incompletos",
+        description: "Selecione o processo de convocação e o tipo.",
+        placement: "top",
+        duration: 3.5,
+      });
+      return;
+    }
+
+    const processo_nome =
+      processosConvocacaoOptions.find((o) => o.value === data.processo_convocacao)?.label ?? "";
+
+    const conteudoEfetivo = (data.conteudo || "").trim()
+      ? data.conteudo
+      : data.conteudo_gabarito || "";
+
+    await postEnvioEmailMutation.mutateAsync({
+      processo_uuid: data.processo_convocacao,
+      processo_nome,
+      tipo: data.tipo,
+      conteudo: conteudoEfetivo,
+      assunto: data.assunto || "",
+    });
+    // Resetar formulário após sucesso
+    reset(defaultValues);
+  };
+
+  return {
+    control,
+    handleSubmit,
+    handleEnviarForm,
+    processosConvocacaoOptions,
+    processosConvocacaoIsLoading,
+    formErrors,
+    watch,
+    setValue,
+    enviando: postEnvioEmailMutation.isPending,
+  };
+};
+
+export default useEnvioEmails;
+

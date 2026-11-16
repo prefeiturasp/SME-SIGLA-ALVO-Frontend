@@ -1,0 +1,227 @@
+import React from "react";
+import { Alert, Col, Row, Typography } from "antd";
+
+import { useNavigate } from "react-router-dom";
+
+import BaseTela, { type TitleItem } from "../../Base/BaseTela";
+
+import { postBuscarUsuarioEol } from "../../../services/resources/usuarios";
+import type { IBuscarUsuarioEolResponse } from "../../../services/resources/usuarios";
+import { usePostCriarUsuario } from "./hooks/usePostCriarUsuario";
+
+import {
+  AppButton,
+  AppFormItem,
+  AppInput,
+  FieldLabel,
+  FilterActionSlot,
+  FilterInlineRow,
+  FilterFieldCol,
+  FilterActionsGroup,
+  PageContainer,
+  ConteudoPagina,
+} from "@/components/ui";
+
+const { Text } = Typography;
+
+const AdicionarUsuarioTela: React.FC = () => {
+  const navigate = useNavigate();
+
+  const [rf, setRf] = React.useState("");
+  const [buscando, setBuscando] = React.useState(false);
+  const [dadosUsuario, setDadosUsuario] = React.useState<IBuscarUsuarioEolResponse | null>(null);
+  const [erro, setErro] = React.useState<string | null>(null);
+  const [erroAdicao, setErroAdicao] = React.useState<string | null>(null);
+
+  const criarUsuarioMutation = usePostCriarUsuario({
+    onSuccess: () => navigate("/gerenciar/gerenciamento-usuarios"),
+  });
+
+  const breadcrumbItems = [
+    {
+      title: (
+        <Text strong style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+          Home
+        </Text>
+      ),
+    },
+    {
+      title: (
+        <Text strong style={{ cursor: "pointer" }} onClick={() => navigate("/gerenciar")}>
+          Gerenciar
+        </Text>
+      ),
+    },
+    {
+      title: (
+        <Text
+          strong
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate("/gerenciar/gerenciamento-usuarios")}
+        >
+          Gerenciamento de usuários
+        </Text>
+      ),
+    },
+    { title: "Adicionar usuário" },
+  ] as TitleItem[];
+
+  const handleBuscar = async () => {
+    const rfTrimmed = rf.trim();
+    if (!rfTrimmed) return;
+
+    setDadosUsuario(null);
+    setErro(null);
+    setErroAdicao(null);
+    setBuscando(true);
+
+    try {
+      const { response } = postBuscarUsuarioEol({ rf: rfTrimmed });
+      const data = await response;
+      setDadosUsuario(data);
+    } catch (e: any) {
+      const statusCode = e?.response?.status;
+      const detail = e?.response?.data?.detail;
+      if (statusCode === 400) {
+        setErro(detail || "Usuário já cadastrado no Sigla.");
+      } else if (statusCode === 404) {
+        setErro("Usuário não encontrado no EOL.");
+      } else {
+        setErro("Falha ao consultar o EOL. Tente novamente.");
+      }
+    } finally {
+      setBuscando(false);
+    }
+  };
+
+  const handleAdicionar = () => {
+    if (!dadosUsuario) return;
+
+    setErroAdicao(null);
+
+    criarUsuarioMutation.mutate(
+      {
+        username: dadosUsuario.username,
+        nome: dadosUsuario.nome,
+        email: dadosUsuario.email,
+      },
+      {
+        onError: (e: any) => {
+          const detail = e?.response?.data?.detail;
+          setErroAdicao(detail || "Falha ao criar o usuário. Tente novamente.");
+        },
+      }
+    );
+  };
+
+  return (
+    <PageContainer>
+      <BaseTela breadcrumbItems={breadcrumbItems} title="Adicionar usuário">
+        <ConteudoPagina>
+          <Text style={{ display: "block", marginBottom: 16 }}>
+            Preencha os campos para adicionar um novo usuário
+          </Text>
+          <FilterInlineRow gutter={[16, 0]}>
+            <FilterFieldCol xs={24} md={12}>
+              <AppFormItem
+                label={<FieldLabel>Registro funcional (RF)</FieldLabel>}
+                labelCol={{ span: 24 }}
+              >
+                <AppInput
+                  allowClear
+                  value={rf}
+                  onChange={(e) => {
+                    const onlyNumbers = e.target.value.replace(/\D/g, "");
+                    setRf(onlyNumbers);
+                    setDadosUsuario(null);
+                    setErro(null);
+                    setErroAdicao(null);
+                  }}
+                  onPressEnter={handleBuscar}
+                  placeholder="Entre com o RF"
+                />
+              </AppFormItem>
+            </FilterFieldCol>
+            <Col xs={24} flex="none">
+              <FilterActionSlot>
+                <FilterActionsGroup>
+                  <AppButton
+                    variant="secondary"
+                    size="large"
+                    onClick={handleBuscar}
+                    disabled={!rf.trim()}
+                    loading={buscando}
+                  >
+                    Buscar usuário
+                  </AppButton>
+                </FilterActionsGroup>
+              </FilterActionSlot>
+            </Col>
+          </FilterInlineRow>
+
+          {erro && (
+            <Alert
+              type="error"
+              message={erro}
+              showIcon
+              style={{ marginTop: 16 }}
+            />
+          )}
+
+          {dadosUsuario && (
+            <>
+              <Row gutter={[16, 0]} style={{ marginTop: 32 }}>
+                <Col xs={24} md={12}>
+                  <AppFormItem
+                    label={<FieldLabel>Nome</FieldLabel>}
+                    labelCol={{ span: 24 }}
+                  >
+                    <AppInput value={dadosUsuario.nome} disabled />
+                  </AppFormItem>
+                </Col>
+                <Col xs={24} md={12}>
+                  <AppFormItem
+                    label={<FieldLabel>E-mail</FieldLabel>}
+                    labelCol={{ span: 24 }}
+                  >
+                    <AppInput value={dadosUsuario.email} disabled />
+                  </AppFormItem>
+                </Col>
+              </Row>
+
+              {erroAdicao && (
+                <Alert
+                  type="error"
+                  message={erroAdicao}
+                  showIcon
+                  style={{ marginTop: 8, marginBottom: 8 }}
+                />
+              )}
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
+                <AppButton
+                  variant="secondary"
+                  size="large"
+                  onClick={() => navigate("/gerenciar/gerenciamento-usuarios")}
+                  disabled={criarUsuarioMutation.isPending}
+                >
+                  Voltar
+                </AppButton>
+                <AppButton
+                  variant="primary"
+                  size="large"
+                  onClick={handleAdicionar}
+                  loading={criarUsuarioMutation.isPending}
+                >
+                  Adicionar usuário
+                </AppButton>
+              </div>
+            </>
+          )}
+        </ConteudoPagina>
+      </BaseTela>
+    </PageContainer>
+  );
+};
+
+export default AdicionarUsuarioTela;

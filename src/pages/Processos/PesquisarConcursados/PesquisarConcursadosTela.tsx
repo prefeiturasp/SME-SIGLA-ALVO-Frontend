@@ -1,0 +1,410 @@
+import React, { useMemo, useState } from "react";
+import { Card, Typography, Input, Table, notification } from "antd";
+import { BarsOutlined } from "@ant-design/icons";
+import { Link, useNavigate } from "react-router-dom";
+import BaseTela, { type TitleItem } from "../../Base/BaseTela";
+import type { ColumnsType } from "antd/es/table";
+import { AppButton, AppIconButton, EditActionIcon, AppFormItem, FilterActionSlot, FilterInlineRow, FilterFieldCol, FilterActionCol, FilterActionsGroup } from '@/components/ui';
+import {
+  getBuscarCandidatos,
+  type CandidatoConcursoItem,
+  type ReclassificacaoItem,
+  type EliminacaoItem,
+} from "../../../services/resources/escolhas";
+import AlterarCandidatoModal from "./components/AlterarCandidatoModal";
+import HistoricoCandidatoModal from "./components/HistoricoCandidatoModal";
+
+const { Text } = Typography;
+
+/** Formata telefone para exibição: (XX) X XXXX-XXXX. Se for "—" ou vazio, retorna "—". */
+function formatarTelefoneExibicao(value: string | undefined): string {
+  if (value === "—" || !value?.trim()) return "—";
+  const d = value.replace(/\D/g, "").slice(0, 11);
+  if (d.length === 0) return "—";
+  if (d.length <= 2) return `(${d}`;
+  if (d.length <= 3) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2, 3)} ${d.slice(3)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 3)} ${d.slice(3, 7)}-${d.slice(7)}`;
+}
+
+type FiltrosForm = {
+  nome?: string;
+  rf?: string;
+  rg?: string;
+  cpf?: string;
+};
+
+export type RowConcursado = {
+  key: string;
+  concurso: string;
+  cargo: string;
+  candidato: string;
+  rf: string;
+  rg: string;
+  cpf: string;
+  telefone: string;
+  classificacaoGeral: number | string;
+  classificacaoNNA: number | string;
+  classificacaoDeficiente: number | string;
+  concursoUuid?: string;
+  concursoCandidatoUuid?: string;
+  candidatoUuid?: string;
+  codigoCargo?: string;
+  reclassificacoes?: ReclassificacaoItem[];
+  eliminacao?: EliminacaoItem | null;
+  /** Tipo de classificação atual (categoria_efetiva): GERAL, PCD, NNA — usado no histórico para exibir o novo tipo após reclassificação. */
+  categoriaEfetiva?: string | null;
+};
+
+function mapResponseToRows(data: CandidatoConcursoItem[]): RowConcursado[] {
+  const rows: RowConcursado[] = [];
+  data.forEach((item, idxItem) => {
+    const nome = item.nome ?? "—";
+    const rf = item.registro_funcional ?? "—";
+    const rg = item.rg ?? "—";
+    const cpf = item.cpf ?? "—";
+    const telefone = item.celular?.trim() || "—";
+    const concursos = item.concursos && item.concursos.length > 0 ? item.concursos : [{}];
+    concursos.forEach((cc, idxConc) => {
+      rows.push({
+        key: `${item.uuid ?? idxItem}-${cc?.concurso_candidato_uuid ?? idxConc}`,
+        concurso: cc?.concurso_nome ?? cc?.concurso_uuid ?? "—",
+        cargo: cc?.descricao_cargo ?? "—",
+        candidato: nome,
+        rf,
+        rg,
+        cpf,
+        telefone,
+        classificacaoGeral: cc?.classificacao ?? "—",
+        classificacaoNNA: cc?.classificacao_nna ?? "—",
+        classificacaoDeficiente: cc?.classificacao_pcd ?? "—",
+        concursoUuid: cc?.concurso_uuid,
+        concursoCandidatoUuid: cc?.concurso_candidato_uuid,
+        candidatoUuid: item.uuid,
+        codigoCargo: cc?.codigo_cargo,
+        reclassificacoes: cc?.reclassificacoes ?? [],
+        eliminacao:
+          cc && cc.eliminado
+            ? {
+                eliminado: true,
+                eliminado_em: cc.eliminado_em,
+                eliminado_motivo: cc.eliminado_motivo ?? "",
+                eliminado_por: cc.eliminado_por ?? "",
+              }
+            : undefined,
+        categoriaEfetiva: cc?.categoria_efetiva,
+      });
+    });
+  });
+  return rows;
+}
+
+const PesquisarConcursadosTela: React.FC = () => {
+  const navigate = useNavigate();
+
+  const [filtros, setFiltros] = useState<FiltrosForm>({
+    nome: "",
+    rf: "",
+    rg: "",
+    cpf: "",
+  });
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  const [rows, setRows] = useState<RowConcursado[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [modalAlterarOpen, setModalAlterarOpen] = useState(false);
+  const [candidatoSelecionado, setCandidatoSelecionado] = useState<RowConcursado | null>(null);
+  const [modalHistoricoOpen, setModalHistoricoOpen] = useState(false);
+  const [candidatoHistorico, setCandidatoHistorico] = useState<RowConcursado | null>(null);
+
+  const breadcrumbItems = useMemo(
+    () => [
+      {
+        title: (
+          <Text
+            strong
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          >
+            Home
+          </Text>
+        ),
+      },
+      {
+        title: (
+          <Link to="/processos/convocacao">
+            <Text strong>Processos</Text>
+          </Link>
+        ),
+      },
+      { title: "Pesquisar Concursados" },
+    ] as TitleItem[],
+    [navigate]
+  );
+
+  const temFiltro = Boolean(
+    (filtros.nome ?? "").trim() ||
+      (filtros.rf ?? "").trim() ||
+      (filtros.rg ?? "").trim() ||
+      (filtros.cpf ?? "").trim()
+  );
+
+  const handleLimpar = () => {
+    setFiltros({
+      nome: "",
+      rf: "",
+      rg: "",
+      cpf: "",
+    });
+    setPagination({ current: 1, pageSize: 10 });
+    setRows([]);
+  };
+
+  /** Busca candidatos com os filtros atuais e preenche a tabela. Reutilizada em handleFiltrar e após salvar no modal. */
+  const refetchCandidatos = async () => {
+    setLoading(true);
+    try {
+      const nome = (filtros.nome ?? "").trim();
+      const rf = (filtros.rf ?? "").trim();
+      const rg = (filtros.rg ?? "").trim();
+      const cpf = (filtros.cpf ?? "").trim();
+      const params: Record<string, string> = {};
+      if (nome) params.nome = nome;
+      if (rf) params.registro_funcional = rf;
+      if (rg) params.rg = rg;
+      if (cpf) params.cpf = cpf;
+      const { response } = getBuscarCandidatos(params);
+      const data = await response;
+      setRows(mapResponseToRows(Array.isArray(data) ? data : []));
+    } catch (err: unknown) {
+      const detail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ??
+        (err as Error)?.message ??
+        "Erro ao buscar candidatos.";
+      notification.error({
+        message: "Erro ao buscar candidatos",
+        description: String(detail),
+        placement: "top",
+        duration: 3.5,
+      });
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFiltrar = async () => {
+    if (!temFiltro) {
+      notification.warning({
+        message: "Informe pelo menos um parâmetro: nome, RF, RG ou CPF.",
+        placement: "top",
+        duration: 3.5,
+      });
+      return;
+    }
+    setPagination((prev) => ({ ...prev, current: 1 }));
+    await refetchCandidatos();
+  };
+
+  const columns: ColumnsType<RowConcursado> = useMemo(
+    () => [
+      { title: "Concurso", dataIndex: "concurso", key: "concurso" },
+      { title: "Cargo", dataIndex: "cargo", key: "cargo" },
+      { title: "Candidato", dataIndex: "candidato", key: "candidato" },
+      {
+        title: "RF",
+        dataIndex: "rf",
+        key: "rf",
+        align: "center",
+      },
+      { title: "RG", dataIndex: "rg", key: "rg", align: "center" },
+      { title: "CPF", dataIndex: "cpf", key: "cpf", align: "center" },
+      {
+        title: "Telefone",
+        dataIndex: "telefone",
+        key: "telefone",
+        align: "center",
+        render: (_: unknown, record: RowConcursado) =>
+          formatarTelefoneExibicao(record.telefone),
+      },
+      {
+        title: "Class. Geral",
+        dataIndex: "classificacaoGeral",
+        key: "classificacaoGeral",
+        align: "center",
+      },
+      {
+        title: "Class. NNA",
+        dataIndex: "classificacaoNNA",
+        key: "classificacaoNNA",
+        align: "center",
+      },
+      {
+        title: "Class Def.",
+        dataIndex: "classificacaoDeficiente",
+        key: "classificacaoDeficiente",
+        align: "center",
+      },
+      {
+        title: "Alterar",
+        key: "alterar",
+        align: "center",
+        render: (_: unknown, record: RowConcursado) => (
+          <AppIconButton
+            type="link"
+            size="small"
+            tooltip="Alterar"
+            icon={<EditActionIcon />}
+            onClick={() => {
+              setCandidatoSelecionado(record);
+              setModalAlterarOpen(true);
+            }}
+          />
+        ),
+      },
+      {
+        title: "Histórico",
+        key: "historico",
+        align: "center",
+        render: (_: unknown, record: RowConcursado) => (
+          <AppIconButton
+            type="link"
+            size="small"
+            tooltip="Histórico"
+            icon={<BarsOutlined />}
+            onClick={() => {
+              setCandidatoHistorico(record);
+              setModalHistoricoOpen(true);
+            }}
+          />
+        ),
+      },
+    ],
+    []
+  );
+
+  return (
+    <BaseTela
+      breadcrumbItems={breadcrumbItems}
+      title="Pesquisar Concursados"
+    >
+      <Card style={{ marginTop: "1.25rem" }} variant="borderless">
+        <FilterInlineRow gutter={[24, 16]} style={{ textAlign: "left" }}>
+          <FilterFieldCol xs={24} sm={12} md={6}>
+            <AppFormItem label="Nome" labelCol={{ span: 24 }}>
+              <Input
+                value={filtros.nome}
+                onChange={(e) =>
+                  setFiltros((prev) => ({ ...prev, nome: e.target.value }))
+                }
+                placeholder="Digite o nome"
+              />
+            </AppFormItem>
+          </FilterFieldCol>
+          <FilterFieldCol xs={24} sm={12} md={6}>
+            <AppFormItem label="RF" labelCol={{ span: 24 }}>
+              <Input
+                value={filtros.rf}
+                onChange={(e) =>
+                  setFiltros((prev) => ({ ...prev, rf: e.target.value }))
+                }
+                placeholder="Digite o RF"
+              />
+            </AppFormItem>
+          </FilterFieldCol>
+
+          <FilterFieldCol xs={24} sm={12} md={6}>
+            <AppFormItem label="RG" labelCol={{ span: 24 }}>
+              <Input
+                value={filtros.rg}
+                onChange={(e) =>
+                  setFiltros((prev) => ({ ...prev, rg: e.target.value }))
+                }
+                placeholder="Digite o RG"
+              />
+            </AppFormItem>
+          </FilterFieldCol>
+          <FilterFieldCol xs={24} sm={12} md={6}>
+            <AppFormItem label="CPF" labelCol={{ span: 24 }}>
+              <Input
+                value={filtros.cpf}
+                onChange={(e) =>
+                  setFiltros((prev) => ({ ...prev, cpf: e.target.value }))
+                }
+                placeholder="Digite o CPF"
+              />
+            </AppFormItem>
+          </FilterFieldCol>
+
+          <FilterActionCol xs={24} md={4}>
+            <FilterActionSlot>
+              <FilterActionsGroup>
+                <AppButton variant="secondary" onClick={handleLimpar}>Limpar</AppButton>
+                <AppButton variant="primary" onClick={handleFiltrar} disabled={!temFiltro}>
+                  Filtrar
+                </AppButton>
+              </FilterActionsGroup>
+            </FilterActionSlot>
+          </FilterActionCol>
+        </FilterInlineRow>
+      </Card>
+
+      <Card style={{ marginTop: "1.25rem" }} variant="borderless">
+        <Table
+          columns={columns}
+          dataSource={rows}
+          loading={loading}
+          locale={{ emptyText: "Nenhum candidato encontrado" }}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            onChange: (page, pageSize) =>
+              setPagination({ current: page, pageSize: pageSize ?? 10 }),
+            showSizeChanger: true,
+            showTotal: (total, range) => (
+              <span style={{ marginLeft: 16 }}>
+                {`Mostrando ${range?.[0] ?? 0}-${range?.[1] ?? 0} de ${total ?? 0} registro(s)`}
+              </span>
+            ),
+          }}
+          rowKey="key"
+        />
+      </Card>
+
+      <AlterarCandidatoModal
+        open={modalAlterarOpen}
+        candidatoUuid={candidatoSelecionado?.candidatoUuid}
+        concurso={candidatoSelecionado?.concurso}
+        cargo={candidatoSelecionado?.cargo}
+        nomeCandidato={candidatoSelecionado?.candidato}
+        onClose={() => {
+          setModalAlterarOpen(false);
+          setCandidatoSelecionado(null);
+        }}
+        onSave={() => {
+          setModalAlterarOpen(false);
+          setCandidatoSelecionado(null);
+          if (temFiltro) refetchCandidatos();
+        }}
+      />
+
+      <HistoricoCandidatoModal
+        open={modalHistoricoOpen}
+        nomeCandidato={candidatoHistorico?.candidato}
+        concurso={candidatoHistorico?.concurso}
+        cargo={candidatoHistorico?.cargo}
+        reclassificacoes={candidatoHistorico?.reclassificacoes}
+        eliminacao={candidatoHistorico?.eliminacao}
+        categoriaEfetiva={candidatoHistorico?.categoriaEfetiva}
+        concursoCandidatoUuid={candidatoHistorico?.concursoCandidatoUuid}
+        concursoUuid={candidatoHistorico?.concursoUuid}
+        codigoCargo={candidatoHistorico?.codigoCargo}
+        onClose={() => {
+          setModalHistoricoOpen(false);
+          setCandidatoHistorico(null);
+        }}
+      />
+    </BaseTela>
+  );
+};
+
+export default PesquisarConcursadosTela;

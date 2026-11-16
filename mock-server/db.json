@@ -1,0 +1,27 @@
+{
+    "agendas": [
+      {
+        "uuid": "1",
+        "qtd_candidatos": 2,
+        "classificacao": "1a até 2a",
+        "data_escolha": "07/10/2025",
+        "sessao": "2",
+        "horario": "03:00 às 21:00",
+        "cargo_nome": "Cargo abc",
+        "cargo_uuid": "uuid",
+        "processo_uuid": "1941651f-106d-4935-a57f-3666be255fff"
+      },
+      {
+        "uuid": "2",
+        "qtd_candidatos": 1,
+        "classificacao": "9a",
+        "data_escolha": "07/10/2025",
+        "sessao": "4",
+        "horario": "03:00 às 21:00",
+        "cargo_nome": "Cargo abc",
+        "cargo_uuid": "uuid",
+        "processo_uuid": "1941651f-106d-4935-a57f-3666be255fff"
+      }
+    ]
+  }
+  

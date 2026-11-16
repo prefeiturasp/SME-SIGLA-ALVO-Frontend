@@ -1,0 +1,247 @@
+import React, { useMemo, useState } from "react";
+import { Select, Tooltip } from "antd";
+import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
+import {
+  AppButton,
+  AppFormItem,
+  StyledSelect,
+  TextTitulo,
+  TextTituloSecundario,
+  FilterActionSlot,
+  FilterActionsGroup,
+  FilterInlineRow,
+  FilterFieldCol,
+  FilterActionCol,
+  RelatoriosDetalhadosFilter,
+  RelatoriosDetalhadosTable,
+  TableCard,
+} from '@/components/ui';
+import type {
+  RelatorioDetalhadoDetalheAno,
+  RelatorioDetalhadoItem,
+} from "../utils/mapRelatoriosDetalhados";
+import { montarSubtituloRelatoriosDetalhados } from "../utils/mapRelatoriosDetalhados";
+
+type RelatoriosDetalhadosProps = {
+  data: RelatorioDetalhadoItem[];
+  anos?: string[];
+  mostrarFiltros?: boolean;
+};
+
+const TODOS_CARGOS = "todos";
+const TODAS_DRES = "todas";
+
+const formatNumber = (value: number) => value.toLocaleString("pt-BR");
+
+const renderValorComDetalheAnos = (
+  value: number,
+  detalhePorAno: RelatorioDetalhadoItem["detalhePorAno"],
+  campo: keyof RelatorioDetalhadoDetalheAno
+) => {
+  if (!detalhePorAno || !Object.keys(detalhePorAno).length) {
+    return formatNumber(value);
+  }
+
+  const tooltip = Object.entries(detalhePorAno)
+    .sort(([anoA], [anoB]) => anoA.localeCompare(anoB))
+    .map(([ano, detalhe]) => `${ano}: ${formatNumber(detalhe[campo])}`)
+    .join(" | ");
+
+  return (
+    <Tooltip title={tooltip}>
+      <span>{formatNumber(value)}</span>
+    </Tooltip>
+  );
+};
+
+const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
+  data,
+  anos,
+  mostrarFiltros = true,
+}) => {
+  const [cargo, setCargo] = useState<string>(TODOS_CARGOS);
+  const [dre, setDre] = useState<string>(TODAS_DRES);
+  const [cargoAplicado, setCargoAplicado] = useState<string>(TODOS_CARGOS);
+  const [dreAplicado, setDreAplicado] = useState<string>(TODAS_DRES);
+  const [paginaAtual, setPaginaAtual] = useState(1);
+
+  const subtitulo = useMemo(() => montarSubtituloRelatoriosDetalhados(anos), [anos]);
+
+  const cargoOptions = useMemo(() => {
+    const cargos = new Map<string, string>();
+
+    data.forEach((item) => {
+      const value = item.codigoCargo ? String(item.codigoCargo) : item.cargo;
+      cargos.set(value, item.cargo);
+    });
+
+    return [
+      { value: TODOS_CARGOS, label: "Todos" },
+      ...Array.from(cargos.entries()).map(([value, label]) => ({ value, label })),
+    ];
+  }, [data]);
+
+  const dreOptions = useMemo(() => {
+    const dres = new Map<string, string>();
+
+    data.forEach((item) => {
+      dres.set(item.dreOriginal, item.dre);
+    });
+
+    return [
+      { value: TODAS_DRES, label: "Todas" },
+      ...Array.from(dres.entries()).map(([value, label]) => ({ value, label })),
+    ];
+  }, [data]);
+
+  const dadosFiltrados = useMemo(() => {
+    return data.filter((item) => {
+      const cargoMatch =
+        cargoAplicado === TODOS_CARGOS ||
+        (item.codigoCargo ? String(item.codigoCargo) : item.cargo) === cargoAplicado;
+      const dreMatch = dreAplicado === TODAS_DRES || item.dreOriginal === dreAplicado;
+
+      return cargoMatch && dreMatch;
+    });
+  }, [cargoAplicado, data, dreAplicado]);
+
+  const columns = useMemo<ColumnsType<RelatorioDetalhadoItem>>(
+    () => [
+      {
+        title: "Concurso",
+        dataIndex: "concurso",
+        key: "concurso",
+        ellipsis: true,
+        render: (value: string) => <strong>{value}</strong>,
+      },
+      {
+        title: "Cargo",
+        dataIndex: "cargo",
+        key: "cargo",
+        ellipsis: true,
+      },
+      {
+        title: "DRE",
+        dataIndex: "dre",
+        key: "dre",
+        ellipsis: true,
+      },
+      {
+        title: "Escolhas",
+        dataIndex: "escolhas",
+        key: "escolhas",
+        width: 110,
+        align: "center",
+        onCell: () => ({ className: "col-numerica-valor" }),
+        render: (value: number, record) =>
+          renderValorComDetalheAnos(value, record.detalhePorAno, "escolhas"),
+      },
+    ],
+    []
+  );
+
+  const dadosPaginados = useMemo(() => {
+    const inicio = (paginaAtual - 1) * 10;
+    return dadosFiltrados.slice(inicio, inicio + 10);
+  }, [dadosFiltrados, paginaAtual]);
+
+  const pagination = useMemo<TablePaginationConfig>(
+    () => ({
+      current: paginaAtual,
+      pageSize: 10,
+      total: dadosFiltrados.length,
+      showSizeChanger: false,
+      showTotal: (total, range) =>
+        `Mostrando ${range[0]}-${range[1]} de ${total} registro(s)`,
+      onChange: (page) => setPaginaAtual(page),
+    }),
+    [dadosFiltrados.length, paginaAtual]
+  );
+
+  const handleLimparFiltros = () => {
+    setCargo(TODOS_CARGOS);
+    setDre(TODAS_DRES);
+    setCargoAplicado(TODOS_CARGOS);
+    setDreAplicado(TODAS_DRES);
+    setPaginaAtual(1);
+  };
+
+  const handleFiltrar = () => {
+    setCargoAplicado(cargo);
+    setDreAplicado(dre);
+    setPaginaAtual(1);
+  };
+
+  return (
+    <TableCard>
+      <TextTitulo style={{ fontSize: 20, marginLeft: 16, display: "block" }}>
+        Relatórios detalhados
+      </TextTitulo>
+      <TextTituloSecundario style={{ fontSize: 14, marginTop: 8, marginLeft: 16, display: "block" }}>
+        {subtitulo}
+      </TextTituloSecundario>
+
+      {mostrarFiltros && (
+        <>
+          <RelatoriosDetalhadosFilter>
+            <FilterInlineRow gutter={[24, 16]}>
+              <FilterFieldCol xs={24} md={12}>
+                <AppFormItem label="Cargo" labelCol={{ span: 24 }}>
+                  <StyledSelect
+                    value={cargo}
+                    onChange={(value) => setCargo(value as string)}
+                    suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
+                  >
+                    {cargoOptions.map((option) => (
+                      <Select.Option key={option.value} value={option.value}>
+                        {option.label}
+                      </Select.Option>
+                    ))}
+                  </StyledSelect>
+                </AppFormItem>
+              </FilterFieldCol>
+              <FilterFieldCol xs={24} md={12}>
+                <AppFormItem label="DRE" labelCol={{ span: 24 }}>
+                  <StyledSelect
+                    value={dre}
+                    onChange={(value) => setDre(value as string)}
+                    suffixIcon={<ExpandMoreIcon style={{ fontSize: "1.5rem", color: "#032B68" }} />}
+                  >
+                    {dreOptions.map((option) => (
+                      <Select.Option key={option.value} value={option.value}>
+                        {option.label}
+                      </Select.Option>
+                    ))}
+                  </StyledSelect>
+                </AppFormItem>
+              </FilterFieldCol>
+              <FilterActionCol xs={24} md={4}>
+                <FilterActionSlot>
+                  <FilterActionsGroup>
+                    <AppButton variant="secondary" size="large" onClick={handleLimparFiltros}>
+                      Limpar filtros
+                    </AppButton>
+                    <AppButton variant="primary" size="large" onClick={handleFiltrar}>
+                      Filtrar
+                    </AppButton>
+                  </FilterActionsGroup>
+                </FilterActionSlot>
+              </FilterActionCol>
+            </FilterInlineRow>
+          </RelatoriosDetalhadosFilter>
+        </>
+      )}
+
+      <RelatoriosDetalhadosTable
+        columns={columns}
+        dataSource={mostrarFiltros ? dadosPaginados : dadosFiltrados}
+        pagination={mostrarFiltros ? pagination : false}
+        locale={{ emptyText: "Nenhum dado encontrado" }}
+      />
+    </TableCard>
+  );
+};
+
+export default RelatoriosDetalhados;

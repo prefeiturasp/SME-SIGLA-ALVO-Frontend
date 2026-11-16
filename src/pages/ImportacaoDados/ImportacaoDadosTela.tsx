@@ -1,0 +1,150 @@
+import React, { useState } from "react";
+import { Typography } from "antd";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import BaseTela, { type TitleItem } from "../Base/BaseTela";
+
+import { CloudDownloadOutlined } from "@ant-design/icons";
+import { ButtonGroup } from "@/components/ui";
+import { useLayoutDownload } from "../../hooks/useLayoutDownload";
+import HabilitadosFormTab from "./Habilitados/HabilitadosFormTab";
+import VagasFormTab from "./Vagas/VagasFormTab";
+import EscolhasFormTab from "./Escolhas/EscolhasFormTab";
+import LotesFormTab from "./Lotes/LotesFormTab";
+import { useGetPermissions } from "../../routes/PermissionContextGuard";
+
+import { StyledTabs, AppButton, ViewActionIcon } from '@/components/ui';
+const { Text } = Typography;
+
+const breadcrumbItems = [
+  {
+    title: (
+      <Link to="/">
+        <Text strong>Home</Text>
+      </Link>
+    ),
+  },
+  {
+    title: (
+      <Link to="/processos">
+        <Text strong>Processos</Text>
+      </Link>
+    ),
+  },
+  { title: "Importação de dados" },
+] as TitleItem[];
+
+const ImportacaoDadosTela: React.FC = () => {
+  const { can } = useGetPermissions();
+
+  //controla as permissões do topo da tela
+  const canViewLayoutArquivoImportacao = can("view_layoutarquivoimportacao");
+  const canBaixarLayoutArquivoImportacao = can("baixar_layoutarquivoimportacao");
+
+  //controla as permissões das abas Vagas
+  const canAddImportacaoArquivoVagas = can("add_importacaoarquivovagas");
+  const canViewHistoricoVagas = can("view_importacaoarquivovagas");
+
+  //controla as permissões das abas Habilitados
+  const canAddImportacaoArquivoHabilitados = can("add_importacaoarquivohabilitado");
+  const canViewHistoricoHabilitados = can("view_importacaoarquivohabilitado");
+
+  //controla as permissões das abas Escolhas
+  const canAddImportacaoArquivoEscolhas = can("add_importacaoescolhas");
+  const canViewHistoricoEscolhas = can("view_importacaoescolhas");
+
+  const location = useLocation();
+  const tipo = location.state?.tipo;
+  const [activeTab, setActiveTab] = useState<string>(tipo || "VAGAS");
+
+  const navigate = useNavigate();
+
+  const handleShowLayoutPadrao = (tipo: string) => {
+    navigate(`/processos/importacao-dados/layout-padrao-${tipo}`);
+  };
+
+  const tabItems = [
+    
+    {
+      key: "VAGAS",
+      label: "Vagas Escolas",
+      children: (
+        <VagasFormTab
+          onShowLayoutPadrao={() => handleShowLayoutPadrao("VAGAS")}
+          canViewHistoricoVagas={canViewHistoricoVagas}
+          canImportarVagas={canAddImportacaoArquivoVagas}
+        />
+      ),
+    },
+    {
+      key: "HABILITADOS",
+      label: "Habilitados",
+      children: (
+        <HabilitadosFormTab
+          onShowLayoutPadrao={() => handleShowLayoutPadrao("HABILITADOS")}
+          canViewHistoricoHabilitados={canViewHistoricoHabilitados}
+          canImportarHabilitados={canAddImportacaoArquivoHabilitados}
+        />
+      ),
+    },
+    {
+      key: "ESCOLHAS",
+      label: "Escolhas",
+      children: (
+        <EscolhasFormTab
+          onShowLayoutPadrao={() => handleShowLayoutPadrao("ESCOLHAS")}
+          canViewHistoricoEscolhas={canViewHistoricoEscolhas}
+          canImportarEscolhas={canAddImportacaoArquivoEscolhas}
+        />
+      ),
+    },
+    {
+      key: "LOTES",
+      label: "Lotes SIGPEC",
+      children: <LotesFormTab />,
+    },
+  ];
+
+  const { handleBaixarArquivo } = useLayoutDownload();
+
+  return (
+    <BaseTela
+      breadcrumbItems={breadcrumbItems}
+      title="Importação de dados"
+      buttons={
+        activeTab !== "ESCOLHAS" && activeTab !== "LOTES" ? (
+          <ButtonGroup>
+            <AppButton
+              variant="secondary"
+              disabled={!canViewLayoutArquivoImportacao}
+              size="large"
+              onClick={() => handleShowLayoutPadrao(activeTab)}
+              icon={<ViewActionIcon style={{ fontSize: 22 }} />}
+            >
+              Ver layout Padrão
+            </AppButton>
+
+            <AppButton
+              variant="secondary"
+              size="large"
+              onClick={() => handleBaixarArquivo(activeTab)}
+              disabled={!canBaixarLayoutArquivoImportacao}
+              icon={<CloudDownloadOutlined style={{ fontSize: 22 }} />}
+            >
+              Baixar layout Padrão
+            </AppButton>
+          </ButtonGroup>
+        ) : undefined
+      }
+    >
+      <>
+        <StyledTabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          items={tabItems}
+        />
+      </>
+    </BaseTela>
+  );
+};
+
+export default ImportacaoDadosTela;

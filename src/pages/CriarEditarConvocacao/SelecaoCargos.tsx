@@ -1,0 +1,129 @@
+import React, { useState } from "react";
+import {
+  Card,
+  Steps,
+  theme,
+  Typography,
+} from "antd";
+import BaseTela, { type TitleItem } from "../Base/BaseTela";
+import { useNavigate } from "react-router-dom";
+
+import { AppButton, StyledCardWithoutBorder } from '@/components/ui';
+import {
+  UserSwitchOutlined,
+} from "@ant-design/icons";
+import { StepActions } from "./components/StepActions";
+import { items, steps } from "./components/StepsNames";
+import { useNovaConvocacaoCandidatos } from "../Processos/NovaConvocacaoCandidatos/hooks/useNovaConvocacaoCandidatos";
+
+const { Text } = Typography;
+
+const SelecaoCargos: React.FC = () => {
+  const { token } = theme.useToken();
+
+  const navigate = useNavigate();
+  
+  const {    
+    isEdit,    
+    editData,
+    uuid,
+    } = useNovaConvocacaoCandidatos();  
+  const breadcrumbItems = [
+    {
+      title: (
+        <Text
+          strong
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate("/")}
+        >
+          Home
+        </Text>
+      ),
+    },
+    {
+      title: (
+        <Text
+          strong
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate("/processos")}
+        >
+          Processos
+        </Text>
+      ),
+    },
+    {
+      title: (
+        <Text
+          strong
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate("/processos/convocacao")}
+        >
+          Convocação de candidatos
+        </Text>
+      ),
+    },
+    {
+      title: isEdit ? "Editar Convocação" : "Nova Convocação",
+    },
+  ] as TitleItem[];
+
+  //ESCOLHE O STEP DEPENDENDO DO QUE JÁ FOI PREENCHIDO EM   EditData
+
+  const current=1;
+  const next = () => {
+    navigate(`/processos/convocacao/editar/${uuid}/agenda`)
+    
+  };
+
+  const prev = () => {
+    navigate(`/processos/convocacao/editar/${uuid}/dados-processo`, {state:{editData: editData, isViewMode: false}});
+  };
+
+  
+
+  
+
+  const contentStyle: React.CSSProperties = {
+    lineHeight: "300px",
+    textAlign: "center",
+
+    borderRadius: token.borderRadiusLG,
+
+    marginTop: 20,
+  };
+
+  // editData
+  return (
+    <>
+      <BaseTela
+        breadcrumbItems={breadcrumbItems}
+        title="Nova convocação"
+        buttons={
+          <AppButton variant="secondary" icon={<UserSwitchOutlined />}>Gerenciamento de vagas</AppButton>
+        }
+      >
+        <StyledCardWithoutBorder title={<Text style={{ fontWeight: '400', color: token.colorTextSecondary }}>Processo de convocação de candidatos</Text>} variant="borderless">
+          <Steps current={current} items={items} />
+        </StyledCardWithoutBorder>
+
+        <StyledCardWithoutBorder
+          style={{ marginTop: "1.25rem" }}
+          title={steps[current].title}
+          variant="borderless"
+        >
+          <div style={contentStyle}>{"escreva seu componente aqui"}</div>
+
+          <StepActions
+            current={current}
+            steps={steps}
+            next={next}
+            prev={prev}
+            onCancel={() => console.log("cancelado!")}
+          />
+        </StyledCardWithoutBorder>
+      </BaseTela>
+    </>
+  );
+};
+
+export default SelecaoCargos;

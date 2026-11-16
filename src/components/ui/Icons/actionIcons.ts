@@ -1,0 +1,17 @@
+export {
+  editIcon,
+  editIconEnabled,
+  viewIcon,
+  deleteIcon,
+  deleteIconEnabled,
+  settingsIcon,
+  getEditIconStyle,
+  getDeleteIconStyle,
+  tableConfirmIcon,
+  tableCancelIcon,
+  tableDeleteIconAction,
+  editableTableStyles,
+  brandHighlightText,
+  brandSecondaryText,
+  iconPrimary,
+} from "../../../design-system/estilos/EstiloIcones";

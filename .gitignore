@@ -1,0 +1,11 @@
+/node_modules
+mock-server/node_modules
+mock-server/package-lock.json
+
+package-lock.json
+.env
+.env.dev
+.env.homolog
+.env.prod
+/coverage
+/dist

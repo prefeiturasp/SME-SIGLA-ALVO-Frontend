@@ -1,0 +1,23 @@
+import { useQuery } from "@tanstack/react-query";
+import { API } from "../../../../services";
+import type { IListRequest } from "../../../../types/IListRequest";
+
+const useImportacoesArquivosHabilitados = (listRequest: IListRequest) => {
+  // Query para buscar importações com parâmetros
+  const { data: importacoesArquivos, isLoading: importacoesArquivosIsLoading } = useQuery({
+    queryKey: ["getImportacaoArquivosHabilitados"],
+    queryFn: ({ signal }) =>
+      API.ImportacaoDados.getImportacaoArquivosHabilitados(         
+         { signal }
+      ).response,
+    staleTime: 0,
+    retry: 0,
+  });
+
+  return {
+    importacoesArquivos,
+    importacoesArquivosIsLoading,
+  };    
+};
+
+export default useImportacoesArquivosHabilitados;
