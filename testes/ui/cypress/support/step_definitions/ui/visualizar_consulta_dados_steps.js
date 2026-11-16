@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { obterBaseUrl } from './common_steps'
 
 const consultaSelectors = {
   dashboardUrl: '/',
@@ -100,7 +101,8 @@ const consultaSelectors = {
   botaoVoltar: () => cy.contains('button', /Voltar/i, { timeout: 5000 })
 }
 
-const obterBaseUrlUI = () => Cypress.env('SIGLA_UI_BASE_URL') || 'https://hom-sigla.sme.prefeitura.sp.gov.br'
+// Base do ALVO (/alvo), com o mesmo fallback do common_steps
+const obterBaseUrlUI = () => obterBaseUrl()
 
 Given('que estou no dashboard', () => {
   cy.url({ timeout: 10000 }).then((url) => {
@@ -113,7 +115,7 @@ Given('que estou no dashboard', () => {
 })
 
 When('navego até a opção {string}', (opcao) => {
-  const baseUrl = Cypress.env('SIGLA_UI_BASE_URL') || 'https://qa-sigla.sme.prefeitura.sp.gov.br'
+  const baseUrl = obterBaseUrl()
   cy.wait(1000)
   // Verifica se já está em sub-rota de processos; se sim, volta ao dashboard para
   // evitar que o clique no menu colapse o submenu em vez de expandi-lo
