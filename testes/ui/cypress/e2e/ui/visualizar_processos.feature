@@ -6,11 +6,10 @@ Funcionalidade: Visualizar Consulta de Convocação de Candidatos
   Para visualizar informações dos processos de convocação
 
   Contexto:
-    Dado que estou na página de login do SIGLA
-    Quando eu insiro credenciais válidas
-    E clico no botão de acessar
-    Então devo ser redirecionado para o dashboard
-    E devo visualizar a página principal do sistema
+    Dado que estou logado no ALVO pelo portal SIGLA
+
+  # LOGIN URL  : https://qa-sigla.sme.prefeitura.sp.gov.br/sigla/login
+  # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br/alvo
 
   # CENÁRIO 1 — Visualizar resumo do processo de convocação
   @consulta-sucesso @visualizar

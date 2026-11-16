@@ -1,15 +1,20 @@
 /// <reference types="cypress" />
 
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { realizarLoginPortalAlvo } from './common_steps'
 
 // =====================================================
 // SELECTORES — CONVOCAÇÃO DE CANDIDATOS
 // =====================================================
 
+// Base do ALVO (/alvo); a raiz do domínio agora redireciona para o portal /sigla
+const obterBaseUrlAlvo = () =>
+  Cypress.env('SIGLA_UI_BASE_URL') || 'https://qa-sigla.sme.prefeitura.sp.gov.br/alvo'
+
 const convocacaoSelectors = {
   // URLs
   urls: {
-    home: 'https://qa-sigla.sme.prefeitura.sp.gov.br/',
+    home: obterBaseUrlAlvo(),
     listaConvocacoes: '/convocacao'
   },
 
@@ -116,16 +121,8 @@ const obterCredenciaisVisualizacao = () => ({
   senha: Cypress.env('SIGLA_LOGIN_SENHA') || 'Alvo123@'
 })
 
-const realizarLogin = (rf, senha) => {
-  cy.visit('https://qa-sigla.sme.prefeitura.sp.gov.br/login')
-  cy.get('input').filter('[type="text"], [type="number"]').first().clear().type(rf, { delay: 100 })
-  cy.wait(500)
-  cy.get('input[type="password"]').clear().type(senha, { delay: 100 })
-  cy.wait(500)
-  cy.contains('button', /Acessar|Entrar|Login/i).click()
-  cy.wait(3000)
-  cy.url().should('not.include', '/login')
-}
+// /alvo/login não existe mais (ALVO 1.0.33.01): login só pelo portal /sigla/login
+const realizarLogin = (rf, senha) => realizarLoginPortalAlvo(rf, senha)
 
 const validarBotaoDesabilitado = (botao) => {
   botao.should('exist')

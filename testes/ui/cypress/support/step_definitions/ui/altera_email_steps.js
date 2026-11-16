@@ -8,15 +8,14 @@ import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
 
 const meusDadosSelectors = {
   urls: {
-    home: 'https://qa-sigla.sme.prefeitura.sp.gov.br',
+    home: 'https://qa-sigla.sme.prefeitura.sp.gov.br/alvo',
     meusDados: '/meus-dados'
   },
 
   perfil: {
-    // XPath confirmado via inspeção do DOM
-    botao: '//*[@id="root"]/div/div/header/div/div[2]/span',
-    // Dropdown renderizado no body pelo Ant Design — coberto por cy.contains()
-    dadosUsuario: '/html/body/div[2]/div/ul/li[1]/span'
+    // XPath confirmado via inspeção do DOM (layout /alvo); o clique leva
+    // direto para /alvo/meus-dados, sem dropdown intermediário
+    botao: '//*[@id="root"]/div/div/header/div/button[1]'
   },
 
   modal: {
@@ -67,19 +66,10 @@ const criarRegex = (texto) =>
 
 When('acesso o menu de perfil do usuário', () => {
   cy.wait(800)
-  // XPath confirmado via inspeção: span wrapping o ícone SVG no header
-  cy.xpath('//*[@id="root"]/div/div/header/div/div[2]/span')
+  cy.xpath(meusDadosSelectors.perfil.botao, { timeout: 20000 })
     .should('exist')
     .click({ force: true })
   cy.wait(800)
-})
-
-When('seleciono {string} no menu de perfil', () => {
-  // XPath confirmado via inspeção: li[1]/span do dropdown Ant Design renderizado no body
-  cy.xpath('/html/body/div[2]/div/ul/li[1]/span')
-    .should('be.visible')
-    .click({ force: true })
-  cy.wait(1500)
 })
 
 // =====================================================

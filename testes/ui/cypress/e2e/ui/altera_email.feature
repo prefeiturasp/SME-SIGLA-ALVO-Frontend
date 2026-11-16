@@ -8,13 +8,13 @@ Funcionalidade: Meus Dados — Alteração de E-mail
   Contexto:
     Dado que estou logado no SIGLA com perfil administrador
 
-  # BASE URL : https://qa-sigla.sme.prefeitura.sp.gov.br
+  # BASE URL  : https://qa-sigla.sme.prefeitura.sp.gov.br/alvo
+  # LOGIN URL : https://qa-sigla.sme.prefeitura.sp.gov.br/sigla/login
 
   # CENÁRIO 1 — Preencher campos do modal de alteração de e-mail e cancelar
   @alterar-email @preenchimento @critico
   Cenário: Preencher campos do modal de alteração de e-mail e cancelar
     Quando acesso o menu de perfil do usuário
-    E seleciono "Dados do Usuário" no menu de perfil
     Então o sistema exibe a tela "Meus Dados"
     Quando clico em "Alterar e-mail" nos meus dados
     Então o modal de alterar e-mail é exibido
@@ -42,7 +42,6 @@ Funcionalidade: Meus Dados — Alteração de E-mail
   @meus-dados @critico
   Cenário: Validar campos exibidos na tela Meus Dados
     Quando acesso o menu de perfil do usuário
-    E seleciono "Dados do Usuário" no menu de perfil
     Então o sistema exibe a tela "Meus Dados"
     E o sistema exibe os campos do perfil do usuário:
       | Nome completo    |
@@ -55,7 +54,6 @@ Funcionalidade: Meus Dados — Alteração de E-mail
   @alterar-email @critico
   Cenário: Validar modal de alteração de e-mail
     Quando acesso o menu de perfil do usuário
-    E seleciono "Dados do Usuário" no menu de perfil
     Então o sistema exibe a tela "Meus Dados"
     Quando clico em "Alterar e-mail" nos meus dados
     Então o modal de alterar e-mail é exibido
@@ -67,7 +65,6 @@ Funcionalidade: Meus Dados — Alteração de E-mail
   @alterar-email @cancelamento @critico
   Cenário: Cancelar alteração de e-mail fecha o modal
     Quando acesso o menu de perfil do usuário
-    E seleciono "Dados do Usuário" no menu de perfil
     Então o sistema exibe a tela "Meus Dados"
     Quando clico em "Alterar e-mail" nos meus dados
     Então o modal de alterar e-mail é exibido
@@ -86,7 +83,6 @@ Funcionalidade: Meus Dados — Alteração de E-mail
       | Relatórios detalhados.         |
       | Acompanhamento em tempo real.  |
     Quando acesso o menu de perfil do usuário
-    E seleciono "Dados do Usuário" no menu de perfil
     Então o sistema exibe a tela "Meus Dados"
     E o sistema exibe os campos do perfil do usuário:
       | Nome completo    |

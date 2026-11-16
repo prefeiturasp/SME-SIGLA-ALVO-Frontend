@@ -89,7 +89,7 @@ module.exports = defineConfig({
       IMPORTA_BASE_PATH: '/ms-importa-arquivos/api/v1',
 
       // UI SIGLA — Frontend Base URL
-      SIGLA_UI_BASE_URL: process.env.SIGLA_UI_BASE_URL || 'https://qa-sigla.sme.prefeitura.sp.gov.br',
+      SIGLA_UI_BASE_URL: process.env.SIGLA_UI_BASE_URL || 'https://qa-sigla.sme.prefeitura.sp.gov.br/alvo',
 
       // CREDENCIAIS DE LOGIN — SIGLA UI (Perfil Administrador)
       SIGLA_LOGIN_RF: process.env.SIGLA_LOGIN_RF || '007001',

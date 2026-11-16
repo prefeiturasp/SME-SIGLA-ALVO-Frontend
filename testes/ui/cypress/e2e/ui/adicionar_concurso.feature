@@ -7,9 +7,10 @@ Funcionalidade: Cadastro de Concursos
   Para disponibilizar concursos para futuras candidaturas
 
   Contexto:
-    Dado que estou logado no SIGLA com perfil administrador
+    Dado que estou logado no ALVO pelo portal SIGLA
 
-  # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br
+  # LOGIN URL  : https://qa-sigla.sme.prefeitura.sp.gov.br/sigla/login
+  # BASE URL   : https://qa-sigla.sme.prefeitura.sp.gov.br/alvo
 
   # CENÁRIO 1 — Cadastrar concurso com sucesso
   @cadastro-concurso @e2e
