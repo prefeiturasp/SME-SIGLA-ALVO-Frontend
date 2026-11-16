@@ -10,6 +10,8 @@ interface ImportMetaEnv {
   readonly VITE_ESCOLHAS_API_URL?: string;
   readonly VITE_AGENDA_API_URL?: string;
   readonly VITE_RELATORIOS_API_URL?: string;
+  /** Somente uso local: quando "local", aplica sessão via query string. */
+  readonly ENVIRONMENT?: string;
 }
 
 interface ImportMeta {

@@ -10,11 +10,16 @@ import type { INewSampleModalProps } from '../BaseTela';
 // Mock do useNavigate
 const mockNavigate = jest.fn();
 const mockUseLocation = jest.fn(() => ({ pathname: '/processos/convocacao' }));
+const mockEncerrarSessao = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
   useLocation: () => mockUseLocation(),
+}));
+
+jest.mock('../../../utils/autenticacao', () => ({
+  encerrarSessao: (...args: unknown[]) => mockEncerrarSessao(...args),
 }));
 
 // Mock do localStorage
@@ -551,9 +556,7 @@ describe('BaseTela Component', () => {
       const logoutIcon = screen.getByTestId('logout-icon');
       await user.click(logoutIcon);
 
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith('TOKEN');
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith('USUARIO');
-      expect(mockNavigate).toHaveBeenCalledWith('/login');
+      expect(mockEncerrarSessao).toHaveBeenCalled();
     });
   });
 

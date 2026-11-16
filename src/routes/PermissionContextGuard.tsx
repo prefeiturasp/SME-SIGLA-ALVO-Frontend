@@ -72,7 +72,10 @@ export interface PermissionContextGuardProps {
   if (isLoading && !isError) {
     return  <LoadingContainer data-testid="@loading-element"><Spin size="large" spinning/></LoadingContainer>   
   }
-
+  console.log("dota 3");
+  console.log(can(permissaoDeExibirATELA));
+  console.log(isLoading);
+  console.log(isError);
   if (!can(permissaoDeExibirATELA) && !isLoading && !isError) { 
     const to = redirectTo || '/403';
     return <Navigate to={to} replace />;

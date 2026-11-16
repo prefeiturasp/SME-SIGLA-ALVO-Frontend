@@ -14,8 +14,6 @@ import {
   Row,
   Steps,
   Typography,
-  Alert,
-  Button,
   Divider,
   Table,
   Space,
@@ -26,7 +24,7 @@ import { FormLabelStyled } from "./EstiloLabels";
 import { CardTitleStyled } from "./EstiloTituloCard";
 import { PageTitleStyled } from "./EstiloTituloPagina";
 import { tableConfirmIcon, tableCancelIcon } from "./EstiloIcones";
-import { QuestionCircleOutlined, UserOutlined, BarChartOutlined, SettingOutlined } from "@ant-design/icons";
+import { UserOutlined, BarChartOutlined, SettingOutlined } from "@ant-design/icons";
 import { AppFormItemStyled } from "@/components/ui/Form/AppFormItem";
 
 const { controlHeight, borderRadius, colors, fontFamily } = tokens;
@@ -3490,157 +3488,6 @@ export const FilterActionsBelow = styled.div`
 
 /** @deprecated Use FilterActionsBelow para ações abaixo; FilterActionsGroup para inline */
 export const FilterActions = FilterActionsBelow;
-
-// ===== LoginLayout.tsx =====
-
-export const LoginContainer = styled.div`
-  display: flex;
-  min-height: 100vh;
-  background-color: #f5f5f5;
-`;
-
-export const LeftSide = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-  background-color: #ffffff;
-`;
-
-export const LoginCard = styled.div`
-  background: #ffffff;
-  border-radius: 0.5rem;
-  padding: 1.5rem 2rem 1rem 2rem;
-  box-shadow: 0 0.25rem 1.25rem rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 31.25rem;
-  min-width: 28.125rem;
-`;
-
-export const StyledForm = styled.form`
-  width: 100%;
-`;
-
-export const FormField = styled.div`
-  margin-bottom: 1.5rem;
-`;
-
-export { LoginFieldLabel } from "./EstiloLabels";
-
-export const LoginErrorMessage = styled.div`
-  color: ${formErrorText.color};
-  font-size: ${formErrorText.fontSize};
-  margin-top: ${formErrorText.marginTop}px;
-`;
-
-export const StyledButton = styled(PrimaryButtonStyled)`
-  width: 100%;
-  margin-top: 0.5rem;
-`;
-
-export const ForgotPasswordLink = styled.button`
-  background: none;
-  border: none;
-  color: ${tokens.colors.secondary};
-  cursor: pointer;
-  margin-top: 1rem;
-  width: 100%;
-  text-align: center;
-  font-size: 14px;
-`;
-
-export const PrefLogoContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 2rem;
-`;
-
-export const PrefLogoImage = styled.img`
-  max-width: 12rem;
-  height: auto;
-`;
-
-export const StyledTitle = styled(Title)`
-  && {
-    text-align: center;
-    margin-bottom: 0.5rem !important;
-  }
-`;
-
-export const LoginText = styled(Text)`
-  display: block;
-  text-align: center;
-  color: #515151;
-  margin-bottom: 1.5rem;
-`;
-
-export const StyledAlert = styled(Alert)`
-  margin-bottom: 1rem;
-`;
-
-export const StyledTooltipIcon = styled(QuestionCircleOutlined)`
-  color: ${tokens.colors.secondary};
-  font-size: 14px;
-`;
-
-export const BackToLoginButton = styled(Button)`
-  width: 100%;
-  margin-top: 1rem;
-`;
-
-export const ImportantNoticeContainer = styled.div`
-  background: #fff7e6;
-  border: 1px solid #ffd591;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-`;
-
-export const ImportantText = styled(Text)`
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-`;
-
-export const NoticeText = styled(Text)`
-  display: block;
-  color: #515151;
-`;
-
-export const PasswordRequirementsList = styled.ul`
-  margin: 1rem 0;
-  padding-left: 1.25rem;
-`;
-
-export const PasswordRequirementTitle = styled(Text)`
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-`;
-
-export const RequirementItem = styled.li<{ $valid?: boolean }>`
-  color: ${({ $valid }) => ($valid ? "#52c41a" : "#515151")};
-  margin-bottom: 0.25rem;
-`;
-
-export const LoginSelect = styled(Select)`
-  width: 100%;
-`;
-
-export const SuccessMessage = styled.span`
-  display: inline;
-`;
-
-export const EmailText = styled.strong`
-  font-weight: 700;
-`;
-
-export const InstructionsText = styled.span`
-  display: block;
-  color: #515151;
-`;
 
 // ===== HomeLayout.tsx =====
 

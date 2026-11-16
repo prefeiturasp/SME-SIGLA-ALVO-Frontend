@@ -9,6 +9,7 @@ import {
   IconeSairCabecalho,
 } from "@/components/ui";
 import { useNavigate } from "react-router-dom";
+import { encerrarSessao } from "@/utils/autenticacao";
 
 export const UserAvatar: React.FC = () => {
   const rf = localStorage.getItem("USUARIO") || "";
@@ -16,10 +17,7 @@ export const UserAvatar: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("TOKEN");
-    localStorage.removeItem("USUARIO");
-    localStorage.removeItem("NOME_USUARIO");
-    navigate("/login");
+    encerrarSessao();
   };
 
   return (

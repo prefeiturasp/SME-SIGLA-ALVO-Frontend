@@ -44,14 +44,6 @@ export const ModalFieldLabel = BlockFormLabel;
 /** Label de informação em modais */
 export const ModalInfoLabel = FormLabelStyled;
 
-/** Login: label com espaço para ícone de ajuda */
-export const LoginFieldLabel = styled(FormLabelStyled)`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  margin-bottom: 0.75rem;
-`;
-
 export const ProfileFieldLabel = BlockFormLabel;
 
 export const MeusDadosFieldLabel = BlockFormLabel;

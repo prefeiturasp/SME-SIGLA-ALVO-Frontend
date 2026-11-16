@@ -11,12 +11,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "styled-components";
 import { theme as antdThemeApi, ConfigProvider, App as AntdApp } from "antd";
 import { antdTheme as appTheme } from "./design-system/antdTheme";
+import { hidratarEnvLocal } from "./config/hidratarEnvLocal";
+import { aplicarSessaoDaQuery } from "./utils/autenticacao";
+
+hidratarEnvLocal();
+aplicarSessaoDaQuery();
 
 const { useToken } = antdThemeApi;
 
 const queryClient = new QueryClient();
-
- 
 
 function ThemedApp() {
   const { token } = useToken();
@@ -27,7 +30,6 @@ function ThemedApp() {
     </ThemeProvider>
   );
 }
-
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

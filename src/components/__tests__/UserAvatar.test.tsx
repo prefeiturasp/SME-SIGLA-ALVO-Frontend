@@ -3,9 +3,15 @@ import { MemoryRouter } from 'react-router-dom';
 import { UserAvatar } from '../UserAvatar';
 
 const mockNavigate = jest.fn();
+const mockEncerrarSessao = jest.fn();
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
+}));
+
+jest.mock('@/utils/autenticacao', () => ({
+  encerrarSessao: (...args: unknown[]) => mockEncerrarSessao(...args),
 }));
 
 const renderizar = () =>
@@ -19,6 +25,7 @@ describe('UserAvatar', () => {
   beforeEach(() => {
     localStorage.clear();
     mockNavigate.mockClear();
+    mockEncerrarSessao.mockClear();
   });
 
   it('mostra RF e nome do usuário logado', () => {
@@ -50,7 +57,7 @@ describe('UserAvatar', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/meus-dados');
   });
 
-  it('limpa a sessão e volta para o login ao clicar em Sair', () => {
+  it('encerra a sessão ao clicar em Sair', () => {
     localStorage.setItem('TOKEN', 'token');
     localStorage.setItem('USUARIO', '1234567');
     localStorage.setItem('NOME_USUARIO', 'Marcus');
@@ -59,9 +66,6 @@ describe('UserAvatar', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Sair' }));
 
-    expect(localStorage.getItem('TOKEN')).toBeNull();
-    expect(localStorage.getItem('USUARIO')).toBeNull();
-    expect(localStorage.getItem('NOME_USUARIO')).toBeNull();
-    expect(mockNavigate).toHaveBeenCalledWith('/login');
+    expect(mockEncerrarSessao).toHaveBeenCalled();
   });
 });
