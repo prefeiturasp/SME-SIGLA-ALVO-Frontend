@@ -1,7 +1,8 @@
 import {
   aplicarSessaoDaQuery,
   encerrarSessao,
-  URL_LOGIN_PORTAL,
+  SIGLA_LOGIN_PATH,
+  urlLogin,
 } from "../autenticacao";
 
 describe("autenticacao", () => {
@@ -11,8 +12,23 @@ describe("autenticacao", () => {
     window.history.replaceState(null, "", "/alvo/");
   });
 
-  it("expõe a URL do login do portal", () => {
-    expect(URL_LOGIN_PORTAL).toBe("/login");
+  it("expõe o path de login do portal fora do ambiente local", () => {
+    expect(SIGLA_LOGIN_PATH).toBe("/sigla/login");
+    expect(urlLogin("qa")).toBe("/sigla/login");
+    expect(urlLogin(undefined)).toBe("/sigla/login");
+  });
+
+  it("usa SIGLA_URL/login quando ENVIRONMENT=local", () => {
+    expect(urlLogin("local", "http://localhost:5173")).toBe(
+      "http://localhost:5173/login",
+    );
+    expect(urlLogin("local", "http://localhost:5173/")).toBe(
+      "http://localhost:5173/login",
+    );
+  });
+
+  it("mantém SIGLA_LOGIN_PATH em local sem SIGLA_URL", () => {
+    expect(urlLogin("local", undefined)).toBe("/sigla/login");
   });
 
   it("limpa a sessão e chama o callback ao encerrar", () => {
