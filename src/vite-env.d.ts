@@ -12,6 +12,8 @@ interface ImportMetaEnv {
   readonly VITE_RELATORIOS_API_URL?: string;
   /** Somente uso local: quando "local", aplica sessão via query string. */
   readonly ENVIRONMENT?: string;
+  /** URL base do portal SIGLA em ambiente local (ex.: http://localhost:5173). */
+  readonly SIGLA_URL?: string;
 }
 
 interface ImportMeta {

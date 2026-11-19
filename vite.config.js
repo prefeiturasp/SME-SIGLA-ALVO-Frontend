@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => {
   const base = normalizarBase(basePath);
 
   const environment = process.env.ENVIRONMENT ?? env.ENVIRONMENT ?? "";
+  const siglaUrl = process.env.SIGLA_URL ?? env.SIGLA_URL ?? "";
 
   console.info(
     `[vite] base = ${base} (VITE_BASE_PATH=${basePath ?? "(nao definido)"})`,
@@ -26,6 +27,7 @@ export default defineConfig(({ mode }) => {
     base,
     define: {
       "import.meta.env.ENVIRONMENT": JSON.stringify(environment),
+      "import.meta.env.SIGLA_URL": JSON.stringify(siglaUrl),
     },
     plugins: [
       react(),

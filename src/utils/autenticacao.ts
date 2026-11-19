@@ -1,10 +1,32 @@
 /** Login fica no portal SIGLA (fora do basename /alvo/). */
-export const URL_LOGIN_PORTAL = "/login";
+export const SIGLA_LOGIN_PATH = "/sigla/login";
 
 const CAMPOS_SESSAO = ["TOKEN", "USUARIO", "NOME_USUARIO"] as const;
 
+export function obterEnvironment(): string | undefined {
+  const valor = window.__ENV__?.ENVIRONMENT;
+  return valor || undefined;
+}
+
+export function obterSiglaUrl(): string | undefined {
+  const valor = window.__ENV__?.SIGLA_URL;
+  return valor || undefined;
+}
+
+/** Em ENVIRONMENT=local usa SIGLA_URL/login; senão SIGLA_LOGIN_PATH. */
+export function urlLogin(
+  environment: string | undefined = obterEnvironment(),
+  siglaUrl: string | undefined = obterSiglaUrl(),
+): string {
+  if (environment === "local" && siglaUrl) {
+    const base = siglaUrl.replace(/\/$/, "");
+    return `${base}/login`;
+  }
+  return SIGLA_LOGIN_PATH;
+}
+
 export function redirecionarParaLogin(): void {
-  window.location.assign(URL_LOGIN_PORTAL);
+  window.location.assign(urlLogin());
 }
 
 export function encerrarSessao(
@@ -18,11 +40,6 @@ export function encerrarSessao(
     // storage indisponível
   }
   aoFinalizar();
-}
-
-export function obterEnvironment(): string | undefined {
-  const valor = window.__ENV__?.ENVIRONMENT;
-  return valor || undefined;
 }
 
 /**
